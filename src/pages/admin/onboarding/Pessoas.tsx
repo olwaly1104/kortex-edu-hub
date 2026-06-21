@@ -2,7 +2,7 @@ import { useState } from "react";
 import { markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserPlus, GraduationCap, Briefcase, Trash2, User } from "lucide-react";
+import { GraduationCap, Briefcase, Trash2, User, Plus } from "lucide-react";
 
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,16 +26,14 @@ export default function OnboardingPessoas({ mode }: { mode: Mode }) {
 /* ---------------- Shared header ---------------- */
 
 function PageHeader({
-  icon: Icon, title, subtitle, ctaLabel, onCta,
+  icon: Icon, title, subtitle,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
   subtitle: string;
-  ctaLabel: string;
-  onCta: () => void;
 }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 pb-1">
       <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
         <Icon className="w-5 h-5" />
       </div>
@@ -43,35 +41,7 @@ function PageHeader({
         <h1 className="text-lg font-semibold leading-tight">{title}</h1>
         <p className="text-xs text-muted-foreground">{subtitle}</p>
       </div>
-      <Button size="sm" onClick={onCta} className="gap-1.5">
-        <UserPlus className="w-3.5 h-3.5" /> {ctaLabel}
-      </Button>
     </div>
-  );
-}
-
-function EmptyPanel({
-  icon: Icon, title, hint, ctaLabel, onCta,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  hint: string;
-  ctaLabel: string;
-  onCta: () => void;
-}) {
-  return (
-    <Card className="p-10 flex flex-col items-center justify-center text-center gap-3">
-      <div className="w-12 h-12 rounded-full bg-muted text-muted-foreground flex items-center justify-center">
-        <Icon className="w-6 h-6" />
-      </div>
-      <div>
-        <p className="text-sm font-semibold">{title}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{hint}</p>
-      </div>
-      <Button size="sm" onClick={onCta} className="gap-1.5">
-        <UserPlus className="w-3.5 h-3.5" /> {ctaLabel}
-      </Button>
-    </Card>
   );
 }
 
@@ -105,51 +75,47 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
 
   const remove = (id: string) => persist(rows.filter((r) => r.id !== id));
 
+  const gridCols = "grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.9fr_0.9fr_48px]";
+
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
       <PageHeader
         icon={GraduationCap}
         title="Docentes"
         subtitle="Registo completo do corpo docente. O email institucional @upra.kor é gerado automaticamente."
-        ctaLabel="Adicionar Docente"
-        onCta={() => setOpen(true)}
       />
 
-
-
-      {rows.length === 0 ? (
-        <EmptyPanel
-          icon={GraduationCap}
-          title="Nenhum docente registado"
-          hint="Adicione docentes para os atribuir a faculdades, cursos e cargos."
-          ctaLabel="Adicionar Docente"
-          onCta={() => setOpen(true)}
-        />
-      ) : (
-        <Card className="overflow-hidden">
-          <div className="grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.9fr_0.9fr_48px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-            <span></span><span>Docente</span><span>Email</span><span>Faculdade</span><span>Departamento</span><span>Grau</span><span>Cargo</span><span></span>
-          </div>
-          <div className="divide-y">
-            {rows.map((r) => (
-              <div key={r.id} className="grid grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.9fr_0.9fr_48px] gap-2 px-4 py-2.5 items-center">
-                <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex items-center justify-center text-muted-foreground">
-                  {r.fotoDataUrl ? <img src={r.fotoDataUrl} alt="" className="w-full h-full object-cover" /> : <User className="w-4 h-4" />}
-                </div>
-                <span className="text-xs font-medium truncate">{r.prefixo} {r.primeiroNome} {r.ultimoNome}</span>
-                <span className="text-xs text-muted-foreground truncate font-mono">{r.email}</span>
-                <span className="text-xs truncate">{r.faculdade || <span className="text-muted-foreground italic">—</span>}</span>
-                <span className="text-xs truncate">{r.departamento || <span className="text-muted-foreground italic">—</span>}</span>
-                <span className="text-xs">{r.grau || "—"}</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-primary/10 text-primary w-fit">{r.cargo}</span>
-                <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => remove(r.id)}>
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
+      <Card className="overflow-hidden">
+        <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
+          <span></span><span>Docente</span><span>Email</span><span>Faculdade</span><span>Departamento</span><span>Grau</span><span>Cargo</span><span></span>
+        </div>
+        <div className="divide-y">
+          {rows.map((r) => (
+            <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2.5 items-center`}>
+              <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex items-center justify-center text-muted-foreground">
+                {r.fotoDataUrl ? <img src={r.fotoDataUrl} alt="" className="w-full h-full object-cover" /> : <User className="w-4 h-4" />}
               </div>
-            ))}
-          </div>
-        </Card>
-      )}
+              <span className="text-xs font-medium truncate">{r.prefixo} {r.primeiroNome} {r.ultimoNome}</span>
+              <span className="text-xs text-muted-foreground truncate font-mono">{r.email}</span>
+              <span className="text-xs truncate">{r.faculdade || <span className="text-muted-foreground italic">—</span>}</span>
+              <span className="text-xs truncate">{r.departamento || <span className="text-muted-foreground italic">—</span>}</span>
+              <span className="text-xs">{r.grau || "—"}</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-primary/10 text-primary w-fit">{r.cargo}</span>
+              <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => remove(r.id)}>
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          ))}
+          {rows.length === 0 && (
+            <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem docentes registados.</p>
+          )}
+        </div>
+        <div className="border-t bg-muted/10 px-4 py-2.5">
+          <Button variant="ghost" size="sm" onClick={() => setOpen(true)} className="h-8 gap-1.5 text-primary hover:text-primary hover:bg-primary/5">
+            <Plus className="w-3.5 h-3.5" /> Adicionar docente
+          </Button>
+        </div>
+      </Card>
 
       <DocenteFormDialog open={open} onOpenChange={setOpen} onSave={onSave} />
     </div>
@@ -188,48 +154,46 @@ function StaffOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
 
   const remove = (id: string) => persist(rows.filter((r) => r.id !== id));
 
+  const gridCols = "grid-cols-[40px_1.4fr_1.4fr_1fr_0.9fr_0.9fr_48px]";
+
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
       <PageHeader
         icon={Briefcase}
         title="Staff"
         subtitle="Registo do pessoal administrativo. O email institucional @upra.kor é gerado automaticamente."
-        ctaLabel="Adicionar Staff"
-        onCta={() => setOpen(true)}
       />
 
-      {rows.length === 0 ? (
-        <EmptyPanel
-          icon={Briefcase}
-          title="Nenhum funcionário registado"
-          hint="Adicione funcionários para atribuir departamentos e funções."
-          ctaLabel="Adicionar Staff"
-          onCta={() => setOpen(true)}
-        />
-      ) : (
-        <Card className="overflow-hidden">
-          <div className="grid grid-cols-[40px_1.4fr_1.4fr_1fr_0.9fr_0.9fr_48px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-            <span></span><span>Funcionário</span><span>Email</span><span>Departamento</span><span>Função</span><span>Módulo</span><span></span>
-          </div>
-          <div className="divide-y">
-            {rows.map((r) => (
-              <div key={r.id} className="grid grid-cols-[40px_1.4fr_1.4fr_1fr_0.9fr_0.9fr_48px] gap-2 px-4 py-2.5 items-center">
-                <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex items-center justify-center text-muted-foreground">
-                  {r.fotoDataUrl ? <img src={r.fotoDataUrl} alt="" className="w-full h-full object-cover" /> : <User className="w-4 h-4" />}
-                </div>
-                <span className="text-xs font-medium truncate">{r.prefixo} {r.primeiroNome} {r.ultimoNome}</span>
-                <span className="text-xs text-muted-foreground truncate font-mono">{r.email}</span>
-                <span className="text-xs truncate">{r.departamento || <span className="text-muted-foreground italic">—</span>}</span>
-                <span className="text-xs truncate">{r.funcao || "—"}</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-primary/10 text-primary w-fit capitalize">{r.moduloKortex || "—"}</span>
-                <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => remove(r.id)}>
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
+      <Card className="overflow-hidden">
+        <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
+          <span></span><span>Funcionário</span><span>Email</span><span>Departamento</span><span>Função</span><span>Módulo</span><span></span>
+        </div>
+        <div className="divide-y">
+          {rows.map((r) => (
+            <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2.5 items-center`}>
+              <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex items-center justify-center text-muted-foreground">
+                {r.fotoDataUrl ? <img src={r.fotoDataUrl} alt="" className="w-full h-full object-cover" /> : <User className="w-4 h-4" />}
               </div>
-            ))}
-          </div>
-        </Card>
-      )}
+              <span className="text-xs font-medium truncate">{r.prefixo} {r.primeiroNome} {r.ultimoNome}</span>
+              <span className="text-xs text-muted-foreground truncate font-mono">{r.email}</span>
+              <span className="text-xs truncate">{r.departamento || <span className="text-muted-foreground italic">—</span>}</span>
+              <span className="text-xs truncate">{r.funcao || "—"}</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-primary/10 text-primary w-fit capitalize">{r.moduloKortex || "—"}</span>
+              <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => remove(r.id)}>
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          ))}
+          {rows.length === 0 && (
+            <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem funcionários registados.</p>
+          )}
+        </div>
+        <div className="border-t bg-muted/10 px-4 py-2.5">
+          <Button variant="ghost" size="sm" onClick={() => setOpen(true)} className="h-8 gap-1.5 text-primary hover:text-primary hover:bg-primary/5">
+            <Plus className="w-3.5 h-3.5" /> Adicionar staff
+          </Button>
+        </div>
+      </Card>
 
       <StaffFormDialog open={open} onOpenChange={setOpen} onSave={onSave} />
     </div>
