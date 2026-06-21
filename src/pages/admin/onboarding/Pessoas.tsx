@@ -117,7 +117,6 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
         icon={GraduationCap}
         title="Docentes"
         subtitle="Registo completo do corpo docente. O email institucional @upra.kor é gerado automaticamente."
-        count={rows.length}
         ctaLabel="Adicionar Docente"
         onCta={() => setOpen(true)}
       />
