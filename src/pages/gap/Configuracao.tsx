@@ -338,11 +338,6 @@ export default function GapConfiguracao() {
           icon={<Settings2 className="w-6 h-6 text-primary" />}
         />
       )}
-      {isOnboarding && (
-        <div className="flex justify-end">
-          <Button size="sm" onClick={confirmCurrentStep} className="gap-1.5"><Check className="w-3.5 h-3.5" /> Confirmar passo</Button>
-        </div>
-      )}
 
       <Tabs value={tab} onValueChange={setTab} className="space-y-6">
         <TabsList className="grid grid-cols-4 w-full max-w-3xl">

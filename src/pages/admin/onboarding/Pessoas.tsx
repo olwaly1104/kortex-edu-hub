@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserPlus, GraduationCap, Briefcase, Trash2, User } from "lucide-react";
+import { UserPlus, GraduationCap, Briefcase, Trash2, User, Users, BookOpen, Award, Medal } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { provisionKortexUser } from "@/lib/accountProvisioning";
@@ -35,7 +35,7 @@ function PageHeader({
   onCta: () => void;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Dados (title) above */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
@@ -48,10 +48,10 @@ function PageHeader({
       </div>
 
       {/* Registos left · CTA right */}
-      <div className="flex items-center gap-3 border-y border-border/60 py-2.5">
-        <div className="flex items-baseline gap-2">
+      <div className="flex items-center gap-3 border-y border-border/60 py-1.5">
+        <div className="flex items-baseline gap-1.5">
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Registos</span>
-          <span className="text-lg font-bold tabular-nums leading-none">{count}</span>
+          <span className="text-sm font-bold tabular-nums leading-none">{count}</span>
         </div>
         <Button size="sm" onClick={onCta} className="ml-auto gap-1.5">
           <UserPlus className="w-3.5 h-3.5" /> {ctaLabel}
@@ -116,6 +116,13 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
 
   const remove = (id: string) => persist(rows.filter((r) => r.id !== id));
 
+  const docenteCounts = useMemo(() => ({
+    total: rows.length,
+    licenciados: rows.filter(r => r.grau === "Licenciatura").length,
+    mestres: rows.filter(r => r.grau === "Mestrado").length,
+    doutorados: rows.filter(r => r.grau === "Doutoramento" || r.grau === "Agregação").length,
+  }), [rows]);
+
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
       <PageHeader
@@ -126,6 +133,26 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
         ctaLabel="Adicionar Docente"
         onCta={() => setOpen(true)}
       />
+
+      {/* Dados */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {[
+          { label: "Total", value: docenteCounts.total, Icon: Users },
+          { label: "Licenciados", value: docenteCounts.licenciados, Icon: BookOpen },
+          { label: "Mestres", value: docenteCounts.mestres, Icon: Award },
+          { label: "Doutorados", value: docenteCounts.doutorados, Icon: Medal },
+        ].map((k) => (
+          <Card key={k.label} className="p-3 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-md bg-muted text-foreground flex items-center justify-center">
+              <k.Icon className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground truncate">{k.label}</p>
+              <p className="text-base font-semibold leading-none">{k.value}</p>
+            </div>
+          </Card>
+        ))}
+      </div>
 
       {rows.length === 0 ? (
         <EmptyPanel
