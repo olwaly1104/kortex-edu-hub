@@ -121,6 +121,11 @@ export default function CalendarioAcademico() {
     setEventos(prev => prev.map(e => {
       if (e.id !== id) return e;
       const next = { ...e, ...patch };
+      if ("tipo" in patch && next.tipo === "exames") {
+        next.epoca ??= "1";
+        next.semestre ??= "1";
+        next.titulo = buildExameTitulo(next.epoca, next.semestre);
+      }
       if (next.tipo === "exames" && ("epoca" in patch || "semestre" in patch)) {
         next.titulo = buildExameTitulo(next.epoca, next.semestre);
       }
