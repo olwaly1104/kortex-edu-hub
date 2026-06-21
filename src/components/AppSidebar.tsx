@@ -250,7 +250,7 @@ const adminSections: NavSection[] = [
     { label: "Meu Perfil", icon: User, path: "/admin/perfil" },
   ]},
   { title: "Configurar", items: [
-    { label: "Faculdades & Cursos", icon: Building2, path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
+    { label: "Área Académica", icon: Building2, path: "/admin/faculdades-cursos?tab=faculdades&step=aca.fac" },
     { label: "RH", icon: UserCog, path: "/admin/onboarding/rh?tab=docentes&step=rh.doc" },
     
     { label: "Geopontos", icon: MapPin, path: "/admin/onboarding/geopontos?step=geo.reg" },
