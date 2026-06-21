@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import OnboardingPessoas from "./Pessoas";
 import OnboardingRegrasPresenca from "./RegrasPresenca";
 
-type Departamento = { id: string; sigla: string; designacao: string; responsavel: string | null };
+type Departamento = { id: string; sigla: string; designacao: string; responsavel: string | null; cor: string | null };
 
 function DepartamentosPanel() {
   const { user } = useAuth();
