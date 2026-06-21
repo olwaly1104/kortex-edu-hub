@@ -346,6 +346,36 @@ export type Database = {
           },
         ]
       }
+      departamentos: {
+        Row: {
+          created_at: string
+          designacao: string
+          id: string
+          owner_user_id: string
+          responsavel: string | null
+          sigla: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          designacao: string
+          id?: string
+          owner_user_id: string
+          responsavel?: string | null
+          sigla: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          designacao?: string
+          id?: string
+          owner_user_id?: string
+          responsavel?: string | null
+          sigla?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       edificios: {
         Row: {
           created_at: string
