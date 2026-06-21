@@ -7,9 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  BookOpen, Check, ArrowLeft, Plus, Trash2, GraduationCap,
+  BookOpen, Check, ArrowLeft, Plus, Trash2, GraduationCap, Eye,
   Building2, ChevronDown, ChevronRight, Users, Timer, Loader2,
 } from "lucide-react";
+import { CadeiraPreviewDialog } from "@/components/admin/CadeiraPreviewDialog";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -34,6 +35,7 @@ export default function GerarCadeiras() {
 
   const [cadeiraCurso, setCadeiraCurso] = useState<string>("");
   const [openFacs, setOpenFacs] = useState<Record<string, boolean>>({});
+  const [previewCadeira, setPreviewCadeira] = useState<CadeiraRow | null>(null);
   const toggleFac = (f: string) => setOpenFacs(p => ({ ...p, [f]: !p[f] }));
 
   // Auto-select first curso when data arrives.
@@ -234,8 +236,8 @@ export default function GerarCadeiras() {
                           <Plus className="w-3 h-3" /> Adicionar
                         </Button>
                       </div>
-                      <div className="grid grid-cols-[1fr_180px_90px_70px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-                        <span>Cadeira</span><span>Docente</span><span>Semestre</span><span>ECTS</span><span></span>
+                      <div className="grid grid-cols-[1fr_180px_90px_70px_36px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+                        <span>Cadeira</span><span>Docente</span><span>Semestre</span><span>ECTS</span><span></span><span></span>
                       </div>
                       {list.length === 0 ? (
                         <div className="p-4 text-xs text-muted-foreground text-center">
@@ -244,7 +246,7 @@ export default function GerarCadeiras() {
                       ) : (
                         <div className="divide-y">
                           {list.map(c => (
-                            <div key={c.id} className="grid grid-cols-[1fr_180px_90px_70px_36px] gap-2 p-2 items-center">
+                            <div key={c.id} className="grid grid-cols-[1fr_180px_90px_70px_36px_36px] gap-2 p-2 items-center">
                               <Input
                                 defaultValue={c.name}
                                 onBlur={e => {
@@ -282,6 +284,9 @@ export default function GerarCadeiras() {
                                   {[3, 4, 5, 6, 7.5, 9, 12].map(v => <SelectItem key={v} value={String(v)}>{v}</SelectItem>)}
                                 </SelectContent>
                               </Select>
+                              <Button size="icon" variant="ghost" onClick={() => setPreviewCadeira(c)} className="h-8 w-8 text-muted-foreground hover:text-primary" title="Pré-visualizar como estudante">
+                                <Eye className="w-3.5 h-3.5" />
+                              </Button>
                               <Button size="icon" variant="ghost" onClick={() => handleDelete(c.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                                 <Trash2 className="w-3.5 h-3.5" />
                               </Button>
@@ -301,7 +306,12 @@ export default function GerarCadeiras() {
       <div className="flex justify-end gap-2 pt-4">
         <Button variant="outline" asChild><Link to="/areaacademica/criador/cursos">Voltar</Link></Button>
         <Button asChild className="gap-2"><Link to="/areaacademica/criador">Concluir e voltar ao Criador <Check className="w-4 h-4" /></Link></Button>
-      </div>
+      <CadeiraPreviewDialog
+        open={!!previewCadeira}
+        onOpenChange={v => !v && setPreviewCadeira(null)}
+        cadeira={previewCadeira}
+      />
+    </div>
     </div>
   );
 }
