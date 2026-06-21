@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import OnboardingPessoas from "./Pessoas";
+import OnboardingRegrasPresenca from "./RegrasPresenca";
 
 type Departamento = { id: string; sigla: string; designacao: string; responsavel?: string };
 const DEPT_KEY = "upra_admin_departamentos_v1";
@@ -103,7 +104,7 @@ export default function OnboardingRH() {
   const onChange = (v: string) => {
     const next = new URLSearchParams(params);
     next.set("tab", v);
-    next.set("step", v === "departamentos" ? "rh.dep" : v === "docentes" ? "rh.doc" : v === "staff" ? "rh.staff" : "rh.conf");
+    next.set("step", v === "departamentos" ? "rh.dep" : v === "docentes" ? "rh.doc" : v === "staff" ? "rh.staff" : "rh.pres");
     setParams(next, { replace: true });
   };
 
@@ -135,9 +136,7 @@ export default function OnboardingRH() {
           <OnboardingPessoas mode="staff" />
         </TabsContent>
         <TabsContent value="conformidade" className="mt-4">
-          <div className="p-6 text-center text-muted-foreground text-sm">
-            Módulo de conformidade e multas em desenvolvimento.
-          </div>
+          <OnboardingRegrasPresenca />
         </TabsContent>
       </Tabs>
     </div>
