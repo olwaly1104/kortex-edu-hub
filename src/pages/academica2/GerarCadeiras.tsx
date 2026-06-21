@@ -306,7 +306,12 @@ export default function GerarCadeiras() {
       <div className="flex justify-end gap-2 pt-4">
         <Button variant="outline" asChild><Link to="/areaacademica/criador/cursos">Voltar</Link></Button>
         <Button asChild className="gap-2"><Link to="/areaacademica/criador">Concluir e voltar ao Criador <Check className="w-4 h-4" /></Link></Button>
-      </div>
+      <CadeiraPreviewDialog
+        open={!!previewCadeira}
+        onOpenChange={v => !v && setPreviewCadeira(null)}
+        cadeira={previewCadeira}
+      />
+    </div>
     </div>
   );
 }
