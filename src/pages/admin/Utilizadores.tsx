@@ -22,8 +22,9 @@ const STORAGE_KEY = "upra_admin_users_v1";
 
 const MODULOS: { value: string; label: string }[] = [
   { value: "admin", label: "Admin (Instituição)" },
-  { value: "coordenador", label: "Coordenador de Curso" },
+  { value: "estudante", label: "Estudante" },
   { value: "professor", label: "Professor" },
+  { value: "coordenador", label: "Coordenador de Curso" },
   { value: "decano", label: "Decano" },
   { value: "reitor", label: "Reitor" },
   { value: "financas", label: "Finanças" },
@@ -48,7 +49,7 @@ export default function AdminUtilizadores() {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState("");
-  const [form, setForm] = useState({ primeiroNome: "", ultimoNome: "", password: "", modulo: "coordenador" });
+  const [form, setForm] = useState({ primeiroNome: "", ultimoNome: "", password: "", modulo: "estudante" });
 
   // Institution email domain inferred from current admin's email (e.g. admin@upra.kor → upra.kor)
   const instDomain = useMemo(() => {
@@ -149,7 +150,7 @@ export default function AdminUtilizadores() {
       };
       setRows((prev) => [...prev, newRow]);
       markOnboardingStepDone(user?.email, "est.imp");
-      setForm({ primeiroNome: "", ultimoNome: "", password: "", modulo: "coordenador" });
+      setForm({ primeiroNome: "", ultimoNome: "", password: "", modulo: "estudante" });
       setOpen(false);
       refetchServer();
     } catch (e: any) {
@@ -199,9 +200,9 @@ export default function AdminUtilizadores() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <Kpi label="Total" value={allUsers.length} />
         <Kpi label="Admins" value={byModulo.admin || 0} />
-        <Kpi label="Coordenadores" value={byModulo.coordenador || 0} />
+        <Kpi label="Estudantes" value={byModulo.estudante || 0} />
         <Kpi label="Staff & Docentes" value={
-          (byModulo.professor || 0) + (byModulo.decano || 0) +
+          (byModulo.professor || 0) + (byModulo.coordenador || 0) + (byModulo.decano || 0) +
           (byModulo.reitor || 0) + (byModulo.financas || 0) + (byModulo.academica || 0) +
           (byModulo.gap || 0) + (byModulo.inscricoes || 0)
         } />

@@ -177,7 +177,7 @@ export default function AdminFaculdadesCursos() {
     setCursoEdits((e) => ({ ...e, [id]: { ...e[id], ...patch } }));
 
   const totalCursos = cursos.length;
-  const totalEstud = cursos.reduce((s, c) => s + (c.estudantes_esperados || 0), 0);
+  const coordsCount = cursos.filter((c) => (c.coordenador || "").trim()).length;
   const decanosCount = faculdades.filter((f) => (f.decano || "").trim()).length;
 
   return (
@@ -193,7 +193,7 @@ export default function AdminFaculdadesCursos() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Faculdades</p><p className="text-2xl font-bold tabular-nums">{faculdades.length}</p></div>
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Cursos</p><p className="text-2xl font-bold tabular-nums">{totalCursos}</p></div>
-        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Estudantes est.</p><p className="text-2xl font-bold tabular-nums">{totalEstud}</p></div>
+        <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Coordenadores</p><p className="text-2xl font-bold tabular-nums">{coordsCount}</p></div>
         <div className="rounded-lg border border-border bg-card p-4"><p className="text-xs text-muted-foreground">Decanos</p><p className="text-2xl font-bold tabular-nums">{decanosCount}</p></div>
       </div>
 
