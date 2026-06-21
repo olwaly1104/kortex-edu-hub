@@ -348,6 +348,7 @@ export type Database = {
       }
       departamentos: {
         Row: {
+          cor: string | null
           created_at: string
           designacao: string
           id: string
@@ -357,6 +358,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          cor?: string | null
           created_at?: string
           designacao: string
           id?: string
@@ -366,6 +368,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          cor?: string | null
           created_at?: string
           designacao?: string
           id?: string

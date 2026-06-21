@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import OnboardingPessoas from "./Pessoas";
 import OnboardingRegrasPresenca from "./RegrasPresenca";
 
-type Departamento = { id: string; sigla: string; designacao: string; responsavel: string | null };
+type Departamento = { id: string; sigla: string; designacao: string; responsavel: string | null; cor: string | null };
 
 function DepartamentosPanel() {
   const { user } = useAuth();
@@ -24,7 +24,7 @@ function DepartamentosPanel() {
     (async () => {
       const { data, error } = await (supabase as any)
         .from("departamentos")
-        .select("id, sigla, designacao, responsavel")
+        .select("id, sigla, designacao, responsavel, cor")
         .order("created_at", { ascending: true });
       if (cancelled) return;
       if (error) {
@@ -42,8 +42,8 @@ function DepartamentosPanel() {
     if (!user?.id) { toast.error("Sessão expirada."); return; }
     const { data, error } = await (supabase as any)
       .from("departamentos")
-      .insert({ owner_user_id: user.id, sigla: "", designacao: "", responsavel: null })
-      .select("id, sigla, designacao, responsavel")
+      .insert({ owner_user_id: user.id, sigla: "", designacao: "", responsavel: null, cor: "#1B3A6B" })
+      .select("id, sigla, designacao, responsavel, cor")
       .single();
     if (error) { toast.error(error.message); return; }
     setRows((prev) => [...prev, data as Departamento]);
@@ -66,7 +66,7 @@ function DepartamentosPanel() {
     if (error) { toast.error(error.message); setRows(prev); }
   };
 
-  const gridCols = "grid-cols-[100px_1.4fr_1.4fr_64px]";
+  const gridCols = "grid-cols-[40px_100px_1.4fr_1.4fr_64px]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -82,11 +82,29 @@ function DepartamentosPanel() {
 
       <Card className="overflow-hidden">
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
+          <span>Pré-visualização</span><span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
         </div>
         <div className="divide-y">
           {rows.map((r) => (
             <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2 items-center`}>
+              <div className="flex items-center justify-center">
+                <label className="relative cursor-pointer">
+                  <span
+                    className="block w-5 h-5 rounded-full border shadow-sm"
+                    style={{ backgroundColor: r.cor || "#1B3A6B", borderColor: r.cor || "#1B3A6B" }}
+                    title="Pré-visualização da cor"
+                  />
+                  <input
+                    type="color"
+                    value={r.cor || "#1B3A6B"}
+                    onChange={(ev) => {
+                      upd(r.id, { cor: ev.target.value });
+                      persist(r.id, { cor: ev.target.value });
+                    }}
+                    className="absolute inset-0 opacity-0 w-5 h-5 cursor-pointer"
+                  />
+                </label>
+              </div>
               <Input
                 value={r.sigla}
                 onChange={(ev) => upd(r.id, { sigla: ev.target.value.toUpperCase() })}
