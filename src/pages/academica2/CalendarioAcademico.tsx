@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Check, CalendarDays, Plus, Trash2, Wand2, Sparkles, Sun, BookOpen, FileSignature, Coffee, Star, ChevronDown } from "lucide-react";
+import { ArrowLeft, Check, CalendarDays, Plus, Trash2, Wand2, Sparkles, Sun, BookOpen, FileSignature, Coffee, Star, ChevronDown, ChevronLeft, ChevronRight, LayoutGrid, CalendarRange } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
