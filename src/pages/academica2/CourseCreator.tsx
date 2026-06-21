@@ -66,7 +66,7 @@ export default function CourseCreator() {
   const steps = isAdmin ? stepsAdmin : stepsAcademica;
   const [anoLabel, setAnoLabel] = useState("2025/2026");
   const [startDate, setStartDate] = useState("01/09/2025");
-  const [endDate, setEndDate] = useState("31/07/2026");
+  const [endDate, setEndDate] = useState("31/08/2026");
   const [semestres, setSemestres] = useState("2");
   const [sem1Start, setSem1Start] = useState("15/09/2025");
   const [sem1End, setSem1End] = useState("31/01/2026");
