@@ -218,7 +218,6 @@ function StaffOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
         icon={Briefcase}
         title="Staff"
         subtitle="Registo do pessoal administrativo. O email institucional @upra.kor é gerado automaticamente."
-        count={rows.length}
         ctaLabel="Adicionar Staff"
         onCta={() => setOpen(true)}
       />

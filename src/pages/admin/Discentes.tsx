@@ -355,15 +355,15 @@ export default function AdminDiscentes() {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Select value={filtroCurso} onValueChange={setFiltroCurso}>
-          <SelectTrigger className="h-9 text-xs w-[220px]"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os cursos</SelectItem>
-            {cursos.map((c: any) => (
-              <SelectItem key={c.id} value={c.id}>{c.codigo || c.nome}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+          <Input
+            placeholder="Pesquisar discente…"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="h-9 text-xs pl-8 w-[260px]"
+          />
+        </div>
         <span className="text-[11px] text-muted-foreground">{filtered.length} discentes</span>
         <Button size="sm" onClick={() => setOpen(true)} className="ml-auto gap-1">
           <Plus className="w-3.5 h-3.5" /> Adicionar Discente
