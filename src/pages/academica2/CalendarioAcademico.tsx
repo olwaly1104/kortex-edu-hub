@@ -12,12 +12,16 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
 type EventoTipo = "semestre" | "exames" | "ferias" | "feriado" | "especial";
+type Epoca = "1" | "2" | "especial";
+type Semestre = "1" | "2";
 type Evento = {
   id: string;
   tipo: EventoTipo;
   titulo: string;
   inicio: string; // yyyy-mm-dd
   fim: string;
+  epoca?: Epoca;
+  semestre?: Semestre | null;
 };
 
 const TIPO_META: Record<EventoTipo, { label: string; color: string; dot: string; ring: string; icon: typeof BookOpen }> = {
@@ -27,6 +31,24 @@ const TIPO_META: Record<EventoTipo, { label: string; color: string; dot: string;
   feriado:  { label: "Feriado",  color: "bg-rose-500 text-white",              dot: "bg-rose-500",    ring: "border-l-rose-500",    icon: Star },
   especial: { label: "Especial", color: "bg-violet-500 text-white",            dot: "bg-violet-500",  ring: "border-l-violet-500",  icon: Sparkles },
 };
+
+const EPOCA_LABEL: Record<Epoca, string> = {
+  "1": "1ª Época",
+  "2": "2ª Época",
+  especial: "Época Especial",
+};
+
+const SEMESTRE_LABEL: Record<Semestre, string> = {
+  "1": "1º Semestre",
+  "2": "2º Semestre",
+};
+
+function buildExameTitulo(epoca?: Epoca, semestre?: Semestre | null) {
+  if (!epoca) return "Exame";
+  const ep = EPOCA_LABEL[epoca];
+  if (epoca === "especial" || !semestre) return `Exames — ${ep}`;
+  return `Exames — ${ep} (${SEMESTRE_LABEL[semestre]})`;
+}
 
 const ANOS_LETIVOS = ["2025/2026", "2026/2027", "2027/2028", "2028/2029"];
 const rangeFromAno = (ano: string) => {
@@ -47,13 +69,13 @@ const buildAuto = (startISO: string, endISO: string): Evento[] => {
   const nextYear = end.getFullYear();
   return [
     { id: "s1",  tipo: "semestre", titulo: "1º Semestre — Aulas",        inicio: fmt(addDays(start, 14)), fim: fmt(addDays(start, 14 + 16 * 7)) },
-    { id: "e1",  tipo: "exames",   titulo: "Exames — 1ª Época (1º Sem)", inicio: fmt(addDays(start, 14 + 16 * 7 + 7)), fim: fmt(addDays(start, 14 + 16 * 7 + 21)) },
-    { id: "e1b", tipo: "exames",   titulo: "Exames — 2ª Época (1º Sem)", inicio: fmt(addDays(start, 14 + 16 * 7 + 28)), fim: fmt(addDays(start, 14 + 16 * 7 + 42)) },
+    { id: "e1",  tipo: "exames",   titulo: "Exames — 1ª Época (1º Semestre)", inicio: fmt(addDays(start, 14 + 16 * 7 + 7)), fim: fmt(addDays(start, 14 + 16 * 7 + 21)), epoca: "1", semestre: "1" },
+    { id: "e1b", tipo: "exames",   titulo: "Exames — 2ª Época (1º Semestre)", inicio: fmt(addDays(start, 14 + 16 * 7 + 28)), fim: fmt(addDays(start, 14 + 16 * 7 + 42)), epoca: "2", semestre: "1" },
     { id: "h1",  tipo: "ferias",   titulo: "Férias de Inverno",          inicio: `${year}-12-22`,         fim: `${nextYear}-01-05` },
     { id: "s2",  tipo: "semestre", titulo: "2º Semestre — Aulas",        inicio: fmt(half),               fim: fmt(addDays(half, 16 * 7)) },
-    { id: "e2",  tipo: "exames",   titulo: "Exames — 1ª Época (2º Sem)", inicio: fmt(addDays(half, 16 * 7 + 7)),  fim: fmt(addDays(half, 16 * 7 + 21)) },
-    { id: "e2b", tipo: "exames",   titulo: "Exames — 2ª Época (2º Sem)", inicio: fmt(addDays(half, 16 * 7 + 28)), fim: fmt(addDays(half, 16 * 7 + 42)) },
-    { id: "esp", tipo: "exames",   titulo: "Exames — Época Especial",    inicio: `${nextYear}-09-15`,     fim: `${nextYear}-09-26` },
+    { id: "e2",  tipo: "exames",   titulo: "Exames — 1ª Época (2º Semestre)", inicio: fmt(addDays(half, 16 * 7 + 7)),  fim: fmt(addDays(half, 16 * 7 + 21)), epoca: "1", semestre: "2" },
+    { id: "e2b", tipo: "exames",   titulo: "Exames — 2ª Época (2º Semestre)", inicio: fmt(addDays(half, 16 * 7 + 28)), fim: fmt(addDays(half, 16 * 7 + 42)), epoca: "2", semestre: "2" },
+    { id: "esp", tipo: "exames",   titulo: "Exames — Época Especial",    inicio: `${nextYear}-09-15`,     fim: `${nextYear}-09-26`, epoca: "especial", semestre: null },
     { id: "f1",  tipo: "feriado",  titulo: "Dia da Independência",       inicio: `${nextYear}-11-11`,     fim: `${nextYear}-11-11` },
     { id: "f2",  tipo: "feriado",  titulo: "Natal",                      inicio: `${year}-12-25`,         fim: `${year}-12-25` },
     { id: "f3",  tipo: "feriado",  titulo: "Ano Novo",                   inicio: `${nextYear}-01-01`,     fim: `${nextYear}-01-01` },
