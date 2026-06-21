@@ -332,7 +332,7 @@ export default function CalendarioAcademico() {
               cells.push({ day: dayNum, iso });
             }
           }
-          const eventsOnDay = (iso: string) => eventos.filter(e => iso >= e.inicio && iso <= e.fim);
+          const eventsOnDay = (iso: string) => displayEventos.filter(e => iso >= e.inicio && iso <= e.fim);
           const monthLabel = monthCursor.toLocaleDateString("pt-PT", { month: "long", year: "numeric" });
           const todayISO = fmt(new Date());
           return (
