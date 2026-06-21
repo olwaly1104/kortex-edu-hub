@@ -172,16 +172,22 @@ export default function CalendarioAcademico() {
     return out;
   }, [inicio, fim]);
 
+  const displayEventos = useMemo<Evento[]>(() => [
+    { id: "__inicio_ano", tipo: "especial", titulo: "Início do Ano Letivo", inicio, fim: inicio },
+    { id: "__fim_ano",    tipo: "especial", titulo: "Fim do Ano Letivo",    inicio: fim, fim },
+    ...eventos,
+  ], [eventos, inicio, fim]);
+
   const eventsByMonth = useMemo(() => {
     const map: Record<string, Evento[]> = {};
-    eventos.forEach(e => {
+    displayEventos.forEach(e => {
       const d = new Date(e.inicio);
       const key = `${d.getFullYear()}-${d.getMonth()}`;
       (map[key] ||= []).push(e);
     });
     Object.values(map).forEach(list => list.sort((a, b) => a.inicio.localeCompare(b.inicio)));
     return map;
-  }, [eventos]);
+  }, [displayEventos]);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -326,7 +332,7 @@ export default function CalendarioAcademico() {
               cells.push({ day: dayNum, iso });
             }
           }
-          const eventsOnDay = (iso: string) => eventos.filter(e => iso >= e.inicio && iso <= e.fim);
+          const eventsOnDay = (iso: string) => displayEventos.filter(e => iso >= e.inicio && iso <= e.fim);
           const monthLabel = monthCursor.toLocaleDateString("pt-PT", { month: "long", year: "numeric" });
           const todayISO = fmt(new Date());
           return (
