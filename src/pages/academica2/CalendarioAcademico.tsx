@@ -222,10 +222,10 @@ export default function CalendarioAcademico() {
               ))}
             </div>
             <div className="inline-flex rounded-md border bg-muted/30 p-0.5">
-              <button onClick={() => setPlanView("cards")} className={`px-2.5 py-1 text-xs rounded inline-flex items-center gap-1.5 ${planView === "cards" ? "bg-background shadow-sm" : "text-muted-foreground"}`}>
-                <LayoutGrid className="w-3 h-3" /> Cartões
+              <button onClick={() => setPlanView("cards")} className={`px-2.5 py-1 text-xs rounded inline-flex items-center gap-1.5 transition ${planView === "cards" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
+                <LayoutGrid className="w-3 h-3" /> Anual
               </button>
-              <button onClick={() => setPlanView("mensal")} className={`px-2.5 py-1 text-xs rounded inline-flex items-center gap-1.5 ${planView === "mensal" ? "bg-background shadow-sm" : "text-muted-foreground"}`}>
+              <button onClick={() => setPlanView("mensal")} className={`px-2.5 py-1 text-xs rounded inline-flex items-center gap-1.5 transition ${planView === "mensal" ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}>
                 <CalendarRange className="w-3 h-3" /> Mensal
               </button>
             </div>
