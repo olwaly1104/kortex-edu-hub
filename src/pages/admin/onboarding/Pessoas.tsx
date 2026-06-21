@@ -116,6 +116,13 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
 
   const remove = (id: string) => persist(rows.filter((r) => r.id !== id));
 
+  const docenteCounts = useMemo(() => ({
+    total: rows.length,
+    licenciados: rows.filter(r => r.grau === "Licenciatura").length,
+    mestres: rows.filter(r => r.grau === "Mestrado").length,
+    doutorados: rows.filter(r => r.grau === "Doutoramento" || r.grau === "Agregação").length,
+  }), [rows]);
+
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
       <PageHeader
@@ -126,6 +133,26 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
         ctaLabel="Adicionar Docente"
         onCta={() => setOpen(true)}
       />
+
+      {/* Dados */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {[
+          { label: "Total", value: docenteCounts.total, Icon: Users },
+          { label: "Licenciados", value: docenteCounts.licenciados, Icon: BookOpen },
+          { label: "Mestres", value: docenteCounts.mestres, Icon: Award },
+          { label: "Doutorados", value: docenteCounts.doutorados, Icon: Medal },
+        ].map((k) => (
+          <Card key={k.label} className="p-3 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-md bg-muted text-foreground flex items-center justify-center">
+              <k.Icon className="w-4 h-4" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground truncate">{k.label}</p>
+              <p className="text-base font-semibold leading-none">{k.value}</p>
+            </div>
+          </Card>
+        ))}
+      </div>
 
       {rows.length === 0 ? (
         <EmptyPanel
