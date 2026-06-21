@@ -236,8 +236,8 @@ export default function GerarCadeiras() {
                           <Plus className="w-3 h-3" /> Adicionar
                         </Button>
                       </div>
-                      <div className="grid grid-cols-[1fr_180px_90px_70px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-                        <span>Cadeira</span><span>Docente</span><span>Semestre</span><span>ECTS</span><span></span>
+                      <div className="grid grid-cols-[1fr_180px_90px_70px_36px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+                        <span>Cadeira</span><span>Docente</span><span>Semestre</span><span>ECTS</span><span></span><span></span>
                       </div>
                       {list.length === 0 ? (
                         <div className="p-4 text-xs text-muted-foreground text-center">
