@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { FinHeader } from "@/pages/financas/_FinHeader";
-import { LayoutDashboard, HelpCircle, CalendarDays, ClipboardList, Users, ClipboardCheck, Clock, MapPin, FileText, UsersRound, User } from "lucide-react";
+import { LayoutDashboard, HelpCircle, CalendarDays, ClipboardList, Users, ClipboardCheck, Clock, MapPin, FileText, UsersRound, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 type AgendaItem = {
@@ -39,7 +39,7 @@ const TYPE_LABEL: Record<string, string> = {
 const ICON_FOR: Record<string, typeof Clock> = {
   reuniao: UsersRound,
   prazo: FileText,
-  pessoal: User,
+  pessoal: Sparkles,
 };
 
 export default function GapInicio() {
