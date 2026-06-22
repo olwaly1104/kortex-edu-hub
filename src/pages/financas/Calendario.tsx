@@ -54,7 +54,7 @@ const fromDb = (r: {
 
 
 /* ── constants ─────────────────────────────────────── */
-const TODAY = "2024-02-14";
+const TODAY = todayStr();
 const ANO_LETIVO = "2024 / 2025";
 
 const DAYS_SHORT = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
