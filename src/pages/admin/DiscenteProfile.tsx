@@ -175,10 +175,6 @@ export default function AdminDiscenteProfile() {
               </div>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Ano · Turma</p>
-              <p className="text-2xl font-bold tabular-nums mt-1">{student.ano}<span className="text-sm text-muted-foreground font-normal">º · {student.turma}</span></p>
-            </div>
-            <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estado Académico</p>
               <div className="mt-1.5">
                 <Badge variant="outline" className="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 border-emerald-200">Activo</Badge>
@@ -193,6 +189,14 @@ export default function AdminDiscenteProfile() {
                 </Badge>
               </div>
             </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Data de Matrícula</p>
+              <p className="text-xs font-semibold mt-1.5">{dataMatricula}</p>
+            </div>
+          </div>
+        </div>
+      </Card>
+
 
 
       <Tabs defaultValue="overview" className="space-y-4">
