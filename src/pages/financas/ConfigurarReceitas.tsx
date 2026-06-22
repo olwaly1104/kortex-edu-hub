@@ -870,7 +870,7 @@ const FIN_ESTADOS_DISC_KEY = (email?: string | null) => KEY("discentes.estados.f
 const DEFAULT_FIN_ESTADOS_DISC: FinEstado[] = [
   { id: "fe1", nome: "Regularizado", cor: "bg-emerald-100 text-emerald-700 border-emerald-200", descricao: "Sem pendências financeiras" },
   { id: "fe2", nome: "Por regularizar", cor: "bg-amber-100 text-amber-700 border-amber-200", descricao: "Mensalidades em atraso" },
-  { id: "fe3", nome: "Isento (Bolseiro)", cor: "bg-blue-100 text-blue-700 border-blue-200", descricao: "Regime de bolsa" },
+  { id: "fe3", nome: "Isento", cor: "bg-blue-100 text-blue-700 border-blue-200", descricao: "Sem obrigação de pagamento" },
 ];
 const FIN_COR_OPCOES = [
   { label: "Verde", value: "bg-emerald-100 text-emerald-700 border-emerald-200" },
