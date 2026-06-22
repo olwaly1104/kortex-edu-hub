@@ -209,6 +209,7 @@ export default function AdminDiscenteProfile() {
               <InfoRow label="Turma" value={`Turma ${student.turma}`} icon={<Users className="w-4 h-4 text-primary" />} />
               <InfoRow label="Regime" value={student.regime === "bolseiro" ? "Bolseiro" : "Normal"} icon={<Award className="w-4 h-4 text-primary" />} />
               <InfoRow label="Matrícula" value={displayId} icon={<IdCard className="w-4 h-4 text-primary" />} />
+              <InfoRow label="ID do Estudante" value={student.id} icon={<IdCard className="w-4 h-4 text-primary" />} />
               <InfoRow label="Data de Matriculação" value={dataMatricula} icon={<Calendar className="w-4 h-4 text-primary" />} />
             </SectionCard>
           </div>
