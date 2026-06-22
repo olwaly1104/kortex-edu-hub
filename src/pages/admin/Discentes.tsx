@@ -145,6 +145,14 @@ export default function AdminDiscentes() {
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [previewId, setPreviewId] = useState<string>("");
+
+  useEffect(() => {
+    if (open) {
+      const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+      setPreviewId(`DISC-${rand}`);
+    }
+  }, [open]);
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const fotoInput = useRef<HTMLInputElement>(null);
