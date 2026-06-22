@@ -45,17 +45,26 @@ Deno.serve(async (req) => {
     console.log("admin-create-user caller:", callerId);
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
-    const { data: roleRow, error: roleCheckErr } = await admin
+    // Resolve caller's roles + institution.
+    const { data: callerRoles } = await admin
       .from("user_roles")
       .select("role")
-      .eq("user_id", callerId)
-      .eq("role", "admin")
+      .eq("user_id", callerId);
+    const roles = new Set((callerRoles ?? []).map((r: any) => String(r.role)));
+    const { data: callerProfile } = await admin
+      .from("profiles")
+      .select("institution_id")
+      .eq("id", callerId)
       .maybeSingle();
-    if (roleCheckErr) {
-      console.error("role check failed:", roleCheckErr.message);
-      return json({ error: "Falha ao verificar permissões: " + roleCheckErr.message }, 500);
-    }
-    if (!roleRow) {
+    const institutionId = (callerProfile?.institution_id as string) || callerId;
+
+    // Admins can create any module. Staff (gap, academica, financas, coordenador,
+    // decano, reitor, inscricoes) can provision estudantes for their institution.
+    const STAFF_PROVISIONERS = new Set([
+      "gap", "academica", "financas", "coordenador", "decano", "reitor", "inscricoes",
+    ]);
+    const isAdmin = roles.has("admin");
+    if (!isAdmin) {
       const metadataRole = String(userData.user.user_metadata?.modulo ?? "").toLowerCase();
       const callerEmail = String(userData.user.email ?? "").toLowerCase();
       const isInstitutionAdmin = metadataRole === "admin" || /^admin@.+\.kor$/.test(callerEmail);
@@ -67,9 +76,13 @@ Deno.serve(async (req) => {
           console.error("admin role backfill failed:", backfillErr.message);
           return json({ error: "Falha ao ativar permissões de administrador: " + backfillErr.message }, 500);
         }
+        roles.add("admin");
         console.log("admin role backfilled for caller:", callerId);
       } else {
-        return json({ error: "Apenas administradores podem criar utilizadores." }, 403);
+        const isStaff = [...roles].some((r) => STAFF_PROVISIONERS.has(r));
+        if (!isStaff) {
+          return json({ error: "Sem permissões para criar utilizadores." }, 403);
+        }
       }
     }
 
