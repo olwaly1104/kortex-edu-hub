@@ -280,7 +280,7 @@ function DiscenteTab() {
     toast.success("Restaurado para o critério da faculdade/geral");
   };
 
-  const cursoName = (id: string) => cursos.find((c: any) => c.id === id)?.nome || "—";
+  const cursoName = (id: string) => cursos.find((c: any) => c.id === id)?.name || "—";
 
   return (
     <div className="space-y-4">
