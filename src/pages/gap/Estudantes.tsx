@@ -177,6 +177,7 @@ export default function GapEstudantes() {
             Os discentes são adicionados pelo Admin em Configuração · Discentes e aparecem aqui automaticamente.
           </p>
         </div>
+      ) : (
         <div className="overflow-hidden rounded-xl border border-border bg-card">
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-xs uppercase tracking-wider text-muted-foreground">
