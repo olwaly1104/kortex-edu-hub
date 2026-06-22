@@ -242,22 +242,83 @@ export default function FinancasCalendario() {
     });
   };
 
-  const handleCreate = () => {
-    if (!form.title.trim()) return;
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from("calendario_events")
+        .select("id,type,title,event_date,start_time,end_time,location,participants,categoria")
+        .order("event_date", { ascending: true });
+      if (!mounted) return;
+      if (error) { console.warn("calendario load", error.message); return; }
+      setUserEvents((data ?? []).map(fromDb));
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const openCreateDialog = () => {
+    const t = todayStr();
+    setForm({ title: "", type: "pessoal", date: t, startTime: "09:00", endTime: "10:00", location: "", description: "", participants: [] });
+    setKind("evento");
+    setSelectedDate(t);
+    setCursor(t);
+    setOpenCreate(true);
+  };
+
+  const handleCreate = async () => {
+    if (!form.title.trim()) { toast.error("Adicione um título."); return; }
     const finalType: EventType =
       kind === "reuniao" ? "reuniao" : kind === "prazo" ? "prazo" : form.type;
     const payload: Omit<AgendaEvent, "id"> = kind === "prazo"
       ? { ...form, type: "prazo", endTime: undefined, participants: [] }
       : { ...form, type: finalType };
-    setUserEvents(prev => [...prev, { ...payload, id: `u-${Date.now()}`, organizer: kind === "reuniao" ? "Diretor Financeiro" : undefined }]);
+
+    const { data: sessionData } = await supabase.auth.getUser();
+    const uid = sessionData.user?.id;
+    if (!uid) { toast.error("Sessão expirada. Inicie sessão novamente."); return; }
+
+    setSaving(true);
+    const meta = TYPE_META[finalType];
+    const dbRow = {
+      owner_user_id: uid,
+      type: toDbType(finalType),
+      title: payload.title.trim(),
+      event_date: payload.date,
+      start_time: (payload.startTime && payload.startTime.length > 0) ? payload.startTime : "09:00",
+      end_time: payload.endTime || null,
+      location: payload.location || null,
+      participants: payload.participants ?? [],
+      color: meta?.bar?.replace("bg-", "") ?? "primary",
+      categoria: finalType,
+    };
+    const { data, error } = await supabase
+      .from("calendario_events")
+      .insert(dbRow)
+      .select("id,type,title,event_date,start_time,end_time,location,participants,categoria")
+      .single();
+    setSaving(false);
+    if (error || !data) { toast.error(error?.message || "Não foi possível guardar."); return; }
+
+    setUserEvents(prev => [...prev, fromDb(data)]);
+    toast.success(kind === "reuniao" ? "Reunião adicionada à agenda." : kind === "prazo" ? "Prazo marcado." : "Evento adicionado.");
     setOpenCreate(false);
-    setForm({ title: "", type: "pessoal", date: selectedDate, startTime: "09:00", endTime: "10:00", location: "", description: "", participants: [] });
+    setForm({ title: "", type: "pessoal", date: todayStr(), startTime: "09:00", endTime: "10:00", location: "", description: "", participants: [] });
     setKind("evento");
   };
 
-  const handleDelete = (id: string) => {
-    setUserEvents(prev => prev.filter(e => e.id !== id));
+  const handleDelete = async (id: string) => {
+    const prev = userEvents;
+    setUserEvents(prev.filter(e => e.id !== id));
     setDetailEvent(null);
+    const { error } = await supabase.from("calendario_events").delete().eq("id", id);
+    if (error) {
+      setUserEvents(prev);
+      toast.error(error.message || "Não foi possível eliminar.");
+    } else {
+      toast.success("Removido.");
+    }
   };
   const respondRequest = (id: string, status: "accepted" | "declined") => {
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
