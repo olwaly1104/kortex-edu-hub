@@ -516,26 +516,12 @@ export default function AdminDiscentes() {
               </div>
             </section>
 
-            {/* Optional extra details collapsible */}
-            <section className="border-t pt-4">
-              <button
-                type="button"
-                onClick={() => setShowMore((v) => !v)}
-                className="w-full flex items-center justify-between gap-2 text-[12px] font-semibold text-foreground hover:text-primary transition"
-              >
-                <span className="flex items-center gap-2">
-                  <Pencil className="w-3.5 h-3.5" />
-                  Adicionar mais detalhes agora (opcional)
-                </span>
-                <span className="text-[10px] text-muted-foreground">{showMore ? "Esconder" : "Mostrar"}</span>
-              </button>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                Pode preencher tudo agora ou deixar para depois — editável a qualquer momento no perfil do discente.
+            <div className="space-y-6 border-t pt-4">
+              <p className="text-[11px] text-muted-foreground -mt-1">
+                Restantes campos são opcionais — podem ser editados depois no perfil do discente.
               </p>
-            </section>
-
-            {showMore && (
               <div className="space-y-6">
+
                 {/* 1. Identificação Pessoal */}
                 <section>
                   <SectionTitle index={1} title="Identificação Pessoal" hint="Foto, data de nascimento, género e documento" />
@@ -730,7 +716,8 @@ export default function AdminDiscentes() {
                   </div>
                 </section>
               </div>
-            )}
+            </div>
+
           </div>
 
           <DialogFooter className="px-6 py-4 border-t bg-muted/20">
@@ -757,30 +744,68 @@ export default function AdminDiscentes() {
       </Dialog>
 
 
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <GraduationCap className="w-5 h-5 text-primary" /> Confirmar criação do discente
-            </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-3">
-                <div>Será criada uma conta Kortex com o email:</div>
-                <div className="font-mono text-foreground text-sm bg-muted px-3 py-2 rounded-md break-all">{previewEmail || "—"}</div>
+      <AlertDialog open={confirmOpen} onOpenChange={(o) => { if (!uploading && !createMut.isPending) setConfirmOpen(o); }}>
+        <AlertDialogContent className="max-w-md">
+          {!(uploading || createMut.isPending) ? (
+            <>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <GraduationCap className="w-5 h-5 text-primary" /> Confirmar criação do discente
+                </AlertDialogTitle>
+                <AlertDialogDescription asChild>
+                  <div className="space-y-3">
+                    <div>Será criada uma conta Kortex com o email:</div>
+                    <div className="font-mono text-foreground text-sm bg-muted px-3 py-2 rounded-md break-all">{previewEmail || "—"}</div>
+                  </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={(e) => { e.preventDefault(); addRow(); }}>
+                  Confirmar e criar conta
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </>
+          ) : (
+            <div className="py-6 px-2 space-y-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-sm font-bold text-foreground">A criar conta Kortex…</div>
+                  <div className="text-[12px] text-muted-foreground">Aguarde alguns segundos</div>
+                </div>
               </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={uploading || createMut.isPending}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={(e) => { e.preventDefault(); setConfirmOpen(false); addRow(); }}
-              disabled={uploading || createMut.isPending}
-            >
-              Confirmar e criar conta
-            </AlertDialogAction>
-          </AlertDialogFooter>
+
+              <div className="rounded-md border bg-muted/30 px-3 py-2">
+                <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Email institucional</div>
+                <div className="font-mono text-[12px] text-foreground/90 truncate">{previewEmail || "—"}</div>
+              </div>
+
+              <ul className="space-y-2 text-[12px]">
+                {[
+                  { label: "A gerar email institucional", done: true },
+                  { label: uploading ? "A carregar documentos…" : "Documentos carregados", done: !uploading },
+                  { label: createMut.isPending ? "A criar conta Kortex e perfil…" : "Conta criada", done: !createMut.isPending },
+                ].map((s, i) => (
+                  <li key={i} className="flex items-center gap-2">
+                    {s.done ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    ) : (
+                      <Loader2 className="w-3.5 h-3.5 text-primary animate-spin shrink-0" />
+                    )}
+                    <span className={s.done ? "text-foreground" : "text-muted-foreground"}>{s.label}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <p className="text-[11px] text-muted-foreground">Não feche esta janela até a operação concluir.</p>
+            </div>
+          )}
         </AlertDialogContent>
       </AlertDialog>
+
 
       <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent>
