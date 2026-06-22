@@ -163,9 +163,6 @@ export default function GapEstudantes() {
         <div className="text-xs text-muted-foreground tabular-nums">
           {filtered.length} de {normalized.length}
         </div>
-        <Button size="sm" onClick={openNew} className="ml-auto gap-1 shrink-0">
-          <Plus className="w-3.5 h-3.5" /> Adicionar Discente
-        </Button>
       </div>
 
       {isLoading ? (
@@ -173,13 +170,13 @@ export default function GapEstudantes() {
           <Loader2 className="w-4 h-4 animate-spin" /> A carregar discentes…
         </div>
       ) : normalized.length === 0 ? (
-        <EmptyState
-          onAdd={openNew}
-          icon={<GraduationCap className="w-7 h-7" />}
-          title="Nenhum discente registado"
-          hint="Comece por adicionar estudantes manualmente ou via inscrições."
-          cta="Adicionar Discente"
-        />
+        <div className="rounded-xl border border-dashed border-border bg-card py-16 flex flex-col items-center gap-3 text-center">
+          <GraduationCap className="w-7 h-7 text-muted-foreground" />
+          <p className="text-sm font-semibold">Nenhum discente registado</p>
+          <p className="text-xs text-muted-foreground max-w-sm">
+            Os discentes são adicionados pelo Admin em Configuração · Discentes e aparecem aqui automaticamente.
+          </p>
+        </div>
       ) : (
         <div className="overflow-hidden rounded-xl border border-border bg-card">
           <table className="w-full text-sm">
