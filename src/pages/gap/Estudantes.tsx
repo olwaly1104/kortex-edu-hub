@@ -163,9 +163,6 @@ export default function GapEstudantes() {
         <div className="text-xs text-muted-foreground tabular-nums">
           {filtered.length} de {normalized.length}
         </div>
-        <Button size="sm" onClick={openNew} className="ml-auto gap-1 shrink-0">
-          <Plus className="w-3.5 h-3.5" /> Adicionar Discente
-        </Button>
       </div>
 
       {isLoading ? (
