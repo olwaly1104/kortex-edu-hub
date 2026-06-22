@@ -513,14 +513,46 @@ export default function AdminDiscentes() {
                 </Field>
               </div>
 
-              <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Email Kortex (auto)</div>
-                  <div className="font-mono text-[12px] text-foreground/90 truncate">
-                    {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Email Kortex (auto)</div>
+                    <div className="font-mono text-[12px] text-foreground/90 truncate">
+                      {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
+                    </div>
                   </div>
+                  <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
                 </div>
-                <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
+                <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">ID do Discente (auto)</div>
+                    <div className="font-mono text-[12px] text-foreground/90 truncate">
+                      {previewId || "DISC-————"}
+                    </div>
+                  </div>
+                  <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
+                </div>
+              </div>
+
+              <div className="rounded-md border border-dashed bg-background px-3 py-2.5 flex items-center justify-between gap-3">
+                <p className="text-[11px] text-muted-foreground leading-snug">
+                  Pode criar já o perfil simplificado (apenas com o nome) e preencher os restantes dados mais tarde no perfil do discente.
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    if (!requiredOk) {
+                      toast.error("Preencha primeiro e último nome");
+                      return;
+                    }
+                    setConfirmOpen(true);
+                  }}
+                  disabled={uploading || createMut.isPending || !requiredOk}
+                  className="gap-1.5 shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Criar perfil simplificado
+                </Button>
               </div>
             </section>
 
