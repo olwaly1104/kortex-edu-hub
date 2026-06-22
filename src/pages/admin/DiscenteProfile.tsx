@@ -266,16 +266,16 @@ export default function AdminDiscenteProfile() {
             const totalAnual = totalMensal * 12;
             return (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <Card className="p-4">
                     <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                       <Wallet className="w-3.5 h-3.5" /> Propina Mensal
                     </div>
                     <p className="text-2xl font-bold tabular-nums mt-2">
-                      {isBolseiro ? "Isento" : fmtAOA(totalMensal)}
+                      {isBolseiro ? "Isento" : fmtAOA(valorMensal)}
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5">
-                      {isBolseiro ? "Regime de Bolsa" : `Base ${fmtAOA(valorMensal)} + ${imposto}%`}
+                      {isBolseiro ? "Regime de Bolsa" : "Mensal"}
                     </p>
                   </Card>
                   <Card className="p-4">
@@ -283,9 +283,16 @@ export default function AdminDiscenteProfile() {
                       <CircleDollarSign className="w-3.5 h-3.5" /> Propina Anual
                     </div>
                     <p className="text-2xl font-bold tabular-nums mt-2">
-                      {isBolseiro ? fmtAOA(0) : fmtAOA(totalAnual)}
+                      {isBolseiro ? fmtAOA(0) : fmtAOA(valorMensal * 12)}
                     </p>
                     <p className="text-[11px] text-muted-foreground mt-0.5">12 mensalidades</p>
+                  </Card>
+                  <Card className="p-4">
+                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      <Receipt className="w-3.5 h-3.5" /> Multas
+                    </div>
+                    <p className="text-2xl font-bold tabular-nums mt-2">{fmtAOA(0)}</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Sem multas</p>
                   </Card>
                   <Card className="p-4">
                     <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
@@ -300,6 +307,7 @@ export default function AdminDiscenteProfile() {
                     <p className="text-[11px] text-muted-foreground mt-2">Sem pendências</p>
                   </Card>
                 </div>
+
 
                 <SectionCard title="Plano Financeiro" icon={<Wallet className="w-4 h-4" />}>
                   <InfoRow label="Regime" value={isBolseiro ? "Bolseiro" : "Normal"} icon={<Award className="w-4 h-4 text-primary" />} />
