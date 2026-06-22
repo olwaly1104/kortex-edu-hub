@@ -230,7 +230,7 @@ export default function GapConfiguracao() {
   const [newAgCat, setNewAgCat] = useState("");
   const [newAgMotLabel, setNewAgMotLabel] = useState("");
   const [newAgMotCat, setNewAgMotCat] = useState("");
-  const [newAgMotResp, setNewAgMotResp] = useState(STAFF_OPTIONS[0]);
+  
   const [newAgMotDur, setNewAgMotDur] = useState(45);
   const [newAgSalaLabel, setNewAgSalaLabel] = useState("");
   const [newAgSalaLot, setNewAgSalaLot] = useState(4);
