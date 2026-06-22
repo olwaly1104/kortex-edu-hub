@@ -726,13 +726,6 @@ export default function GapConfiguracao() {
                         </Select>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
-                        <Select value={newAgMotResp} onValueChange={setNewAgMotResp}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>{STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                        </Select>
-                      </div>
-                      <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Duração (min)</label>
                         <Input type="number" min={10} step={5} value={newAgMotDur} onChange={e => setNewAgMotDur(Number(e.target.value) || 30)} />
                       </div>
@@ -741,8 +734,8 @@ export default function GapConfiguracao() {
                       <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
                       <Button onClick={() => {
                         if (!newAgMotLabel.trim() || !newAgMotCat) return;
-                        setAgMotivos(prev => [...prev, { key: slugify(newAgMotLabel), label: newAgMotLabel.trim(), categoria: newAgMotCat, responsavel: newAgMotResp, duracao: newAgMotDur }]);
-                        setNewAgMotLabel(""); setNewAgMotCat(""); setNewAgMotResp(STAFF_OPTIONS[0]); setNewAgMotDur(45);
+                        setAgMotivos(prev => [...prev, { key: slugify(newAgMotLabel), label: newAgMotLabel.trim(), categoria: newAgMotCat, duracao: newAgMotDur }]);
+                        setNewAgMotLabel(""); setNewAgMotCat(""); setNewAgMotDur(45);
                         setAgMotOpen(false);
                         toast({ title: "Motivo adicionado" });
                       }} disabled={!newAgMotLabel.trim() || !newAgMotCat}>Adicionar</Button>
