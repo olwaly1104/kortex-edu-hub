@@ -246,9 +246,20 @@ export default function AdminDiscentes() {
     setDraft((d) => ({ ...d, fotoFile: f, fotoPreview: URL.createObjectURL(f) }));
   };
 
+  const requiredOk =
+    draft.primeiroNome.trim() &&
+    draft.ultimoNome.trim() &&
+    draft.nascimento &&
+    draft.genero &&
+    draft.faculdade_id &&
+    draft.curso_id &&
+    draft.ano &&
+    draft.turma &&
+    draft.regime;
+
   const addRow = async () => {
-    if (!draft.primeiroNome.trim() || !draft.curso_id) {
-      toast.error("Preencha primeiro nome e curso");
+    if (!requiredOk) {
+      toast.error("Preencha os campos obrigatórios: primeiro e último nome, data de nascimento, género, faculdade, curso, ano, turma e regime");
       return;
     }
     if (!previewEmail) {
