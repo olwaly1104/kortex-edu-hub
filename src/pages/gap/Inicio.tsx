@@ -155,24 +155,14 @@ export default function GapInicio() {
 
         <section className="rounded-xl border border-border bg-card p-5">
           <header className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold">Solicitações Pendentes</h2>
+            <h2 className="text-sm font-semibold">Anúncios</h2>
             <span className="text-xs font-semibold text-primary tabular-nums">0</span>
           </header>
           <div className="rounded-md border border-dashed border-border p-6 text-center text-xs text-muted-foreground">
-            Sem pedidos pendentes.
+            Sem anúncios.
           </div>
         </section>
       </div>
-
-      <section className="rounded-xl border border-border bg-card p-5">
-        <header className="flex items-center justify-between mb-3">
-          <h2 className="text-sm font-semibold">Candidaturas Activas</h2>
-          <span className="text-xs font-semibold text-primary tabular-nums">0</span>
-        </header>
-        <div className="rounded-md border border-dashed border-border p-8 text-center text-xs text-muted-foreground">
-          Sem candidaturas em curso.
-        </div>
-      </section>
     </div>
   );
 }
