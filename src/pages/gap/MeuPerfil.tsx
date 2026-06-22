@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -11,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import {
   Camera, User, Mail, Phone, MapPin, FileText, Upload, Trash2, CheckCircle2,
-  IdCard, BadgeCheck, Briefcase, Save,
+  IdCard, BadgeCheck, Briefcase, Pencil, FileDown,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -32,6 +31,8 @@ const PROVINCIAS_MUNICIPIOS: Record<string, string[]> = {
   "Zaire": ["Mbanza Kongo", "Soyo", "N'zeto"],
 };
 
+const MODULO = "GAP";
+
 export default function GapMeuPerfil() {
   const fileInputPhoto = useRef<HTMLInputElement>(null);
   const fileInputCv = useRef<HTMLInputElement>(null);
@@ -43,13 +44,14 @@ export default function GapMeuPerfil() {
     ultimoNome: "Leitão",
     email: "yolanda.leitao@upra.kor",
     telefone: "+244 923 456 789",
-    cargo: "Coordenadora GAP",
     bi: "004567890LA041",
     provincia: "Luanda",
     municipio: "Talatona",
     endereco: "Rua das Acácias, n.º 142, Bairro Talatona",
-    bio: "Coordenadora do Gabinete de Apoio ao Discente. Responsável pela gestão de candidaturas, atendimentos e acompanhamento de estudantes.",
   });
+
+  const [editIdent, setEditIdent] = useState(false);
+  const [editMorada, setEditMorada] = useState(false);
 
   const [cv, setCv] = useState<{ name: string; size: number; uploadedAt: string } | null>(null);
   const [docId, setDocId] = useState<{ name: string; size: number; uploadedAt: string } | null>(null);
@@ -87,6 +89,54 @@ export default function GapMeuPerfil() {
   const initials = (form.primeiroNome[0] || "") + (form.ultimoNome[0] || "");
   const municipios = PROVINCIAS_MUNICIPIOS[form.provincia] || [];
 
+  const gerarDocumento = () => {
+    const today = new Date().toLocaleDateString("pt-PT");
+    const html = `<!doctype html><html lang="pt"><head><meta charset="utf-8" />
+<title>Perfil · ${form.primeiroNome} ${form.ultimoNome}</title>
+<style>
+  *{box-sizing:border-box} body{font-family:Inter,Arial,sans-serif;color:#0f172a;margin:0;padding:48px;max-width:820px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 4px} .sub{color:#64748b;font-size:13px;margin-bottom:24px}
+  .head{display:flex;gap:20px;align-items:center;border-bottom:2px solid hsl(142 65% 26%);padding-bottom:20px;margin-bottom:24px}
+  .avatar{width:96px;height:96px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:600;color:hsl(142 65% 26%);overflow:hidden}
+  .avatar img{width:100%;height:100%;object-fit:cover}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:hsl(142 65% 26%);margin:28px 0 10px;border-bottom:1px solid #e2e8f0;padding-bottom:6px}
+  .row{display:grid;grid-template-columns:180px 1fr;gap:8px;padding:6px 0;font-size:14px}
+  .row b{color:#475569;font-weight:500}
+  .footer{margin-top:48px;border-top:1px solid #e2e8f0;padding-top:12px;font-size:11px;color:#94a3b8;text-align:center}
+  @media print{body{padding:24px} button{display:none}}
+  .print{position:fixed;top:16px;right:16px;background:hsl(142 65% 26%);color:#fff;border:0;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:600}
+</style></head><body>
+<button class="print" onclick="window.print()">Imprimir / PDF</button>
+<div class="head">
+  <div class="avatar">${photo ? `<img src="${photo}" />` : initials}</div>
+  <div>
+    <h1>${form.primeiroNome} ${form.ultimoNome}</h1>
+    <div class="sub">Módulo ${MODULO} · UPRA — Universidade Privada de Angola</div>
+    <div class="sub">Documento gerado em ${today}</div>
+  </div>
+</div>
+<h2>Identificação</h2>
+<div class="row"><b>Primeiro nome</b><span>${form.primeiroNome}</span></div>
+<div class="row"><b>Último nome</b><span>${form.ultimoNome}</span></div>
+<div class="row"><b>Email institucional</b><span>${form.email}</span></div>
+<div class="row"><b>Telefone</b><span>${form.telefone}</span></div>
+<div class="row"><b>N.º Bilhete de Identidade</b><span>${form.bi}</span></div>
+<div class="row"><b>Módulo</b><span>${MODULO}</span></div>
+<h2>Morada</h2>
+<div class="row"><b>Província</b><span>${form.provincia}</span></div>
+<div class="row"><b>Município</b><span>${form.municipio}</span></div>
+<div class="row"><b>Endereço</b><span>${form.endereco}</span></div>
+<h2>Documentos anexos</h2>
+<div class="row"><b>Curriculum Vitae</b><span>${cv ? cv.name : "— não carregado —"}</span></div>
+<div class="row"><b>Documento de Identificação</b><span>${docId ? docId.name : "— não carregado —"}</span></div>
+<div class="footer">UPRA · Gabinete de Apoio ao Discente · Documento autogerado a partir do perfil institucional.</div>
+</body></html>`;
+    const w = window.open("", "_blank");
+    if (!w) { toast.error("Permita janelas para gerar o documento."); return; }
+    w.document.open(); w.document.write(html); w.document.close();
+    toast.success("Documento de perfil gerado.");
+  };
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in max-w-5xl mx-auto">
       {/* Header */}
@@ -116,7 +166,7 @@ export default function GapMeuPerfil() {
           <div className="flex-1 min-w-[220px]">
             <h1 className="text-2xl font-bold text-foreground">{form.primeiroNome} {form.ultimoNome}</h1>
             <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1.5">
-              <Briefcase className="w-3.5 h-3.5" /> {form.cargo}
+              <Briefcase className="w-3.5 h-3.5" /> Módulo {MODULO}
             </p>
             <div className="flex flex-wrap gap-2 mt-3">
               <Badge variant="outline" className="gap-1"><Mail className="w-3 h-3" /> {form.email}</Badge>
@@ -124,60 +174,76 @@ export default function GapMeuPerfil() {
               <Badge variant="outline" className="gap-1"><MapPin className="w-3 h-3" /> {form.municipio}, {form.provincia}</Badge>
             </div>
           </div>
-          <Button onClick={() => toast.success("Perfil guardado.")} className="gap-2">
-            <Save className="w-4 h-4" /> Guardar alterações
+          <Button onClick={gerarDocumento} className="gap-2">
+            <FileDown className="w-4 h-4" /> Gerar documento
           </Button>
         </div>
       </Card>
 
       {/* Identificação */}
       <Card className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <User className="w-4 h-4 text-primary" />
-          <h2 className="text-sm font-semibold">Identificação</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <User className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold">Identificação</h2>
+          </div>
+          <Button
+            variant={editIdent ? "default" : "outline"}
+            size="sm"
+            className="gap-1.5 h-8"
+            onClick={() => { if (editIdent) toast.success("Identificação actualizada."); setEditIdent(v => !v); }}
+          >
+            <Pencil className="w-3.5 h-3.5" /> {editIdent ? "Concluir" : "Editar"}
+          </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label className="text-xs">Primeiro nome</Label>
-            <Input value={form.primeiroNome} onChange={e => update("primeiroNome", e.target.value)} className="mt-1 h-10" />
+            <Input disabled={!editIdent} value={form.primeiroNome} onChange={e => update("primeiroNome", e.target.value)} className="mt-1 h-10" />
           </div>
           <div>
             <Label className="text-xs">Último nome</Label>
-            <Input value={form.ultimoNome} onChange={e => update("ultimoNome", e.target.value)} className="mt-1 h-10" />
+            <Input disabled={!editIdent} value={form.ultimoNome} onChange={e => update("ultimoNome", e.target.value)} className="mt-1 h-10" />
           </div>
           <div>
             <Label className="text-xs">Email institucional</Label>
-            <Input type="email" value={form.email} onChange={e => update("email", e.target.value)} className="mt-1 h-10" />
+            <Input type="email" disabled readOnly value={form.email} className="mt-1 h-10 bg-muted/40" />
           </div>
           <div>
             <Label className="text-xs">Telefone</Label>
-            <Input value={form.telefone} onChange={e => update("telefone", e.target.value)} className="mt-1 h-10" />
+            <Input disabled={!editIdent} value={form.telefone} onChange={e => update("telefone", e.target.value)} className="mt-1 h-10" />
           </div>
           <div>
             <Label className="text-xs">N.º Bilhete de Identidade</Label>
-            <Input value={form.bi} onChange={e => update("bi", e.target.value)} className="mt-1 h-10" />
+            <Input disabled={!editIdent} value={form.bi} onChange={e => update("bi", e.target.value)} className="mt-1 h-10" />
           </div>
           <div>
-            <Label className="text-xs">Cargo</Label>
-            <Input value={form.cargo} onChange={e => update("cargo", e.target.value)} className="mt-1 h-10" />
-          </div>
-          <div className="md:col-span-2">
-            <Label className="text-xs">Biografia / Notas</Label>
-            <Textarea rows={3} value={form.bio} onChange={e => update("bio", e.target.value)} className="mt-1" />
+            <Label className="text-xs">Módulo</Label>
+            <Input disabled readOnly value={MODULO} className="mt-1 h-10 bg-muted/40" />
           </div>
         </div>
       </Card>
 
       {/* Morada */}
       <Card className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <MapPin className="w-4 h-4 text-primary" />
-          <h2 className="text-sm font-semibold">Morada</h2>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-semibold">Morada</h2>
+          </div>
+          <Button
+            variant={editMorada ? "default" : "outline"}
+            size="sm"
+            className="gap-1.5 h-8"
+            onClick={() => { if (editMorada) toast.success("Morada actualizada."); setEditMorada(v => !v); }}
+          >
+            <Pencil className="w-3.5 h-3.5" /> {editMorada ? "Concluir" : "Editar"}
+          </Button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label className="text-xs">Província</Label>
-            <Select value={form.provincia} onValueChange={(v) => { update("provincia", v); update("municipio", PROVINCIAS_MUNICIPIOS[v]?.[0] || ""); }}>
+            <Select disabled={!editMorada} value={form.provincia} onValueChange={(v) => { update("provincia", v); update("municipio", PROVINCIAS_MUNICIPIOS[v]?.[0] || ""); }}>
               <SelectTrigger className="mt-1 h-10"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {Object.keys(PROVINCIAS_MUNICIPIOS).map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
@@ -186,7 +252,7 @@ export default function GapMeuPerfil() {
           </div>
           <div>
             <Label className="text-xs">Município</Label>
-            <Select value={form.municipio} onValueChange={(v) => update("municipio", v)}>
+            <Select disabled={!editMorada} value={form.municipio} onValueChange={(v) => update("municipio", v)}>
               <SelectTrigger className="mt-1 h-10"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {municipios.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
@@ -195,7 +261,7 @@ export default function GapMeuPerfil() {
           </div>
           <div className="md:col-span-2">
             <Label className="text-xs">Endereço (rua, número, bairro)</Label>
-            <Input value={form.endereco} onChange={e => update("endereco", e.target.value)} className="mt-1 h-10" />
+            <Input disabled={!editMorada} value={form.endereco} onChange={e => update("endereco", e.target.value)} className="mt-1 h-10" />
           </div>
         </div>
       </Card>
