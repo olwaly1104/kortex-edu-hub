@@ -446,7 +446,7 @@ export default function AdminDiscentes() {
                     <Button
                       size="icon"
                       variant="ghost"
-                      onClick={() => removeRow(r.id)}
+                      onClick={() => setDeleteId(r.id)}
                       disabled={deleteMut.isPending}
                       className="h-8 w-8 text-muted-foreground hover:text-destructive"
                       title="Eliminar"
