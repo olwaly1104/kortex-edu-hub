@@ -333,6 +333,34 @@ export default function GapMeuPerfil() {
             </Button>
             <input ref={fileInputId} type="file" accept=".pdf,image/*" className="hidden" onChange={onIdChange} />
           </div>
+
+          {/* Perfil Institucional (autogerado) */}
+          <div className="rounded-lg border border-border p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+                <FileDown className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold">Perfil Institucional</p>
+                <p className="text-[11px] text-muted-foreground">Documento autogerado a partir do perfil · PDF</p>
+              </div>
+            </div>
+            <div className="mt-3 rounded-md bg-muted/40 p-2.5 flex items-center gap-2">
+              <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium truncate">perfil-{form.primeiroNome.toLowerCase()}-{form.ultimoNome.toLowerCase()}.pdf</p>
+                <p className="text-[10px] text-muted-foreground">Atualizado automaticamente</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 mt-3">
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={verPerfil}>
+                <Eye className="w-3.5 h-3.5" /> Ver
+              </Button>
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={descarregarPerfil}>
+                <Download className="w-3.5 h-3.5" /> Descarregar
+              </Button>
+            </div>
+          </div>
         </div>
       </Card>
     </div>
