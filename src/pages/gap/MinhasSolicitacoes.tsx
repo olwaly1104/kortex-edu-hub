@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Clock, Search, X, Inbox, Send, Plus, GraduationCap, CalendarDays,
-  ArrowRight, Check, ChevronLeft, ChevronRight, AlertTriangle, Building2,
+  Check, ChevronLeft, ChevronRight, AlertTriangle, Building2,
   FileText, Paperclip, Trash2, Rocket,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
