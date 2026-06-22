@@ -125,7 +125,7 @@ Deno.serve(async (req) => {
       if (existingErr || !existingProfile?.id) {
         return json({ error: "Este email já existe na autenticação, mas ainda não tem perfil ligado. Crie com outro email." }, 409);
       }
-      if (existingProfile.institution_id && existingProfile.institution_id !== callerId) {
+      if (existingProfile.institution_id && existingProfile.institution_id !== institutionId) {
         return json({ error: "Este email já pertence a outra instituição." }, 409);
       }
       newUserId = existingProfile.id;
@@ -137,7 +137,7 @@ Deno.serve(async (req) => {
         id: newUserId,
         display_name: name,
         email,
-        institution_id: callerId,
+        institution_id: institutionId,
         must_change_password: true,
       },
       { onConflict: "id" }
