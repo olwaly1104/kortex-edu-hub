@@ -190,7 +190,7 @@ export default function GapConfiguracao() {
 
   // ===== AGENDAMENTOS =====
   type AgCategoria = { key: string; label: string; color: string };
-  type AgMotivo = { key: string; label: string; categoria: string; responsavel: string; duracao: number };
+  type AgMotivo = { key: string; label: string; categoria: string; duracao: number };
   type AgSala = { key: string; label: string; lotacao: number };
 
   const [agCategorias, setAgCategorias] = useState<AgCategoria[]>([
@@ -203,11 +203,11 @@ export default function GapConfiguracao() {
     { key: "documentacao", label: "Documentação", color: "bg-slate-100 text-slate-700 border-slate-200" },
   ]);
   const [agMotivos, setAgMotivos] = useState<AgMotivo[]>([
-    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico", responsavel: "Dra. Helena Cabral · GAP", duracao: 50 },
-    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico", responsavel: "Dr. João Tavares · GAP", duracao: 40 },
-    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional", responsavel: "Dra. Helena Cabral · GAP", duracao: 60 },
-    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional", responsavel: "Dr. João Tavares · GAP", duracao: 30 },
-    { key: "mediacao", label: "Mediação de conflito", categoria: "Social", responsavel: "Dra. Helena Cabral · GAP", duracao: 60 },
+    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico", duracao: 50 },
+    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico", duracao: 40 },
+    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional", duracao: 60 },
+    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional", duracao: 30 },
+    { key: "mediacao", label: "Mediação de conflito", categoria: "Social", duracao: 60 },
   ]);
   const [agSalas, setAgSalas] = useState<AgSala[]>([
     { key: "gap1", label: "Gab. GAP 1", lotacao: 4 },
@@ -230,7 +230,7 @@ export default function GapConfiguracao() {
   const [newAgCat, setNewAgCat] = useState("");
   const [newAgMotLabel, setNewAgMotLabel] = useState("");
   const [newAgMotCat, setNewAgMotCat] = useState("");
-  const [newAgMotResp, setNewAgMotResp] = useState(STAFF_OPTIONS[0]);
+  
   const [newAgMotDur, setNewAgMotDur] = useState(45);
   const [newAgSalaLabel, setNewAgSalaLabel] = useState("");
   const [newAgSalaLot, setNewAgSalaLot] = useState(4);
@@ -726,13 +726,6 @@ export default function GapConfiguracao() {
                         </Select>
                       </div>
                       <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
-                        <Select value={newAgMotResp} onValueChange={setNewAgMotResp}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>{STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                        </Select>
-                      </div>
-                      <div>
                         <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Duração (min)</label>
                         <Input type="number" min={10} step={5} value={newAgMotDur} onChange={e => setNewAgMotDur(Number(e.target.value) || 30)} />
                       </div>
@@ -741,8 +734,8 @@ export default function GapConfiguracao() {
                       <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
                       <Button onClick={() => {
                         if (!newAgMotLabel.trim() || !newAgMotCat) return;
-                        setAgMotivos(prev => [...prev, { key: slugify(newAgMotLabel), label: newAgMotLabel.trim(), categoria: newAgMotCat, responsavel: newAgMotResp, duracao: newAgMotDur }]);
-                        setNewAgMotLabel(""); setNewAgMotCat(""); setNewAgMotResp(STAFF_OPTIONS[0]); setNewAgMotDur(45);
+                        setAgMotivos(prev => [...prev, { key: slugify(newAgMotLabel), label: newAgMotLabel.trim(), categoria: newAgMotCat, duracao: newAgMotDur }]);
+                        setNewAgMotLabel(""); setNewAgMotCat(""); setNewAgMotDur(45);
                         setAgMotOpen(false);
                         toast({ title: "Motivo adicionado" });
                       }} disabled={!newAgMotLabel.trim() || !newAgMotCat}>Adicionar</Button>
@@ -759,7 +752,6 @@ export default function GapConfiguracao() {
                   <tr className="border-b bg-muted/30">
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
                     <th className="text-center p-3 font-medium text-muted-foreground text-xs">Duração</th>
                     {isCardEditing("ag-motivos") && <th className="w-12" />}
                   </tr>
@@ -773,7 +765,6 @@ export default function GapConfiguracao() {
                         <td className="p-3">
                           {catCfg ? <Badge variant="outline" className={cn("text-[10px]", catCfg.color)}>{catCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.categoria}</span>}
                         </td>
-                        <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
                         <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.duracao} min</td>
                         {isCardEditing("ag-motivos") && (
                           <td className="p-3 text-right">
