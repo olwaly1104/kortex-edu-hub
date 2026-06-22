@@ -864,10 +864,28 @@ function SalariosSection({ email }: { email?: string | null }) {
 /* ═══════════════════════════════ MULTAS ═══════════════════════════════════ */
 
 type RhMulta = { id: string; nome: string; valor: number; descricao: string; aplicaA: "Docente" | "Staff" | "Discente" | "Ambos" };
+type FinEstado = { id: string; nome: string; cor: string; descricao?: string };
 
-function MultasSection({ email: _email }: { email?: string | null }) {
+const FIN_ESTADOS_DISC_KEY = (email?: string | null) => KEY("discentes.estados.financeiros", email);
+const DEFAULT_FIN_ESTADOS_DISC: FinEstado[] = [
+  { id: "fe1", nome: "Regularizado", cor: "bg-emerald-100 text-emerald-700 border-emerald-200", descricao: "Sem pendências financeiras" },
+  { id: "fe2", nome: "Por regularizar", cor: "bg-amber-100 text-amber-700 border-amber-200", descricao: "Mensalidades em atraso" },
+  { id: "fe3", nome: "Isento (Bolseiro)", cor: "bg-blue-100 text-blue-700 border-blue-200", descricao: "Regime de bolsa" },
+];
+const FIN_COR_OPCOES = [
+  { label: "Verde", value: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
+  { label: "Vermelho", value: "bg-red-100 text-red-700 border-red-200" },
+  { label: "Azul", value: "bg-blue-100 text-blue-700 border-blue-200" },
+  { label: "Cinza", value: "bg-slate-100 text-slate-700 border-slate-200" },
+  { label: "Violeta", value: "bg-violet-100 text-violet-700 border-violet-200" },
+];
+
+function MultasSection({ email }: { email?: string | null }) {
   const [multas, setMultas] = useState<RhMulta[]>([]);
   const [target, setTarget] = useState<"docentes" | "staff" | "discentes">("docentes");
+  const [finEstados, setFinEstados] = useState<FinEstado[]>(() => readJSON<FinEstado[]>(FIN_ESTADOS_DISC_KEY(email), DEFAULT_FIN_ESTADOS_DISC));
+  useEffect(() => writeJSON(FIN_ESTADOS_DISC_KEY(email), finEstados), [finEstados, email]);
 
   useEffect(() => {
     try {
@@ -915,6 +933,51 @@ function MultasSection({ email: _email }: { email?: string | null }) {
           );
         })}
       </div>
+
+      {target === "discentes" && (
+        <Card className="overflow-hidden">
+          <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-primary" />
+            <div className="min-w-0">
+              <h2 className="text-sm font-bold text-foreground">Estados financeiros (discentes)</h2>
+              <p className="text-[11px] text-muted-foreground">Defina os estados possíveis a atribuir ao discente no perfil financeiro.</p>
+            </div>
+            <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{finEstados.length} estado{finEstados.length === 1 ? "" : "s"}</span>
+          </div>
+          <div className="divide-y">
+            <div className="grid grid-cols-[1fr_1.2fr_180px_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+              <div>Designação</div>
+              <div>Descrição</div>
+              <div>Cor</div>
+              <div>Pré-visualização</div>
+              <div className="text-right">Ação</div>
+            </div>
+            {finEstados.map((es) => (
+              <div key={es.id} className="grid grid-cols-[1fr_1.2fr_180px_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+                <Input className="h-9" placeholder="Ex: Regularizado" value={es.nome}
+                  onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, nome: e.target.value } : x))} />
+                <Input className="h-9" placeholder="Descrição curta" value={es.descricao || ""}
+                  onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, descricao: e.target.value } : x))} />
+                <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={es.cor}
+                  onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, cor: e.target.value } : x))}>
+                  {FIN_COR_OPCOES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </select>
+                <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium ${es.cor}`}>{es.nome || "—"}</span>
+                <div className="flex justify-end">
+                  <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    onClick={() => setFinEstados((s) => s.filter((x) => x.id !== es.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="px-5 py-3 border-t bg-muted/10">
+            <Button size="sm" variant="outline" className="gap-1.5"
+              onClick={() => setFinEstados((s) => [...s, { id: newId(), nome: "", cor: FIN_COR_OPCOES[0].value, descricao: "" }])}>
+              <Plus className="w-3.5 h-3.5" /> Adicionar estado
+            </Button>
+          </div>
+        </Card>
+      )}
 
       <Card className="overflow-hidden">
         <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
