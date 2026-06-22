@@ -243,17 +243,23 @@ export default function FinancasCalendario() {
   };
 
   const [saving, setSaving] = useState(false);
+  const [geopontos, setGeopontos] = useState<{ id: string; sigla: string; nome: string }[]>([]);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
-      const { data, error } = await supabase
-        .from("calendario_events")
-        .select("id,type,title,event_date,start_time,end_time,location,participants,categoria")
-        .order("event_date", { ascending: true });
+      const [{ data: evs, error: evErr }, { data: geos, error: geErr }] = await Promise.all([
+        supabase
+          .from("calendario_events")
+          .select("id,type,title,event_date,start_time,end_time,location,participants,categoria")
+          .order("event_date", { ascending: true }),
+        supabase.from("edificios").select("id,sigla,nome").order("sigla"),
+      ]);
       if (!mounted) return;
-      if (error) { console.warn("calendario load", error.message); return; }
-      setUserEvents((data ?? []).map(fromDb));
+      if (evErr) console.warn("calendario load", evErr.message);
+      else setUserEvents((evs ?? []).map(fromDb));
+      if (geErr) console.warn("geopontos load", geErr.message);
+      else setGeopontos(geos ?? []);
     })();
     return () => { mounted = false; };
   }, []);
