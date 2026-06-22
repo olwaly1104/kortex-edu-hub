@@ -304,9 +304,8 @@ export default function AdminDiscenteProfile() {
                 <SectionCard title="Plano Financeiro" icon={<Wallet className="w-4 h-4" />}>
                   <InfoRow label="Regime" value={isBolseiro ? "Bolseiro" : "Normal"} icon={<Award className="w-4 h-4 text-primary" />} />
                   <InfoRow label="Curso" value={cursoName} icon={<GraduationCap className="w-4 h-4 text-primary" />} />
-                  <InfoRow label="Propina base" value={propina ? fmtAOA(valorMensal) : "—"} icon={<Wallet className="w-4 h-4 text-primary" />} />
-                  <InfoRow label="Imposto" value={propina ? `${imposto}%` : "—"} icon={<Receipt className="w-4 h-4 text-primary" />} />
-                  <InfoRow label="Mensalidade final" value={isBolseiro ? "Isento" : (propina ? fmtAOA(totalMensal) : "—")} icon={<CircleDollarSign className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Propina mensal" value={isBolseiro ? "Isento" : (propina ? fmtAOA(valorMensal) : "—")} icon={<Wallet className="w-4 h-4 text-primary" />} />
+                  <InfoRow label="Prazo" value="—" icon={<Calendar className="w-4 h-4 text-primary" />} />
                   <InfoRow label="Data de matriculação" value={dataMatricula} icon={<Calendar className="w-4 h-4 text-primary" />} />
                 </SectionCard>
               </>
