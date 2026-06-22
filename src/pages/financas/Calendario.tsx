@@ -885,9 +885,18 @@ export default function FinancasCalendario() {
               <div className="space-y-1.5 rounded-xl bg-blue-50/40 border border-blue-100 p-4">
                 <Label className="text-xs flex items-center gap-1.5 text-blue-900"><Users className="w-3 h-3" /> Participantes</Label>
                 <p className="text-[11px] text-blue-700/80 mb-2">Todos os selecionados receberão um pedido de reunião no calendário.</p>
+                <div className="relative mb-2">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  <Input
+                    value={participantSearch}
+                    onChange={(e) => setParticipantSearch(e.target.value)}
+                    placeholder="Procurar participante…"
+                    className="h-9 pl-8 text-xs bg-card"
+                  />
+                </div>
                 <ScrollArea className="h-40 rounded-md border bg-card p-2">
                   <div className="space-y-1">
-                    {DEPT_PEOPLE.map(p => {
+                    {DEPT_PEOPLE.filter(p => p.toLowerCase().includes(participantSearch.toLowerCase())).map(p => {
                       const checked = (form.participants ?? []).includes(p);
                       return (
                         <label key={p} className={cn("flex items-center gap-2 text-xs cursor-pointer p-2 rounded transition-colors",
@@ -897,6 +906,9 @@ export default function FinancasCalendario() {
                         </label>
                       );
                     })}
+                    {DEPT_PEOPLE.filter(p => p.toLowerCase().includes(participantSearch.toLowerCase())).length === 0 && (
+                      <p className="text-[11px] text-muted-foreground text-center py-4">Nenhum participante encontrado.</p>
+                    )}
                   </div>
                 </ScrollArea>
                 {(form.participants?.length ?? 0) > 0 && (
