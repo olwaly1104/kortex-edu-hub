@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import {
   Camera, User, Mail, Phone, MapPin, FileText, Upload, Trash2, CheckCircle2,
-  IdCard, BadgeCheck, Briefcase, Pencil, FileDown,
+  IdCard, BadgeCheck, Briefcase, Pencil, FileDown, Eye, Download,
 } from "lucide-react";
 import { toast } from "sonner";
 
