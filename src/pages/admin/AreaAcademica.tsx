@@ -35,6 +35,7 @@ export default function AreaAcademica() {
       <OnboardingStepBanner />
       <Tabs value={tab} onValueChange={onChange} className="space-y-4">
         <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+        <TabsList className="grid grid-cols-5 w-full max-w-3xl">
           <TabsTrigger value="faculdades" className="gap-1.5">
             <Building2 className="w-3.5 h-3.5" /> Faculdades & Cursos
           </TabsTrigger>
@@ -46,6 +47,9 @@ export default function AreaAcademica() {
           </TabsTrigger>
           <TabsTrigger value="turmas" className="gap-1.5">
             <Users className="w-3.5 h-3.5" /> Turmas
+          </TabsTrigger>
+          <TabsTrigger value="criterio" className="gap-1.5">
+            <Award className="w-3.5 h-3.5" /> Critério Académico
           </TabsTrigger>
         </TabsList>
 
@@ -61,6 +65,9 @@ export default function AreaAcademica() {
           </TabsContent>
           <TabsContent value="turmas" className="mt-0">
             <CriarTurmas />
+          </TabsContent>
+          <TabsContent value="criterio" className="mt-0">
+            <CriterioAcademico />
           </TabsContent>
         </SuppressOnboardingBanner>
       </Tabs>
