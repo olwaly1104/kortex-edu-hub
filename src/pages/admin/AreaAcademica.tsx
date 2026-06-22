@@ -1,19 +1,21 @@
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Building2, BookOpen, CalendarDays, Users } from "lucide-react";
+import { Building2, BookOpen, CalendarDays, Users, Award } from "lucide-react";
 import { OnboardingStepBanner, SuppressOnboardingBanner } from "@/components/admin/OnboardingStepBanner";
 import AdminFaculdadesCursos from "./FaculdadesCursos";
 import GerarCadeiras from "../academica2/GerarCadeiras";
 import CalendarioAcademico from "../academica2/CalendarioAcademico";
 import CriarTurmas from "../academica2/CriarTurmas";
+import CriterioAcademico from "./CriterioAcademico";
 
-type TabKey = "faculdades" | "cadeiras" | "calendario" | "turmas";
+type TabKey = "faculdades" | "cadeiras" | "calendario" | "turmas" | "criterio";
 
 const STEP_FOR: Record<TabKey, string> = {
   faculdades: "aca.fac",
   cadeiras: "aca.cad",
   calendario: "aca.cal",
   turmas: "aca.tur",
+  criterio: "aca.cri",
 };
 
 export default function AreaAcademica() {
