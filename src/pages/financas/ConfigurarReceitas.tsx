@@ -866,7 +866,7 @@ function SalariosSection({ email }: { email?: string | null }) {
 type RhMulta = { id: string; nome: string; valor: number; descricao: string; aplicaA: "Docente" | "Staff" | "Discente" | "Ambos" };
 type FinEstado = { id: string; nome: string; cor: string; descricao?: string; min: number; max: number; locked?: boolean };
 
-const FIN_ESTADOS_DISC_KEY = (email?: string | null) => KEY("discentes.estados.financeiros.v2", email);
+const FIN_ESTADOS_DISC_KEY = (email?: string | null) => KEY("discentes.estados.financeiros.v3", email);
 const DEFAULT_FIN_ESTADOS_DISC: FinEstado[] = [
   { id: "fe1", nome: "Regularizado", cor: "bg-emerald-100 text-emerald-700 border-emerald-200", descricao: "Sem pendências financeiras", min: 0, max: 0, locked: true },
   { id: "fe2", nome: "Por regularizar", cor: "bg-amber-100 text-amber-700 border-amber-200", descricao: "Mensalidades em atraso recente", min: 1, max: 2 },
