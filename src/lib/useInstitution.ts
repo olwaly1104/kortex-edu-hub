@@ -445,11 +445,11 @@ export function useBulkCreateEstudantes() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (inputs: EstudanteInput[]) => {
-      const uid = await currentUserId();
-      if (!uid) throw new Error("Sessão expirada.");
+      const inst = await currentInstitutionId();
+      if (!inst) throw new Error("Sessão expirada.");
       if (inputs.length === 0) return [];
       const rows = inputs.map((i) => ({
-        owner_user_id: uid,
+        owner_user_id: inst,
         ano: "1",
         turma: "A",
         origem: "importado",
