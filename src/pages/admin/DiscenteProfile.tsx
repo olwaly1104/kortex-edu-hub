@@ -179,18 +179,21 @@ export default function AdminDiscenteProfile() {
               <p className="text-2xl font-bold tabular-nums mt-1">{student.ano}<span className="text-sm text-muted-foreground font-normal">º · {student.turma}</span></p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estado</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estado Académico</p>
               <div className="mt-1.5">
-                <Badge variant="outline" className="text-xs px-2 py-0.5 bg-accent/10 text-accent border-accent/30">Activo</Badge>
+                <Badge variant="outline" className="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 border-emerald-200">Activo</Badge>
               </div>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Matrícula</p>
-              <p className="text-xs font-mono font-bold mt-1.5 truncate">{displayId}</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estado Financeiro</p>
+              <div className="mt-1.5">
+                <Badge variant="outline" className={cn("text-xs px-2 py-0.5",
+                  student.regime === "bolseiro" ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-emerald-50 text-emerald-700 border-emerald-200")}>
+                  {student.regime === "bolseiro" ? "Isento (Bolseiro)" : "Regularizado"}
+                </Badge>
+              </div>
             </div>
-          </div>
-        </div>
-      </Card>
+
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="bg-muted/40">
