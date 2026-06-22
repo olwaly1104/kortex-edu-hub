@@ -190,7 +190,7 @@ export default function GapConfiguracao() {
 
   // ===== AGENDAMENTOS =====
   type AgCategoria = { key: string; label: string; color: string };
-  type AgMotivo = { key: string; label: string; categoria: string; responsavel: string; duracao: number };
+  type AgMotivo = { key: string; label: string; categoria: string; duracao: number };
   type AgSala = { key: string; label: string; lotacao: number };
 
   const [agCategorias, setAgCategorias] = useState<AgCategoria[]>([
@@ -203,11 +203,11 @@ export default function GapConfiguracao() {
     { key: "documentacao", label: "Documentação", color: "bg-slate-100 text-slate-700 border-slate-200" },
   ]);
   const [agMotivos, setAgMotivos] = useState<AgMotivo[]>([
-    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico", responsavel: "Dra. Helena Cabral · GAP", duracao: 50 },
-    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico", responsavel: "Dr. João Tavares · GAP", duracao: 40 },
-    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional", responsavel: "Dra. Helena Cabral · GAP", duracao: 60 },
-    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional", responsavel: "Dr. João Tavares · GAP", duracao: 30 },
-    { key: "mediacao", label: "Mediação de conflito", categoria: "Social", responsavel: "Dra. Helena Cabral · GAP", duracao: 60 },
+    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico", duracao: 50 },
+    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico", duracao: 40 },
+    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional", duracao: 60 },
+    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional", duracao: 30 },
+    { key: "mediacao", label: "Mediação de conflito", categoria: "Social", duracao: 60 },
   ]);
   const [agSalas, setAgSalas] = useState<AgSala[]>([
     { key: "gap1", label: "Gab. GAP 1", lotacao: 4 },
