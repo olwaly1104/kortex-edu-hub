@@ -123,14 +123,15 @@ export default function GapInicio() {
             <ul className="divide-y divide-border rounded-md border border-border">
               {agenda.map(item => {
                 const key = (item.categoria || item.type || "outro").toLowerCase();
-                const Icon = ICON_FOR[key] ?? Clock;
+                const meta = TYPE_META[key] ?? TYPE_META.outro;
+                const Icon = meta.icon;
                 const time = item.start_time
                   ? item.start_time.slice(0, 5) + (item.end_time ? ` – ${item.end_time.slice(0, 5)}` : "")
                   : "Todo o dia";
                 return (
                   <li key={item.id} className="flex items-center gap-3 px-3 py-2.5">
-                    <span className={`w-1.5 h-8 rounded-full shrink-0 ${TYPE_DOT[key] ?? TYPE_DOT.outro}`} />
-                    <div className="w-9 h-9 rounded-md bg-muted text-muted-foreground flex items-center justify-center shrink-0">
+                    <span className={`w-1.5 h-8 rounded-full shrink-0 ${meta.bar}`} />
+                    <div className={`w-9 h-9 rounded-md flex items-center justify-center shrink-0 border ${meta.soft} ${meta.text}`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -142,8 +143,8 @@ export default function GapInicio() {
                         )}
                       </div>
                     </div>
-                    <span className="text-[10px] uppercase tracking-wide text-muted-foreground shrink-0">
-                      {TYPE_LABEL[key] ?? "Outro"}
+                    <span className={`text-[10px] uppercase tracking-wide font-medium px-2 py-0.5 rounded-md border shrink-0 ${meta.soft} ${meta.text}`}>
+                      {meta.label}
                     </span>
                   </li>
                 );
