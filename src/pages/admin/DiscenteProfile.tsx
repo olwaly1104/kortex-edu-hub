@@ -131,7 +131,12 @@ export default function AdminDiscenteProfile() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Perfil do Discente</p>
-                <h1 className="text-2xl font-bold text-foreground leading-tight mt-1">{student.nome}</h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <h1 className="text-2xl font-bold text-foreground leading-tight">{student.nome}</h1>
+                  <Badge className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/10 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
+                    <GraduationCap className="w-3 h-3 mr-1" /> Estudante
+                  </Badge>
+                </div>
                 <p className="text-xs text-muted-foreground mt-1.5">
                   <Link to="/admin/faculdades-cursos" className="hover:text-foreground transition-colors">
                     {cursoCode ? `${cursoCode} · ` : ""}{cursoName}
