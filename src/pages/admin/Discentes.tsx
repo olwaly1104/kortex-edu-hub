@@ -308,6 +308,7 @@ export default function AdminDiscentes() {
         enc_bilhete_url,
       });
       toast.success(`Discente adicionado · ${previewEmail}`);
+      setJustCreated(previewEmail);
       setDraft(emptyDraft(draft.faculdade_id, draft.curso_id));
       if (fotoInput.current) fotoInput.current.value = "";
       if (biInput.current) biInput.current.value = "";
