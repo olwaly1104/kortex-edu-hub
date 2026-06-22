@@ -685,7 +685,7 @@ export default function AdminDiscentes() {
             <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
             <Button
               onClick={addRow}
-              disabled={uploading || createMut.isPending || !draft.primeiroNome.trim() || !draft.curso_id}
+              disabled={uploading || createMut.isPending || !requiredOk}
               className="gap-1.5"
             >
               {(uploading || createMut.isPending) ? (
