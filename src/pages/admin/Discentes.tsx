@@ -145,7 +145,6 @@ export default function AdminDiscentes() {
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const deleteTarget = useMemo(() => normalizedRef => null, []);
   const fotoInput = useRef<HTMLInputElement>(null);
   const biInput = useRef<HTMLInputElement>(null);
   const certInput = useRef<HTMLInputElement>(null);
