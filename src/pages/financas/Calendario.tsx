@@ -247,21 +247,32 @@ export default function FinancasCalendario() {
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
-      const [{ data: evs, error: evErr }, { data: geos, error: geErr }] = await Promise.all([
-        supabase
-          .from("calendario_events")
-          .select("id,type,title,event_date,start_time,end_time,location,participants,categoria")
-          .order("event_date", { ascending: true }),
-        supabase.from("edificios").select("id,sigla,nome").order("sigla"),
-      ]);
+    const loadEvents = async () => {
+      const { data: evs, error: evErr } = await supabase
+        .from("calendario_events")
+        .select("id,type,title,event_date,start_time,end_time,location,participants,categoria")
+        .order("event_date", { ascending: true });
       if (!mounted) return;
       if (evErr) console.warn("calendario load", evErr.message);
       else setUserEvents((evs ?? []).map(fromDb));
+    };
+    (async () => {
+      const { data: geos, error: geErr } = await supabase
+        .from("edificios").select("id,sigla,nome").order("sigla");
+      if (!mounted) return;
       if (geErr) console.warn("geopontos load", geErr.message);
       else setGeopontos(geos ?? []);
+      await loadEvents();
     })();
-    return () => { mounted = false; };
+    const channel = supabase
+      .channel("calendario-events-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "calendario_events" },
+        () => loadEvents(),
+      )
+      .subscribe();
+    return () => { mounted = false; supabase.removeChannel(channel); };
   }, []);
 
   const openCreateDialog = () => {
