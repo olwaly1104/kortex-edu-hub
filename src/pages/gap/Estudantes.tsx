@@ -195,7 +195,11 @@ export default function GapEstudantes() {
             </thead>
             <tbody className="divide-y divide-border">
               {filtered.map((r) => (
-                <tr key={r.id} className="hover:bg-muted/30">
+                <tr
+                  key={r.id}
+                  onClick={() => navigate(`/admin/discentes/${r.id}`)}
+                  className="hover:bg-muted/30 cursor-pointer"
+                >
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
@@ -216,7 +220,7 @@ export default function GapEstudantes() {
                       {r.estado}
                     </span>
                   </td>
-                  <td className="py-3 px-2">
+                  <td className="py-3 px-2" onClick={(e) => e.stopPropagation()}>
                     <Button
                       size="icon"
                       variant="ghost"
