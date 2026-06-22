@@ -877,9 +877,9 @@ export default function FinancasCalendario() {
 
           <DialogFooter className="px-6 py-4 border-t bg-muted/20">
             <Button variant="ghost" onClick={() => setOpenCreate(false)}>Cancelar</Button>
-            <Button onClick={handleCreate} className="gap-1.5">
+            <Button onClick={handleCreate} disabled={saving} className="gap-1.5">
               <Check className="w-4 h-4" />
-              {kind === "reuniao" ? "Enviar pedido" : kind === "prazo" ? "Marcar prazo" : "Adicionar à agenda"}
+              {saving ? "A guardar…" : kind === "reuniao" ? "Enviar pedido" : kind === "prazo" ? "Marcar prazo" : "Adicionar à agenda"}
             </Button>
           </DialogFooter>
         </DialogContent>
