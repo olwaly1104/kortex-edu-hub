@@ -841,8 +841,8 @@ export default function GapConfiguracao() {
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima de aprovação</label>
-                <Input type="number" min={0} max={20} step={0.5} value={cdNotaMinima} disabled={!isCardEditing("cd-params")} onChange={e => setCdNotaMinima(e.target.value === "" ? "" : Number(e.target.value))} />
-                <p className="text-[10px] text-muted-foreground mt-1">Escala 0–20 no exame de acesso</p>
+                <Input type="number" min={0} max={20} step={0.5} value={cdNotaMinima} disabled readOnly />
+                <p className="text-[10px] text-muted-foreground mt-1">Definida em Área Académica · apenas leitura</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>
