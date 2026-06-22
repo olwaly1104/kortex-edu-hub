@@ -538,7 +538,6 @@ export default function AdminDiscentes() {
                 <span className="text-[11px] text-muted-foreground">Restantes campos podem ser editados depois.</span>
                 <Button
                   size="sm"
-                  variant="ghost"
                   onClick={() => {
                     if (!requiredOk) {
                       toast.error("Preencha primeiro e último nome");
@@ -547,7 +546,7 @@ export default function AdminDiscentes() {
                     setConfirmOpen(true);
                   }}
                   disabled={uploading || createMut.isPending || !requiredOk}
-                  className="h-7 px-2 text-[11px] gap-1 text-primary hover:text-primary"
+                  className="h-7 px-2.5 text-[11px] gap-1"
                 >
                   <Plus className="w-3 h-3" /> Criar simplificado
                 </Button>
