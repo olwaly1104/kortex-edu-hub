@@ -15,6 +15,18 @@ import {
 
 export default function Academica2Inicio() {
   const { user } = useAuth();
+
+  const [notaMinima, setNotaMinima] = useState<number | "">(() => {
+    if (typeof window === "undefined") return 10;
+    const v = window.localStorage.getItem("academica.notaMinimaAcesso");
+    return v ? Number(v) : 10;
+  });
+  const saveNotaMinima = () => {
+    const v = notaMinima === "" ? "" : String(notaMinima);
+    window.localStorage.setItem("academica.notaMinimaAcesso", v);
+    window.dispatchEvent(new StorageEvent("storage", { key: "academica.notaMinimaAcesso", newValue: v }));
+    toast.success("Nota mínima de aprovação atualizada. GAP verá o novo valor.");
+  };
   const ativo = anosLetivos.find(a => a.status === "ativo")!;
   const planeado = anosLetivos.find(a => a.status === "planeado")!;
 
