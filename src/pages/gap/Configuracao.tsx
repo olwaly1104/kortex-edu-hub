@@ -216,6 +216,11 @@ export default function GapConfiguracao() {
   ]);
   const [agHoraInicio, setAgHoraInicio] = useState("08:00");
   const [agHoraFim, setAgHoraFim] = useState("17:00");
+  const [agEstado, setAgEstado] = useState<"aberto" | "fechado">(() => {
+    if (typeof window === "undefined") return "aberto";
+    return (localStorage.getItem("gap_ag_estado") as "aberto" | "fechado") || "aberto";
+  });
+  useEffect(() => { try { localStorage.setItem("gap_ag_estado", agEstado); } catch {} }, [agEstado]);
 
   // Ag dialogs
   const [agCatOpen, setAgCatOpen] = useState(false);
@@ -609,7 +614,7 @@ export default function GapConfiguracao() {
               </div>
               <CardEditToggle id="ag-params" />
             </div>
-            <div className="grid grid-cols-2 gap-4 max-w-md">
+            <div className="grid grid-cols-3 gap-4 max-w-2xl">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Início atendimento</label>
                 <Input type="time" value={agHoraInicio} disabled={!isCardEditing("ag-params")} onChange={e => setAgHoraInicio(e.target.value)} />
@@ -617,6 +622,29 @@ export default function GapConfiguracao() {
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Fim atendimento</label>
                 <Input type="time" value={agHoraFim} disabled={!isCardEditing("ag-params")} onChange={e => setAgHoraFim(e.target.value)} />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Estado</label>
+                <div className="flex gap-1.5 h-9 rounded-md border border-border bg-muted/30 p-0.5">
+                  {(["aberto","fechado"] as const).map(s => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setAgEstado(s)}
+                      className={cn(
+                        "flex-1 text-xs font-semibold rounded capitalize transition-colors",
+                        agEstado === s
+                          ? s === "aberto" ? "bg-emerald-600 text-white shadow-sm" : "bg-rose-600 text-white shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      {s === "aberto" ? "Aberto" : "Fechado"}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10.5px] text-muted-foreground mt-1">
+                  Pode fechar manualmente após o fim do atendimento.
+                </p>
               </div>
             </div>
           </Card>
