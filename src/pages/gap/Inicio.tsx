@@ -39,7 +39,7 @@ const TYPE_LABEL: Record<string, string> = {
 const ICON_FOR: Record<string, typeof Clock> = {
   reuniao: UsersRound,
   prazo: FileText,
-  pessoal: User,
+  pessoal: Sparkles,
 };
 
 export default function GapInicio() {
