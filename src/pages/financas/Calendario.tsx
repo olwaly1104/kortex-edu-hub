@@ -382,7 +382,7 @@ export default function FinancasCalendario() {
               </span>
             </div>
             <Button size="sm" className="h-9 gap-1.5 text-xs shadow-md hover:shadow-lg transition-shadow"
-              onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+              onClick={openCreateDialog}>
               <Plus className="w-4 h-4" /> Adicionar à Agenda
             </Button>
           </div>
@@ -521,7 +521,7 @@ export default function FinancasCalendario() {
                         <CalendarDays className="w-7 h-7 text-muted-foreground/40 mx-auto mb-2" />
                         <p className="text-xs text-muted-foreground">Sem eventos neste dia</p>
                         <Button size="sm" variant="outline" className="mt-3 gap-1.5 text-xs"
-                          onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+                          onClick={openCreateDialog}>
                           <Plus className="w-3.5 h-3.5" /> Adicionar
                         </Button>
                       </div>
@@ -600,7 +600,7 @@ export default function FinancasCalendario() {
                   <CalendarDays className="w-7 h-7 text-muted-foreground/40 mx-auto mb-2" />
                   <p className="text-xs text-muted-foreground">Sem eventos neste dia</p>
                   <Button size="sm" variant="outline" className="mt-3 gap-1.5 text-xs"
-                    onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+                    onClick={openCreateDialog}>
                     <Plus className="w-3.5 h-3.5" /> Adicionar
                   </Button>
                 </div>
