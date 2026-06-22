@@ -462,225 +462,276 @@ export default function AdminDiscentes() {
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <GraduationCap className="w-5 h-5 text-primary" /> Adicionar Discente
-            </DialogTitle>
-            <DialogDescription>Preencha os dados do estudante. O email institucional é gerado automaticamente.</DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-6 py-2">
-            {/* 1. Identificação Pessoal */}
-            <section>
-              <SectionTitle index={1} title="Identificação Pessoal" hint="Dados do estudante e documento de identidade" />
-              <div className="flex items-start gap-4">
-                <button
-                  type="button"
-                  onClick={() => fotoInput.current?.click()}
-                  className="w-20 h-20 shrink-0 rounded-lg border-2 border-dashed border-input bg-background flex items-center justify-center overflow-hidden hover:border-primary hover:bg-primary/5 transition"
-                >
-                  {draft.fotoPreview ? (
-                    <img src={draft.fotoPreview} alt="foto" className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="flex flex-col items-center text-muted-foreground">
-                      <Camera className="w-5 h-5 mb-0.5" />
-                      <span className="text-[9px]">Foto</span>
-                    </div>
-                  )}
-                  <input
-                    ref={fotoInput}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => onFoto(e.target.files?.[0] || null)}
-                  />
-                </button>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-1">
-                  <Field label="Primeiro nome">
-                    <Input value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} placeholder="Ana" className="h-8 text-xs" />
-                  </Field>
-                  <Field label="Último nome">
-                    <Input value={draft.ultimoNome} onChange={(e) => setF("ultimoNome", e.target.value)} placeholder="Silva" className="h-8 text-xs" />
-                  </Field>
-                  <Field label="Data de nascimento">
-                    <Input type="date" value={draft.nascimento} onChange={(e) => setF("nascimento", e.target.value)} className="h-8 text-xs" />
-                  </Field>
-                  <Field label="Género">
-                    <Select value={draft.genero} onValueChange={(v) => setF("genero", v as Genero)}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="M">Masculino</SelectItem>
-                        <SelectItem value="F">Feminino</SelectItem>
-                        <SelectItem value="Outro">Outro</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Nº Bilhete de Identidade">
-                    <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
-                  </Field>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+          {/* Header */}
+          <div className="px-6 pt-6 pb-5 border-b bg-gradient-to-br from-primary/5 via-background to-background">
+            <DialogHeader className="space-y-2">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <div className="min-w-0">
+                  <DialogTitle className="text-base font-bold">Adicionar Discente</DialogTitle>
+                  <DialogDescription className="text-[12px]">
+                    Apenas o nome é necessário. A conta Kortex é criada de imediato — restantes dados podem ser editados depois no perfil.
+                  </DialogDescription>
                 </div>
               </div>
-            </section>
-
-            {/* 2. Enquadramento Académico */}
-            <section>
-              <SectionTitle index={2} title="Enquadramento Académico" hint="Faculdade, curso, ano, turma e regime de inscrição" />
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-                <Field label="Faculdade">
-                  <Select value={draft.faculdade_id} onValueChange={(v) => setF("faculdade_id", v)}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-                    <SelectContent>
-                      {faculdades.map((f: any) => (
-                        <SelectItem key={f.id} value={f.id}>{f.sigla || f.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Curso">
-                  <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)} disabled={cursosDaFac.length === 0}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder={cursosDaFac.length === 0 ? "Sem cursos" : "—"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {cursosDaFac.map((c: any) => (
-                        <SelectItem key={c.id} value={c.id}>{c.code || c.codigo || c.name || c.nome}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Ano">
-                  <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Turma">
-                  <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Regime">
-                  <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="normal">Normal</SelectItem>
-                      <SelectItem value="bolseiro">Bolseiro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
-              </div>
-            </section>
-
-            {/* 3. Contacto & Email */}
-            <section>
-              <SectionTitle index={3} title="Contacto & Email Institucional" hint="Telemóvel pessoal e email gerado automaticamente" />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <Field label="Telemóvel">
-                  <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
-                </Field>
-                <div className="md:col-span-2">
-                  <Field label="Email institucional">
-                    <div className="h-8 px-2.5 flex items-center justify-between gap-2 text-[11px] bg-muted/40 border border-input rounded-md">
-                      <span className="truncate font-mono text-foreground/80">{previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}</span>
-                      <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
-                    </div>
-                  </Field>
-                </div>
-              </div>
-            </section>
-
-            {/* 4. Morada */}
-            <section>
-              <SectionTitle index={4} title="Morada de Residência" hint="Localização atual do estudante" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                <Field label="Província">
-                  <Select value={draft.provincia} onValueChange={(v) => setDraft((d) => ({ ...d, provincia: v, municipio: "" }))}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-                    <SelectContent>
-                      {PROVINCIAS.map((p) => (
-                        <SelectItem key={p} value={p}>{p}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Município">
-                  <Select value={draft.municipio} onValueChange={(v) => setF("municipio", v)} disabled={!draft.provincia}>
-                    <SelectTrigger className="h-8 text-xs">
-                      <SelectValue placeholder={draft.provincia ? "—" : "Escolha província"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(MUNICIPIOS[draft.provincia] || []).map((m) => (
-                        <SelectItem key={m} value={m}>{m}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <div className="md:col-span-2">
-                  <Field label="Endereço">
-                    <Input value={draft.endereco} onChange={(e) => setF("endereco", e.target.value)} placeholder="Rua, bairro, nº" className="h-8 text-xs" />
-                  </Field>
-                </div>
-              </div>
-            </section>
-
-            {/* 5. Encarregado */}
-            <section>
-              <SectionTitle index={5} title="Encarregado de Educação" hint="Pessoa responsável pelo estudante" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                <Field label="Primeiro nome">
-                  <Input value={draft.enc_primeiro_nome} onChange={(e) => setF("enc_primeiro_nome", e.target.value)} placeholder="João" className="h-8 text-xs" />
-                </Field>
-                <Field label="Último nome">
-                  <Input value={draft.enc_ultimo_nome} onChange={(e) => setF("enc_ultimo_nome", e.target.value)} placeholder="Silva" className="h-8 text-xs" />
-                </Field>
-                <Field label="Parentesco">
-                  <Input value={draft.enc_parentesco} onChange={(e) => setF("enc_parentesco", e.target.value)} placeholder="Pai / Mãe / Tutor" className="h-8 text-xs" />
-                </Field>
-                <Field label="Contacto telefónico">
-                  <Input value={draft.enc_telefone} onChange={(e) => setF("enc_telefone", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
-                </Field>
-              </div>
-            </section>
-
-            {/* 6. Documentação */}
-            <section>
-              <SectionTitle index={6} title="Documentação Anexa" hint="Carregue os ficheiros em PDF ou imagem" />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <Field label="Bilhete de Identidade">
-                  <FileButton
-                    file={draft.bilheteFile}
-                    onPick={(f) => setF("bilheteFile", f)}
-                    inputRef={biInput}
-                    accept="image/*,application/pdf"
-                    Icon={IdCard}
-                  />
-                </Field>
-                <Field label="Certificado Ensino Médio">
-                  <FileButton
-                    file={draft.certificadoFile}
-                    onPick={(f) => setF("certificadoFile", f)}
-                    inputRef={certInput}
-                    accept="image/*,application/pdf"
-                    Icon={FileText}
-                  />
-                </Field>
-                <Field label="BI do Encarregado">
-                  <FileButton
-                    file={draft.encBilheteFile}
-                    onPick={(f) => setF("encBilheteFile", f)}
-                    inputRef={encBiInput}
-                    accept="image/*,application/pdf"
-                    Icon={IdCard}
-                  />
-                </Field>
-              </div>
-            </section>
+            </DialogHeader>
           </div>
 
-          <DialogFooter>
+          <div className="px-6 py-5 space-y-6">
+            {/* Minimal required block */}
+            <section className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Field label="Primeiro nome *">
+                  <Input
+                    autoFocus
+                    value={draft.primeiroNome}
+                    onChange={(e) => setF("primeiroNome", e.target.value)}
+                    placeholder="Ana"
+                    className="h-9 text-sm"
+                  />
+                </Field>
+                <Field label="Último nome *">
+                  <Input
+                    value={draft.ultimoNome}
+                    onChange={(e) => setF("ultimoNome", e.target.value)}
+                    placeholder="Silva"
+                    className="h-9 text-sm"
+                  />
+                </Field>
+              </div>
+
+              <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Email Kortex (auto)</div>
+                  <div className="font-mono text-[12px] text-foreground/90 truncate">
+                    {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
+                  </div>
+                </div>
+                <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
+              </div>
+            </section>
+
+            {/* Optional extra details collapsible */}
+            <section className="border-t pt-4">
+              <button
+                type="button"
+                onClick={() => setShowMore((v) => !v)}
+                className="w-full flex items-center justify-between gap-2 text-[12px] font-semibold text-foreground hover:text-primary transition"
+              >
+                <span className="flex items-center gap-2">
+                  <Pencil className="w-3.5 h-3.5" />
+                  Adicionar mais detalhes agora (opcional)
+                </span>
+                <span className="text-[10px] text-muted-foreground">{showMore ? "Esconder" : "Mostrar"}</span>
+              </button>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Pode preencher tudo agora ou deixar para depois — editável a qualquer momento no perfil do discente.
+              </p>
+            </section>
+
+            {showMore && (
+              <div className="space-y-6">
+                {/* 1. Identificação Pessoal */}
+                <section>
+                  <SectionTitle index={1} title="Identificação Pessoal" hint="Foto, data de nascimento, género e documento" />
+                  <div className="flex items-start gap-4">
+                    <button
+                      type="button"
+                      onClick={() => fotoInput.current?.click()}
+                      className="w-20 h-20 shrink-0 rounded-lg border-2 border-dashed border-input bg-background flex items-center justify-center overflow-hidden hover:border-primary hover:bg-primary/5 transition"
+                    >
+                      {draft.fotoPreview ? (
+                        <img src={draft.fotoPreview} alt="foto" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="flex flex-col items-center text-muted-foreground">
+                          <Camera className="w-5 h-5 mb-0.5" />
+                          <span className="text-[9px]">Foto</span>
+                        </div>
+                      )}
+                      <input
+                        ref={fotoInput}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => onFoto(e.target.files?.[0] || null)}
+                      />
+                    </button>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-1">
+                      <Field label="Data de nascimento">
+                        <Input type="date" value={draft.nascimento} onChange={(e) => setF("nascimento", e.target.value)} className="h-8 text-xs" />
+                      </Field>
+                      <Field label="Género">
+                        <Select value={draft.genero} onValueChange={(v) => setF("genero", v as Genero)}>
+                          <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="M">Masculino</SelectItem>
+                            <SelectItem value="F">Feminino</SelectItem>
+                            <SelectItem value="Outro">Outro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </Field>
+                      <Field label="Nº Bilhete de Identidade">
+                        <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
+                      </Field>
+                    </div>
+                  </div>
+                </section>
+
+                {/* 2. Enquadramento Académico */}
+                <section>
+                  <SectionTitle index={2} title="Enquadramento Académico" hint="Faculdade, curso, ano, turma e regime de inscrição" />
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    <Field label="Faculdade">
+                      <Select value={draft.faculdade_id} onValueChange={(v) => setF("faculdade_id", v)}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                        <SelectContent>
+                          {faculdades.map((f: any) => (
+                            <SelectItem key={f.id} value={f.id}>{f.sigla || f.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Field label="Curso">
+                      <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)} disabled={cursosDaFac.length === 0}>
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder={cursosDaFac.length === 0 ? "Sem cursos" : "—"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {cursosDaFac.map((c: any) => (
+                            <SelectItem key={c.id} value={c.id}>{c.code || c.codigo || c.name || c.nome}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Field label="Ano">
+                      <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
+                      </Select>
+                    </Field>
+                    <Field label="Turma">
+                      <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </Field>
+                    <Field label="Regime">
+                      <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="normal">Normal</SelectItem>
+                          <SelectItem value="bolseiro">Bolseiro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  </div>
+                </section>
+
+                {/* 3. Contacto */}
+                <section>
+                  <SectionTitle index={3} title="Contacto" hint="Telemóvel pessoal" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <Field label="Telemóvel">
+                      <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
+                    </Field>
+                  </div>
+                </section>
+
+                {/* 4. Morada */}
+                <section>
+                  <SectionTitle index={4} title="Morada de Residência" hint="Localização atual do estudante" />
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <Field label="Província">
+                      <Select value={draft.provincia} onValueChange={(v) => setDraft((d) => ({ ...d, provincia: v, municipio: "" }))}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                        <SelectContent>
+                          {PROVINCIAS.map((p) => (
+                            <SelectItem key={p} value={p}>{p}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Field label="Município">
+                      <Select value={draft.municipio} onValueChange={(v) => setF("municipio", v)} disabled={!draft.provincia}>
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder={draft.provincia ? "—" : "Escolha província"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {(MUNICIPIOS[draft.provincia] || []).map((m) => (
+                            <SelectItem key={m} value={m}>{m}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <div className="md:col-span-2">
+                      <Field label="Endereço">
+                        <Input value={draft.endereco} onChange={(e) => setF("endereco", e.target.value)} placeholder="Rua, bairro, nº" className="h-8 text-xs" />
+                      </Field>
+                    </div>
+                  </div>
+                </section>
+
+                {/* 5. Encarregado */}
+                <section>
+                  <SectionTitle index={5} title="Encarregado de Educação" hint="Pessoa responsável pelo estudante" />
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <Field label="Primeiro nome">
+                      <Input value={draft.enc_primeiro_nome} onChange={(e) => setF("enc_primeiro_nome", e.target.value)} placeholder="João" className="h-8 text-xs" />
+                    </Field>
+                    <Field label="Último nome">
+                      <Input value={draft.enc_ultimo_nome} onChange={(e) => setF("enc_ultimo_nome", e.target.value)} placeholder="Silva" className="h-8 text-xs" />
+                    </Field>
+                    <Field label="Parentesco">
+                      <Input value={draft.enc_parentesco} onChange={(e) => setF("enc_parentesco", e.target.value)} placeholder="Pai / Mãe / Tutor" className="h-8 text-xs" />
+                    </Field>
+                    <Field label="Contacto telefónico">
+                      <Input value={draft.enc_telefone} onChange={(e) => setF("enc_telefone", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
+                    </Field>
+                  </div>
+                </section>
+
+                {/* 6. Documentação */}
+                <section>
+                  <SectionTitle index={6} title="Documentação Anexa" hint="Carregue os ficheiros em PDF ou imagem" />
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <Field label="Bilhete de Identidade">
+                      <FileButton
+                        file={draft.bilheteFile}
+                        onPick={(f) => setF("bilheteFile", f)}
+                        inputRef={biInput}
+                        accept="image/*,application/pdf"
+                        Icon={IdCard}
+                      />
+                    </Field>
+                    <Field label="Certificado Ensino Médio">
+                      <FileButton
+                        file={draft.certificadoFile}
+                        onPick={(f) => setF("certificadoFile", f)}
+                        inputRef={certInput}
+                        accept="image/*,application/pdf"
+                        Icon={FileText}
+                      />
+                    </Field>
+                    <Field label="BI do Encarregado">
+                      <FileButton
+                        file={draft.encBilheteFile}
+                        onPick={(f) => setF("encBilheteFile", f)}
+                        inputRef={encBiInput}
+                        accept="image/*,application/pdf"
+                        Icon={IdCard}
+                      />
+                    </Field>
+                  </div>
+                </section>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter className="px-6 py-4 border-t bg-muted/20">
             <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
             <Button
               onClick={() => {
@@ -694,14 +745,15 @@ export default function AdminDiscentes() {
               className="gap-1.5"
             >
               {(uploading || createMut.isPending) ? (
-                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> A guardar…</>
+                <><Loader2 className="w-3.5 h-3.5 animate-spin" /> A criar…</>
               ) : (
-                <><Plus className="w-3.5 h-3.5" /> Adicionar Discente</>
+                <><Plus className="w-3.5 h-3.5" /> Criar conta Kortex</>
               )}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
