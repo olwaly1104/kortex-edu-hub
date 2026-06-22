@@ -64,6 +64,7 @@ export default function CriarTurmas() {
   const [openFacs, setOpenFacs] = useState<Record<string, boolean>>({});
   const toggleFac = (f: string) => setOpenFacs(p => ({ ...p, [f]: !p[f] }));
   const [selectedCurso, setSelectedCurso] = useState<string>(cursoTemplates[0].id);
+  const [verTurma, setVerTurma] = useState<{ codigo: string; sala: string; turno: string; capacidade: number; estudantes: ReturnType<typeof buildStudents> } | null>(null);
 
   const curso = cursoTemplates.find(c => c.id === selectedCurso)!;
   const cursoTurmas = data[selectedCurso];
