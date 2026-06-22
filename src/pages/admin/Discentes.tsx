@@ -534,13 +534,11 @@ export default function AdminDiscentes() {
                 </div>
               </div>
 
-              <div className="rounded-md border border-dashed bg-background px-3 py-2.5 flex items-center justify-between gap-3">
-                <p className="text-[11px] text-muted-foreground leading-snug">
-                  Pode criar já o perfil simplificado (apenas com o nome) e preencher os restantes dados mais tarde no perfil do discente.
-                </p>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] text-muted-foreground">Restantes campos podem ser editados depois.</span>
                 <Button
                   size="sm"
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => {
                     if (!requiredOk) {
                       toast.error("Preencha primeiro e último nome");
@@ -549,9 +547,9 @@ export default function AdminDiscentes() {
                     setConfirmOpen(true);
                   }}
                   disabled={uploading || createMut.isPending || !requiredOk}
-                  className="gap-1.5 shrink-0"
+                  className="h-7 px-2 text-[11px] gap-1 text-primary hover:text-primary"
                 >
-                  <Plus className="w-3.5 h-3.5" /> Criar perfil simplificado
+                  <Plus className="w-3 h-3" /> Criar simplificado
                 </Button>
               </div>
             </section>
