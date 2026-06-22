@@ -98,6 +98,16 @@ async function currentUserId(): Promise<string | null> {
   return data.user?.id ?? null;
 }
 
+async function currentInstitutionId(): Promise<string | null> {
+  const uid = await currentUserId();
+  if (!uid) return null;
+  const { data } = await (supabase.from("profiles" as any) as any)
+    .select("institution_id")
+    .eq("id", uid)
+    .maybeSingle();
+  return (data?.institution_id as string) || uid;
+}
+
 // ---------- Queries ----------
 
 export function useFaculdades() {
@@ -406,11 +416,11 @@ export function useCreateEstudante() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: EstudanteInput) => {
-      const uid = await currentUserId();
-      if (!uid) throw new Error("Sessão expirada.");
+      const inst = await currentInstitutionId();
+      if (!inst) throw new Error("Sessão expirada.");
       const { data, error } = await (supabase.from("estudantes" as any) as any)
         .insert({
-          owner_user_id: uid,
+          owner_user_id: inst,
           ano: "1",
           turma: "A",
           origem: "novo",
@@ -435,11 +445,11 @@ export function useBulkCreateEstudantes() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (inputs: EstudanteInput[]) => {
-      const uid = await currentUserId();
-      if (!uid) throw new Error("Sessão expirada.");
+      const inst = await currentInstitutionId();
+      if (!inst) throw new Error("Sessão expirada.");
       if (inputs.length === 0) return [];
       const rows = inputs.map((i) => ({
-        owner_user_id: uid,
+        owner_user_id: inst,
         ano: "1",
         turma: "A",
         origem: "importado",
