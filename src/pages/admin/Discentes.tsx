@@ -716,7 +716,8 @@ export default function AdminDiscentes() {
                   </div>
                 </section>
               </div>
-            )}
+            </div>
+
           </div>
 
           <DialogFooter className="px-6 py-4 border-t bg-muted/20">
