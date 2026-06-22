@@ -45,17 +45,26 @@ Deno.serve(async (req) => {
     console.log("admin-create-user caller:", callerId);
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
-    const { data: roleRow, error: roleCheckErr } = await admin
+    // Resolve caller's roles + institution.
+    const { data: callerRoles } = await admin
       .from("user_roles")
       .select("role")
-      .eq("user_id", callerId)
-      .eq("role", "admin")
+      .eq("user_id", callerId);
+    const roles = new Set((callerRoles ?? []).map((r: any) => String(r.role)));
+    const { data: callerProfile } = await admin
+      .from("profiles")
+      .select("institution_id")
+      .eq("id", callerId)
       .maybeSingle();
-    if (roleCheckErr) {
-      console.error("role check failed:", roleCheckErr.message);
-      return json({ error: "Falha ao verificar permissões: " + roleCheckErr.message }, 500);
-    }
-    if (!roleRow) {
+    const institutionId = (callerProfile?.institution_id as string) || callerId;
+
+    // Admins can create any module. Staff (gap, academica, financas, coordenador,
+    // decano, reitor, inscricoes) can provision estudantes for their institution.
+    const STAFF_PROVISIONERS = new Set([
+      "gap", "academica", "financas", "coordenador", "decano", "reitor", "inscricoes",
+    ]);
+    const isAdmin = roles.has("admin");
+    if (!isAdmin) {
       const metadataRole = String(userData.user.user_metadata?.modulo ?? "").toLowerCase();
       const callerEmail = String(userData.user.email ?? "").toLowerCase();
       const isInstitutionAdmin = metadataRole === "admin" || /^admin@.+\.kor$/.test(callerEmail);
@@ -67,9 +76,13 @@ Deno.serve(async (req) => {
           console.error("admin role backfill failed:", backfillErr.message);
           return json({ error: "Falha ao ativar permissões de administrador: " + backfillErr.message }, 500);
         }
+        roles.add("admin");
         console.log("admin role backfilled for caller:", callerId);
       } else {
-        return json({ error: "Apenas administradores podem criar utilizadores." }, 403);
+        const isStaff = [...roles].some((r) => STAFF_PROVISIONERS.has(r));
+        if (!isStaff) {
+          return json({ error: "Sem permissões para criar utilizadores." }, 403);
+        }
       }
     }
 
@@ -86,6 +99,10 @@ Deno.serve(async (req) => {
     }
     if (!ALLOWED_ROLES.has(modulo)) {
       return json({ error: "Módulo inválido." }, 400);
+    }
+    // Non-admin staff can only provision estudantes.
+    if (!isAdmin && modulo !== "estudante") {
+      return json({ error: "Apenas administradores podem criar utilizadores deste tipo." }, 403);
     }
 
     const { data: created, error: createErr } = await admin.auth.admin.createUser({
@@ -108,7 +125,7 @@ Deno.serve(async (req) => {
       if (existingErr || !existingProfile?.id) {
         return json({ error: "Este email já existe na autenticação, mas ainda não tem perfil ligado. Crie com outro email." }, 409);
       }
-      if (existingProfile.institution_id && existingProfile.institution_id !== callerId) {
+      if (existingProfile.institution_id && existingProfile.institution_id !== institutionId) {
         return json({ error: "Este email já pertence a outra instituição." }, 409);
       }
       newUserId = existingProfile.id;
@@ -120,7 +137,7 @@ Deno.serve(async (req) => {
         id: newUserId,
         display_name: name,
         email,
-        institution_id: callerId,
+        institution_id: institutionId,
         must_change_password: true,
       },
       { onConflict: "id" }
