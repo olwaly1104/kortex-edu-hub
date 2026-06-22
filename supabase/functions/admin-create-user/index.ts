@@ -100,6 +100,10 @@ Deno.serve(async (req) => {
     if (!ALLOWED_ROLES.has(modulo)) {
       return json({ error: "Módulo inválido." }, 400);
     }
+    // Non-admin staff can only provision estudantes.
+    if (!isAdmin && modulo !== "estudante") {
+      return json({ error: "Apenas administradores podem criar utilizadores deste tipo." }, 403);
+    }
 
     const { data: created, error: createErr } = await admin.auth.admin.createUser({
       email,
