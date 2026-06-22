@@ -32,7 +32,7 @@ const DAYS_FULL = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", 
 const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
 type EventType = "ferias" | "reuniao" | "feriado" | "pessoal" | "prazo";
-type ItemKind = "evento" | "reuniao";
+type ItemKind = "evento" | "prazo" | "reuniao";
 
 interface AgendaEvent {
   id: string;
