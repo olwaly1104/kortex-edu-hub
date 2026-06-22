@@ -280,7 +280,7 @@ export default function AdminDiscenteProfile() {
                   </Card>
                   <Card className="p-4">
                     <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
-                      <CircleDollarSign className="w-3.5 h-3.5" /> Total Anual Estimado
+                      <CircleDollarSign className="w-3.5 h-3.5" /> Propina Anual
                     </div>
                     <p className="text-2xl font-bold tabular-nums mt-2">
                       {isBolseiro ? fmtAOA(0) : fmtAOA(totalAnual)}
