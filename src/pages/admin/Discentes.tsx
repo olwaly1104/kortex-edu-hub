@@ -626,8 +626,8 @@ export default function AdminDiscentes() {
 
                 {/* 2. Enquadramento Académico */}
                 <section>
-                  <SectionTitle index={2} title="Enquadramento Académico" hint="Faculdade, curso, ano, turma e regime de inscrição" />
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                  <SectionTitle index={2} title="Enquadramento Académico" hint="Faculdade, curso, ano e turma" />
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     <Field label="Faculdade">
                       <Select value={draft.faculdade_id} onValueChange={(v) => setF("faculdade_id", v)}>
                         <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
@@ -662,24 +662,18 @@ export default function AdminDiscentes() {
                         <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                       </Select>
                     </Field>
-                    <Field label="Regime">
-                      <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="normal">Normal</SelectItem>
-                          <SelectItem value="bolseiro">Bolseiro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </Field>
                   </div>
                 </section>
 
                 {/* 3. Contacto */}
                 <section>
-                  <SectionTitle index={3} title="Contacto" hint="Telemóvel pessoal" />
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <SectionTitle index={3} title="Contacto" hint="Telemóvel pessoal e email institucional" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <Field label="Telemóvel">
                       <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
+                    </Field>
+                    <Field label="Email institucional">
+                      <Input value={previewEmail} readOnly disabled placeholder={`nome.apelido@${EMAIL_DOMAIN}`} className="h-8 text-xs bg-muted/40 font-mono" />
                     </Field>
                   </div>
                 </section>
