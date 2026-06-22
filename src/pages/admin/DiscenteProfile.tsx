@@ -165,12 +165,11 @@ export default function AdminDiscenteProfile() {
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Presença</p>
-              <div className="mt-1.5 flex items-center gap-2">
-                <div className="flex-1 max-w-[120px] h-1.5 rounded-full bg-muted overflow-hidden">
-                  <div className="h-full bg-emerald-500" style={{ width: "92%" }} />
-                </div>
-                <span className="text-xs font-semibold tabular-nums text-emerald-700">92%</span>
-              </div>
+              <p className="mt-1.5 text-xs text-foreground tabular-nums">
+                <span className="font-semibold text-emerald-700">46</span> presenças ·{" "}
+                <span className="font-semibold text-amber-700">2</span> atrasos ·{" "}
+                <span className="font-semibold text-red-700">2</span> faltas
+              </p>
             </div>
           </div>
         </div>
