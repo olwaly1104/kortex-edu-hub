@@ -770,19 +770,17 @@ export default function AdminDiscentes() {
             <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
             <Button
               onClick={() => {
-                if (!requiredOk) {
-                  toast.error("Preencha primeiro e último nome");
-                  return;
-                }
+                if (!draft.primeiroNome.trim()) setDraft(d => ({ ...d, primeiroNome: "Novo" }));
+                if (!draft.ultimoNome.trim()) setDraft(d => ({ ...d, ultimoNome: "Discente" }));
                 setConfirmOpen(true);
               }}
-              disabled={uploading || createMut.isPending || !requiredOk}
+              disabled={uploading || createMut.isPending}
               className="gap-1.5"
             >
               {(uploading || createMut.isPending) ? (
                 <><Loader2 className="w-3.5 h-3.5 animate-spin" /> A criar…</>
               ) : (
-                <><Plus className="w-3.5 h-3.5" /> Criar conta Kortex</>
+                <><Plus className="w-3.5 h-3.5" /> Adicionar discente</>
               )}
             </Button>
           </DialogFooter>
