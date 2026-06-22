@@ -790,9 +790,28 @@ export default function AdminDiscentes() {
       </Dialog>
 
 
-      <AlertDialog open={confirmOpen} onOpenChange={(o) => { if (!uploading && !createMut.isPending) setConfirmOpen(o); }}>
+      <AlertDialog open={confirmOpen} onOpenChange={(o) => { if (!uploading && !createMut.isPending) { setConfirmOpen(o); if (!o) setJustCreated(null); } }}>
         <AlertDialogContent className="max-w-md">
-          {!(uploading || createMut.isPending) ? (
+          {justCreated ? (
+            <>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <Check className="w-5 h-5 text-emerald-600" /> Discente criado com sucesso
+                </AlertDialogTitle>
+                <AlertDialogDescription asChild>
+                  <div className="space-y-3">
+                    <div>A conta Kortex foi criada com o email:</div>
+                    <div className="font-mono text-foreground text-sm bg-muted px-3 py-2 rounded-md break-all">{justCreated}</div>
+                  </div>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogAction onClick={(e) => { e.preventDefault(); setJustCreated(null); setConfirmOpen(false); }}>
+                  Avançar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </>
+          ) : !(uploading || createMut.isPending) ? (
             <>
               <AlertDialogHeader>
                 <AlertDialogTitle className="flex items-center gap-2">
