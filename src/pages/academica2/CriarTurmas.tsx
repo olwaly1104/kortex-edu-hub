@@ -37,6 +37,19 @@ const buildDefault = (years: number, estudantesEsperados: number): CursoTurmas =
   return out;
 };
 
+const FIRST_NAMES = ["João","Maria","Pedro","Ana","Carlos","Sofia","Tiago","Inês","Rui","Beatriz","André","Mariana","Bruno","Catarina","Diogo","Filipa","Gonçalo","Helena","Hugo","Joana","Luís","Margarida","Miguel","Núria","Paulo","Rita","Sérgio","Teresa","Vasco","Xavier","Yara","Zita"];
+const LAST_NAMES = ["Silva","Santos","Pereira","Costa","Ferreira","Almeida","Rodrigues","Martins","Carvalho","Oliveira","Lopes","Sousa","Marques","Gonçalves","Pinto","Ramos","Mendes","Castro","Antunes","Fonseca"];
+const hashStr = (s: string) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
+const buildStudents = (seed: string, n: number) => Array.from({ length: n }, (_, i) => {
+  const h = hashStr(`${seed}-${i}`);
+  const fn = FIRST_NAMES[h % FIRST_NAMES.length];
+  const ln1 = LAST_NAMES[(h >> 3) % LAST_NAMES.length];
+  const ln2 = LAST_NAMES[(h >> 7) % LAST_NAMES.length];
+  const nome = `${fn} ${ln1} ${ln2}`;
+  const email = `${fn}.${ln1}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") + (i + 1) + "@upra.kor";
+  return { id: `${seed}-${i}`, nome, email, numero: 20000 + (h % 80000) };
+});
+
 export default function CriarTurmas() {
   const isOnboarding = useIsOnboardingStep();
   const { user } = useAuth();
