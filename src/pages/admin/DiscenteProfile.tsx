@@ -130,20 +130,28 @@ export default function AdminDiscenteProfile() {
                 {fotoUrl ? <img src={fotoUrl} alt={student.nome} className="w-full h-full object-cover" /> : initials}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Perfil do Discente</p>
-                <div className="flex items-center gap-2 mt-1">
-                  <h1 className="text-2xl font-bold text-foreground leading-tight">{student.nome}</h1>
+                <div className="flex items-center gap-2">
                   <Badge className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/10 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
                     <GraduationCap className="w-3 h-3 mr-1" /> Estudante
                   </Badge>
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">· Perfil do Discente</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1.5">
-                  <Link to="/admin/faculdades-cursos" className="hover:text-foreground transition-colors">
-                    {cursoCode ? `${cursoCode} · ` : ""}{cursoName}
+                <h1 className="text-2xl font-bold text-foreground leading-tight mt-1.5">{student.nome}</h1>
+                <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
+                  <Link to="/admin/faculdades-cursos" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-semibold border border-primary/20 hover:bg-primary/15 transition-colors">
+                    <Building2 className="w-3 h-3" /> {facName}
                   </Link>
-                  <span className="mx-1.5 text-muted-foreground/40">·</span>
-                  {student.ano}º Ano · Turma {student.turma}
-                </p>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[11px] font-semibold border border-blue-200">
+                    <GraduationCap className="w-3 h-3" /> {cursoCode || cursoName}
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-foreground text-[11px] font-semibold border border-border">
+                    <Calendar className="w-3 h-3" /> {student.ano}º Ano
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-foreground text-[11px] font-semibold border border-border">
+                    <Users className="w-3 h-3" /> Turma {student.turma}
+                  </span>
+                </div>
+
                 <div className="flex items-center gap-2 mt-4 flex-wrap">
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
                     <MessageCircle className="w-3.5 h-3.5" /> Chat
@@ -167,22 +175,29 @@ export default function AdminDiscenteProfile() {
               </div>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Ano · Turma</p>
-              <p className="text-2xl font-bold tabular-nums mt-1">{student.ano}<span className="text-sm text-muted-foreground font-normal">º · {student.turma}</span></p>
-            </div>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estado</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estado Académico</p>
               <div className="mt-1.5">
-                <Badge variant="outline" className="text-xs px-2 py-0.5 bg-accent/10 text-accent border-accent/30">Activo</Badge>
+                <Badge variant="outline" className="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 border-emerald-200">Activo</Badge>
               </div>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Matrícula</p>
-              <p className="text-xs font-mono font-bold mt-1.5 truncate">{displayId}</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estado Financeiro</p>
+              <div className="mt-1.5">
+                <Badge variant="outline" className={cn("text-xs px-2 py-0.5",
+                  student.regime === "bolseiro" ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-emerald-50 text-emerald-700 border-emerald-200")}>
+                  {student.regime === "bolseiro" ? "Isento (Bolseiro)" : "Regularizado"}
+                </Badge>
+              </div>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Data de Matrícula</p>
+              <p className="text-xs font-semibold mt-1.5">{dataMatricula}</p>
             </div>
           </div>
         </div>
       </Card>
+
+
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="bg-muted/40">
