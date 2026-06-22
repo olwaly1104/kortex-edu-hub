@@ -589,6 +589,12 @@ export default function AdminDiscentes() {
                     </button>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-1">
+                      <Field label="Primeiro nome">
+                        <Input value={draft.primeiroNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
+                      </Field>
+                      <Field label="Último nome">
+                        <Input value={draft.ultimoNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
+                      </Field>
                       <Field label="Data de nascimento">
                         <Input type="date" value={draft.nascimento} onChange={(e) => setF("nascimento", e.target.value)} className="h-8 text-xs" />
                       </Field>
@@ -604,6 +610,15 @@ export default function AdminDiscentes() {
                       </Field>
                       <Field label="Nº Bilhete de Identidade">
                         <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
+                      </Field>
+                      <Field label="Regime">
+                        <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
+                          <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="normal">Normal</SelectItem>
+                            <SelectItem value="bolseiro">Bolseiro</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </Field>
                     </div>
                   </div>
