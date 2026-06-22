@@ -16,7 +16,7 @@ import {
 import {
   ChevronLeft, ChevronRight, Plus, CalendarDays, Clock, MapPin,
   GraduationCap, Palmtree, Users, FileText, Trash2, Check, X, Bell, UserCircle2,
-  Eye, AlignLeft, Tag, CalendarRange, Info, Briefcase, Sparkles, Video, Building2, Link2,
+  Eye, AlignLeft, Tag, CalendarRange, Info, Briefcase, Sparkles, Video, Building2, Link2, Search,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Rocket } from "lucide-react";
