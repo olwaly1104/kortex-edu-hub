@@ -150,8 +150,8 @@ export default function GapEstudantes() {
         <Stat label="Turmas" value={new Set(normalized.map((r) => `${r.curso}-${r.ano}${r.turma}`)).size} />
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex-1 min-w-[180px] max-w-sm">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Procurar discente..."
@@ -163,7 +163,7 @@ export default function GapEstudantes() {
         <div className="text-xs text-muted-foreground tabular-nums">
           {filtered.length} de {normalized.length}
         </div>
-        <Button size="sm" onClick={openNew} className="ml-auto gap-1">
+        <Button size="sm" onClick={openNew} className="ml-auto gap-1 shrink-0">
           <Plus className="w-3.5 h-3.5" /> Adicionar Discente
         </Button>
       </div>
