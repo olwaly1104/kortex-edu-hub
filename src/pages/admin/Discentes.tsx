@@ -167,18 +167,15 @@ export default function AdminDiscentes() {
     [cursos, draft.faculdade_id],
   );
 
-  // Initialise faculdade → curso defaults.
+  // Curso must belong to selected faculdade; reset if it doesn't.
   useEffect(() => {
-    if (!draft.faculdade_id && faculdades.length > 0) {
-      setDraft((d) => ({ ...d, faculdade_id: (faculdades[0] as any).id }));
+    if (!draft.faculdade_id) {
+      if (draft.curso_id) setDraft((d) => ({ ...d, curso_id: "" }));
+      return;
     }
-  }, [faculdades, draft.faculdade_id]);
-
-  useEffect(() => {
-    if (!draft.faculdade_id) return;
     const validCurso = cursosDaFac.find((c: any) => c.id === draft.curso_id);
-    if (!validCurso) {
-      setDraft((d) => ({ ...d, curso_id: cursosDaFac[0]?.id || "" }));
+    if (!validCurso && draft.curso_id) {
+      setDraft((d) => ({ ...d, curso_id: "" }));
     }
   }, [cursosDaFac, draft.faculdade_id, draft.curso_id]);
 
