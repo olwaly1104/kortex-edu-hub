@@ -852,8 +852,23 @@ export default function FinancasCalendario() {
 
             <div className="space-y-1.5">
               <Label className="text-xs flex items-center gap-1.5 text-foreground"><MapPin className="w-3 h-3" /> Local <span className="text-muted-foreground font-normal">(opcional)</span></Label>
-              <Input value={form.location} onChange={e => setForm({ ...form, location: e.target.value })} placeholder="Sala / Gabinete" className="h-10" />
+              {geopontos.length === 0 ? (
+                <div className="rounded-md border border-dashed border-border bg-muted/30 px-3 py-2.5 text-[11px] text-muted-foreground">
+                  Sem geopontos registados. Adicione edifícios em <span className="font-medium text-foreground">Onboarding → Geopontos</span> para os poder selecionar aqui.
+                </div>
+              ) : (
+                <Select value={form.location || "__none"} onValueChange={(v) => setForm({ ...form, location: v === "__none" ? "" : v })}>
+                  <SelectTrigger className="h-10"><SelectValue placeholder="Selecionar geoponto" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none">— Sem local —</SelectItem>
+                    {geopontos.map(g => (
+                      <SelectItem key={g.id} value={`${g.sigla} · ${g.nome}`}>{g.sigla} · {g.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
+
 
             {kind === "reuniao" && (
               <div className="space-y-1.5 rounded-xl bg-blue-50/40 border border-blue-100 p-4">
