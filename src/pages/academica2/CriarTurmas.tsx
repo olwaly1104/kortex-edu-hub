@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cursoTemplates, alocacaoCandidatos } from "@/data/academica2Data";
-import { ArrowLeft, Check, Users, ChevronDown, ChevronRight, Building2, GraduationCap, Plus, Trash2, MapPin, ClipboardList, Layers, Wand2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ArrowLeft, Check, Users, ChevronDown, ChevronRight, Building2, GraduationCap, Plus, Trash2, MapPin, ClipboardList, Layers, Wand2, Eye, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
