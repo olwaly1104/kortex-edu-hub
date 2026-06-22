@@ -174,9 +174,6 @@ export default function GapMeuPerfil() {
               <Badge variant="outline" className="gap-1"><MapPin className="w-3 h-3" /> {form.municipio}, {form.provincia}</Badge>
             </div>
           </div>
-          <Button onClick={gerarDocumento} className="gap-2">
-            <FileDown className="w-4 h-4" /> Gerar documento
-          </Button>
         </div>
       </Card>
 
