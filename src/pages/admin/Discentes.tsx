@@ -680,15 +680,19 @@ export default function AdminDiscentes() {
                       </Select>
                     </Field>
                     <Field label="Ano">
-                      <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecionar" /></SelectTrigger>
-                        <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
+                      <Select value={draft.ano} onValueChange={(v) => setF("ano", v)} disabled={anosDoCurso.length === 0}>
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder={anosDoCurso.length === 0 ? "Escolha curso" : "Selecionar"} />
+                        </SelectTrigger>
+                        <SelectContent>{anosDoCurso.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
                       </Select>
                     </Field>
                     <Field label="Turma">
-                      <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecionar" /></SelectTrigger>
-                        <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                      <Select value={draft.turma} onValueChange={(v) => setF("turma", v)} disabled={!draft.ano}>
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue placeholder={!draft.ano ? "Escolha ano" : "Selecionar"} />
+                        </SelectTrigger>
+                        <SelectContent>{turmasDoAno.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                       </Select>
                     </Field>
                   </div>
