@@ -752,7 +752,6 @@ export default function GapConfiguracao() {
                   <tr className="border-b bg-muted/30">
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
                     <th className="text-center p-3 font-medium text-muted-foreground text-xs">Duração</th>
                     {isCardEditing("ag-motivos") && <th className="w-12" />}
                   </tr>
@@ -766,7 +765,6 @@ export default function GapConfiguracao() {
                         <td className="p-3">
                           {catCfg ? <Badge variant="outline" className={cn("text-[10px]", catCfg.color)}>{catCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.categoria}</span>}
                         </td>
-                        <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
                         <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.duracao} min</td>
                         {isCardEditing("ag-motivos") && (
                           <td className="p-3 text-right">
