@@ -164,8 +164,12 @@ export default function AdminDiscenteProfile() {
               </div>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Data de Matrícula</p>
-              <p className="text-xs font-semibold mt-1.5">{dataMatricula}</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Presença</p>
+              <div className="mt-1.5">
+                <Badge variant="outline" className="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 border-emerald-200">
+                  Presente
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
