@@ -98,17 +98,17 @@ export default function AdminDiscenteProfile() {
         <div className="grid lg:grid-cols-[1.6fr_1fr] divide-y lg:divide-y-0 lg:divide-x divide-border">
           <div className="p-6 relative">
             {/* Auto-generated matrícula document */}
-            <div className="absolute top-4 right-4 flex items-center gap-2 rounded-lg border border-border bg-background/80 backdrop-blur px-2.5 py-1.5 shadow-sm">
-              <FileText className="w-3.5 h-3.5 text-primary" />
+            <div className="absolute top-4 right-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1.5 shadow-sm">
+              <FileText className="w-3.5 h-3.5 text-red-600" />
               <div className="leading-tight">
-                <p className="text-[10px] font-semibold text-foreground tabular-nums">{displayId}</p>
-                <p className="text-[9px] text-muted-foreground">Gerado automaticamente</p>
+                <p className="text-[10px] font-semibold text-red-700 tabular-nums">{displayId}</p>
+                <p className="text-[9px] text-red-600/80">Gerado automaticamente</p>
               </div>
               <div className="flex items-center gap-1 ml-1">
-                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDocOpen(true)} title="Pré-visualizar">
+                <Button size="icon" variant="ghost" className="h-6 w-6 text-red-700 hover:bg-red-100 hover:text-red-800" onClick={() => setDocOpen(true)} title="Pré-visualizar">
                   <Eye className="w-3.5 h-3.5" />
                 </Button>
-                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDocOpen(true)} title="Descarregar">
+                <Button size="icon" variant="ghost" className="h-6 w-6 text-red-700 hover:bg-red-100 hover:text-red-800" onClick={() => setDocOpen(true)} title="Descarregar">
                   <Download className="w-3.5 h-3.5" />
                 </Button>
               </div>
