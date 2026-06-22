@@ -214,8 +214,12 @@ export default function FinancasCalendario() {
 
   const handleCreate = () => {
     if (!form.title.trim()) return;
-    const finalType: EventType = kind === "reuniao" ? "reuniao" : form.type;
-    setUserEvents(prev => [...prev, { ...form, type: finalType, id: `u-${Date.now()}`, organizer: kind === "reuniao" ? "Diretor Financeiro" : undefined }]);
+    const finalType: EventType =
+      kind === "reuniao" ? "reuniao" : kind === "prazo" ? "prazo" : form.type;
+    const payload: Omit<AgendaEvent, "id"> = kind === "prazo"
+      ? { ...form, type: "prazo", endTime: undefined, participants: [] }
+      : { ...form, type: finalType };
+    setUserEvents(prev => [...prev, { ...payload, id: `u-${Date.now()}`, organizer: kind === "reuniao" ? "Diretor Financeiro" : undefined }]);
     setOpenCreate(false);
     setForm({ title: "", type: "pessoal", date: selectedDate, startTime: "09:00", endTime: "10:00", location: "", description: "", participants: [] });
     setKind("evento");
