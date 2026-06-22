@@ -165,10 +165,11 @@ export default function AdminDiscenteProfile() {
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Presença</p>
-              <div className="mt-1.5">
-                <Badge variant="outline" className="text-xs px-2 py-0.5 bg-emerald-50 text-emerald-700 border-emerald-200">
-                  Presente
-                </Badge>
+              <div className="mt-1.5 flex items-center gap-2">
+                <div className="flex-1 max-w-[120px] h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full bg-emerald-500" style={{ width: "92%" }} />
+                </div>
+                <span className="text-xs font-semibold tabular-nums text-emerald-700">92%</span>
               </div>
             </div>
           </div>
