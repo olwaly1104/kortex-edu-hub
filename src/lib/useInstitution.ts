@@ -99,11 +99,13 @@ async function currentUserId(): Promise<string | null> {
 }
 
 async function currentInstitutionId(): Promise<string | null> {
-  const { data, error } = await (supabase.rpc as any)("current_institution_id");
-  if (error || !data) {
-    return await currentUserId();
-  }
-  return data as string;
+  const uid = await currentUserId();
+  if (!uid) return null;
+  const { data } = await (supabase.from("profiles" as any) as any)
+    .select("institution_id")
+    .eq("id", uid)
+    .maybeSingle();
+  return (data?.institution_id as string) || uid;
 }
 
 // ---------- Queries ----------
