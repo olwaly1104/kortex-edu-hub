@@ -869,9 +869,9 @@ type FinEstado = { id: string; nome: string; cor: string; descricao?: string; mi
 const FIN_ESTADOS_DISC_KEY = (email?: string | null) => KEY("discentes.estados.financeiros.v3", email);
 const DEFAULT_FIN_ESTADOS_DISC: FinEstado[] = [
   { id: "fe1", nome: "Regularizado", cor: "bg-emerald-100 text-emerald-700 border-emerald-200", descricao: "Sem pendências financeiras", min: 0, max: 0, locked: true },
-  { id: "fe2", nome: "Por regularizar", cor: "bg-amber-100 text-amber-700 border-amber-200", descricao: "Mensalidades em atraso recente", min: 1, max: 2 },
-  { id: "fe3", nome: "Em risco", cor: "bg-orange-100 text-orange-700 border-orange-200", descricao: "Atraso prolongado, requer acompanhamento", min: 3, max: 6 },
-  { id: "fe4", nome: "Incumprimento", cor: "bg-red-100 text-red-700 border-red-200", descricao: "Dívida grave, sujeito a sanções", min: 7, max: 12 },
+  { id: "fe2", nome: "Por regularizar", cor: "bg-amber-100 text-amber-700 border-amber-200", descricao: "Mensalidades em atraso recente", min: 1, max: 3 },
+  { id: "fe3", nome: "Em risco", cor: "bg-orange-100 text-orange-700 border-orange-200", descricao: "Atraso prolongado, requer acompanhamento", min: 4, max: 5 },
+  { id: "fe4", nome: "Incumprimento", cor: "bg-red-100 text-red-700 border-red-200", descricao: "Dívida grave, sujeito a sanções", min: 6, max: 12 },
   { id: "fe5", nome: "Isento", cor: "bg-blue-100 text-blue-700 border-blue-200", descricao: "Sem obrigação de pagamento (bolseiro/regime especial)", min: 0, max: 0, locked: true },
 ];
 
