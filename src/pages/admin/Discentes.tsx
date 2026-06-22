@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -131,6 +131,7 @@ async function uploadDoc(file: File, prefix: string, email: string): Promise<str
 
 export default function AdminDiscentes() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: rows = [], isLoading } = useEstudantes();
   const { data: cursos = [] } = useCursos();
   const { data: faculdades = [] } = useFaculdades();
@@ -237,6 +238,8 @@ export default function AdminDiscentes() {
   const setF = <K extends keyof Draft>(k: K, v: Draft[K]) => setDraft((d) => ({ ...d, [k]: v }));
 
   const previewEmail = buildEmail(draft.primeiroNome, draft.ultimoNome);
+  const profileBasePath = location.pathname.startsWith("/gap") ? "/gap/estudantes" : "/admin/discentes";
+  const openDiscenteProfile = (id: string) => navigate(`${profileBasePath}/${id}`);
 
   const onFoto = (f: File | null) => {
     if (!f) return;
@@ -410,10 +413,10 @@ export default function AdminDiscentes() {
               <div
                 key={r.id}
                 className={`${GRID} cursor-pointer hover:bg-muted/40 transition-colors`}
-                onClick={() => navigate(`/admin/discentes/${r.id}`)}
+                onClick={() => openDiscenteProfile(r.id)}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => { if (e.key === "Enter") navigate(`/admin/discentes/${r.id}`); }}
+                onKeyDown={(e) => { if (e.key === "Enter") openDiscenteProfile(r.id); }}
               >
                 <Avatar path={r.foto_url} name={`${r.primeiroNome} ${r.ultimoNome}`} />
                 <span className="text-xs font-medium truncate">{r.primeiroNome}</span>
