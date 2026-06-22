@@ -111,6 +111,30 @@ export default function Academica2Inicio() {
       </div>
 
       <Card className="p-5">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+              <GaugeCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-foreground">Nota Mínima de Aprovação</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Escala 0–20 · aplicada ao exame de acesso. O GAP utiliza este valor em modo de leitura.</p>
+            </div>
+          </div>
+          <div className="flex items-end gap-2">
+            <div>
+              <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Valor (0–20)</label>
+              <Input type="number" min={0} max={20} step={0.5} value={notaMinima}
+                onChange={e => setNotaMinima(e.target.value === "" ? "" : Number(e.target.value))}
+                className="w-28 h-10" />
+            </div>
+            <Button onClick={saveNotaMinima} className="gap-1.5 h-10"><Save className="w-4 h-4" /> Guardar</Button>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-5">
+
         <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-primary" /> Acções Rápidas
         </h2>
