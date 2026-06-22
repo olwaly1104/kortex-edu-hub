@@ -34,7 +34,6 @@ export default function AreaAcademica() {
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-4">
       <OnboardingStepBanner />
       <Tabs value={tab} onValueChange={onChange} className="space-y-4">
-        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
         <TabsList className="grid grid-cols-5 w-full max-w-3xl">
           <TabsTrigger value="faculdades" className="gap-1.5">
             <Building2 className="w-3.5 h-3.5" /> Faculdades & Cursos
