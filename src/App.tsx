@@ -129,6 +129,7 @@ import GapEstudanteProfile from "./pages/gap/EstudanteProfile";
 import GapCandidaturas from "./pages/gap/Candidaturas";
 import GapCandidaturaDetail from "./pages/gap/CandidaturaDetail";
 import GapConfiguracao from "./pages/gap/Configuracao";
+import GapMeuPerfil from "./pages/gap/MeuPerfil";
 
 import FinancasDashboard from "./pages/financas/Dashboard";
 import FinancasInicio from "./pages/financas/Inicio";
