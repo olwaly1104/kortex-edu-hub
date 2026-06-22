@@ -22,6 +22,36 @@ import { cn } from "@/lib/utils";
 import { Rocket } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isInstitutionLive } from "@/pages/financas/_FinHeader";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+const todayStr = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+const DB_TYPES = new Set(["reuniao", "prazo", "pessoal", "outro"]);
+const toDbType = (t: EventType): "reuniao" | "prazo" | "pessoal" | "outro" =>
+  DB_TYPES.has(t) ? (t as "reuniao" | "prazo" | "pessoal" | "outro") : "outro";
+const fromDb = (r: {
+  id: string; type: string; title: string; event_date: string;
+  start_time: string | null; end_time: string | null; location: string | null;
+  participants: unknown; categoria: string | null;
+}): AgendaEvent => {
+  const rawType = (r.categoria && (["ferias","feriado","pessoal","prazo","reuniao"] as const).includes(r.categoria as never))
+    ? (r.categoria as EventType)
+    : (r.type as EventType);
+  return {
+    id: r.id,
+    type: rawType,
+    title: r.title,
+    date: r.event_date,
+    startTime: r.start_time ? r.start_time.slice(0, 5) : undefined,
+    endTime: r.end_time ? r.end_time.slice(0, 5) : undefined,
+    location: r.location ?? undefined,
+    participants: Array.isArray(r.participants) ? (r.participants as string[]) : [],
+  };
+};
+
 
 /* ── constants ─────────────────────────────────────── */
 const TODAY = "2024-02-14";
@@ -212,22 +242,83 @@ export default function FinancasCalendario() {
     });
   };
 
-  const handleCreate = () => {
-    if (!form.title.trim()) return;
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const { data, error } = await supabase
+        .from("calendario_events")
+        .select("id,type,title,event_date,start_time,end_time,location,participants,categoria")
+        .order("event_date", { ascending: true });
+      if (!mounted) return;
+      if (error) { console.warn("calendario load", error.message); return; }
+      setUserEvents((data ?? []).map(fromDb));
+    })();
+    return () => { mounted = false; };
+  }, []);
+
+  const openCreateDialog = () => {
+    const t = todayStr();
+    setForm({ title: "", type: "pessoal", date: t, startTime: "09:00", endTime: "10:00", location: "", description: "", participants: [] });
+    setKind("evento");
+    setSelectedDate(t);
+    setCursor(t);
+    setOpenCreate(true);
+  };
+
+  const handleCreate = async () => {
+    if (!form.title.trim()) { toast.error("Adicione um título."); return; }
     const finalType: EventType =
       kind === "reuniao" ? "reuniao" : kind === "prazo" ? "prazo" : form.type;
     const payload: Omit<AgendaEvent, "id"> = kind === "prazo"
       ? { ...form, type: "prazo", endTime: undefined, participants: [] }
       : { ...form, type: finalType };
-    setUserEvents(prev => [...prev, { ...payload, id: `u-${Date.now()}`, organizer: kind === "reuniao" ? "Diretor Financeiro" : undefined }]);
+
+    const { data: sessionData } = await supabase.auth.getUser();
+    const uid = sessionData.user?.id;
+    if (!uid) { toast.error("Sessão expirada. Inicie sessão novamente."); return; }
+
+    setSaving(true);
+    const meta = TYPE_META[finalType];
+    const dbRow = {
+      owner_user_id: uid,
+      type: toDbType(finalType),
+      title: payload.title.trim(),
+      event_date: payload.date,
+      start_time: (payload.startTime && payload.startTime.length > 0) ? payload.startTime : "09:00",
+      end_time: payload.endTime || null,
+      location: payload.location || null,
+      participants: payload.participants ?? [],
+      color: meta?.bar?.replace("bg-", "") ?? "primary",
+      categoria: finalType,
+    };
+    const { data, error } = await supabase
+      .from("calendario_events")
+      .insert(dbRow)
+      .select("id,type,title,event_date,start_time,end_time,location,participants,categoria")
+      .single();
+    setSaving(false);
+    if (error || !data) { toast.error(error?.message || "Não foi possível guardar."); return; }
+
+    setUserEvents(prev => [...prev, fromDb(data)]);
+    toast.success(kind === "reuniao" ? "Reunião adicionada à agenda." : kind === "prazo" ? "Prazo marcado." : "Evento adicionado.");
     setOpenCreate(false);
-    setForm({ title: "", type: "pessoal", date: selectedDate, startTime: "09:00", endTime: "10:00", location: "", description: "", participants: [] });
+    setForm({ title: "", type: "pessoal", date: todayStr(), startTime: "09:00", endTime: "10:00", location: "", description: "", participants: [] });
     setKind("evento");
   };
 
-  const handleDelete = (id: string) => {
-    setUserEvents(prev => prev.filter(e => e.id !== id));
+  const handleDelete = async (id: string) => {
+    const prev = userEvents;
+    setUserEvents(prev.filter(e => e.id !== id));
     setDetailEvent(null);
+    const { error } = await supabase.from("calendario_events").delete().eq("id", id);
+    if (error) {
+      setUserEvents(prev);
+      toast.error(error.message || "Não foi possível eliminar.");
+    } else {
+      toast.success("Removido.");
+    }
   };
   const respondRequest = (id: string, status: "accepted" | "declined") => {
     setRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
@@ -291,7 +382,7 @@ export default function FinancasCalendario() {
               </span>
             </div>
             <Button size="sm" className="h-9 gap-1.5 text-xs shadow-md hover:shadow-lg transition-shadow"
-              onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+              onClick={openCreateDialog}>
               <Plus className="w-4 h-4" /> Adicionar à Agenda
             </Button>
           </div>
@@ -430,7 +521,7 @@ export default function FinancasCalendario() {
                         <CalendarDays className="w-7 h-7 text-muted-foreground/40 mx-auto mb-2" />
                         <p className="text-xs text-muted-foreground">Sem eventos neste dia</p>
                         <Button size="sm" variant="outline" className="mt-3 gap-1.5 text-xs"
-                          onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+                          onClick={openCreateDialog}>
                           <Plus className="w-3.5 h-3.5" /> Adicionar
                         </Button>
                       </div>
@@ -509,7 +600,7 @@ export default function FinancasCalendario() {
                   <CalendarDays className="w-7 h-7 text-muted-foreground/40 mx-auto mb-2" />
                   <p className="text-xs text-muted-foreground">Sem eventos neste dia</p>
                   <Button size="sm" variant="outline" className="mt-3 gap-1.5 text-xs"
-                    onClick={() => { setForm(f => ({ ...f, date: selectedDate })); setOpenCreate(true); }}>
+                    onClick={openCreateDialog}>
                     <Plus className="w-3.5 h-3.5" /> Adicionar
                   </Button>
                 </div>
@@ -786,9 +877,9 @@ export default function FinancasCalendario() {
 
           <DialogFooter className="px-6 py-4 border-t bg-muted/20">
             <Button variant="ghost" onClick={() => setOpenCreate(false)}>Cancelar</Button>
-            <Button onClick={handleCreate} className="gap-1.5">
+            <Button onClick={handleCreate} disabled={saving} className="gap-1.5">
               <Check className="w-4 h-4" />
-              {kind === "reuniao" ? "Enviar pedido" : kind === "prazo" ? "Marcar prazo" : "Adicionar à agenda"}
+              {saving ? "A guardar…" : kind === "reuniao" ? "Enviar pedido" : kind === "prazo" ? "Marcar prazo" : "Adicionar à agenda"}
             </Button>
           </DialogFooter>
         </DialogContent>
