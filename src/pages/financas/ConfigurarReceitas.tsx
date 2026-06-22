@@ -944,47 +944,71 @@ function MultasSection({ email }: { email?: string | null }) {
             <AlertCircle className="w-4 h-4 text-primary" />
             <div className="min-w-0">
               <h2 className="text-sm font-bold text-foreground">Estados financeiros (discentes)</h2>
-              <p className="text-[11px] text-muted-foreground">Defina os estados possíveis a atribuir ao discente no perfil financeiro.</p>
+              <p className="text-[11px] text-muted-foreground">Atribuição automática com base nos meses em atraso. O sistema atualiza o estado do discente sem intervenção manual.</p>
             </div>
             <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{finEstados.length} estado{finEstados.length === 1 ? "" : "s"}</span>
           </div>
+          <div className="px-5 py-2.5 border-b bg-emerald-50/60 text-[11px] text-emerald-800 flex items-center gap-2">
+            <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Automatização ativa — o estado é recalculado diariamente conforme os meses em atraso de cada discente.
+          </div>
           <div className="divide-y">
-            <div className="grid grid-cols-[1.1fr_1.3fr_1.2fr_150px_150px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div className="grid grid-cols-[1.1fr_1.5fr_220px_140px_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
               <div>Designação</div>
               <div>Descrição</div>
-              <div>Critério (atraso)</div>
+              <div>Meses em atraso (0–12)</div>
               <div>Cor</div>
               <div>Pré-visualização</div>
               <div className="text-right">Ação</div>
             </div>
-            {finEstados.map((es) => (
-              <div key={es.id} className="grid grid-cols-[1.1fr_1.3fr_1.2fr_150px_150px_40px] gap-3 px-5 py-2.5 items-center text-sm">
-                <Input className="h-9" placeholder="Ex: Regularizado" value={es.nome}
+            {finEstados.map((es) => {
+              const locked = !!es.locked;
+              return (
+              <div key={es.id} className="grid grid-cols-[1.1fr_1.5fr_220px_140px_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+                <Input className="h-9" placeholder="Ex: Por regularizar" value={es.nome} disabled={locked}
                   onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, nome: e.target.value } : x))} />
                 <Input className="h-9" placeholder="Descrição curta" value={es.descricao || ""}
                   onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, descricao: e.target.value } : x))} />
-                <Input className="h-9" placeholder="Ex: 1–2 meses em atraso" value={es.criterio || ""}
-                  onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, criterio: e.target.value } : x))} />
-                <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={es.cor}
+                <div className="flex items-center gap-1.5">
+                  <Input type="number" min={0} max={12} className="h-9 w-16 text-center tabular-nums" value={es.min} disabled={locked}
+                    onChange={(e) => {
+                      const v = Math.max(0, Math.min(12, Number(e.target.value) || 0));
+                      setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, min: v, max: Math.max(v, x.max) } : x));
+                    }} />
+                  <span className="text-xs text-muted-foreground">a</span>
+                  <Input type="number" min={0} max={12} className="h-9 w-16 text-center tabular-nums" value={es.max} disabled={locked}
+                    onChange={(e) => {
+                      const v = Math.max(0, Math.min(12, Number(e.target.value) || 0));
+                      setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, max: Math.max(v, x.min), min: Math.min(v, x.min) } : x));
+                    }} />
+                  <span className="text-[11px] text-muted-foreground whitespace-nowrap">meses</span>
+                </div>
+                <select className="h-9 rounded-md border border-input bg-background px-2 text-sm disabled:opacity-60" value={es.cor} disabled={locked}
                   onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, cor: e.target.value } : x))}>
                   {FIN_COR_OPCOES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
                 <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium ${es.cor}`}>{es.nome || "—"}</span>
                 <div className="flex justify-end">
-                  <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                    onClick={() => setFinEstados((s) => s.filter((x) => x.id !== es.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+                  {locked ? (
+                    <span className="text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted border" title="Estado fixo do sistema">Fixo</span>
+                  ) : (
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => setFinEstados((s) => s.filter((x) => x.id !== es.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+                  )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
           <div className="px-5 py-3 border-t bg-muted/10">
             <Button size="sm" variant="outline" className="gap-1.5"
-              onClick={() => setFinEstados((s) => [...s, { id: newId(), nome: "", cor: FIN_COR_OPCOES[0].value, descricao: "" }])}>
+              onClick={() => setFinEstados((s) => [...s, { id: newId(), nome: "", cor: FIN_COR_OPCOES[0].value, descricao: "", min: 1, max: 1 }])}>
               <Plus className="w-3.5 h-3.5" /> Adicionar estado
             </Button>
           </div>
         </Card>
       )}
+
 
       <Card className="overflow-hidden">
         <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
