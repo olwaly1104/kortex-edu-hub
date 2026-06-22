@@ -97,20 +97,35 @@ export default function AdminDiscenteProfile() {
 
         <div className="grid lg:grid-cols-[1.6fr_1fr] divide-y lg:divide-y-0 lg:divide-x divide-border">
           <div className="p-6 relative">
-            {/* Matrícula doc badge removed per request */}
+            {/* Auto-generated matrícula document */}
+            <div className="absolute top-4 right-4 flex items-center gap-2 rounded-lg border border-border bg-background/80 backdrop-blur px-2.5 py-1.5 shadow-sm">
+              <FileText className="w-3.5 h-3.5 text-primary" />
+              <div className="leading-tight">
+                <p className="text-[10px] font-semibold text-foreground tabular-nums">{displayId}</p>
+                <p className="text-[9px] text-muted-foreground">Gerado automaticamente</p>
+              </div>
+              <div className="flex items-center gap-1 ml-1">
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDocOpen(true)} title="Pré-visualizar">
+                  <Eye className="w-3.5 h-3.5" />
+                </Button>
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDocOpen(true)} title="Descarregar">
+                  <Download className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            </div>
 
             <div className="flex items-start gap-5">
               <div className="w-20 h-20 rounded-full bg-muted overflow-hidden shrink-0 ring-2 ring-border flex items-center justify-center text-xl font-semibold text-muted-foreground">
                 {fotoUrl ? <img src={fotoUrl} alt={student.nome} className="w-full h-full object-cover" /> : initials}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Perfil do Discente</p>
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <h1 className="text-2xl font-bold text-foreground leading-tight">{student.nome}</h1>
+                <div className="flex items-center gap-2">
                   <Badge className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/10 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
                     <GraduationCap className="w-3 h-3 mr-1" /> Estudante
                   </Badge>
+                  <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Perfil do Discente</span>
                 </div>
+                <h1 className="text-2xl font-bold text-foreground leading-tight mt-1.5">{student.nome}</h1>
                 <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
                   <Link to="/admin/faculdades-cursos" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-semibold border border-primary/20 hover:bg-primary/15 transition-colors">
                     <Building2 className="w-3 h-3" /> {facName}
