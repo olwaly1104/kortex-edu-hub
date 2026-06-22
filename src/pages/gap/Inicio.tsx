@@ -49,7 +49,7 @@ export default function GapInicio() {
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
+    const load = async () => {
       const { data, error } = await supabase
         .from("calendario_events")
         .select("id,type,title,start_time,end_time,location,categoria")
@@ -58,8 +58,17 @@ export default function GapInicio() {
       if (!mounted) return;
       if (!error) setAgenda(data ?? []);
       setLoading(false);
-    })();
-    return () => { mounted = false; };
+    };
+    load();
+    const channel = supabase
+      .channel("gap-inicio-agenda")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "calendario_events", filter: `event_date=eq.${todayStr()}` },
+        () => load(),
+      )
+      .subscribe();
+    return () => { mounted = false; supabase.removeChannel(channel); };
   }, []);
 
   const presencaPill = (
