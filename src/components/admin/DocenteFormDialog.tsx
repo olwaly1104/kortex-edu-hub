@@ -185,6 +185,15 @@ export function DocenteFormDialog({
                   <Field label="Nº Bilhete de Identidade">
                     <Input className="h-8 text-xs" value={draft.bilhete || ""} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" />
                   </Field>
+                  <Field label="Contrato">
+                    <Select value={draft.contrato || ""} onValueChange={(v) => setF("contrato", v as DocenteRow["contrato"])}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Permanente">Permanente</SelectItem>
+                        <SelectItem value="Prestador">Prestador</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
                 </div>
               </div>
             </section>
