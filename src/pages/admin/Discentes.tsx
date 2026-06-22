@@ -325,7 +325,7 @@ export default function AdminDiscentes() {
     window.open(data.signedUrl, "_blank");
   };
 
-  const GRID = "grid grid-cols-[36px_1fr_1fr_100px_90px_70px_1fr_60px_60px_70px_110px_56px] gap-2 px-4 py-2 items-center";
+  const GRID = "grid grid-cols-[90px_1fr_1fr_80px_70px_1fr_50px_70px_88px] gap-2 px-4 py-2 items-center";
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
