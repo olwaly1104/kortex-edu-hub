@@ -864,13 +864,15 @@ function SalariosSection({ email }: { email?: string | null }) {
 /* ═══════════════════════════════ MULTAS ═══════════════════════════════════ */
 
 type RhMulta = { id: string; nome: string; valor: number; descricao: string; aplicaA: "Docente" | "Staff" | "Discente" | "Ambos" };
-type FinEstado = { id: string; nome: string; cor: string; descricao?: string };
+type FinEstado = { id: string; nome: string; cor: string; descricao?: string; criterio?: string };
 
 const FIN_ESTADOS_DISC_KEY = (email?: string | null) => KEY("discentes.estados.financeiros", email);
 const DEFAULT_FIN_ESTADOS_DISC: FinEstado[] = [
-  { id: "fe1", nome: "Regularizado", cor: "bg-emerald-100 text-emerald-700 border-emerald-200", descricao: "Sem pendências financeiras" },
-  { id: "fe2", nome: "Por regularizar", cor: "bg-amber-100 text-amber-700 border-amber-200", descricao: "Mensalidades em atraso" },
-  { id: "fe3", nome: "Isento", cor: "bg-blue-100 text-blue-700 border-blue-200", descricao: "Sem obrigação de pagamento" },
+  { id: "fe1", nome: "Regularizado", cor: "bg-emerald-100 text-emerald-700 border-emerald-200", descricao: "Sem pendências financeiras", criterio: "0 meses em atraso" },
+  { id: "fe2", nome: "Por regularizar", cor: "bg-amber-100 text-amber-700 border-amber-200", descricao: "Mensalidades em atraso recente", criterio: "1–2 meses em atraso" },
+  { id: "fe3", nome: "Em risco", cor: "bg-orange-100 text-orange-700 border-orange-200", descricao: "Atraso prolongado, requer acompanhamento", criterio: "3–6 meses em atraso" },
+  { id: "fe4", nome: "Incumprimento", cor: "bg-red-100 text-red-700 border-red-200", descricao: "Dívida grave, sujeito a sanções", criterio: "6+ meses em atraso" },
+  { id: "fe5", nome: "Isento", cor: "bg-blue-100 text-blue-700 border-blue-200", descricao: "Sem obrigação de pagamento", criterio: "Bolseiro ou regime especial" },
 ];
 const FIN_COR_OPCOES = [
   { label: "Verde", value: "bg-emerald-100 text-emerald-700 border-emerald-200" },
