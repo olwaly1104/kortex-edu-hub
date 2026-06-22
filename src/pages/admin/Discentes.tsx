@@ -170,14 +170,47 @@ export default function AdminDiscentes() {
   // Curso must belong to selected faculdade; reset if it doesn't.
   useEffect(() => {
     if (!draft.faculdade_id) {
-      if (draft.curso_id) setDraft((d) => ({ ...d, curso_id: "" }));
+      if (draft.curso_id) setDraft((d) => ({ ...d, curso_id: "", ano: "", turma: "" }));
       return;
     }
     const validCurso = cursosDaFac.find((c: any) => c.id === draft.curso_id);
     if (!validCurso && draft.curso_id) {
-      setDraft((d) => ({ ...d, curso_id: "" }));
+      setDraft((d) => ({ ...d, curso_id: "", ano: "", turma: "" }));
     }
   }, [cursosDaFac, draft.faculdade_id, draft.curso_id]);
+
+  // Anos disponíveis = nº de anos do curso selecionado.
+  const anosDoCurso = useMemo(() => {
+    const c = cursos.find((x: any) => x.id === draft.curso_id) as any;
+    const n = Math.max(1, Math.min(10, Number(c?.years) || 0));
+    return n > 0 ? Array.from({ length: n }, (_, i) => String(i + 1)) : [];
+  }, [cursos, draft.curso_id]);
+
+  // Turmas existentes para o curso+ano (a partir de discentes já criados).
+  const turmasDoAno = useMemo(() => {
+    if (!draft.curso_id || !draft.ano) return [] as string[];
+    const set = new Set<string>();
+    rows.forEach((r: any) => {
+      if (r.curso_id === draft.curso_id && String(r.ano) === String(draft.ano) && r.turma) {
+        set.add(String(r.turma));
+      }
+    });
+    const arr = Array.from(set).sort();
+    return arr.length ? arr : ["A"]; // permite criar a 1ª turma
+  }, [rows, draft.curso_id, draft.ano]);
+
+  // Reset ano se não existe no curso; reset turma se não existe nas opções.
+  useEffect(() => {
+    if (draft.ano && !anosDoCurso.includes(draft.ano)) {
+      setDraft((d) => ({ ...d, ano: "", turma: "" }));
+    }
+  }, [anosDoCurso, draft.ano]);
+
+  useEffect(() => {
+    if (draft.turma && !turmasDoAno.includes(draft.turma)) {
+      setDraft((d) => ({ ...d, turma: "" }));
+    }
+  }, [turmasDoAno, draft.turma]);
 
   const cursoCode = useMemo(() => {
     const m = new Map<string, string>();
