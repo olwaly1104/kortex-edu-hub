@@ -46,6 +46,7 @@ const empty = (curso_id = ""): Draft => ({
 });
 
 export default function GapEstudantes() {
+  const navigate = useNavigate();
   const { data: rows = [], isLoading } = useEstudantes();
   const { data: cursos = [] } = useCursos();
   const createMut = useCreateEstudante();
