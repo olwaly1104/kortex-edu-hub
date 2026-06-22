@@ -516,26 +516,12 @@ export default function AdminDiscentes() {
               </div>
             </section>
 
-            {/* Optional extra details collapsible */}
-            <section className="border-t pt-4">
-              <button
-                type="button"
-                onClick={() => setShowMore((v) => !v)}
-                className="w-full flex items-center justify-between gap-2 text-[12px] font-semibold text-foreground hover:text-primary transition"
-              >
-                <span className="flex items-center gap-2">
-                  <Pencil className="w-3.5 h-3.5" />
-                  Adicionar mais detalhes agora (opcional)
-                </span>
-                <span className="text-[10px] text-muted-foreground">{showMore ? "Esconder" : "Mostrar"}</span>
-              </button>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                Pode preencher tudo agora ou deixar para depois — editável a qualquer momento no perfil do discente.
+            <div className="space-y-6 border-t pt-4">
+              <p className="text-[11px] text-muted-foreground -mt-1">
+                Restantes campos são opcionais — podem ser editados depois no perfil do discente.
               </p>
-            </section>
-
-            {showMore && (
               <div className="space-y-6">
+
                 {/* 1. Identificação Pessoal */}
                 <section>
                   <SectionTitle index={1} title="Identificação Pessoal" hint="Foto, data de nascimento, género e documento" />
