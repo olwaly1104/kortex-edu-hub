@@ -144,6 +144,7 @@ export default function AdminDiscentes() {
   const [uploading, setUploading] = useState(false);
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [justCreated, setJustCreated] = useState<string | null>(null);
   const [showMore, setShowMore] = useState(false);
   const [previewId, setPreviewId] = useState<string>("");
 
