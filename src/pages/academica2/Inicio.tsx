@@ -2,12 +2,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { anosLetivos, cursoTemplates, alocacaoCandidatos, exames, quizzes } from "@/data/academica2Data";
 import {
   Sparkles, Calendar, ChevronRight, GraduationCap, Layers, Users,
-  ClipboardCheck, BookOpen, FileText, BrainCircuit, Rocket,
+  ClipboardCheck, BookOpen, FileText, BrainCircuit, Rocket, GaugeCircle, Save,
 } from "lucide-react";
 
 export default function Academica2Inicio() {
