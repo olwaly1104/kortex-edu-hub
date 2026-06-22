@@ -969,20 +969,28 @@ function MultasSection({ email }: { email?: string | null }) {
                   onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, nome: e.target.value } : x))} />
                 <Input className="h-9" placeholder="Descrição curta" value={es.descricao || ""}
                   onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, descricao: e.target.value } : x))} />
-                <div className="flex items-center gap-1.5">
-                  <Input type="number" min={0} max={12} className="h-9 w-16 text-center tabular-nums" value={es.min} disabled={locked}
-                    onChange={(e) => {
-                      const v = Math.max(0, Math.min(12, Number(e.target.value) || 0));
-                      setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, min: v, max: Math.max(v, x.max) } : x));
-                    }} />
-                  <span className="text-xs text-muted-foreground">a</span>
-                  <Input type="number" min={0} max={12} className="h-9 w-16 text-center tabular-nums" value={es.max} disabled={locked}
-                    onChange={(e) => {
-                      const v = Math.max(0, Math.min(12, Number(e.target.value) || 0));
-                      setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, max: Math.max(v, x.min), min: Math.min(v, x.min) } : x));
-                    }} />
-                  <span className="text-[11px] text-muted-foreground whitespace-nowrap">meses</span>
-                </div>
+                {locked ? (
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <span className="inline-flex items-center justify-center h-9 px-3 rounded-md border bg-muted/40 tabular-nums font-medium text-foreground">0</span>
+                    <span className="whitespace-nowrap">meses (fixo)</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <Input type="number" min={0} max={12} className="h-9 w-16 text-center tabular-nums" value={es.min}
+                      onChange={(e) => {
+                        const v = Math.max(0, Math.min(12, Number(e.target.value) || 0));
+                        setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, min: v, max: Math.max(v, x.max) } : x));
+                      }} />
+                    <span className="text-xs text-muted-foreground">a</span>
+                    <Input type="number" min={0} max={12} className="h-9 w-16 text-center tabular-nums" value={es.max}
+                      onChange={(e) => {
+                        const v = Math.max(0, Math.min(12, Number(e.target.value) || 0));
+                        setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, max: Math.max(v, x.min), min: Math.min(v, x.min) } : x));
+                      }} />
+                    <span className="text-[11px] text-muted-foreground whitespace-nowrap">meses</span>
+                  </div>
+                )}
+
                 <select className="h-9 rounded-md border border-input bg-background px-2 text-sm disabled:opacity-60" value={es.cor} disabled={locked}
                   onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, cor: e.target.value } : x))}>
                   {FIN_COR_OPCOES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
