@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import {
   Camera, User, Mail, Phone, MapPin, FileText, Upload, Trash2, CheckCircle2,
-  IdCard, BadgeCheck, Briefcase, Pencil, FileDown,
+  IdCard, BadgeCheck, Briefcase, Pencil, FileDown, Eye, Download,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -132,9 +132,15 @@ export default function GapMeuPerfil() {
 <div class="footer">UPRA · Gabinete de Apoio ao Discente · Documento autogerado a partir do perfil institucional.</div>
 </body></html>`;
     const w = window.open("", "_blank");
-    if (!w) { toast.error("Permita janelas para gerar o documento."); return; }
+    if (!w) { toast.error("Permita janelas para gerar o documento."); return w as any; }
     w.document.open(); w.document.write(html); w.document.close();
-    toast.success("Documento de perfil gerado.");
+    return w;
+  };
+
+  const verPerfil = () => { gerarDocumento(); };
+  const descarregarPerfil = () => {
+    const w = gerarDocumento();
+    if (w) setTimeout(() => { try { w.focus(); w.print(); } catch {} }, 400);
   };
 
   return (
@@ -174,9 +180,6 @@ export default function GapMeuPerfil() {
               <Badge variant="outline" className="gap-1"><MapPin className="w-3 h-3" /> {form.municipio}, {form.provincia}</Badge>
             </div>
           </div>
-          <Button onClick={gerarDocumento} className="gap-2">
-            <FileDown className="w-4 h-4" /> Gerar documento
-          </Button>
         </div>
       </Card>
 
@@ -272,7 +275,7 @@ export default function GapMeuPerfil() {
           <FileText className="w-4 h-4 text-primary" />
           <h2 className="text-sm font-semibold">Documentos</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* CV */}
           <div className="rounded-lg border border-border p-4">
             <div className="flex items-start gap-3">
@@ -329,6 +332,34 @@ export default function GapMeuPerfil() {
               <Upload className="w-3.5 h-3.5" /> {docId ? "Substituir documento" : "Carregar documento"}
             </Button>
             <input ref={fileInputId} type="file" accept=".pdf,image/*" className="hidden" onChange={onIdChange} />
+          </div>
+
+          {/* Perfil Institucional (autogerado) */}
+          <div className="rounded-lg border border-border p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0">
+                <FileDown className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold">Perfil Institucional</p>
+                <p className="text-[11px] text-muted-foreground">Documento autogerado a partir do perfil · PDF</p>
+              </div>
+            </div>
+            <div className="mt-3 rounded-md bg-muted/40 p-2.5 flex items-center gap-2">
+              <BadgeCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium truncate">perfil-{form.primeiroNome.toLowerCase()}-{form.ultimoNome.toLowerCase()}.pdf</p>
+                <p className="text-[10px] text-muted-foreground">Atualizado automaticamente</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 mt-3">
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={verPerfil}>
+                <Eye className="w-3.5 h-3.5" /> Ver
+              </Button>
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={descarregarPerfil}>
+                <Download className="w-3.5 h-3.5" /> Descarregar
+              </Button>
+            </div>
           </div>
         </div>
       </Card>
