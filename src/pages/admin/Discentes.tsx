@@ -395,60 +395,65 @@ export default function AdminDiscentes() {
       ) : (
         <Card className="overflow-hidden">
           <div className={`${GRID} text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b !py-2`}>
-            <span></span>
+            <span>ID</span>
             <span>Primeiro</span>
             <span>Último</span>
-            <span>Nascimento</span>
-            <span>Telemóvel</span>
+            <span>Regime</span>
             <span>Faculdade</span>
             <span>Curso</span>
             <span>Ano</span>
-            <span>Turma</span>
-            <span>Regime</span>
             <span>Docs</span>
-            <span></span>
-
+            <span className="text-right">Ações</span>
           </div>
 
           <div className="divide-y">
-            {filtered.map((r) => (
-              <div
-                key={r.id}
-                className={`${GRID} cursor-pointer hover:bg-muted/40 transition-colors`}
-                onClick={() => openDiscenteProfile(r.id)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === "Enter") openDiscenteProfile(r.id); }}
-              >
-                <Avatar path={r.foto_url} name={`${r.primeiroNome} ${r.ultimoNome}`} />
-                <span className="text-xs font-medium truncate">{r.primeiroNome}</span>
-                <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
-                <span className="text-xs tabular-nums text-muted-foreground">{r.nascimento || "—"}</span>
-                <span className="text-xs tabular-nums truncate">{r.telemovel || "—"}</span>
-                <span className="text-xs font-mono font-semibold">{r.faculdadeSigla}</span>
-                <span className="text-xs font-mono">{r.curso}</span>
-                <span className="text-xs tabular-nums">{r.ano}º</span>
-                <span className="text-xs tabular-nums">{r.turma}</span>
-                <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold w-fit ${r.regime === "bolseiro" ? "bg-amber-50 text-amber-700" : "bg-muted text-muted-foreground"}`}>
-                  {r.regime === "bolseiro" ? "Bolseiro" : "Normal"}
-                </span>
-                <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                  <DocPill label="BI" path={r.bilhete_url} onOpen={openDoc} Icon={IdCard} />
-                  <DocPill label="Cert" path={r.certificado_url} onOpen={openDoc} Icon={FileText} />
+            {filtered.map((r) => {
+              const docsTotal = 4;
+              const docsDone = [r.foto_url, r.bilhete_url, r.certificado_url, r.enc_bilhete_url].filter(Boolean).length;
+              const shortId = `DISC-${(r.id as string).slice(0, 4).toUpperCase()}`;
+              return (
+                <div
+                  key={r.id}
+                  className={`${GRID} cursor-pointer hover:bg-muted/40 transition-colors`}
+                  onClick={() => openDiscenteProfile(r.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === "Enter") openDiscenteProfile(r.id); }}
+                >
+                  <span className="text-[11px] font-mono text-muted-foreground">{shortId}</span>
+                  <span className="text-xs font-medium truncate">{r.primeiroNome}</span>
+                  <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold w-fit ${r.regime === "bolseiro" ? "bg-amber-50 text-amber-700" : "bg-muted text-muted-foreground"}`}>
+                    {r.regime === "bolseiro" ? "Bolseiro" : "Normal"}
+                  </span>
+                  <span className="text-xs font-mono font-semibold">{r.faculdadeSigla}</span>
+                  <span className="text-xs font-mono truncate">{r.curso}</span>
+                  <span className="text-xs tabular-nums">{r.ano}º</span>
+                  <span className="text-xs tabular-nums text-muted-foreground">{docsDone}/{docsTotal}</span>
+                  <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => openDiscenteProfile(r.id)}
+                      className="h-8 w-8 text-muted-foreground hover:text-primary"
+                      title="Editar"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => removeRow(r.id)}
+                      disabled={deleteMut.isPending}
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      title="Eliminar"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => removeRow(r.id)}
-                    disabled={deleteMut.isPending}
-                    className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
       )}
