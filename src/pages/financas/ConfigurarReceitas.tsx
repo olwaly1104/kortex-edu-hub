@@ -122,8 +122,6 @@ const REGIMES_IVA: { regime: string; taxa: number; label: string; custom?: boole
   { regime: "Geral", taxa: 0.14, label: "Geral — 14%" },
   { regime: "Intermédio", taxa: 0.07, label: "Intermédio — 7%" },
   { regime: "Reduzido", taxa: 0.05, label: "Reduzido — 5%" },
-  { regime: "Isento", taxa: 0, label: "Isento — 0%" },
-  { regime: "Exportação", taxa: 0, label: "Exportação — 0%" },
   { regime: "Personalizado", taxa: 0, label: "Personalizado", custom: true },
 ];
 const REGIMES = REGIMES_IVA.map((r) => r.regime);
@@ -136,8 +134,6 @@ const LOCKED_IMPOSTOS: Imposto[] = [
   { id: "iva-geral", nome: nomeForImposto("Geral", 0.14), taxa: 0.14, regime: "Geral", locked: true },
   { id: "iva-intermedio", nome: nomeForImposto("Intermédio", 0.07), taxa: 0.07, regime: "Intermédio", locked: true },
   { id: "iva-reduzido", nome: nomeForImposto("Reduzido", 0.05), taxa: 0.05, regime: "Reduzido", locked: true },
-  { id: "iva-isento", nome: nomeForImposto("Isento", 0), taxa: 0, regime: "Isento", locked: true },
-  { id: "iva-exportacao", nome: nomeForImposto("Exportação", 0), taxa: 0, regime: "Exportação", locked: true },
 ];
 
 const COR_OPCOES_GLOBAL = [

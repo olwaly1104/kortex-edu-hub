@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cursoTemplates, alocacaoCandidatos } from "@/data/academica2Data";
-import { ArrowLeft, Check, Users, ChevronDown, ChevronRight, Building2, GraduationCap, Plus, Trash2, MapPin, ClipboardList, Layers, Wand2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ArrowLeft, Check, Users, ChevronDown, ChevronRight, Building2, GraduationCap, Plus, Trash2, MapPin, ClipboardList, Layers, Wand2, Eye, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -36,6 +37,19 @@ const buildDefault = (years: number, estudantesEsperados: number): CursoTurmas =
   return out;
 };
 
+const FIRST_NAMES = ["João","Maria","Pedro","Ana","Carlos","Sofia","Tiago","Inês","Rui","Beatriz","André","Mariana","Bruno","Catarina","Diogo","Filipa","Gonçalo","Helena","Hugo","Joana","Luís","Margarida","Miguel","Núria","Paulo","Rita","Sérgio","Teresa","Vasco","Xavier","Yara","Zita"];
+const LAST_NAMES = ["Silva","Santos","Pereira","Costa","Ferreira","Almeida","Rodrigues","Martins","Carvalho","Oliveira","Lopes","Sousa","Marques","Gonçalves","Pinto","Ramos","Mendes","Castro","Antunes","Fonseca"];
+const hashStr = (s: string) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
+const buildStudents = (seed: string, n: number) => Array.from({ length: n }, (_, i) => {
+  const h = hashStr(`${seed}-${i}`);
+  const fn = FIRST_NAMES[h % FIRST_NAMES.length];
+  const ln1 = LAST_NAMES[(h >> 3) % LAST_NAMES.length];
+  const ln2 = LAST_NAMES[(h >> 7) % LAST_NAMES.length];
+  const nome = `${fn} ${ln1} ${ln2}`;
+  const email = `${fn}.${ln1}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") + (i + 1) + "@upra.kor";
+  return { id: `${seed}-${i}`, nome, email, numero: 20000 + (h % 80000) };
+});
+
 export default function CriarTurmas() {
   const isOnboarding = useIsOnboardingStep();
   const { user } = useAuth();
@@ -50,6 +64,7 @@ export default function CriarTurmas() {
   const [openFacs, setOpenFacs] = useState<Record<string, boolean>>({});
   const toggleFac = (f: string) => setOpenFacs(p => ({ ...p, [f]: !p[f] }));
   const [selectedCurso, setSelectedCurso] = useState<string>(cursoTemplates[0].id);
+  const [verTurma, setVerTurma] = useState<{ codigo: string; sala: string; turno: string; capacidade: number; estudantes: ReturnType<typeof buildStudents> } | null>(null);
 
   const curso = cursoTemplates.find(c => c.id === selectedCurso)!;
   const cursoTurmas = data[selectedCurso];
@@ -191,14 +206,17 @@ export default function CriarTurmas() {
                     <Plus className="w-3 h-3" /> Adicionar Turma
                   </Button>
                 </div>
-                <div className="grid grid-cols-[60px_1fr_110px_110px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-                  <span>Turma</span><span>Sala</span><span>Turno</span><span>Capacidade</span><span></span>
+                <div className="grid grid-cols-[60px_1fr_110px_110px_70px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+                  <span>Turma</span><span>Sala</span><span>Turno</span><span>Capacidade</span><span>Alunos</span><span></span>
                 </div>
                 <div className="divide-y">
-                  {turmas.map((t, idx) => (
-                    <div key={t.id} className="grid grid-cols-[60px_1fr_110px_110px_36px] gap-2 p-2 items-center">
+                  {turmas.map((t, idx) => {
+                    const codigo = `${curso.code}-${ano}${t.letra}`;
+                    const nAlunos = Math.min(t.capacidade, Math.max(0, t.capacidade - ((idx + ano) % 4)));
+                    return (
+                    <div key={t.id} className="grid grid-cols-[60px_1fr_110px_110px_70px_36px] gap-2 p-2 items-center">
                       <div className="flex items-center gap-1.5 font-bold text-primary text-sm pl-2">
-                        <span>{curso.code}-{ano}{t.letra}</span>
+                        <span>{codigo}</span>
                       </div>
                       <Select value={t.sala} onValueChange={v => update(curso.id, ano, idx, { sala: v })}>
                         <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
@@ -209,11 +227,16 @@ export default function CriarTurmas() {
                         <SelectContent>{turnos.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                       </Select>
                       <Input type="number" value={t.capacidade} onChange={e => update(curso.id, ano, idx, { capacidade: +e.target.value })} className="h-8 text-xs" />
+                      <Button size="sm" variant="outline" className="h-8 gap-1 text-xs"
+                        onClick={() => setVerTurma({ codigo, sala: t.sala, turno: t.turno, capacidade: t.capacidade, estudantes: buildStudents(codigo, nAlunos) })}>
+                        <Eye className="w-3 h-3" /> Ver
+                      </Button>
                       <Button size="icon" variant="ghost" onClick={() => removeTurma(curso.id, ano, idx)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </Card>
             );
@@ -225,6 +248,37 @@ export default function CriarTurmas() {
         <Button variant="outline" asChild><Link to="/areaacademica/criador/cadeiras">Voltar</Link></Button>
         <Button asChild className="gap-2"><Link to="/areaacademica/criador/calendario">Próximo: Calendário <Check className="w-4 h-4" /></Link></Button>
       </div>
+
+      <Dialog open={!!verTurma} onOpenChange={(o) => !o && setVerTurma(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> Turma {verTurma?.codigo}</DialogTitle>
+            <DialogDescription className="flex items-center gap-3 text-xs">
+              <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> {verTurma?.sala}</span>
+              <span>· {verTurma?.turno}</span>
+              <span>· {verTurma?.estudantes.length}/{verTurma?.capacidade} alunos</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto border rounded-md">
+            <div className="grid grid-cols-[40px_70px_1fr_1fr] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b sticky top-0">
+              <span>#</span><span>Nº</span><span>Nome</span><span>Email</span>
+            </div>
+            <div className="divide-y">
+              {verTurma?.estudantes.map((e, i) => (
+                <div key={e.id} className="grid grid-cols-[40px_70px_1fr_1fr] gap-2 px-3 py-1.5 text-xs items-center">
+                  <span className="text-muted-foreground">{i + 1}</span>
+                  <span className="font-mono text-[11px]">{e.numero}</span>
+                  <span className="font-medium truncate">{e.nome}</span>
+                  <span className="text-muted-foreground inline-flex items-center gap-1 truncate"><Mail className="w-3 h-3 shrink-0" />{e.email}</span>
+                </div>
+              ))}
+              {verTurma && verTurma.estudantes.length === 0 && (
+                <div className="px-3 py-6 text-center text-xs text-muted-foreground">Sem alunos alocados.</div>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
