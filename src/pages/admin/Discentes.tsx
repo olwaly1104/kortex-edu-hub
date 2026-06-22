@@ -144,6 +144,8 @@ export default function AdminDiscentes() {
   const [uploading, setUploading] = useState(false);
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const fotoInput = useRef<HTMLInputElement>(null);
   const biInput = useRef<HTMLInputElement>(null);
