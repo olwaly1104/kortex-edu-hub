@@ -130,13 +130,13 @@ export default function AdminDiscenteProfile() {
                 {fotoUrl ? <img src={fotoUrl} alt={student.nome} className="w-full h-full object-cover" /> : initials}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Perfil do Discente</p>
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <h1 className="text-2xl font-bold text-foreground leading-tight">{student.nome}</h1>
                   <Badge className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/10 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
                     <GraduationCap className="w-3 h-3 mr-1" /> Estudante
                   </Badge>
-                  <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">· Perfil do Discente</span>
                 </div>
-                <h1 className="text-2xl font-bold text-foreground leading-tight mt-1.5">{student.nome}</h1>
                 <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
                   <Link to="/admin/faculdades-cursos" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-semibold border border-primary/20 hover:bg-primary/15 transition-colors">
                     <Building2 className="w-3 h-3" /> {facName}
