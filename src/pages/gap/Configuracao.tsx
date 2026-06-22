@@ -216,6 +216,11 @@ export default function GapConfiguracao() {
   ]);
   const [agHoraInicio, setAgHoraInicio] = useState("08:00");
   const [agHoraFim, setAgHoraFim] = useState("17:00");
+  const [agEstado, setAgEstado] = useState<"aberto" | "fechado">(() => {
+    if (typeof window === "undefined") return "aberto";
+    return (localStorage.getItem("gap_ag_estado") as "aberto" | "fechado") || "aberto";
+  });
+  useEffect(() => { try { localStorage.setItem("gap_ag_estado", agEstado); } catch {} }, [agEstado]);
 
   // Ag dialogs
   const [agCatOpen, setAgCatOpen] = useState(false);
