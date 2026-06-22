@@ -98,6 +98,14 @@ async function currentUserId(): Promise<string | null> {
   return data.user?.id ?? null;
 }
 
+async function currentInstitutionId(): Promise<string | null> {
+  const { data, error } = await (supabase.rpc as any)("current_institution_id");
+  if (error || !data) {
+    return await currentUserId();
+  }
+  return data as string;
+}
+
 // ---------- Queries ----------
 
 export function useFaculdades() {
