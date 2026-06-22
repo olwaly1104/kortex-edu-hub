@@ -32,7 +32,7 @@ const DAYS_FULL = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", 
 const MONTH_NAMES = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
 type EventType = "ferias" | "reuniao" | "feriado" | "pessoal" | "prazo";
-type ItemKind = "evento" | "reuniao";
+type ItemKind = "evento" | "prazo" | "reuniao";
 
 interface AgendaEvent {
   id: string;
@@ -214,8 +214,12 @@ export default function FinancasCalendario() {
 
   const handleCreate = () => {
     if (!form.title.trim()) return;
-    const finalType: EventType = kind === "reuniao" ? "reuniao" : form.type;
-    setUserEvents(prev => [...prev, { ...form, type: finalType, id: `u-${Date.now()}`, organizer: kind === "reuniao" ? "Diretor Financeiro" : undefined }]);
+    const finalType: EventType =
+      kind === "reuniao" ? "reuniao" : kind === "prazo" ? "prazo" : form.type;
+    const payload: Omit<AgendaEvent, "id"> = kind === "prazo"
+      ? { ...form, type: "prazo", endTime: undefined, participants: [] }
+      : { ...form, type: finalType };
+    setUserEvents(prev => [...prev, { ...payload, id: `u-${Date.now()}`, organizer: kind === "reuniao" ? "Diretor Financeiro" : undefined }]);
     setOpenCreate(false);
     setForm({ title: "", type: "pessoal", date: selectedDate, startTime: "09:00", endTime: "10:00", location: "", description: "", participants: [] });
     setKind("evento");
@@ -643,25 +647,31 @@ export default function FinancasCalendario() {
             <DialogHeader className="space-y-1">
               <DialogTitle className="text-lg font-bold">Adicionar à Agenda</DialogTitle>
               <DialogDescription className="text-xs">
-                Crie um evento pessoal, prazo ou envie um pedido de reunião para a sua equipa.
+                Crie um evento pessoal, marque um prazo ou envie um pedido de reunião.
               </DialogDescription>
             </DialogHeader>
           </div>
 
           <div className="px-6 py-5 space-y-5 max-h-[70vh] overflow-y-auto">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               {([
-                { v: "evento" as const, label: "Evento / Prazo", desc: "Apenas para si", icon: CalendarDays },
+                { v: "evento" as const, label: "Evento", desc: "Pessoal ou institucional", icon: CalendarDays },
+                { v: "prazo" as const, label: "Prazo", desc: "Data limite a cumprir", icon: FileText },
                 { v: "reuniao" as const, label: "Reunião", desc: "Convidar participantes", icon: Users },
               ]).map(opt => {
                 const I = opt.icon;
+                const active = kind === opt.v;
+                const accent = opt.v === "prazo"
+                  ? (active ? "border-amber-500 bg-amber-50 shadow-sm" : "border-border hover:border-amber-300 hover:bg-amber-50/30")
+                  : (active ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/40 hover:bg-muted/30");
+                const iconBg = opt.v === "prazo"
+                  ? (active ? "bg-amber-500 text-white" : "bg-muted text-muted-foreground")
+                  : (active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground");
                 return (
                   <button key={opt.v} type="button" onClick={() => setKind(opt.v)}
-                    className={cn("text-left p-4 rounded-xl border-2 transition-all",
-                      kind === opt.v ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/40 hover:bg-muted/30"
-                    )}>
+                    className={cn("text-left p-4 rounded-xl border-2 transition-all", accent)}>
                     <div className="flex items-center gap-2.5">
-                      <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", kind === opt.v ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
+                      <div className={cn("w-9 h-9 rounded-lg flex items-center justify-center", iconBg)}>
                         <I className="w-4 h-4" />
                       </div>
                       <div>
@@ -674,23 +684,32 @@ export default function FinancasCalendario() {
               })}
             </div>
 
+            {kind === "prazo" && (
+              <div className="rounded-lg border border-amber-200 bg-amber-50/60 px-3 py-2.5 flex items-start gap-2">
+                <FileText className="w-4 h-4 text-amber-700 mt-0.5 shrink-0" />
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  Um prazo marca uma data limite. Não tem hora de fim nem participantes — apenas o título, a data e (opcionalmente) uma hora-limite.
+                </p>
+              </div>
+            )}
+
             <div className="space-y-1.5">
               <Label className="text-xs flex items-center gap-1.5 text-foreground"><Tag className="w-3 h-3" /> Título</Label>
               <Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
-                placeholder={kind === "reuniao" ? "Ex: Reunião sobre orçamento Q1" : "Ex: Encontro com auditor"} className="h-10" />
+                placeholder={kind === "reuniao" ? "Ex: Reunião sobre orçamento Q1" : kind === "prazo" ? "Ex: Entrega do relatório anual" : "Ex: Encontro com auditor"} className="h-10" />
             </div>
 
             <div className="space-y-1.5">
               <Label className="text-xs flex items-center gap-1.5 text-foreground"><AlignLeft className="w-3 h-3" /> Descrição <span className="text-muted-foreground font-normal">(opcional)</span></Label>
               <Textarea rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}
-                placeholder="Notas, contexto ou agenda da reunião…" />
+                placeholder={kind === "prazo" ? "Notas sobre o prazo, requisitos ou responsáveis…" : "Notas, contexto ou agenda da reunião…"} />
             </div>
 
             {kind === "evento" && (
               <div className="space-y-1.5">
                 <Label className="text-xs text-foreground">Categoria</Label>
-                <div className="grid grid-cols-4 gap-2">
-                  {(["pessoal","prazo","feriado","ferias"] as EventType[]).map(t => {
+                <div className="grid grid-cols-3 gap-2">
+                  {(["pessoal","feriado","ferias"] as EventType[]).map(t => {
                     const m = TYPE_META[t]; const I = m.icon;
                     return (
                       <button key={t} type="button" onClick={() => setForm({ ...form, type: t })}
@@ -706,20 +725,33 @@ export default function FinancasCalendario() {
               </div>
             )}
 
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs flex items-center gap-1.5 text-foreground"><CalendarDays className="w-3 h-3" /> Data</Label>
-                <Input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="h-10" />
+            {kind === "prazo" ? (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs flex items-center gap-1.5 text-foreground"><CalendarDays className="w-3 h-3" /> Data limite</Label>
+                  <Input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="h-10" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs flex items-center gap-1.5 text-foreground"><Clock className="w-3 h-3" /> Hora-limite <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+                  <Input type="time" value={form.startTime} onChange={e => setForm({ ...form, startTime: e.target.value })} className="h-10" />
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs flex items-center gap-1.5 text-foreground"><Clock className="w-3 h-3" /> Início</Label>
-                <Input type="time" value={form.startTime} onChange={e => setForm({ ...form, startTime: e.target.value })} className="h-10" />
+            ) : (
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs flex items-center gap-1.5 text-foreground"><CalendarDays className="w-3 h-3" /> Data</Label>
+                  <Input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="h-10" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs flex items-center gap-1.5 text-foreground"><Clock className="w-3 h-3" /> Início</Label>
+                  <Input type="time" value={form.startTime} onChange={e => setForm({ ...form, startTime: e.target.value })} className="h-10" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs flex items-center gap-1.5 text-foreground"><Clock className="w-3 h-3" /> Fim</Label>
+                  <Input type="time" value={form.endTime} onChange={e => setForm({ ...form, endTime: e.target.value })} className="h-10" />
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs flex items-center gap-1.5 text-foreground"><Clock className="w-3 h-3" /> Fim</Label>
-                <Input type="time" value={form.endTime} onChange={e => setForm({ ...form, endTime: e.target.value })} className="h-10" />
-              </div>
-            </div>
+            )}
 
             <div className="space-y-1.5">
               <Label className="text-xs flex items-center gap-1.5 text-foreground"><MapPin className="w-3 h-3" /> Local <span className="text-muted-foreground font-normal">(opcional)</span></Label>
@@ -756,11 +788,12 @@ export default function FinancasCalendario() {
             <Button variant="ghost" onClick={() => setOpenCreate(false)}>Cancelar</Button>
             <Button onClick={handleCreate} className="gap-1.5">
               <Check className="w-4 h-4" />
-              {kind === "reuniao" ? "Enviar pedido" : "Adicionar à agenda"}
+              {kind === "reuniao" ? "Enviar pedido" : kind === "prazo" ? "Marcar prazo" : "Adicionar à agenda"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
 
       {/* ── Event detail ── */}
       <EventDetailDialog event={detailEvent} onClose={() => setDetailEvent(null)} onDelete={handleDelete} />

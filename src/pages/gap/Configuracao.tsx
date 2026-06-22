@@ -1,5 +1,5 @@
 import { OnboardingStepBanner, markOnboardingStepDone, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -253,7 +253,18 @@ export default function GapConfiguracao() {
     { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
   const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([]);
-  const [cdNotaMinima, setCdNotaMinima] = useState<number | "">("");
+  const [cdNotaMinima, setCdNotaMinima] = useState<number | "">(() => {
+    if (typeof window === "undefined") return "";
+    const v = window.localStorage.getItem("academica.notaMinimaAcesso");
+    return v ? Number(v) : "";
+  });
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "academica.notaMinimaAcesso") setCdNotaMinima(e.newValue ? Number(e.newValue) : "");
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
   const [cdTaxa, setCdTaxa] = useState<number | "">("");
   const [cdMaxOpcoes, setCdMaxOpcoes] = useState<number | "">("");
   const [cdPeriodoInicio, setCdPeriodoInicio] = useState("");
@@ -830,8 +841,8 @@ export default function GapConfiguracao() {
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima de aprovação</label>
-                <Input type="number" min={0} max={20} step={0.5} value={cdNotaMinima} disabled={!isCardEditing("cd-params")} onChange={e => setCdNotaMinima(e.target.value === "" ? "" : Number(e.target.value))} />
-                <p className="text-[10px] text-muted-foreground mt-1">Escala 0–20 no exame de acesso</p>
+                <Input type="number" min={0} max={20} step={0.5} value={cdNotaMinima} disabled readOnly />
+                <p className="text-[10px] text-muted-foreground mt-1">Definida em Área Académica · apenas leitura</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>

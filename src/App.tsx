@@ -129,6 +129,7 @@ import GapEstudanteProfile from "./pages/gap/EstudanteProfile";
 import GapCandidaturas from "./pages/gap/Candidaturas";
 import GapCandidaturaDetail from "./pages/gap/CandidaturaDetail";
 import GapConfiguracao from "./pages/gap/Configuracao";
+import GapMeuPerfil from "./pages/gap/MeuPerfil";
 
 import FinancasDashboard from "./pages/financas/Dashboard";
 import FinancasInicio from "./pages/financas/Inicio";
@@ -489,7 +490,7 @@ function AppRoutes() {
         <Route path="/gap/email" element={<StudentEmail />} />
         <Route path="/gap/contactos" element={<StudentContacts />} />
         <Route path="/gap/financas" element={<FinancasPessoalFinancas />} />
-        <Route path="/gap/perfil" element={<StudentProfile />} />
+        <Route path="/gap/perfil" element={<GapMeuPerfil />} />
         {/* Área Académica II — Criador / Planeador Curricular */}
         <Route path="/areaacademica" element={<Academica2Inicio />} />
         <Route path="/areaacademica/criador" element={<Academica2CourseCreator />} />
