@@ -864,10 +864,28 @@ function SalariosSection({ email }: { email?: string | null }) {
 /* ═══════════════════════════════ MULTAS ═══════════════════════════════════ */
 
 type RhMulta = { id: string; nome: string; valor: number; descricao: string; aplicaA: "Docente" | "Staff" | "Discente" | "Ambos" };
+type FinEstado = { id: string; nome: string; cor: string; descricao?: string };
 
-function MultasSection({ email: _email }: { email?: string | null }) {
+const FIN_ESTADOS_DISC_KEY = (email?: string | null) => KEY("discentes.estados.financeiros", email);
+const DEFAULT_FIN_ESTADOS_DISC: FinEstado[] = [
+  { id: "fe1", nome: "Regularizado", cor: "bg-emerald-100 text-emerald-700 border-emerald-200", descricao: "Sem pendências financeiras" },
+  { id: "fe2", nome: "Por regularizar", cor: "bg-amber-100 text-amber-700 border-amber-200", descricao: "Mensalidades em atraso" },
+  { id: "fe3", nome: "Isento (Bolseiro)", cor: "bg-blue-100 text-blue-700 border-blue-200", descricao: "Regime de bolsa" },
+];
+const FIN_COR_OPCOES = [
+  { label: "Verde", value: "bg-emerald-100 text-emerald-700 border-emerald-200" },
+  { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
+  { label: "Vermelho", value: "bg-red-100 text-red-700 border-red-200" },
+  { label: "Azul", value: "bg-blue-100 text-blue-700 border-blue-200" },
+  { label: "Cinza", value: "bg-slate-100 text-slate-700 border-slate-200" },
+  { label: "Violeta", value: "bg-violet-100 text-violet-700 border-violet-200" },
+];
+
+function MultasSection({ email }: { email?: string | null }) {
   const [multas, setMultas] = useState<RhMulta[]>([]);
   const [target, setTarget] = useState<"docentes" | "staff" | "discentes">("docentes");
+  const [finEstados, setFinEstados] = useState<FinEstado[]>(() => readJSON<FinEstado[]>(FIN_ESTADOS_DISC_KEY(email), DEFAULT_FIN_ESTADOS_DISC));
+  useEffect(() => writeJSON(FIN_ESTADOS_DISC_KEY(email), finEstados), [finEstados, email]);
 
   useEffect(() => {
     try {
