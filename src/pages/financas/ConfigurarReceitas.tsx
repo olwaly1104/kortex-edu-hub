@@ -948,19 +948,22 @@ function MultasSection({ email }: { email?: string | null }) {
             <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{finEstados.length} estado{finEstados.length === 1 ? "" : "s"}</span>
           </div>
           <div className="divide-y">
-            <div className="grid grid-cols-[1fr_1.2fr_180px_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div className="grid grid-cols-[1.1fr_1.3fr_1.2fr_150px_150px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
               <div>Designação</div>
               <div>Descrição</div>
+              <div>Critério (atraso)</div>
               <div>Cor</div>
               <div>Pré-visualização</div>
               <div className="text-right">Ação</div>
             </div>
             {finEstados.map((es) => (
-              <div key={es.id} className="grid grid-cols-[1fr_1.2fr_180px_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <div key={es.id} className="grid grid-cols-[1.1fr_1.3fr_1.2fr_150px_150px_40px] gap-3 px-5 py-2.5 items-center text-sm">
                 <Input className="h-9" placeholder="Ex: Regularizado" value={es.nome}
                   onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, nome: e.target.value } : x))} />
                 <Input className="h-9" placeholder="Descrição curta" value={es.descricao || ""}
                   onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, descricao: e.target.value } : x))} />
+                <Input className="h-9" placeholder="Ex: 1–2 meses em atraso" value={es.criterio || ""}
+                  onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, criterio: e.target.value } : x))} />
                 <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={es.cor}
                   onChange={(e) => setFinEstados((s) => s.map((x) => x.id === es.id ? { ...x, cor: e.target.value } : x))}>
                   {FIN_COR_OPCOES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
