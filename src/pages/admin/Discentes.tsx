@@ -145,6 +145,14 @@ export default function AdminDiscentes() {
   const [open, setOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [previewId, setPreviewId] = useState<string>("");
+
+  useEffect(() => {
+    if (open) {
+      const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+      setPreviewId(`DISC-${rand}`);
+    }
+  }, [open]);
 
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const fotoInput = useRef<HTMLInputElement>(null);
@@ -505,14 +513,46 @@ export default function AdminDiscentes() {
                 </Field>
               </div>
 
-              <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Email Kortex (auto)</div>
-                  <div className="font-mono text-[12px] text-foreground/90 truncate">
-                    {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Email Kortex (auto)</div>
+                    <div className="font-mono text-[12px] text-foreground/90 truncate">
+                      {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
+                    </div>
                   </div>
+                  <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
                 </div>
-                <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
+                <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">ID do Discente (auto)</div>
+                    <div className="font-mono text-[12px] text-foreground/90 truncate">
+                      {previewId || "DISC-————"}
+                    </div>
+                  </div>
+                  <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
+                </div>
+              </div>
+
+              <div className="rounded-md border border-dashed bg-background px-3 py-2.5 flex items-center justify-between gap-3">
+                <p className="text-[11px] text-muted-foreground leading-snug">
+                  Pode criar já o perfil simplificado (apenas com o nome) e preencher os restantes dados mais tarde no perfil do discente.
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    if (!requiredOk) {
+                      toast.error("Preencha primeiro e último nome");
+                      return;
+                    }
+                    setConfirmOpen(true);
+                  }}
+                  disabled={uploading || createMut.isPending || !requiredOk}
+                  className="gap-1.5 shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Criar perfil simplificado
+                </Button>
               </div>
             </section>
 
@@ -549,6 +589,12 @@ export default function AdminDiscentes() {
                     </button>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-1">
+                      <Field label="Primeiro nome">
+                        <Input value={draft.primeiroNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
+                      </Field>
+                      <Field label="Último nome">
+                        <Input value={draft.ultimoNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
+                      </Field>
                       <Field label="Data de nascimento">
                         <Input type="date" value={draft.nascimento} onChange={(e) => setF("nascimento", e.target.value)} className="h-8 text-xs" />
                       </Field>
@@ -565,14 +611,23 @@ export default function AdminDiscentes() {
                       <Field label="Nº Bilhete de Identidade">
                         <Input value={draft.bilhete} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" className="h-8 text-xs" />
                       </Field>
+                      <Field label="Regime">
+                        <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
+                          <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="normal">Normal</SelectItem>
+                            <SelectItem value="bolseiro">Bolseiro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </Field>
                     </div>
                   </div>
                 </section>
 
                 {/* 2. Enquadramento Académico */}
                 <section>
-                  <SectionTitle index={2} title="Enquadramento Académico" hint="Faculdade, curso, ano, turma e regime de inscrição" />
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                  <SectionTitle index={2} title="Enquadramento Académico" hint="Faculdade, curso, ano e turma" />
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     <Field label="Faculdade">
                       <Select value={draft.faculdade_id} onValueChange={(v) => setF("faculdade_id", v)}>
                         <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
@@ -607,24 +662,18 @@ export default function AdminDiscentes() {
                         <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                       </Select>
                     </Field>
-                    <Field label="Regime">
-                      <Select value={draft.regime} onValueChange={(v) => setF("regime", v as Regime)}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="normal">Normal</SelectItem>
-                          <SelectItem value="bolseiro">Bolseiro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </Field>
                   </div>
                 </section>
 
                 {/* 3. Contacto */}
                 <section>
-                  <SectionTitle index={3} title="Contacto" hint="Telemóvel pessoal" />
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <SectionTitle index={3} title="Contacto" hint="Telemóvel pessoal e email institucional" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <Field label="Telemóvel">
                       <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
+                    </Field>
+                    <Field label="Email institucional">
+                      <Input value={previewEmail} readOnly disabled placeholder={`nome.apelido@${EMAIL_DOMAIN}`} className="h-8 text-xs bg-muted/40 font-mono" />
                     </Field>
                   </div>
                 </section>
