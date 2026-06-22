@@ -197,7 +197,7 @@ export default function GapEstudantes() {
               {filtered.map((r) => (
                 <tr
                   key={r.id}
-                  onClick={() => navigate(`/admin/discentes/${r.id}`)}
+                  onClick={() => navigate(`/gap/estudantes/${r.id}`)}
                   className="hover:bg-muted/30 cursor-pointer"
                 >
                   <td className="py-3 px-4">
