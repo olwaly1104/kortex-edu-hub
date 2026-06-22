@@ -206,14 +206,17 @@ export default function CriarTurmas() {
                     <Plus className="w-3 h-3" /> Adicionar Turma
                   </Button>
                 </div>
-                <div className="grid grid-cols-[60px_1fr_110px_110px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-                  <span>Turma</span><span>Sala</span><span>Turno</span><span>Capacidade</span><span></span>
+                <div className="grid grid-cols-[60px_1fr_110px_110px_70px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+                  <span>Turma</span><span>Sala</span><span>Turno</span><span>Capacidade</span><span>Alunos</span><span></span>
                 </div>
                 <div className="divide-y">
-                  {turmas.map((t, idx) => (
-                    <div key={t.id} className="grid grid-cols-[60px_1fr_110px_110px_36px] gap-2 p-2 items-center">
+                  {turmas.map((t, idx) => {
+                    const codigo = `${curso.code}-${ano}${t.letra}`;
+                    const nAlunos = Math.min(t.capacidade, Math.max(0, t.capacidade - ((idx + ano) % 4)));
+                    return (
+                    <div key={t.id} className="grid grid-cols-[60px_1fr_110px_110px_70px_36px] gap-2 p-2 items-center">
                       <div className="flex items-center gap-1.5 font-bold text-primary text-sm pl-2">
-                        <span>{curso.code}-{ano}{t.letra}</span>
+                        <span>{codigo}</span>
                       </div>
                       <Select value={t.sala} onValueChange={v => update(curso.id, ano, idx, { sala: v })}>
                         <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
@@ -224,11 +227,16 @@ export default function CriarTurmas() {
                         <SelectContent>{turnos.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
                       </Select>
                       <Input type="number" value={t.capacidade} onChange={e => update(curso.id, ano, idx, { capacidade: +e.target.value })} className="h-8 text-xs" />
+                      <Button size="sm" variant="outline" className="h-8 gap-1 text-xs"
+                        onClick={() => setVerTurma({ codigo, sala: t.sala, turno: t.turno, capacidade: t.capacidade, estudantes: buildStudents(codigo, nAlunos) })}>
+                        <Eye className="w-3 h-3" /> Ver
+                      </Button>
                       <Button size="icon" variant="ghost" onClick={() => removeTurma(curso.id, ano, idx)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </Card>
             );
