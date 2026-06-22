@@ -708,11 +708,11 @@ export default function AdminDiscentes() {
             <AlertDialogTitle className="flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-primary" /> Confirmar criação do discente
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              Ao confirmar, será criado o discente <strong>{draft.primeiroNome} {draft.ultimoNome}</strong> e
-              automaticamente provisionada uma <strong>conta Kortex</strong> com o email{" "}
-              <span className="font-mono">{previewEmail || "—"}</span>. O estudante poderá iniciar sessão de imediato
-              e estará disponível na lista de Contactos para iniciar conversa.
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <div>Será criada uma conta Kortex com o email:</div>
+                <div className="font-mono text-foreground text-sm bg-muted px-3 py-2 rounded-md break-all">{previewEmail || "—"}</div>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
