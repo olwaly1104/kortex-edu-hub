@@ -408,8 +408,8 @@ export default function AdminDiscentes() {
 
           <div className="divide-y">
             {filtered.map((r) => {
-              const docsTotal = 4;
-              const docsDone = [r.foto_url, r.bilhete_url, r.certificado_url, r.enc_bilhete_url].filter(Boolean).length;
+              const docsTotal = 3;
+              const docsDone = [r.foto_url, r.bilhete_url, r.certificado_url].filter(Boolean).length;
               const shortId = `DISC-${(r.id as string).slice(0, 4).toUpperCase()}`;
               return (
                 <div
