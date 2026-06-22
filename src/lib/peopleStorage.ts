@@ -37,6 +37,7 @@ export type DocenteRow = {
   provincia?: string;
   municipio?: string;
   endereco?: string;
+  contrato?: "Permanente" | "Prestador";
   // Academic profile
   grau?: Grau;
   especialidade?: string;
