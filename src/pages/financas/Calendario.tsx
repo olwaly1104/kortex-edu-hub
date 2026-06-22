@@ -22,6 +22,36 @@ import { cn } from "@/lib/utils";
 import { Rocket } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { isInstitutionLive } from "@/pages/financas/_FinHeader";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+const todayStr = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+const DB_TYPES = new Set(["reuniao", "prazo", "pessoal", "outro"]);
+const toDbType = (t: EventType): "reuniao" | "prazo" | "pessoal" | "outro" =>
+  DB_TYPES.has(t) ? (t as "reuniao" | "prazo" | "pessoal" | "outro") : "outro";
+const fromDb = (r: {
+  id: string; type: string; title: string; event_date: string;
+  start_time: string | null; end_time: string | null; location: string | null;
+  participants: unknown; categoria: string | null;
+}): AgendaEvent => {
+  const rawType = (r.categoria && (["ferias","feriado","pessoal","prazo","reuniao"] as const).includes(r.categoria as never))
+    ? (r.categoria as EventType)
+    : (r.type as EventType);
+  return {
+    id: r.id,
+    type: rawType,
+    title: r.title,
+    date: r.event_date,
+    startTime: r.start_time ? r.start_time.slice(0, 5) : undefined,
+    endTime: r.end_time ? r.end_time.slice(0, 5) : undefined,
+    location: r.location ?? undefined,
+    participants: Array.isArray(r.participants) ? (r.participants as string[]) : [],
+  };
+};
+
 
 /* ── constants ─────────────────────────────────────── */
 const TODAY = "2024-02-14";
