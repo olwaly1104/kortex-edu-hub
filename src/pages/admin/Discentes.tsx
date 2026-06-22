@@ -682,7 +682,13 @@ export default function AdminDiscentes() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
             <Button
-              onClick={addRow}
+              onClick={() => {
+                if (!requiredOk) {
+                  toast.error("Preencha primeiro e último nome");
+                  return;
+                }
+                setConfirmOpen(true);
+              }}
               disabled={uploading || createMut.isPending || !requiredOk}
               className="gap-1.5"
             >
@@ -695,6 +701,31 @@ export default function AdminDiscentes() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <GraduationCap className="w-5 h-5 text-primary" /> Confirmar criação do discente
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Ao confirmar, será criado o discente <strong>{draft.primeiroNome} {draft.ultimoNome}</strong> e
+              automaticamente provisionada uma <strong>conta Kortex</strong> com o email{" "}
+              <span className="font-mono">{previewEmail || "—"}</span>. O estudante poderá iniciar sessão de imediato
+              e estará disponível na lista de Contactos para iniciar conversa.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={uploading || createMut.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); setConfirmOpen(false); addRow(); }}
+              disabled={uploading || createMut.isPending}
+            >
+              Confirmar e criar conta
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
