@@ -253,7 +253,18 @@ export default function GapConfiguracao() {
     { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
   const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([]);
-  const [cdNotaMinima, setCdNotaMinima] = useState<number | "">("");
+  const [cdNotaMinima, setCdNotaMinima] = useState<number | "">(() => {
+    if (typeof window === "undefined") return "";
+    const v = window.localStorage.getItem("academica.notaMinimaAcesso");
+    return v ? Number(v) : "";
+  });
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "academica.notaMinimaAcesso") setCdNotaMinima(e.newValue ? Number(e.newValue) : "");
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
   const [cdTaxa, setCdTaxa] = useState<number | "">("");
   const [cdMaxOpcoes, setCdMaxOpcoes] = useState<number | "">("");
   const [cdPeriodoInicio, setCdPeriodoInicio] = useState("");
