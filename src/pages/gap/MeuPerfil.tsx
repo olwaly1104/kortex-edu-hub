@@ -132,9 +132,15 @@ export default function GapMeuPerfil() {
 <div class="footer">UPRA · Gabinete de Apoio ao Discente · Documento autogerado a partir do perfil institucional.</div>
 </body></html>`;
     const w = window.open("", "_blank");
-    if (!w) { toast.error("Permita janelas para gerar o documento."); return; }
+    if (!w) { toast.error("Permita janelas para gerar o documento."); return w as any; }
     w.document.open(); w.document.write(html); w.document.close();
-    toast.success("Documento de perfil gerado.");
+    return w;
+  };
+
+  const verPerfil = () => { gerarDocumento(); };
+  const descarregarPerfil = () => {
+    const w = gerarDocumento();
+    if (w) setTimeout(() => { try { w.focus(); w.print(); } catch {} }, 400);
   };
 
   return (
