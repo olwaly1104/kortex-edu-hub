@@ -888,8 +888,16 @@ const FIN_COR_OPCOES = [
 function MultasSection({ email }: { email?: string | null }) {
   const [multas, setMultas] = useState<RhMulta[]>([]);
   const [target, setTarget] = useState<"docentes" | "staff" | "discentes">("docentes");
-  const [finEstados, setFinEstados] = useState<FinEstado[]>(() => readJSON<FinEstado[]>(FIN_ESTADOS_DISC_KEY(email), DEFAULT_FIN_ESTADOS_DISC));
+  const [finEstados, setFinEstados] = useState<FinEstado[]>(() => {
+    const raw = readJSON<FinEstado[]>(FIN_ESTADOS_DISC_KEY(email), DEFAULT_FIN_ESTADOS_DISC);
+    return raw.map((e) => {
+      const nameLc = (e.nome || "").trim().toLowerCase();
+      const isLocked = nameLc === "regularizado" || nameLc === "isento" || e.id === "fe1" || e.id === "fe5";
+      return isLocked ? { ...e, min: 0, max: 0, locked: true } : { ...e, min: e.min ?? 1, max: e.max ?? 1, locked: false };
+    });
+  });
   useEffect(() => writeJSON(FIN_ESTADOS_DISC_KEY(email), finEstados), [finEstados, email]);
+
 
   useEffect(() => {
     try {
