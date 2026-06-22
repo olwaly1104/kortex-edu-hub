@@ -114,8 +114,8 @@ const emptyDraft = (faculdade_id = "", curso_id = ""): Draft => ({
   encBilheteFile: null,
   faculdade_id,
   curso_id,
-  ano: "1",
-  turma: "A",
+  ano: "",
+  turma: "",
 });
 
 async function uploadDoc(file: File, prefix: string, email: string): Promise<string> {
@@ -648,13 +648,13 @@ export default function AdminDiscentes() {
                     </Field>
                     <Field label="Ano">
                       <Select value={draft.ano} onValueChange={(v) => setF("ano", v)}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecionar" /></SelectTrigger>
                         <SelectContent>{anosPool.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
                       </Select>
                     </Field>
                     <Field label="Turma">
                       <Select value={draft.turma} onValueChange={(v) => setF("turma", v)}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecionar" /></SelectTrigger>
                         <SelectContent>{turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                       </Select>
                     </Field>
