@@ -114,8 +114,8 @@ const emptyDraft = (faculdade_id = "", curso_id = ""): Draft => ({
   encBilheteFile: null,
   faculdade_id,
   curso_id,
-  ano: "1",
-  turma: "A",
+  ano: "",
+  turma: "",
 });
 
 async function uploadDoc(file: File, prefix: string, email: string): Promise<string> {
