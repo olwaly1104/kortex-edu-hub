@@ -248,6 +248,37 @@ export default function CriarTurmas() {
         <Button variant="outline" asChild><Link to="/areaacademica/criador/cadeiras">Voltar</Link></Button>
         <Button asChild className="gap-2"><Link to="/areaacademica/criador/calendario">Próximo: Calendário <Check className="w-4 h-4" /></Link></Button>
       </div>
+
+      <Dialog open={!!verTurma} onOpenChange={(o) => !o && setVerTurma(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> Turma {verTurma?.codigo}</DialogTitle>
+            <DialogDescription className="flex items-center gap-3 text-xs">
+              <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> {verTurma?.sala}</span>
+              <span>· {verTurma?.turno}</span>
+              <span>· {verTurma?.estudantes.length}/{verTurma?.capacidade} alunos</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[60vh] overflow-y-auto border rounded-md">
+            <div className="grid grid-cols-[40px_70px_1fr_1fr] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b sticky top-0">
+              <span>#</span><span>Nº</span><span>Nome</span><span>Email</span>
+            </div>
+            <div className="divide-y">
+              {verTurma?.estudantes.map((e, i) => (
+                <div key={e.id} className="grid grid-cols-[40px_70px_1fr_1fr] gap-2 px-3 py-1.5 text-xs items-center">
+                  <span className="text-muted-foreground">{i + 1}</span>
+                  <span className="font-mono text-[11px]">{e.numero}</span>
+                  <span className="font-medium truncate">{e.nome}</span>
+                  <span className="text-muted-foreground inline-flex items-center gap-1 truncate"><Mail className="w-3 h-3 shrink-0" />{e.email}</span>
+                </div>
+              ))}
+              {verTurma && verTurma.estudantes.length === 0 && (
+                <div className="px-3 py-6 text-center text-xs text-muted-foreground">Sem alunos alocados.</div>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
