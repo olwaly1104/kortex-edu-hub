@@ -252,11 +252,12 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
         {impostos.length === 0 ? (
           <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem impostos configurados.</div>
         ) : impostos.map((i) => {
-          const custom = isCustomRegime(i.regime);
           const locked = i.locked;
+          const regimeInList = REGIMES_IVA.find((r) => r.regime === i.regime);
           return (
           <div key={i.id} className="grid grid-cols-[1fr_160px] gap-3 px-5 py-2.5 items-center text-sm">
-            <select className={`h-9 rounded-md border border-input bg-background px-2 text-sm ${locked ? "pointer-events-none" : ""}`} value={i.regime}
+            <select className={`h-9 rounded-md border border-input bg-background px-2 text-sm ${locked ? "pointer-events-none opacity-70" : ""}`} value={i.regime}
+              disabled={locked}
               onChange={(e) => {
                 const regime = e.target.value;
                 const nowCustom = isCustomRegime(regime);
@@ -264,15 +265,16 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
                 setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, regime, taxa, nome: nomeForImposto(regime, taxa) } : x));
               }}>
               {REGIMES_IVA.map((r) => <option key={r.regime} value={r.regime}>{r.label}</option>)}
+              {!regimeInList && <option value={i.regime}>{i.nome}</option>}
             </select>
-            {custom && !locked ? (
+            {locked ? (
+              <div className="text-right tabular-nums font-medium text-foreground">{(i.taxa * 100).toFixed(0)}%</div>
+            ) : (
               <Input type="number" min={0} max={100} step={1} className="h-9 text-right tabular-nums" value={Math.round(i.taxa * 100)}
                 onChange={(e) => {
                   const taxa = Math.max(0, Math.min(100, Number(e.target.value) || 0)) / 100;
                   setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, taxa, nome: nomeForImposto(x.regime, taxa) } : x));
                 }} />
-            ) : (
-              <div className="text-right tabular-nums font-medium text-foreground">{(i.taxa * 100).toFixed(0)}%</div>
             )}
           </div>
           );
