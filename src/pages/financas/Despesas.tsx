@@ -78,6 +78,50 @@ const emptyDespesa = (defaultStatus: string): NewDespesa => ({
 export default function Despesas() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const email = user?.email;
+
+  // Read configured categorias / estados / responsaveis (mirrors ConfigurarReceitas → Despesas)
+  const [cfgCategorias, setCfgCategorias] = useState<CfgCategoria[]>(() =>
+    readJSON<CfgCategoria[]>(CFG_KEY("des.categorias", email), []));
+  const [cfgEstados, setCfgEstados] = useState<CfgEstado[]>(() => {
+    const r = readJSON<CfgEstado[]>(CFG_KEY("des.estados", email), []);
+    return r.length ? r : DEFAULT_ESTADOS;
+  });
+  const [cfgResponsaveis, setCfgResponsaveis] = useState<CfgResp[]>(() =>
+    readJSON<CfgResp[]>(CFG_KEY("des.responsaveis", email), []));
+
+  // Re-hydrate when window regains focus, so config edits made elsewhere appear
+  useEffect(() => {
+    const hydrate = () => {
+      setCfgCategorias(readJSON<CfgCategoria[]>(CFG_KEY("des.categorias", email), []));
+      const r = readJSON<CfgEstado[]>(CFG_KEY("des.estados", email), []);
+      setCfgEstados(r.length ? r : DEFAULT_ESTADOS);
+      setCfgResponsaveis(readJSON<CfgResp[]>(CFG_KEY("des.responsaveis", email), []));
+    };
+    window.addEventListener("focus", hydrate);
+    return () => window.removeEventListener("focus", hydrate);
+  }, [email]);
+
+  const categoryNames = useMemo(() => cfgCategorias.map(c => c.nome).filter(Boolean), [cfgCategorias]);
+  const estadoNames = useMemo(() => cfgEstados.map(e => e.nome).filter(Boolean), [cfgEstados]);
+  const estadoLabels = useMemo(() => {
+    const m: Record<string, string> = {};
+    cfgEstados.forEach(e => { m[e.nome.toLowerCase()] = e.nome; });
+    return m;
+  }, [cfgEstados]);
+  const estadoColor = useMemo(() => {
+    const m: Record<string, string> = {};
+    cfgEstados.forEach(e => { m[e.nome.toLowerCase()] = e.cor; });
+    return m;
+  }, [cfgEstados]);
+  const estadoDescricao = useMemo(() => {
+    const m: Record<string, string> = {};
+    cfgEstados.forEach(e => { m[e.nome.toLowerCase()] = e.descricao || ""; });
+    return m;
+  }, [cfgEstados]);
+  const defaultEstado = estadoNames[0] || "Pendente";
+
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("todos");
   const [filterCategory, setFilterCategory] = useState("todos");
@@ -86,12 +130,22 @@ export default function Despesas() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [periodo, setPeriodo] = useState<Periodo>("mes");
   const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("mes"));
-  const [form, setForm] = useState<NewDespesa>(emptyDespesa);
+  const [form, setForm] = useState<NewDespesa>(() => emptyDespesa(defaultEstado));
   const mult = PERIODO_MULT[periodo];
+
+  // Keep default status in sync if config changes before first edit
+  useEffect(() => {
+    setForm(f => (f.status ? f : { ...f, status: defaultEstado }));
+  }, [defaultEstado]);
 
   const setField = <K extends keyof NewDespesa>(k: K, v: NewDespesa[K]) => setForm(f => ({ ...f, [k]: v }));
   const amountNum = Number(form.amount.replace(/[^0-9.,]/g, "").replace(",", ".")) || 0;
   const isValid = form.description.trim().length >= 3 && !!form.category && amountNum > 0 && !!form.date;
+
+  const requiredDocs = useMemo(
+    () => cfgCategorias.find(c => c.nome === form.category)?.documentos || [],
+    [cfgCategorias, form.category],
+  );
 
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
@@ -105,9 +159,10 @@ export default function Despesas() {
       return;
     }
     toast({ title: "Despesa registada", description: `${form.description} · ${formatCurrency(amountNum)}` });
-    setForm(emptyDespesa);
+    setForm(emptyDespesa(defaultEstado));
     setSheetOpen(false);
   };
+
 
 
   const isSortActive = sortField !== null;
