@@ -557,6 +557,36 @@ export type Database = {
         }
         Relationships: []
       }
+      fin_despesa_categorias: {
+        Row: {
+          cor: string
+          created_at: string
+          documentos: Json
+          id: string
+          nome: string
+          owner_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          cor?: string
+          created_at?: string
+          documentos?: Json
+          id?: string
+          nome: string
+          owner_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          cor?: string
+          created_at?: string
+          documentos?: Json
+          id?: string
+          nome?: string
+          owner_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
