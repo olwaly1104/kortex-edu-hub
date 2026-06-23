@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useFaculdades, useCursos } from "@/lib/useInstitution";
 import { loadDocentes, loadStaff } from "@/lib/peopleStorage";
+import { supabase } from "@/integrations/supabase/client";
 
 type Instituicao = {
   nomeLegal: string; nomeOficial: string; sigla: string; nif: string; fundacao: string; natureza: string;
