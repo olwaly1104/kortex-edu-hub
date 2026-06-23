@@ -299,12 +299,13 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   const updatePropina = useUpdatePropina();
   const [draft, setDraft] = useState<Record<string, { valor: string; impostoId: string }>>({});
   const [anosByCurso, setAnosByCurso] = useState<Record<string, number[]>>(() => readJSON(ANOS_KEY(email), {}));
-  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, number>>(() => {
-    const raw = readJSON<Record<string, number | string | string[]>>(PRAZO_KEY(email), {});
-    const norm: Record<string, number> = {};
+  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, number[]>>(() => {
+    const raw = readJSON<Record<string, number | string | (number | string)[]>>(PRAZO_KEY(email), {});
+    const norm: Record<string, number[]> = {};
     Object.entries(raw).forEach(([k, v]) => {
-      const n = typeof v === "number" ? v : Number(Array.isArray(v) ? v[0] : v);
-      if (!Number.isNaN(n) && n > 0) norm[k] = n;
+      const arr = Array.isArray(v) ? v : [v];
+      const nums = arr.map((x) => Number(x)).filter((n) => !Number.isNaN(n) && n > 0);
+      if (nums.length) norm[k] = Array.from(new Set(nums));
     });
     return norm;
   });
