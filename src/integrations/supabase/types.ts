@@ -884,6 +884,10 @@ export type Database = {
         Args: { _conversation_id: string }
         Returns: undefined
       }
+      set_institution_fiscal: {
+        Args: { _nif: string; _nome_legal: string }
+        Returns: undefined
+      }
       touch_last_seen: { Args: never; Returns: undefined }
     }
     Enums: {

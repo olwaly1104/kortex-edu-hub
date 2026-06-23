@@ -71,6 +71,7 @@ export const loadStaff = (): StaffRow[] => {
 };
 export const saveStaff = (rows: StaffRow[]) => {
   try { localStorage.setItem(STAFF_KEY, JSON.stringify(rows.map(({ editing: _e, ...r }) => r))); } catch {/* noop */}
+  try { window.dispatchEvent(new CustomEvent("upra:people-changed", { detail: { kind: "staff" } })); } catch {/* noop */}
 };
 
 export const loadDocentes = (): DocenteRow[] => {
@@ -81,6 +82,7 @@ export const loadDocentes = (): DocenteRow[] => {
 };
 export const saveDocentes = (rows: DocenteRow[]) => {
   try { localStorage.setItem(DOCENTES_KEY, JSON.stringify(rows.map(({ editing: _e, ...r }) => r))); } catch {/* noop */}
+  try { window.dispatchEvent(new CustomEvent("upra:people-changed", { detail: { kind: "docentes" } })); } catch {/* noop */}
 };
 
 export const fullName = (p: { prefixo?: string; primeiroNome: string; ultimoNome: string }) =>
