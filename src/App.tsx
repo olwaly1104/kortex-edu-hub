@@ -143,6 +143,7 @@ import FinancasSolicitacoes from "./pages/financas/Solicitacoes";
 import FinancasSolicitacaoDetail from "./pages/financas/SolicitacaoDetail";
 import FinancasPessoalFinancas from "./pages/financas/PessoalFinancas";
 import FinancasCalendario from "./pages/financas/Calendario";
+import FinancasDiscentes from "./pages/financas/Discentes";
 
 import InscricoesLayout from "./layouts/InscricoesLayout";
 import InscricoesRegistar from "./pages/inscricoes/Registar";
