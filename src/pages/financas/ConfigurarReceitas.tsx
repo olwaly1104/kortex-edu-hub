@@ -479,7 +479,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
 /* ═══════════════════════════════ DESPESAS ═════════════════════════════════ */
 
 type DesCategoria = { id: string; nome: string; cor: string; documentos: string[] };
-type DesEstado = { id: string; nome: string; cor: string };
+type DesEstado = { id: string; nome: string; cor: string; descricao?: string };
 type DesResp = { id: string; pessoa: string; categoria: string; limite: number };
 
 function DespesasSection({ email }: { email?: string | null }) {
