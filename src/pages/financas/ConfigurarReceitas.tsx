@@ -906,9 +906,23 @@ const FIN_COR_OPCOES = [
   { label: "Violeta", value: "bg-violet-100 text-violet-700 border-violet-200" },
 ];
 
+const MULTAS_KEY = (target: "docentes" | "staff" | "discentes", email?: string | null) =>
+  KEY(`multas.${target}.v1`, email);
+
 function MultasSection({ email }: { email?: string | null }) {
-  const [multas, setMultas] = useState<RhMulta[]>([]);
   const [target, setTarget] = useState<"docentes" | "staff" | "discentes">("docentes");
+
+  const [docentesMultas, setDocentesMultas] = useState<RhMulta[]>(() =>
+    readJSON<RhMulta[]>(MULTAS_KEY("docentes", email), []));
+  const [staffMultas, setStaffMultas] = useState<RhMulta[]>(() =>
+    readJSON<RhMulta[]>(MULTAS_KEY("staff", email), []));
+  const [discentesMultas, setDiscentesMultas] = useState<RhMulta[]>(() =>
+    readJSON<RhMulta[]>(MULTAS_KEY("discentes", email), []));
+
+  useEffect(() => writeJSON(MULTAS_KEY("docentes", email), docentesMultas), [docentesMultas, email]);
+  useEffect(() => writeJSON(MULTAS_KEY("staff", email), staffMultas), [staffMultas, email]);
+  useEffect(() => writeJSON(MULTAS_KEY("discentes", email), discentesMultas), [discentesMultas, email]);
+
   const [finEstados, setFinEstados] = useState<FinEstado[]>(() => {
     const raw = readJSON<FinEstado[]>(FIN_ESTADOS_DISC_KEY(email), DEFAULT_FIN_ESTADOS_DISC);
     return raw.map((e) => {
@@ -919,31 +933,34 @@ function MultasSection({ email }: { email?: string | null }) {
   });
   useEffect(() => writeJSON(FIN_ESTADOS_DISC_KEY(email), finEstados), [finEstados, email]);
 
+  const currentList = target === "docentes" ? docentesMultas : target === "staff" ? staffMultas : discentesMultas;
+  const setCurrentList = target === "docentes" ? setDocentesMultas : target === "staff" ? setStaffMultas : setDiscentesMultas;
+  const aplicaALabel = target === "docentes" ? "Docente" : target === "staff" ? "Staff" : "Discente";
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("upra.rh.multas.v1");
-      setMultas(raw ? (JSON.parse(raw) as RhMulta[]) : []);
-    } catch { setMultas([]); }
-  }, []);
-
-  const docentes = multas.filter((m) => m.aplicaA === "Docente" || m.aplicaA === "Ambos");
-  const staff = multas.filter((m) => m.aplicaA === "Staff" || m.aplicaA === "Ambos");
-  const discentes = multas.filter((m) => m.aplicaA === "Discente");
-
-  const current = target === "docentes" ? docentes : target === "staff" ? staff : discentes;
   const meta = {
-    docentes:  { title: "Multas a docentes",  icon: GraduationCap, source: "RH → Docentes" },
-    staff:     { title: "Multas a staff",     icon: Briefcase,     source: "RH → Staff" },
-    discentes: { title: "Multas a discentes", icon: Users,         source: "Académica → Regras de Disciplina" },
+    docentes:  { title: "Multas a docentes",  icon: GraduationCap },
+    staff:     { title: "Multas a staff",     icon: Briefcase },
+    discentes: { title: "Multas a discentes", icon: Users },
   }[target];
   const Icon = meta.icon;
 
   const toggles: { key: typeof target; label: string; icon: React.ComponentType<{ className?: string }>; count: number }[] = [
-    { key: "docentes",  label: "Docentes",  icon: GraduationCap, count: docentes.length },
-    { key: "staff",     label: "Staff",     icon: Briefcase,     count: staff.length },
-    { key: "discentes", label: "Discentes", icon: Users,         count: discentes.length },
+    { key: "docentes",  label: "Docentes",  icon: GraduationCap, count: docentesMultas.length },
+    { key: "staff",     label: "Staff",     icon: Briefcase,     count: staffMultas.length },
+    { key: "discentes", label: "Discentes", icon: Users,         count: discentesMultas.length },
   ];
+
+  const addMulta = () => setCurrentList((s) => [...s, {
+    id: newId(),
+    nome: "",
+    valor: 0,
+    descricao: "",
+    aplicaA: aplicaALabel as RhMulta["aplicaA"],
+  }]);
+  const updMulta = (id: string, patch: Partial<RhMulta>) =>
+    setCurrentList((s) => s.map((m) => m.id === id ? { ...m, ...patch } : m));
+  const delMulta = (id: string) => setCurrentList((s) => s.filter((m) => m.id !== id));
+
 
   return (
     <div className="space-y-6">
