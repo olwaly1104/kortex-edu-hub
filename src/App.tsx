@@ -468,6 +468,7 @@ function AppRoutes() {
         <Route path="/financas/salarios" element={<FinancasSalarios />} />
         <Route path="/financas/orcamentos" element={<FinancasOrcamentos />} />
         <Route path="/financas/discentes" element={<FinancasDiscentes />} />
+        <Route path="/financas/discentes/:discenteId" element={<GapEstudanteProfile />} />
         <Route path="/financas/chat" element={<StudentChat />} />
         <Route path="/financas/email" element={<StudentEmail />} />
         <Route path="/financas/contactos" element={<StudentContacts />} />
