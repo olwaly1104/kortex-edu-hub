@@ -45,6 +45,7 @@ export type DocenteRow = {
   anosExperiencia?: string;
   cvFileName?: string;
   diplomaFileName?: string;
+  moduloKortex?: string; // professor | coordenador | decano | reitor
   editing?: boolean;
 };
 
