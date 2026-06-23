@@ -837,10 +837,24 @@ function SalariosSection({ email }: { email?: string | null }) {
   });
 
   useEffect(() => {
-    import("@/lib/peopleStorage").then(({ loadDocentes, loadStaff, fullName }) => {
-      setDocentes(loadDocentes().map((d) => ({ id: d.id, nome: fullName(d) })));
-      setStaff(loadStaff().map((s) => ({ id: s.id, nome: fullName(s) })));
-    });
+    let cancelled = false;
+    const refresh = () => {
+      import("@/lib/peopleStorage").then(({ loadDocentes, loadStaff, fullName }) => {
+        if (cancelled) return;
+        setDocentes(loadDocentes().map((d) => ({ id: d.id, nome: fullName(d) })));
+        setStaff(loadStaff().map((s) => ({ id: s.id, nome: fullName(s) })));
+      });
+    };
+    refresh();
+    window.addEventListener("focus", refresh);
+    window.addEventListener("storage", refresh);
+    window.addEventListener("upra:people-changed", refresh);
+    return () => {
+      cancelled = true;
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("upra:people-changed", refresh);
+    };
   }, []);
 
   useEffect(() => writeJSON(storageKey, rows), [rows, storageKey]);
