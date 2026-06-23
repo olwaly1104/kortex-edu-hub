@@ -107,7 +107,7 @@ export default function FinancasDiscentes() {
               {filtered.map((r) => (
                 <tr
                   key={r.id}
-                  onClick={() => navigate(`/gap/estudantes/${r.id}`)}
+                  onClick={() => navigate(`/financas/discentes/${r.id}`)}
                   className="hover:bg-muted/30 cursor-pointer"
                 >
                   <td className="py-3 px-4">
