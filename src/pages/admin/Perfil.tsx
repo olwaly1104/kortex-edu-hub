@@ -288,11 +288,23 @@ export default function AdminPerfil() {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-xs">Nome legal</Label>
-            <Input value={instituicao.nomeLegal} onChange={e => setInstituicao({ ...instituicao, nomeLegal: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
+            <Input
+              value={instituicao.nomeLegal}
+              onChange={e => setInstituicao({ ...instituicao, nomeLegal: e.target.value })}
+              onBlur={() => { (supabase.rpc as any)("set_institution_fiscal", { _nome_legal: instituicao.nomeLegal || "", _nif: instituicao.nif || "" }); }}
+              className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`}
+              readOnly={locked}
+            />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">NIF</Label>
-            <Input value={instituicao.nif} onChange={e => setInstituicao({ ...instituicao, nif: e.target.value })} className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`} readOnly={locked} />
+            <Input
+              value={instituicao.nif}
+              onChange={e => setInstituicao({ ...instituicao, nif: e.target.value })}
+              onBlur={() => { (supabase.rpc as any)("set_institution_fiscal", { _nome_legal: instituicao.nomeLegal || "", _nif: instituicao.nif || "" }); }}
+              className={`h-9 ${locked ? "bg-muted/40 cursor-not-allowed" : ""}`}
+              readOnly={locked}
+            />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs">Nome da instituição</Label>
