@@ -176,6 +176,7 @@ const financasSections: NavSection[] = [
     { label: "Despesas", icon: FileText, path: "/financas/despesas" },
     { label: "Salários", icon: Users, path: "/financas/salarios" },
     { label: "Orçamentos", icon: FolderOpen, path: "/financas/orcamentos" },
+    { label: "Discentes", icon: GraduationCap, path: "/financas/discentes" },
     { label: "Configurador", icon: Settings2, path: "/financas/configurador" },
   ]},
   { title: "Comunicação", items: [
