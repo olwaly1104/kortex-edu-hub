@@ -119,20 +119,38 @@ export default function AdminPerfil() {
     pushProfile(user?.email, instituicao);
   }, [instituicao, PROFILE_KEY, user?.email]);
 
-  // Hydrate Nome Legal / NIF from the real database
+  // Hydrate Nome Legal / NIF from the real database, and backfill the DB
+  // from local values when they exist there but not yet in the database.
   useEffect(() => {
     (async () => {
       try {
         const { data } = await supabase.rpc("get_institution_fiscal");
         const row = Array.isArray(data) ? data[0] : data;
-        if (!row) return;
+        const dbNome = row?.nome_legal ?? "";
+        const dbNif = row?.nif ?? "";
+        // If DB is empty but we have local values, push them up so all
+        // institution modules (Finanças, etc.) see the same data.
+        const localNome = (instituicao.nomeLegal || "").trim();
+        const localNif = (instituicao.nif || "").trim();
+        const needsBackfill = (!dbNome && localNome) || (!dbNif && localNif);
+        if (needsBackfill) {
+          const { data: auth } = await supabase.auth.getUser();
+          const uid = auth?.user?.id;
+          if (uid) {
+            await supabase.from("profiles").update({
+              nome_legal: localNome || dbNome || null,
+              nif: localNif || dbNif || null,
+            }).eq("id", uid);
+          }
+        }
         setInstituicao((prev) => ({
           ...prev,
-          nomeLegal: row.nome_legal ?? prev.nomeLegal,
-          nif: row.nif ?? prev.nif,
+          nomeLegal: dbNome || prev.nomeLegal,
+          nif: dbNif || prev.nif,
         }));
       } catch { /* ignore */ }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.email]);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.com$/i.test((instituicao.email || "").trim());
