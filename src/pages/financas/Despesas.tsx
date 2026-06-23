@@ -249,13 +249,9 @@ export default function Despesas() {
             </Button>
           )}
           <div className="flex items-center gap-2">
-            {[
-              { key: "todos", label: "Todos" },
-              { key: "aprovada", label: "Aprovada" },
-              { key: "pendente", label: "Pendente" },
-              { key: "rejeitada", label: "Rejeitada" },
-            ].map(s => (
-              <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">{s.label}</Button>
+            <Button size="sm" variant={filterStatus === "todos" ? "default" : "outline"} onClick={() => setFilterStatus("todos")} className="text-xs">Todos</Button>
+            {estadoNames.map(name => (
+              <Button key={name} size="sm" variant={filterStatus === name.toLowerCase() ? "default" : "outline"} onClick={() => setFilterStatus(name.toLowerCase())} className="text-xs">{name}</Button>
             ))}
             <div className="w-px h-6 bg-border" />
             <Popover>
