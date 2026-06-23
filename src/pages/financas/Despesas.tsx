@@ -529,7 +529,7 @@ export default function Despesas() {
 
           {/* Footer */}
           <div className="sticky bottom-0 bg-card border-t border-border px-6 py-3 flex items-center justify-between gap-2">
-            <Button variant="ghost" size="sm" onClick={() => { setForm(emptyDespesa); setSheetOpen(false); }}>Cancelar</Button>
+            <Button variant="ghost" size="sm" onClick={() => { setForm(emptyDespesa(defaultEstado)); setSheetOpen(false); }}>Cancelar</Button>
             <Button size="sm" disabled={!isValid} onClick={submit} className="gap-1.5">
               <Check className="w-4 h-4" /> Guardar Despesa
             </Button>
