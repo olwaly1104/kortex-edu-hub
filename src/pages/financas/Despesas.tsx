@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, ArrowUpDown, X, Check, Wallet, Clock, Ban, TrendingDown, FileText } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { Upload, Paperclip, Trash2, Calendar as CalendarIcon, Coins, Tag, User2, ShieldCheck, FileSignature } from "lucide-react";
 import { formatCurrency, type Transaction } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
 
@@ -22,16 +23,31 @@ import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from 
 type SortField = "amount";
 type SortDir = "asc" | "desc";
 
-const statusColors: Record<string, string> = {
-  aprovada: "bg-accent/15 text-accent border-accent/30",
-  pendente: "bg-amber-100 text-amber-700 border-amber-200",
-  rejeitada: "bg-destructive/15 text-destructive border-destructive/30",
+// ─── Config (mirrors ConfigurarReceitas → Despesas section) ────────────────
+type CfgCategoria = { id: string; nome: string; cor: string; documentos: string[] };
+type CfgEstado = { id: string; nome: string; cor: string; descricao?: string };
+type CfgResp = { id: string; pessoa: string; categoria: string; limite: number };
+
+const CFG_KEY = (kind: string, email?: string | null) =>
+  `upra.fin.cfg.${kind}::${email || "anon"}`;
+const readJSON = <T,>(k: string, fb: T): T => {
+  try {
+    const r = localStorage.getItem(k);
+    return r ? (JSON.parse(r) as T) : fb;
+  } catch {
+    return fb;
+  }
 };
-const statusLabels: Record<string, string> = { aprovada: "Aprovada", pendente: "Pendente", rejeitada: "Rejeitada" };
+
+const DEFAULT_ESTADOS: CfgEstado[] = [
+  { id: "e1", nome: "Pendente", cor: "bg-amber-100 text-amber-700 border-amber-200", descricao: "Aguarda revisão e aprovação." },
+  { id: "e2", nome: "Aprovada", cor: "bg-emerald-100 text-emerald-700 border-emerald-200", descricao: "Validada, pronta para pagamento." },
+  { id: "e3", nome: "Rejeitada", cor: "bg-red-100 text-red-700 border-red-200", descricao: "Recusada pelo responsável." },
+  { id: "e4", nome: "Paga", cor: "bg-blue-100 text-blue-700 border-blue-200", descricao: "Pagamento efetuado e contabilizado." },
+];
+
 const despesas: Transaction[] = [];
 
-
-const DESPESA_CATEGORIES = ["Operacional", "Pedagógica", "Manutenção", "Serviços", "Material", "Salários", "Outros"] as const;
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 type NewDespesa = {
@@ -41,26 +57,71 @@ type NewDespesa = {
   amount: string;
   requestedBy: string;
   responsavel: string;
-  status: "pendente" | "aprovada" | "rejeitada";
+  status: string;
   justificacao: string;
   docs: { name: string; size: number }[];
 };
 
-const emptyDespesa: NewDespesa = {
+const emptyDespesa = (defaultStatus: string): NewDespesa => ({
   date: todayISO(),
   description: "",
   category: "",
   amount: "",
   requestedBy: "",
   responsavel: "",
-  status: "pendente",
+  status: defaultStatus,
   justificacao: "",
   docs: [],
-};
+});
+
 
 export default function Despesas() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const email = user?.email;
+
+  // Read configured categorias / estados / responsaveis (mirrors ConfigurarReceitas → Despesas)
+  const [cfgCategorias, setCfgCategorias] = useState<CfgCategoria[]>(() =>
+    readJSON<CfgCategoria[]>(CFG_KEY("des.categorias", email), []));
+  const [cfgEstados, setCfgEstados] = useState<CfgEstado[]>(() => {
+    const r = readJSON<CfgEstado[]>(CFG_KEY("des.estados", email), []);
+    return r.length ? r : DEFAULT_ESTADOS;
+  });
+  const [cfgResponsaveis, setCfgResponsaveis] = useState<CfgResp[]>(() =>
+    readJSON<CfgResp[]>(CFG_KEY("des.responsaveis", email), []));
+
+  // Re-hydrate when window regains focus, so config edits made elsewhere appear
+  useEffect(() => {
+    const hydrate = () => {
+      setCfgCategorias(readJSON<CfgCategoria[]>(CFG_KEY("des.categorias", email), []));
+      const r = readJSON<CfgEstado[]>(CFG_KEY("des.estados", email), []);
+      setCfgEstados(r.length ? r : DEFAULT_ESTADOS);
+      setCfgResponsaveis(readJSON<CfgResp[]>(CFG_KEY("des.responsaveis", email), []));
+    };
+    window.addEventListener("focus", hydrate);
+    return () => window.removeEventListener("focus", hydrate);
+  }, [email]);
+
+  const categoryNames = useMemo(() => cfgCategorias.map(c => c.nome).filter(Boolean), [cfgCategorias]);
+  const estadoNames = useMemo(() => cfgEstados.map(e => e.nome).filter(Boolean), [cfgEstados]);
+  const estadoLabels = useMemo(() => {
+    const m: Record<string, string> = {};
+    cfgEstados.forEach(e => { m[e.nome.toLowerCase()] = e.nome; });
+    return m;
+  }, [cfgEstados]);
+  const estadoColor = useMemo(() => {
+    const m: Record<string, string> = {};
+    cfgEstados.forEach(e => { m[e.nome.toLowerCase()] = e.cor; });
+    return m;
+  }, [cfgEstados]);
+  const estadoDescricao = useMemo(() => {
+    const m: Record<string, string> = {};
+    cfgEstados.forEach(e => { m[e.nome.toLowerCase()] = e.descricao || ""; });
+    return m;
+  }, [cfgEstados]);
+  const defaultEstado = estadoNames[0] || "Pendente";
+
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("todos");
   const [filterCategory, setFilterCategory] = useState("todos");
@@ -69,12 +130,22 @@ export default function Despesas() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [periodo, setPeriodo] = useState<Periodo>("mes");
   const [periodoValue, setPeriodoValue] = useState<string>(periodoDefaultValue("mes"));
-  const [form, setForm] = useState<NewDespesa>(emptyDespesa);
+  const [form, setForm] = useState<NewDespesa>(() => emptyDespesa(defaultEstado));
   const mult = PERIODO_MULT[periodo];
+
+  // Keep default status in sync if config changes before first edit
+  useEffect(() => {
+    setForm(f => (f.status ? f : { ...f, status: defaultEstado }));
+  }, [defaultEstado]);
 
   const setField = <K extends keyof NewDespesa>(k: K, v: NewDespesa[K]) => setForm(f => ({ ...f, [k]: v }));
   const amountNum = Number(form.amount.replace(/[^0-9.,]/g, "").replace(",", ".")) || 0;
   const isValid = form.description.trim().length >= 3 && !!form.category && amountNum > 0 && !!form.date;
+
+  const requiredDocs = useMemo(
+    () => cfgCategorias.find(c => c.nome === form.category)?.documentos || [],
+    [cfgCategorias, form.category],
+  );
 
   const handleFiles = (files: FileList | null) => {
     if (!files) return;
@@ -88,9 +159,10 @@ export default function Despesas() {
       return;
     }
     toast({ title: "Despesa registada", description: `${form.description} · ${formatCurrency(amountNum)}` });
-    setForm(emptyDespesa);
+    setForm(emptyDespesa(defaultEstado));
     setSheetOpen(false);
   };
+
 
 
   const isSortActive = sortField !== null;
@@ -160,7 +232,7 @@ export default function Despesas() {
           {/* Categories first */}
           <div className="flex items-center gap-2">
             <Button size="sm" variant={filterCategory === "todos" ? "default" : "outline"} onClick={() => setFilterCategory("todos")} className="text-xs">Todas</Button>
-            {DESPESA_CATEGORIES.map(c => (
+            {categoryNames.map(c => (
               <Button key={c} size="sm" variant={filterCategory === c ? "default" : "outline"} onClick={() => setFilterCategory(c)} className="text-xs">{c}</Button>
             ))}
           </div>
@@ -177,13 +249,9 @@ export default function Despesas() {
             </Button>
           )}
           <div className="flex items-center gap-2">
-            {[
-              { key: "todos", label: "Todos" },
-              { key: "aprovada", label: "Aprovada" },
-              { key: "pendente", label: "Pendente" },
-              { key: "rejeitada", label: "Rejeitada" },
-            ].map(s => (
-              <Button key={s.key} size="sm" variant={filterStatus === s.key ? "default" : "outline"} onClick={() => setFilterStatus(s.key)} className="text-xs">{s.label}</Button>
+            <Button size="sm" variant={filterStatus === "todos" ? "default" : "outline"} onClick={() => setFilterStatus("todos")} className="text-xs">Todos</Button>
+            {estadoNames.map(name => (
+              <Button key={name} size="sm" variant={filterStatus === name.toLowerCase() ? "default" : "outline"} onClick={() => setFilterStatus(name.toLowerCase())} className="text-xs">{name}</Button>
             ))}
             <div className="w-px h-6 bg-border" />
             <Popover>
@@ -205,7 +273,7 @@ export default function Despesas() {
 
         {hasActiveControls && (
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {isStatusActive && <Badge variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => setFilterStatus("todos")}>Estado: {statusLabels[filterStatus]} <X className="w-2.5 h-2.5" /></Badge>}
+            {isStatusActive && <Badge variant="outline" className="text-[10px] gap-1 bg-accent/10 text-accent border-accent/20 cursor-pointer hover:bg-accent/15" onClick={() => setFilterStatus("todos")}>Estado: {estadoLabels[filterStatus] || filterStatus} <X className="w-2.5 h-2.5" /></Badge>}
             {isCatActive && <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => setFilterCategory("todos")}>Categoria: {filterCategory} <X className="w-2.5 h-2.5" /></Badge>}
             {isSortActive && <Badge variant="outline" className="text-[10px] gap-1 bg-primary/5 text-primary border-primary/20 cursor-pointer hover:bg-primary/10" onClick={() => { setSortField(null); setSortDir("desc"); }}>Valor: {sortDir === "desc" ? "Maior" : "Menor"} <X className="w-2.5 h-2.5" /></Badge>}
             {isSearchActive && <Badge variant="outline" className="text-[10px] gap-1 bg-secondary/10 text-secondary border-secondary/20 cursor-pointer hover:bg-secondary/15" onClick={() => setSearch("")}>Pesquisa: "{search}" <X className="w-2.5 h-2.5" /></Badge>}
@@ -234,7 +302,7 @@ export default function Despesas() {
               <td className="p-3 text-right text-xs font-semibold text-destructive">-{formatCurrency(d.amount)}</td>
               <td className="p-3 text-xs text-muted-foreground">{d.category === "Salários" ? "—" : (d.requestedBy || "—")}</td>
               <td className="p-3 text-xs text-foreground">{d.responsavel || "—"}</td>
-              <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", statusColors[d.status])}>{statusLabels[d.status] || d.status}</Badge></td>
+              <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", estadoColor[(d.status || "").toLowerCase()] || "bg-muted text-muted-foreground border-border")}>{estadoLabels[(d.status || "").toLowerCase()] || d.status}</Badge></td>
               <td className="p-3 text-center" onClick={e => e.stopPropagation()}>
                 {(() => {
                   const total = (d as any).docsRequired ?? 0;
@@ -296,11 +364,14 @@ export default function Despesas() {
                 <div className="space-y-1.5">
                   <Label className="text-xs font-medium flex items-center gap-1"><Tag className="w-3 h-3" /> Categoria <span className="text-destructive">*</span></Label>
                   <Select value={form.category} onValueChange={v => setField("category", v)}>
-                    <SelectTrigger className="h-9"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectTrigger className="h-9"><SelectValue placeholder={categoryNames.length ? "Selecione" : "Configure categorias em Configurador"} /></SelectTrigger>
                     <SelectContent>
-                      {DESPESA_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      {categoryNames.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  {requiredDocs.length > 0 && (
+                    <p className="text-[10px] text-muted-foreground">Documentos exigidos: {requiredDocs.join(", ")}</p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
@@ -350,8 +421,23 @@ export default function Despesas() {
                   <Input placeholder="Nome do solicitante" value={form.requestedBy} onChange={e => setField("requestedBy", e.target.value)} className="h-9" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-medium">Responsável</Label>
-                  <Input placeholder="Aprovador / gestor" value={form.responsavel} onChange={e => setField("responsavel", e.target.value)} className="h-9" />
+                  <Label className="text-xs font-medium">Responsável (aprovador)</Label>
+                  {cfgResponsaveis.length > 0 ? (
+                    <Select value={form.responsavel} onValueChange={v => setField("responsavel", v)}>
+                      <SelectTrigger className="h-9"><SelectValue placeholder="Selecionar aprovador" /></SelectTrigger>
+                      <SelectContent>
+                        {cfgResponsaveis
+                          .filter(r => !r.categoria || !form.category || r.categoria === form.category)
+                          .map(r => (
+                            <SelectItem key={r.id} value={r.pessoa}>
+                              {r.pessoa} {r.limite ? `· até ${formatCurrency(r.limite)}` : ""}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input placeholder="Aprovador / gestor" value={form.responsavel} onChange={e => setField("responsavel", e.target.value)} className="h-9" />
+                  )}
                 </div>
               </div>
             </div>
@@ -367,25 +453,30 @@ export default function Despesas() {
 
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium">Estado inicial</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(["pendente", "aprovada", "rejeitada"] as const).map(s => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => setField("status", s)}
-                      className={cn(
-                        "h-9 rounded-md border text-xs font-medium capitalize transition-colors",
-                        form.status === s
-                          ? s === "aprovada" ? "bg-accent/15 border-accent text-accent"
-                          : s === "rejeitada" ? "bg-destructive/10 border-destructive text-destructive"
-                          : "bg-amber-50 border-amber-300 text-amber-700"
-                          : "bg-background border-input text-muted-foreground hover:border-primary hover:text-primary"
-                      )}
-                    >
-                      {statusLabels[s]}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {cfgEstados.map(es => {
+                    const active = form.status === es.nome;
+                    return (
+                      <button
+                        key={es.id}
+                        type="button"
+                        onClick={() => setField("status", es.nome)}
+                        title={es.descricao || es.nome}
+                        className={cn(
+                          "h-9 rounded-md border text-xs font-medium transition-colors px-2",
+                          active
+                            ? es.cor
+                            : "bg-background border-input text-muted-foreground hover:border-primary hover:text-primary",
+                        )}
+                      >
+                        {es.nome}
+                      </button>
+                    );
+                  })}
                 </div>
+                {form.status && estadoDescricao[form.status.toLowerCase()] && (
+                  <p className="text-[10px] text-muted-foreground">{estadoDescricao[form.status.toLowerCase()]}</p>
+                )}
               </div>
 
               <div className="space-y-1.5">
@@ -438,7 +529,7 @@ export default function Despesas() {
 
           {/* Footer */}
           <div className="sticky bottom-0 bg-card border-t border-border px-6 py-3 flex items-center justify-between gap-2">
-            <Button variant="ghost" size="sm" onClick={() => { setForm(emptyDespesa); setSheetOpen(false); }}>Cancelar</Button>
+            <Button variant="ghost" size="sm" onClick={() => { setForm(emptyDespesa(defaultEstado)); setSheetOpen(false); }}>Cancelar</Button>
             <Button size="sm" disabled={!isValid} onClick={submit} className="gap-1.5">
               <Check className="w-4 h-4" /> Guardar Despesa
             </Button>
