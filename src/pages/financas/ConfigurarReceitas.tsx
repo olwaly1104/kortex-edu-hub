@@ -401,11 +401,20 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const impostoId = d?.impostoId ?? findImpostoIdByTaxa(p.imposto);
                     const taxa = impostos.find((i) => i.id === impostoId)?.taxa ?? p.imposto;
                     const bruto = Number(valorVal) || 0;
-                    const meses = prazoByCurso[c.id] ?? 0;
-                    const brutaAnual = bruto * (1 + taxa) * meses;
-                    const liquidaAnual = bruto * meses;
+                    const mesesArr = (prazoByCurso[c.id] ?? []).slice().sort((a, b) => a - b);
+                    const mesesMax = mesesArr.length ? Math.max(...mesesArr) : 0;
+                    const brutaAnual = bruto * (1 + taxa) * mesesMax;
+                    const liquidaAnual = bruto * mesesMax;
                     const dirty = d !== undefined;
-                    const setMeses = (m: number) => setPrazoByCurso((s) => ({ ...s, [c.id]: m }));
+                    const toggleMes = (m: number) => setPrazoByCurso((s) => {
+                      const cur = s[c.id] ?? [];
+                      const has = cur.includes(m);
+                      const next = has ? cur.filter((x) => x !== m) : [...cur, m].sort((a, b) => a - b);
+                      return { ...s, [c.id]: next };
+                    });
+                    const mesesLabel = mesesArr.length
+                      ? mesesArr.map((m) => `${m} meses`).join(" · ")
+                      : "— Selecionar —";
                     return (
                       <div key={c.id}>
                         <div className="grid gap-3 px-5 py-3 items-center text-sm" style={{ gridTemplateColumns: COLS }}>
@@ -427,18 +436,26 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             <option value="">— Selecionar —</option>
                             {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome}</option>)}
                           </select>
-                          <select
-                            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-                            value={meses || ""}
-                            onChange={(e) => setMeses(Number(e.target.value))}
-                          >
-                            <option value="">— Selecionar —</option>
-                            {MESES_OPCOES.map((m) => (
-                              <option key={m} value={m}>
-                                {m === 1 ? "1 mês" : `${m} meses`}
-                              </option>
-                            ))}
-                          </select>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button type="button"
+                                className="h-9 rounded-md border border-input bg-background px-2 text-sm flex items-center justify-between gap-2 hover:bg-muted/40">
+                                <span className={mesesArr.length ? "text-foreground truncate" : "text-muted-foreground"}>{mesesLabel}</span>
+                                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="w-44 p-1">
+                              {MESES_OPCOES.map((m) => {
+                                const checked = mesesArr.includes(m);
+                                return (
+                                  <label key={m} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
+                                    <Checkbox checked={checked} onCheckedChange={() => toggleMes(m)} />
+                                    <span>{m} meses</span>
+                                  </label>
+                                );
+                              })}
+                            </PopoverContent>
+                          </Popover>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(bruto * (1 + taxa))} Kz</div>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(brutaAnual)} Kz</div>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidaAnual)} Kz</div>
