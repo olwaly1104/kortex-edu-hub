@@ -131,9 +131,10 @@ const nomeForImposto = (regime: string, taxa: number) =>
   isCustomRegime(regime) ? `Personalizado ${(taxa * 100).toFixed(0)}%` : `IVA ${regime} ${(taxa * 100).toFixed(0)}%`;
 
 const LOCKED_IMPOSTOS: Imposto[] = [
-  { id: "iva-geral", nome: nomeForImposto("Geral", 0.14), taxa: 0.14, regime: "Geral", locked: true },
-  { id: "iva-intermedio", nome: nomeForImposto("Intermédio", 0.07), taxa: 0.07, regime: "Intermédio", locked: true },
-  { id: "iva-reduzido", nome: nomeForImposto("Reduzido", 0.05), taxa: 0.05, regime: "Reduzido", locked: true },
+  { id: "isento", nome: "Isento — 0%", taxa: 0, regime: "Isento", locked: true },
+  { id: "iva-geral", nome: nomeForImposto("Geral", 0.14), taxa: 0.14, regime: "Geral" },
+  { id: "iva-intermedio", nome: nomeForImposto("Intermédio", 0.07), taxa: 0.07, regime: "Intermédio" },
+  { id: "iva-reduzido", nome: nomeForImposto("Reduzido", 0.05), taxa: 0.05, regime: "Reduzido" },
 ];
 
 const COR_OPCOES_GLOBAL = [
@@ -251,11 +252,12 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
         {impostos.length === 0 ? (
           <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem impostos configurados.</div>
         ) : impostos.map((i) => {
-          const custom = isCustomRegime(i.regime);
           const locked = i.locked;
+          const regimeInList = REGIMES_IVA.find((r) => r.regime === i.regime);
           return (
           <div key={i.id} className="grid grid-cols-[1fr_160px] gap-3 px-5 py-2.5 items-center text-sm">
-            <select className={`h-9 rounded-md border border-input bg-background px-2 text-sm ${locked ? "pointer-events-none" : ""}`} value={i.regime}
+            <select className={`h-9 rounded-md border border-input bg-background px-2 text-sm ${locked ? "pointer-events-none opacity-70" : ""}`} value={i.regime}
+              disabled={locked}
               onChange={(e) => {
                 const regime = e.target.value;
                 const nowCustom = isCustomRegime(regime);
@@ -263,15 +265,16 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
                 setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, regime, taxa, nome: nomeForImposto(regime, taxa) } : x));
               }}>
               {REGIMES_IVA.map((r) => <option key={r.regime} value={r.regime}>{r.label}</option>)}
+              {!regimeInList && <option value={i.regime}>{i.nome}</option>}
             </select>
-            {custom && !locked ? (
+            {locked ? (
+              <div className="text-right tabular-nums font-medium text-foreground">{(i.taxa * 100).toFixed(0)}%</div>
+            ) : (
               <Input type="number" min={0} max={100} step={1} className="h-9 text-right tabular-nums" value={Math.round(i.taxa * 100)}
                 onChange={(e) => {
                   const taxa = Math.max(0, Math.min(100, Number(e.target.value) || 0)) / 100;
                   setImpostos((s) => s.map((x) => x.id === i.id ? { ...x, taxa, nome: nomeForImposto(x.regime, taxa) } : x));
                 }} />
-            ) : (
-              <div className="text-right tabular-nums font-medium text-foreground">{(i.taxa * 100).toFixed(0)}%</div>
             )}
           </div>
           );
@@ -287,7 +290,7 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
 
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
 
-const MESES_OPCOES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+const MESES_OPCOES = [10, 12];
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
@@ -296,12 +299,13 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   const updatePropina = useUpdatePropina();
   const [draft, setDraft] = useState<Record<string, { valor: string; impostoId: string }>>({});
   const [anosByCurso, setAnosByCurso] = useState<Record<string, number[]>>(() => readJSON(ANOS_KEY(email), {}));
-  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, number>>(() => {
-    const raw = readJSON<Record<string, number | string | string[]>>(PRAZO_KEY(email), {});
-    const norm: Record<string, number> = {};
+  const [prazoByCurso, setPrazoByCurso] = useState<Record<string, number[]>>(() => {
+    const raw = readJSON<Record<string, number | string | (number | string)[]>>(PRAZO_KEY(email), {});
+    const norm: Record<string, number[]> = {};
     Object.entries(raw).forEach(([k, v]) => {
-      const n = typeof v === "number" ? v : Number(Array.isArray(v) ? v[0] : v);
-      if (!Number.isNaN(n) && n > 0) norm[k] = n;
+      const arr = Array.isArray(v) ? v : [v];
+      const nums = arr.map((x) => Number(x)).filter((n) => !Number.isNaN(n) && n > 0);
+      if (nums.length) norm[k] = Array.from(new Set(nums));
     });
     return norm;
   });
@@ -374,7 +378,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
           <div className="min-w-[1100px] divide-y">
             <div className="grid gap-3 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10" style={{ gridTemplateColumns: COLS }}>
               <div>Faculdade · Curso</div>
-              <div>Propina líquida mensal</div>
+              <div>Propina mensal</div>
               <div>Regime</div>
               <div>Meses</div>
               <div className="text-right">Propina mensal c/ IVA incl.</div>
@@ -397,11 +401,20 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const impostoId = d?.impostoId ?? findImpostoIdByTaxa(p.imposto);
                     const taxa = impostos.find((i) => i.id === impostoId)?.taxa ?? p.imposto;
                     const bruto = Number(valorVal) || 0;
-                    const meses = prazoByCurso[c.id] ?? 0;
-                    const brutaAnual = bruto * (1 + taxa) * meses;
-                    const liquidaAnual = bruto * meses;
+                    const mesesArr = (prazoByCurso[c.id] ?? []).slice().sort((a, b) => a - b);
+                    const mesesMax = mesesArr.length ? Math.max(...mesesArr) : 0;
+                    const brutaAnual = bruto * (1 + taxa) * mesesMax;
+                    const liquidaAnual = bruto * mesesMax;
                     const dirty = d !== undefined;
-                    const setMeses = (m: number) => setPrazoByCurso((s) => ({ ...s, [c.id]: m }));
+                    const toggleMes = (m: number) => setPrazoByCurso((s) => {
+                      const cur = s[c.id] ?? [];
+                      const has = cur.includes(m);
+                      const next = has ? cur.filter((x) => x !== m) : [...cur, m].sort((a, b) => a - b);
+                      return { ...s, [c.id]: next };
+                    });
+                    const mesesLabel = mesesArr.length
+                      ? mesesArr.map((m) => `${m} meses`).join(" · ")
+                      : "— Selecionar —";
                     return (
                       <div key={c.id}>
                         <div className="grid gap-3 px-5 py-3 items-center text-sm" style={{ gridTemplateColumns: COLS }}>
@@ -423,18 +436,26 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             <option value="">— Selecionar —</option>
                             {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome}</option>)}
                           </select>
-                          <select
-                            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-                            value={meses || ""}
-                            onChange={(e) => setMeses(Number(e.target.value))}
-                          >
-                            <option value="">— Selecionar —</option>
-                            {MESES_OPCOES.map((m) => (
-                              <option key={m} value={m}>
-                                {m === 1 ? "1 mês" : `${m} meses`}
-                              </option>
-                            ))}
-                          </select>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button type="button"
+                                className="h-9 rounded-md border border-input bg-background px-2 text-sm flex items-center justify-between gap-2 hover:bg-muted/40">
+                                <span className={mesesArr.length ? "text-foreground truncate" : "text-muted-foreground"}>{mesesLabel}</span>
+                                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="w-44 p-1">
+                              {MESES_OPCOES.map((m) => {
+                                const checked = mesesArr.includes(m);
+                                return (
+                                  <label key={m} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
+                                    <Checkbox checked={checked} onCheckedChange={() => toggleMes(m)} />
+                                    <span>{m} meses</span>
+                                  </label>
+                                );
+                              })}
+                            </PopoverContent>
+                          </Popover>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(bruto * (1 + taxa))} Kz</div>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(brutaAnual)} Kz</div>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidaAnual)} Kz</div>
