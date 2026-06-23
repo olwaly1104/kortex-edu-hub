@@ -64,7 +64,7 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
       await provisionKortexUser({
         name: `${row.primeiroNome} ${row.ultimoNome}`.trim(),
         email: row.email,
-        modulo: "professor",
+        modulo: row.moduloKortex || "professor",
       });
     } catch (e: any) {
       console.warn("provision docente failed:", e?.message);
