@@ -320,11 +320,7 @@ export default function AdminDiscenteProfile() {
                 {(() => {
                   // Ano lectivo: Setembro → Junho (10 meses)
                   const MESES = ["Set", "Out", "Nov", "Dez", "Jan", "Fev", "Mar", "Abr", "Mai", "Jun"];
-                  const now = new Date();
-                  const month = now.getMonth(); // 0-based
-                  // Ano lectivo arranca em Setembro (mes 8). Meses decorridos:
-                  const elapsed = month >= 8 ? month - 8 + 1 : month + 4 + 1;
-                  const monthsPaid = isBolseiro ? MESES.length : Math.max(0, Math.min(MESES.length, elapsed - 1));
+                  const monthsPaid = 0;
                   const totalMeses = MESES.length;
                   const pct = Math.round((monthsPaid / totalMeses) * 100);
                   const valorPago = isBolseiro ? 0 : valorMensal * monthsPaid;
@@ -384,8 +380,8 @@ export default function AdminDiscenteProfile() {
                   const MESES_FULL = ["Setembro", "Outubro", "Novembro", "Dezembro", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho"];
                   const now = new Date();
                   const month = now.getMonth();
-                  const elapsed = month >= 8 ? month - 8 + 1 : month + 4 + 1;
-                  const monthsPaid = isBolseiro ? MESES_FULL.length : Math.max(0, Math.min(MESES_FULL.length, elapsed - 1));
+                  const monthsPaid = 0;
+                  const refYear = month >= 8 ? now.getFullYear() : now.getFullYear() - 1;
                   const refYear = month >= 8 ? now.getFullYear() : now.getFullYear() - 1;
 
                   const history = MESES_FULL.map((nome, i) => {
