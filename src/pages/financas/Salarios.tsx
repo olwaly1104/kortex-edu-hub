@@ -173,10 +173,17 @@ export default function Salarios() {
             <th className="text-center p-3 font-medium text-muted-foreground">Estado</th>
             <th className="text-center p-3 font-medium text-muted-foreground">Recibo</th>
           </tr></thead>
-          <tbody>{filtered.map(s => (
-            <tr key={s.id} className="border-b last:border-0 hover:bg-muted/20 transition-colors">
+          <tbody>{filtered.map(s => {
+            const docId = docenteByName.get(s.name.trim().toLowerCase());
+            const isDocente = !!docId;
+            return (
+            <tr
+              key={s.id}
+              className={cn("border-b last:border-0 hover:bg-muted/20 transition-colors", isDocente && "cursor-pointer")}
+              onClick={() => { if (isDocente) navigate(`/financas/docentes/${docId}`); }}
+            >
               <td className="p-3 text-xs text-muted-foreground font-mono">{s.employeeId}</td>
-              <td className="p-3 text-xs font-medium text-foreground">{s.name}</td>
+              <td className={cn("p-3 text-xs font-medium text-foreground", isDocente && "text-primary hover:underline")}>{s.name}</td>
               <td className="p-3 text-xs text-foreground">{s.role}</td>
               <td className="p-3 text-xs text-muted-foreground">{s.department}</td>
               <td className="p-3"><Badge variant="outline" className="text-[10px]">{contractLabels[s.contractType]}</Badge></td>
@@ -186,7 +193,7 @@ export default function Salarios() {
               <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", statusColors[s.status])}>{statusLabels[s.status]}</Badge></td>
               <td className="p-3 text-center">
                 {s.status === "pago" ? (
-                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={() => toast({ title: "Recibo de vencimento", description: `${s.name} — ${s.payDate}` })}>
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-[10px] gap-1 text-muted-foreground hover:text-primary" onClick={(e) => { e.stopPropagation(); toast({ title: "Recibo de vencimento", description: `${s.name} — ${s.payDate}` }); }}>
                     <FileText className="w-3 h-3" /> Recibo
                   </Button>
                 ) : (
@@ -194,7 +201,8 @@ export default function Salarios() {
                 )}
               </td>
             </tr>
-          ))}</tbody>
+            );
+          })}</tbody>
         </table>
         {filtered.length === 0 && <p className="text-center text-muted-foreground py-8">Nenhum salário encontrado.</p>}
         <div className="border-t bg-muted/20 px-3 py-2 text-xs text-muted-foreground">{filtered.length} de {salarios.length} funcionários</div>
