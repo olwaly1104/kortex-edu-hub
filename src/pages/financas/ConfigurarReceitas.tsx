@@ -616,15 +616,15 @@ function DespesasSection({ email }: { email?: string | null }) {
             <div>Documentos exigidos</div>
             <div className="text-right">Ação</div>
           </div>
-          {categorias.length === 0 ? (
+          {catsLoading ? (
+            <div className="px-5 py-10 text-center text-xs text-muted-foreground">A carregar…</div>
+          ) : categorias.length === 0 ? (
             <div className="px-5 py-10 text-center text-xs text-muted-foreground">Sem categorias configuradas.</div>
           ) : categorias.map((c) => {
             const toggleDoc = (doc: string) => {
-              setCategorias((s) => s.map((x) => {
-                if (x.id !== c.id) return x;
-                const has = x.documentos.includes(doc);
-                return { ...x, documentos: has ? x.documentos.filter((d) => d !== doc) : [...x.documentos, doc] };
-              }));
+              const has = c.documentos.includes(doc);
+              const next = has ? c.documentos.filter((d) => d !== doc) : [...c.documentos, doc];
+              updateCategoriaLocal(c.id, { documentos: next });
             };
             const DocChip = ({ doc, icon: I }: { doc: string; icon: React.ComponentType<{ className?: string }> }) => {
               const active = c.documentos.includes(doc);
@@ -644,9 +644,9 @@ function DespesasSection({ email }: { email?: string | null }) {
             return (
               <div key={c.id} className="grid grid-cols-[1.2fr_160px_140px_1.4fr_44px] gap-4 px-5 py-3 items-center text-sm">
                 <Input className="h-9" placeholder="Ex: Infraestrutura" value={c.nome}
-                  onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, nome: e.target.value } : x))} />
+                  onChange={(e) => updateCategoriaLocal(c.id, { nome: e.target.value })} />
                 <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={c.cor}
-                  onChange={(e) => setCategorias((s) => s.map((x) => x.id === c.id ? { ...x, cor: e.target.value } : x))}>
+                  onChange={(e) => updateCategoriaLocal(c.id, { cor: e.target.value })}>
                   {COR_OPCOES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
                 <span className={`inline-flex items-center justify-center px-2.5 py-1.5 rounded-md border text-xs font-medium truncate ${c.cor}`}>{c.nome || "—"}</span>
@@ -656,7 +656,7 @@ function DespesasSection({ email }: { email?: string | null }) {
                 </div>
                 <div className="flex justify-end">
                   <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                    onClick={() => setCategorias((s) => s.filter((x) => x.id !== c.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+                    onClick={() => removeCategoria(c.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
                 </div>
               </div>
             );
@@ -664,10 +664,26 @@ function DespesasSection({ email }: { email?: string | null }) {
         </div>
         <div className="px-5 py-3 border-t bg-muted/10">
           <Button size="sm" variant="outline" className="gap-1.5"
-            onClick={() => setCategorias((s) => [...s, { id: newId(), nome: "", cor: COR_OPCOES[0].value, documentos: [] }])}>
+            onClick={() => { setDraftNome(""); setConfirmAdd(true); }}>
             <Plus className="w-3.5 h-3.5" /> Adicionar categoria
           </Button>
         </div>
+
+        {confirmAdd && (
+          <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={() => setConfirmAdd(false)}>
+            <div className="bg-background rounded-lg shadow-lg max-w-md w-full p-5 space-y-4" onClick={(e) => e.stopPropagation()}>
+              <div>
+                <h3 className="text-base font-bold">Bloquear nova categoria</h3>
+                <p className="text-xs text-muted-foreground mt-1">Indique a designação. Após bloquear, fica registada na base de dados e poderá editar livremente cor e documentos exigidos.</p>
+              </div>
+              <Input autoFocus value={draftNome} onChange={(e) => setDraftNome(e.target.value)} placeholder="Ex: Infraestrutura" className="h-10" />
+              <div className="flex justify-end gap-2">
+                <Button size="sm" variant="outline" onClick={() => setConfirmAdd(false)}>Cancelar</Button>
+                <Button size="sm" onClick={confirmCreateCategoria}>Bloquear e adicionar</Button>
+              </div>
+            </div>
+          </div>
+        )}
       </Card>
       )}
 
