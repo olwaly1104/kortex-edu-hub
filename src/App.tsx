@@ -471,7 +471,7 @@ function AppRoutes() {
         <Route path="/financas/email" element={<StudentEmail />} />
         <Route path="/financas/contactos" element={<StudentContacts />} />
         <Route path="/financas/pessoal/financas" element={<FinancasPessoalFinancas />} />
-        <Route path="/financas/perfil" element={<StudentProfile />} />
+        <Route path="/financas/perfil" element={<FinancasMeuPerfil />} />
         {/* GAP — Gabinete de Apoio Psicopedagógico */}
         <Route path="/gap" element={<GapInicio />} />
         <Route path="/gap/dashboard" element={<GapDashboard />} />
