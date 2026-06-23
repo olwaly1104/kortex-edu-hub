@@ -1138,13 +1138,12 @@ function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos
 
       <LineItemsBlock
         title="Emolumento"
-        subtitle="Inscrições, matrículas, declarações, certificados, 2ª via de cartão, etc."
+        subtitle="Inscrições, matrículas, declarações, certificados, 2ª via de cartão, etc. Aplica-se sempre a discentes."
         icon={Receipt}
         storageKey={KEY("taxas", email)}
         withType
         typeLabel="Categoria"
         typeOptions={cats.map((c) => c.nome).filter((c) => c.trim())}
-        withTarget
         withTax
         withTaxValue
         impostos={impostos}
