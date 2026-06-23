@@ -18,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
 import { supabase } from "@/integrations/supabase/client";
+import { finDespesas } from "@/data/financasDespesasData";
 
 import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
@@ -47,7 +48,21 @@ const DEFAULT_ESTADOS: CfgEstado[] = [
   { id: "e4", nome: "Paga", cor: "bg-blue-100 text-blue-700 border-blue-200", descricao: "Pagamento efetuado e contabilizado." },
 ];
 
-const despesas: Transaction[] = [];
+const despesas: Transaction[] = finDespesas.map(d => ({
+  id: d.id,
+  date: d.date,
+  description: d.description,
+  category: d.category,
+  amount: d.amount,
+  type: "despesa" as const,
+  status: d.status as Transaction["status"],
+  requestedBy: d.requestedBy,
+  requesterRole: d.requesterRole,
+  responsavel: d.responsavel,
+  responsavelRole: d.responsavelRole,
+  justification: d.justificacao,
+}));
+
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
