@@ -195,6 +195,7 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
   const add = () => setImpostos((s) => [...s, { id: newId(), nome: nomeForImposto("Personalizado", 0), taxa: 0, regime: "Personalizado" }]);
   const [nomeLegal, setNomeLegal] = useState<string>("");
   const [nif, setNif] = useState<string>("");
+  const [fiscalSaving, setFiscalSaving] = useState(false);
   useEffect(() => {
     let cancelled = false;
     const load = async () => {
@@ -211,6 +212,22 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
     window.addEventListener("focus", onFocus);
     return () => { cancelled = true; window.removeEventListener("focus", onFocus); };
   }, [email]);
+
+  const saveFiscal = async (next: { nomeLegal?: string; nif?: string }) => {
+    setFiscalSaving(true);
+    try {
+      await (supabase.rpc as any)("set_institution_fiscal", {
+        _nome_legal: next.nomeLegal ?? nomeLegal ?? "",
+        _nif: next.nif ?? nif ?? "",
+      });
+      toast.success("Identificação institucional atualizada.");
+    } catch (e: any) {
+      toast.error(e?.message || "Falha ao guardar.");
+    } finally {
+      setFiscalSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Card className="overflow-hidden">
@@ -218,17 +235,30 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
           <FileText className="w-4 h-4 text-primary" />
           <div className="min-w-0">
             <h2 className="text-sm font-bold text-foreground">Identificação Institucional</h2>
-            <p className="text-[11px] text-muted-foreground">Definido na Ficha Institucional. Para alterar, edite no perfil da instituição.</p>
+            <p className="text-[11px] text-muted-foreground">Partilhado com Admin → Meu Perfil. Editável aqui — guarda na base de dados ao sair do campo.</p>
           </div>
+          {fiscalSaving && <Loader2 className="w-3.5 h-3.5 animate-spin text-muted-foreground ml-auto" />}
         </div>
         <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-xs text-muted-foreground">Nome Legal</Label>
-            <Input value={nomeLegal || "—"} readOnly className="h-9 bg-muted/40 cursor-not-allowed" />
+            <Input
+              value={nomeLegal}
+              onChange={(e) => setNomeLegal(e.target.value)}
+              onBlur={() => saveFiscal({ nomeLegal })}
+              placeholder="Ex: Universidade Privada de Angola, SA"
+              className="h-9"
+            />
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs text-muted-foreground">Número de Identificação Fiscal (NIF)</Label>
-            <Input value={nif || "—"} readOnly className="h-9 font-mono tabular-nums bg-muted/40 cursor-not-allowed" />
+            <Input
+              value={nif}
+              onChange={(e) => setNif(e.target.value)}
+              onBlur={() => saveFiscal({ nif })}
+              placeholder="Ex: 5417000000"
+              className="h-9 font-mono tabular-nums"
+            />
           </div>
         </div>
       </Card>
