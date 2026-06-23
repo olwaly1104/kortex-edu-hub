@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
@@ -9,8 +9,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { provisionKortexUser } from "@/lib/accountProvisioning";
 import {
-  loadDocentes, saveDocentes,
-  loadStaff, saveStaff,
+  loadDocentes, saveDocentes, syncDocentesFromDb,
+  loadStaff, saveStaff, syncStaffFromDb,
   type DocenteRow, type StaffRow,
 } from "@/lib/peopleStorage";
 import { DocenteFormDialog } from "@/components/admin/DocenteFormDialog";
@@ -52,6 +52,8 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
   const [rows, setRows] = useState<DocenteRow[]>(() => loadDocentes());
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => { syncDocentesFromDb().then(setRows); }, []);
 
   const persist = (next: DocenteRow[]) => {
     setRows(next);
@@ -140,6 +142,8 @@ type StaffRowExtra = StaffRow & { fotoDataUrl?: string };
 function StaffOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
   const [rows, setRows] = useState<StaffRowExtra[]>(() => loadStaff() as StaffRowExtra[]);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => { syncStaffFromDb().then((r) => setRows(r as StaffRowExtra[])); }, []);
 
   const persist = (next: StaffRowExtra[]) => {
     setRows(next);
