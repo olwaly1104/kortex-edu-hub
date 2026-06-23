@@ -297,6 +297,16 @@ export default function AdminDiscentes() {
       toast.error("Preencha primeiro e último nome");
       return;
     }
+    if (!draft.curso_id) {
+      toast.error("Selecione faculdade e curso antes de confirmar.");
+      setConfirmOpen(false);
+      return;
+    }
+    if (!draft.ano || !draft.turma) {
+      toast.error("Selecione ano e turma antes de confirmar.");
+      setConfirmOpen(false);
+      return;
+    }
     if (!previewEmail) {
       toast.error("Não foi possível gerar email a partir do nome");
       return;
