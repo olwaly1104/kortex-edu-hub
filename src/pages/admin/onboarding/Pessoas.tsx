@@ -51,6 +51,7 @@ function PageHeader({
 function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
   const [rows, setRows] = useState<DocenteRow[]>(() => loadDocentes());
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   const persist = (next: DocenteRow[]) => {
     setRows(next);
