@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useFaculdades, useCursos, usePropinas, useUpdatePropina } from "@/lib/useInstitution";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Configurar Finanças — página única ligada ao onboarding.
