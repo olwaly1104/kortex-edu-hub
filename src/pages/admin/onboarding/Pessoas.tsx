@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,7 @@ function PageHeader({
 function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
   const [rows, setRows] = useState<DocenteRow[]>(() => loadDocentes());
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   const persist = (next: DocenteRow[]) => {
     setRows(next);
@@ -91,7 +93,11 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
         </div>
         <div className="divide-y">
           {rows.map((r) => (
-            <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2.5 items-center`}>
+            <div
+              key={r.id}
+              className={`grid ${gridCols} gap-2 px-4 py-2.5 items-center hover:bg-muted/30 cursor-pointer transition-colors`}
+              onClick={() => navigate(`/admin/docentes/${r.id}`)}
+            >
               <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex items-center justify-center text-muted-foreground">
                 {r.fotoDataUrl ? <img src={r.fotoDataUrl} alt="" className="w-full h-full object-cover" /> : <User className="w-4 h-4" />}
               </div>
@@ -101,7 +107,12 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
               <span className="text-xs truncate">{r.departamento || <span className="text-muted-foreground italic">—</span>}</span>
               <span className="text-xs">{r.grau || "—"}</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-primary/10 text-primary w-fit">{r.cargo}</span>
-              <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => remove(r.id)}>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                onClick={(e) => { e.stopPropagation(); remove(r.id); }}
+              >
                 <Trash2 className="w-3.5 h-3.5" />
               </Button>
             </div>
