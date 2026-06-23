@@ -34,8 +34,15 @@ export const emptyDocente = (): DocenteRow => ({
   nascimento: "", genero: "M", bilhete: "", bilheteFileName: "", fotoDataUrl: "",
   provincia: "", municipio: "", endereco: "",
   grau: "Licenciatura", especialidade: "", instituicaoFormacao: "", anosExperiencia: "",
-  cvFileName: "", diplomaFileName: "",
+  cvFileName: "", diplomaFileName: "", moduloKortex: "professor",
 });
+
+const MODULOS_DOCENTE = [
+  { value: "professor", label: "Professor" },
+  { value: "coordenador", label: "Coordenador de Curso" },
+  { value: "decano", label: "Decano" },
+  { value: "reitor", label: "Reitor" },
+];
 
 export function DocenteFormDialog({
   open, onOpenChange, onSave, initial,
@@ -114,6 +121,15 @@ export function DocenteFormDialog({
                 />
               </Field>
             </div>
+
+            <Field label="Módulo Kortex *">
+              <Select value={draft.moduloKortex || "professor"} onValueChange={(v) => setF("moduloKortex", v)}>
+                <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {MODULOS_DOCENTE.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
 
             <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between gap-2">
               <div className="min-w-0">
