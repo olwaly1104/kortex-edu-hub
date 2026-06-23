@@ -421,8 +421,23 @@ export default function Despesas() {
                   <Input placeholder="Nome do solicitante" value={form.requestedBy} onChange={e => setField("requestedBy", e.target.value)} className="h-9" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-medium">Responsável</Label>
-                  <Input placeholder="Aprovador / gestor" value={form.responsavel} onChange={e => setField("responsavel", e.target.value)} className="h-9" />
+                  <Label className="text-xs font-medium">Responsável (aprovador)</Label>
+                  {cfgResponsaveis.length > 0 ? (
+                    <Select value={form.responsavel} onValueChange={v => setField("responsavel", v)}>
+                      <SelectTrigger className="h-9"><SelectValue placeholder="Selecionar aprovador" /></SelectTrigger>
+                      <SelectContent>
+                        {cfgResponsaveis
+                          .filter(r => !r.categoria || !form.category || r.categoria === form.category)
+                          .map(r => (
+                            <SelectItem key={r.id} value={r.pessoa}>
+                              {r.pessoa} {r.limite ? `· até ${formatCurrency(r.limite)}` : ""}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input placeholder="Aprovador / gestor" value={form.responsavel} onChange={e => setField("responsavel", e.target.value)} className="h-9" />
+                  )}
                 </div>
               </div>
             </div>
