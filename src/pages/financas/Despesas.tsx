@@ -83,8 +83,7 @@ export default function Despesas() {
   const email = user?.email;
 
   // Read configured categorias / estados / responsaveis (mirrors ConfigurarReceitas → Despesas)
-  const [cfgCategorias, setCfgCategorias] = useState<CfgCategoria[]>(() =>
-    readJSON<CfgCategoria[]>(CFG_KEY("des.categorias", email), []));
+  const [cfgCategorias, setCfgCategorias] = useState<CfgCategoria[]>([]);
   const [cfgEstados, setCfgEstados] = useState<CfgEstado[]>(() => {
     const r = readJSON<CfgEstado[]>(CFG_KEY("des.estados", email), []);
     return r.length ? r : DEFAULT_ESTADOS;
@@ -92,10 +91,23 @@ export default function Despesas() {
   const [cfgResponsaveis, setCfgResponsaveis] = useState<CfgResp[]>(() =>
     readJSON<CfgResp[]>(CFG_KEY("des.responsaveis", email), []));
 
-  // Re-hydrate when window regains focus, so config edits made elsewhere appear
+  const loadCategorias = async () => {
+    const { data, error } = await supabase
+      .from("fin_despesa_categorias")
+      .select("id, nome, cor, documentos")
+      .order("created_at", { ascending: true });
+    if (!error && Array.isArray(data)) {
+      setCfgCategorias(data.map((r: any) => ({
+        id: r.id, nome: r.nome || "", cor: r.cor || "",
+        documentos: Array.isArray(r.documentos) ? r.documentos : [],
+      })));
+    }
+  };
+
   useEffect(() => {
+    loadCategorias();
     const hydrate = () => {
-      setCfgCategorias(readJSON<CfgCategoria[]>(CFG_KEY("des.categorias", email), []));
+      loadCategorias();
       const r = readJSON<CfgEstado[]>(CFG_KEY("des.estados", email), []);
       setCfgEstados(r.length ? r : DEFAULT_ESTADOS);
       setCfgResponsaveis(readJSON<CfgResp[]>(CFG_KEY("des.responsaveis", email), []));
