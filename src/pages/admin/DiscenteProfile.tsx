@@ -382,7 +382,6 @@ export default function AdminDiscenteProfile() {
                   const month = now.getMonth();
                   const monthsPaid = 0;
                   const refYear = month >= 8 ? now.getFullYear() : now.getFullYear() - 1;
-                  const refYear = month >= 8 ? now.getFullYear() : now.getFullYear() - 1;
 
                   const history = MESES_FULL.map((nome, i) => {
                     const ano = i <= 3 ? refYear : refYear + 1; // Set-Dez do ano refYear, resto do seguinte
