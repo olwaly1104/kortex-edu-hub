@@ -487,19 +487,28 @@ function DespesasSection({ email }: { email?: string | null }) {
   const estKey = KEY("des.estados", email);
   const respKey = KEY("des.responsaveis", email);
 
-  const [categorias, setCategorias] = useState<DesCategoria[]>(() => {
-    const raw = readJSON<any[]>(catKey, []);
-    return raw.map((item) => ({
-      id: item.id || newId(),
-      nome: item.nome || "",
-      cor: item.cor || "bg-slate-100 text-slate-700 border-slate-200",
-      documentos: Array.isArray(item.documentos)
-        ? item.documentos
-        : item.documento
-          ? String(item.documento).split(/,\s*/).filter(Boolean)
-          : [],
-    }));
-  });
+  const [categorias, setCategorias] = useState<DesCategoria[]>([]);
+  const [catsLoading, setCatsLoading] = useState(true);
+
+  const reloadCats = async () => {
+    const { data, error } = await supabase
+      .from("fin_despesa_categorias")
+      .select("id, nome, cor, documentos")
+      .order("created_at", { ascending: true });
+    if (!error && Array.isArray(data)) {
+      setCategorias(data.map((r: any) => ({
+        id: r.id,
+        nome: r.nome || "",
+        cor: r.cor || "bg-slate-100 text-slate-700 border-slate-200",
+        documentos: Array.isArray(r.documentos) ? r.documentos : [],
+      })));
+    }
+    setCatsLoading(false);
+  };
+  useEffect(() => { reloadCats(); }, []);
+  // Keep localStorage in sync so Despesas.tsx (read path) stays consistent for now.
+  useEffect(() => { writeJSON(catKey, categorias); }, [categorias, catKey]);
+
   const [estados, setEstados] = useState<DesEstado[]>(() => readJSON<DesEstado[]>(estKey, [
     { id: "e1", nome: "Pendente", cor: "bg-amber-100 text-amber-700 border-amber-200", descricao: "Aguarda revisão e aprovação." },
     { id: "e2", nome: "Aprovada", cor: "bg-emerald-100 text-emerald-700 border-emerald-200", descricao: "Validada, pronta para pagamento." },
@@ -508,9 +517,52 @@ function DespesasSection({ email }: { email?: string | null }) {
   ]));
   const [responsaveis, setResponsaveis] = useState<DesResp[]>(() => readJSON<DesResp[]>(respKey, []));
 
-  useEffect(() => writeJSON(catKey, categorias), [categorias, catKey]);
   useEffect(() => writeJSON(estKey, estados), [estados, estKey]);
   useEffect(() => writeJSON(respKey, responsaveis), [responsaveis, respKey]);
+
+  // Lock-in dialog for new category
+  const [confirmAdd, setConfirmAdd] = useState(false);
+  const [draftNome, setDraftNome] = useState("");
+
+  const persistCategoria = async (id: string, patch: Partial<DesCategoria>) => {
+    const upd: any = {};
+    if (patch.nome !== undefined) upd.nome = patch.nome;
+    if (patch.cor !== undefined) upd.cor = patch.cor;
+    if (patch.documentos !== undefined) upd.documentos = patch.documentos;
+    if (Object.keys(upd).length === 0) return;
+    await supabase.from("fin_despesa_categorias").update(upd).eq("id", id);
+  };
+
+  const updateCategoriaLocal = (id: string, patch: Partial<DesCategoria>) => {
+    setCategorias((s) => s.map((x) => x.id === id ? { ...x, ...patch } : x));
+    persistCategoria(id, patch);
+  };
+
+  const removeCategoria = async (id: string) => {
+    setCategorias((s) => s.filter((x) => x.id !== id));
+    await supabase.from("fin_despesa_categorias").delete().eq("id", id);
+  };
+
+  const confirmCreateCategoria = async () => {
+    const nome = draftNome.trim();
+    if (!nome) { toast.error("Indique a designação."); return; }
+    const { data: { user: u } } = await supabase.auth.getUser();
+    if (!u) { toast.error("Sessão inválida."); return; }
+    const { data, error } = await supabase
+      .from("fin_despesa_categorias")
+      .insert({ owner_user_id: u.id, nome, cor: COR_OPCOES[0].value, documentos: [] })
+      .select("id, nome, cor, documentos")
+      .single();
+    if (error || !data) { toast.error("Falha ao criar categoria."); return; }
+    setCategorias((s) => [...s, {
+      id: data.id, nome: data.nome, cor: data.cor,
+      documentos: Array.isArray(data.documentos) ? (data.documentos as string[]) : [],
+    }]);
+    setDraftNome("");
+    setConfirmAdd(false);
+    toast.success("Categoria bloqueada. Pode agora editar livremente.");
+  };
+
 
   const COR_OPCOES = [
     { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
