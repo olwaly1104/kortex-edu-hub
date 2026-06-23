@@ -1,15 +1,195 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
+import { ArrowLeft, FileText, CheckCircle2, Clock, XCircle, Paperclip, FileImage, FileSpreadsheet } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import EmptyState from "@/components/EmptyState";
-import { ArrowLeft } from "lucide-react";
+import { findDespesa, finStatusMetaDespesa, prettyDate, type DespesaAnexo } from "@/data/financasDespesasData";
+import { formatCurrency } from "@/data/financeModuleData";
+import FinancasDespesaDocPreview from "./DespesaDocPreview";
 
 export default function FinancasDespesaDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const d = findDespesa(id);
+
+  if (!d) {
+    return (
+      <div className="p-6 max-w-4xl mx-auto space-y-4">
+        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1.5"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
+        <EmptyState title="Despesa não encontrada" description={`Não existe nenhuma despesa com o identificador ${id ?? "—"}.`} />
+      </div>
+    );
+  }
+
+  const st = finStatusMetaDespesa[d.status];
+  const dSub = new Date(d.date);
+
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-4">
-      <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1.5"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
-      <EmptyState title="Despesa não encontrada" description={`Não existe nenhuma despesa com o identificador ${id ?? "—"}.`} />
+    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+      <Link to="/financas/despesas" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <ArrowLeft className="w-4 h-4" /> Voltar a Despesas
+      </Link>
+
+      <Card className="overflow-hidden p-0 gap-0">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2 px-6 py-3 border-b border-border bg-muted/20 text-[10px] uppercase tracking-[0.12em] font-semibold">
+          <span className="text-primary">Ano Lectivo 2024/2025</span>
+          <span className="text-muted-foreground/40">·</span>
+          <Link to="/financas/despesas" className="text-muted-foreground hover:text-foreground transition-colors">Despesas</Link>
+          <span className="text-muted-foreground/40">·</span>
+          <span className="font-mono text-foreground normal-case tracking-normal">{d.ref}</span>
+        </div>
+
+        {/* Title block */}
+        <div className="px-6 pt-4 pb-4">
+          <div className="flex items-start gap-3 rounded-lg border border-border bg-background p-3">
+            <div className="shrink-0 w-[60px] rounded-md border border-border overflow-hidden bg-background text-center">
+              <div className="bg-primary/90 py-0.5">
+                <p className="text-[9px] uppercase tracking-[0.15em] text-primary-foreground font-bold">
+                  {dSub.toLocaleDateString("pt-PT", { month: "short" }).replace(".", "")}
+                </p>
+              </div>
+              <div className="py-1">
+                <p className="text-[24px] leading-none font-bold text-foreground tabular-nums tracking-tight">
+                  {String(dSub.getDate()).padStart(2, "0")}
+                </p>
+                <p className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-semibold mt-0.5">
+                  {dSub.getFullYear()}
+                </p>
+              </div>
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">{d.description}</h1>
+              <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.cls)}>
+                  <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />
+                  {st.label}
+                </Badge>
+                <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">{d.category}</Badge>
+                <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1 bg-red-50 text-red-700 border-red-200">
+                  -{formatCurrency(d.amount)}
+                </Badge>
+              </div>
+            </div>
+
+            <div className="shrink-0 flex flex-col items-end gap-1.5">
+              <div className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background text-[11px] font-mono font-semibold text-foreground">
+                {d.ref}
+              </div>
+              <div className="inline-flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-md border border-border bg-background shadow-sm">
+                <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
+                  <FileText className="w-3 h-3 text-red-600" />
+                </div>
+                <div className="flex flex-col leading-tight">
+                  <span className="text-[11px] font-semibold text-foreground tabular-nums">Despesa-{d.ref}</span>
+                  <span className="text-[9px] text-muted-foreground font-medium">Gerado automaticamente</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Body grid: Cronologia + Doc preview */}
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-0 border-t border-border">
+          {/* Left — Cronologia + Metadata */}
+          <div className="p-6 space-y-6 border-r border-border">
+            {/* Metadata */}
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-2">Identificação</p>
+              <dl className="space-y-1.5 text-xs">
+                <MetaRow k="Solicitado por"   v={`${d.requestedBy} · ${d.requesterRole ?? "—"}`} />
+                <MetaRow k="Responsável"      v={`${d.responsavel} · ${d.responsavelRole ?? "—"}`} />
+                <MetaRow k="Fornecedor"       v={d.fornecedor ?? "—"} />
+                <MetaRow k="NIF"              v={d.nif ?? "—"} />
+                <MetaRow k="Método pagamento" v={d.metodoPagamento ?? "—"} />
+                <MetaRow k="Rubrica"          v={d.rubricaOrcamental ?? "—"} />
+                <MetaRow k="Submetido em"     v={prettyDate(d.date)} />
+                <MetaRow k="Prazo"            v={prettyDate(d.dueDate)} />
+              </dl>
+            </div>
+
+            {/* Justificação */}
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-2">Justificação</p>
+              <p className="text-xs leading-relaxed text-foreground/85 whitespace-pre-line">{d.justificacao}</p>
+            </div>
+
+            {/* Anexos */}
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-2">Anexos ({d.anexos.length})</p>
+              <ul className="space-y-1.5">
+                {d.anexos.map((a, i) => {
+                  const ic = anexoIcon(a.tipo);
+                  return (
+                    <li key={i} className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-border bg-muted/30">
+                      <div className={`w-6 h-6 rounded border flex items-center justify-center shrink-0 ${ic.cls}`}>
+                        <ic.Icon className="w-3 h-3" />
+                      </div>
+                      <span className="text-xs font-medium text-foreground truncate flex-1">{a.nome}</span>
+                      {a.size && <span className="text-[10px] text-muted-foreground shrink-0">{a.size}</span>}
+                      <Paperclip className="w-3 h-3 text-muted-foreground shrink-0" />
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            {/* Cronologia */}
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Cronologia</p>
+              <ol className="relative border-l-2 border-border pl-5 space-y-4">
+                {d.historico.map((h, i) => {
+                  const tone = toneFor(h.accao);
+                  const Icon = tone.icon;
+                  return (
+                    <li key={i} className="relative">
+                      <span className={cn("absolute -left-[28px] top-0 w-5 h-5 rounded-full flex items-center justify-center ring-4", tone.cls)}>
+                        <Icon className="w-3 h-3" />
+                      </span>
+                      <div className="text-xs font-semibold text-foreground">{h.accao}</div>
+                      <div className="text-[10px] text-muted-foreground tabular-nums mt-0.5">{h.data} · {h.actor ?? "—"}</div>
+                      {h.nota && <p className="text-[11px] text-foreground/75 mt-1 leading-relaxed">{h.nota}</p>}
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          </div>
+
+          {/* Right — Doc preview */}
+          <div className="min-h-[680px]">
+            <FinancasDespesaDocPreview despesa={d} />
+          </div>
+        </div>
+      </Card>
     </div>
   );
+}
+
+function MetaRow({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex items-baseline gap-2">
+      <dt className="text-muted-foreground w-[120px] shrink-0">{k}</dt>
+      <dd className="font-medium text-foreground flex-1 truncate">{v}</dd>
+    </div>
+  );
+}
+
+function toneFor(accao: string) {
+  const a = accao.toLowerCase();
+  if (a.includes("aprov"))  return { icon: CheckCircle2, cls: "bg-emerald-500 text-white ring-emerald-500/15" };
+  if (a.includes("rejeit")) return { icon: XCircle,      cls: "bg-red-500 text-white ring-red-500/15" };
+  if (a.includes("pag"))    return { icon: CheckCircle2, cls: "bg-blue-500 text-white ring-blue-500/15" };
+  if (a.includes("submet")) return { icon: FileText,     cls: "bg-primary text-primary-foreground ring-primary/15" };
+  return { icon: Clock, cls: "bg-amber-500 text-white ring-amber-500/15" };
+}
+
+function anexoIcon(t: DespesaAnexo["tipo"]) {
+  if (t === "image") return { Icon: FileImage,       cls: "bg-violet-50 border-violet-200 text-violet-600" };
+  if (t === "sheet") return { Icon: FileSpreadsheet, cls: "bg-emerald-50 border-emerald-200 text-emerald-600" };
+  if (t === "doc")   return { Icon: FileText,        cls: "bg-sky-50 border-sky-200 text-sky-600" };
+  return { Icon: FileText, cls: "bg-red-50 border-red-200 text-red-600" };
 }
