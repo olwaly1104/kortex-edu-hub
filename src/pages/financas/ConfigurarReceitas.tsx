@@ -1069,30 +1069,40 @@ function MultasSection({ email }: { email?: string | null }) {
           <Icon className="w-4 h-4 text-primary" />
           <div className="min-w-0">
             <h2 className="text-sm font-bold text-foreground">{meta.title}</h2>
-            <p className="text-[11px] text-muted-foreground">Configurada em {meta.source}. Finanças visualiza em modo só-leitura.</p>
+            <p className="text-[11px] text-muted-foreground">Configure as multas aplicáveis a {aplicaALabel.toLowerCase()}s. Cada separador gere a sua própria lista.</p>
           </div>
-          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{current.length} multa{current.length === 1 ? "" : "s"}</span>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{currentList.length} multa{currentList.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[1fr_140px_140px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div className="grid grid-cols-[1.1fr_1.4fr_140px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Designação</div>
-            <div>Aplica-se a</div>
+            <div>Descrição</div>
             <div className="text-right">Valor (Kz)</div>
+            <div className="text-right">Ação</div>
           </div>
-          {current.length === 0 ? (
+          {currentList.length === 0 ? (
             <div className="px-5 py-10 text-center text-xs text-muted-foreground">
-              Sem multas configuradas. Configure em <span className="font-medium text-foreground">{meta.source}</span>.
+              Sem multas configuradas para {aplicaALabel.toLowerCase()}s. Clique em <span className="font-medium text-foreground">Adicionar multa</span>.
             </div>
-          ) : current.map((m) => (
-            <div key={m.id} className="grid grid-cols-[1fr_140px_140px] gap-3 px-5 py-2.5 items-center text-sm">
-              <div className="min-w-0">
-                <p className="font-medium truncate">{m.nome}</p>
-                {m.descricao && <p className="text-[11px] text-muted-foreground truncate">{m.descricao}</p>}
+          ) : currentList.map((m) => (
+            <div key={m.id} className="grid grid-cols-[1.1fr_1.4fr_140px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+              <Input className="h-9" placeholder="Ex: Atraso entrega" value={m.nome}
+                onChange={(e) => updMulta(m.id, { nome: e.target.value })} />
+              <Input className="h-9" placeholder="Descrição curta" value={m.descricao || ""}
+                onChange={(e) => updMulta(m.id, { descricao: e.target.value })} />
+              <Input type="number" min={0} className="h-9 tabular-nums text-right" value={m.valor}
+                onChange={(e) => updMulta(m.id, { valor: Number(e.target.value) || 0 })} />
+              <div className="flex justify-end">
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => delMulta(m.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
               </div>
-              <span className="text-xs text-muted-foreground">{m.aplicaA}</span>
-              <div className="text-right tabular-nums font-medium">{fmt(m.valor)}</div>
             </div>
           ))}
+        </div>
+        <div className="px-5 py-3 border-t bg-muted/10">
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={addMulta}>
+            <Plus className="w-3.5 h-3.5" /> Adicionar multa
+          </Button>
         </div>
       </Card>
     </div>
