@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, Search, ArrowUpDown, X, Check, Wallet, Clock, Ban, TrendingDown, FileText } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { Upload, Paperclip, Trash2, Calendar as CalendarIcon, Coins, Tag, User2, ShieldCheck, FileSignature } from "lucide-react";
 import { formatCurrency, type Transaction } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { FinHeader } from "./_FinHeader";
 
@@ -22,16 +23,31 @@ import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from 
 type SortField = "amount";
 type SortDir = "asc" | "desc";
 
-const statusColors: Record<string, string> = {
-  aprovada: "bg-accent/15 text-accent border-accent/30",
-  pendente: "bg-amber-100 text-amber-700 border-amber-200",
-  rejeitada: "bg-destructive/15 text-destructive border-destructive/30",
+// ─── Config (mirrors ConfigurarReceitas → Despesas section) ────────────────
+type CfgCategoria = { id: string; nome: string; cor: string; documentos: string[] };
+type CfgEstado = { id: string; nome: string; cor: string; descricao?: string };
+type CfgResp = { id: string; pessoa: string; categoria: string; limite: number };
+
+const CFG_KEY = (kind: string, email?: string | null) =>
+  `upra.fin.cfg.${kind}::${email || "anon"}`;
+const readJSON = <T,>(k: string, fb: T): T => {
+  try {
+    const r = localStorage.getItem(k);
+    return r ? (JSON.parse(r) as T) : fb;
+  } catch {
+    return fb;
+  }
 };
-const statusLabels: Record<string, string> = { aprovada: "Aprovada", pendente: "Pendente", rejeitada: "Rejeitada" };
+
+const DEFAULT_ESTADOS: CfgEstado[] = [
+  { id: "e1", nome: "Pendente", cor: "bg-amber-100 text-amber-700 border-amber-200", descricao: "Aguarda revisão e aprovação." },
+  { id: "e2", nome: "Aprovada", cor: "bg-emerald-100 text-emerald-700 border-emerald-200", descricao: "Validada, pronta para pagamento." },
+  { id: "e3", nome: "Rejeitada", cor: "bg-red-100 text-red-700 border-red-200", descricao: "Recusada pelo responsável." },
+  { id: "e4", nome: "Paga", cor: "bg-blue-100 text-blue-700 border-blue-200", descricao: "Pagamento efetuado e contabilizado." },
+];
+
 const despesas: Transaction[] = [];
 
-
-const DESPESA_CATEGORIES = ["Operacional", "Pedagógica", "Manutenção", "Serviços", "Material", "Salários", "Outros"] as const;
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
 type NewDespesa = {
@@ -41,22 +57,23 @@ type NewDespesa = {
   amount: string;
   requestedBy: string;
   responsavel: string;
-  status: "pendente" | "aprovada" | "rejeitada";
+  status: string;
   justificacao: string;
   docs: { name: string; size: number }[];
 };
 
-const emptyDespesa: NewDespesa = {
+const emptyDespesa = (defaultStatus: string): NewDespesa => ({
   date: todayISO(),
   description: "",
   category: "",
   amount: "",
   requestedBy: "",
   responsavel: "",
-  status: "pendente",
+  status: defaultStatus,
   justificacao: "",
   docs: [],
-};
+});
+
 
 export default function Despesas() {
   const { toast } = useToast();
