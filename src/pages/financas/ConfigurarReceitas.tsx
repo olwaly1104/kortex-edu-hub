@@ -964,10 +964,8 @@ function MultasSection({ email }: { email?: string | null }) {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-800 flex items-center gap-2">
-        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-        Tabelas geridas por RH e Académica. Finanças tem apenas visualização.
-      </div>
+
+
 
       <div className="inline-flex items-center gap-1 p-1 rounded-lg border bg-muted/30">
         {toggles.map((t) => {
