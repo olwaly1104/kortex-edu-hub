@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, X, Users, Wallet, Clock, Loader2, FileText, ArrowUpDown } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { formatCurrency, salarios, type Salary } from "@/data/financeModuleData";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { loadDocentes } from "@/lib/peopleStorage";
 import { FinHeader } from "./_FinHeader";
 import { PeriodSelector, PERIODO_MULT, type Periodo, periodoDefaultValue } from "./_PeriodSelector";
 
@@ -25,6 +27,15 @@ const contractLabels: Record<Salary["contractType"], string> = { efectivo: "Efec
 
 export default function Salarios() {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const docenteByName = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const d of loadDocentes()) {
+      const full = `${d.primeiroNome} ${d.ultimoNome}`.trim().toLowerCase();
+      if (full) map.set(full, d.id);
+    }
+    return map;
+  }, []);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("todos");
   const [filterContract, setFilterContract] = useState<string>("todos");
