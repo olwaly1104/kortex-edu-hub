@@ -290,7 +290,7 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
 
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
 
-const MESES_OPCOES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+const MESES_OPCOES = [10, 12];
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
