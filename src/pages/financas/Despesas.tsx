@@ -364,11 +364,14 @@ export default function Despesas() {
                 <div className="space-y-1.5">
                   <Label className="text-xs font-medium flex items-center gap-1"><Tag className="w-3 h-3" /> Categoria <span className="text-destructive">*</span></Label>
                   <Select value={form.category} onValueChange={v => setField("category", v)}>
-                    <SelectTrigger className="h-9"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectTrigger className="h-9"><SelectValue placeholder={categoryNames.length ? "Selecione" : "Configure categorias em Configurador"} /></SelectTrigger>
                     <SelectContent>
-                      {DESPESA_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                      {categoryNames.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                     </SelectContent>
                   </Select>
+                  {requiredDocs.length > 0 && (
+                    <p className="text-[10px] text-muted-foreground">Documentos exigidos: {requiredDocs.join(", ")}</p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
