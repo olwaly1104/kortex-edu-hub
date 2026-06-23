@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useFaculdades, useCursos, usePropinas, useUpdatePropina } from "@/lib/useInstitution";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Configurar Finanças — página única ligada ao onboarding.
@@ -195,24 +196,20 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
   const [nomeLegal, setNomeLegal] = useState<string>("");
   const [nif, setNif] = useState<string>("");
   useEffect(() => {
-    const suffix = (email || "").trim().toLowerCase();
-    const profKey = suffix ? `upra.admin.perfil:${suffix}` : "upra.admin.perfil";
-    const onbKey = suffix ? `upra.admin.onboarding:${suffix}` : "upra.admin.onboarding";
-    const read = () => {
+    let cancelled = false;
+    const load = async () => {
       try {
-        const p = JSON.parse(localStorage.getItem(profKey) || "null");
-        if (p?.nomeLegal) setNomeLegal(String(p.nomeLegal));
-        if (p?.nif) { setNif(String(p.nif)); return; }
-        const o = JSON.parse(localStorage.getItem(onbKey) || "null");
-        if (!nomeLegal) setNomeLegal(String(o?.dados?.nomeLegal || ""));
-        setNif(String(o?.dados?.nif || ""));
-      } catch { setNif(""); }
+        const { data } = await supabase.rpc("get_institution_fiscal");
+        const row = Array.isArray(data) ? data[0] : data;
+        if (cancelled) return;
+        setNomeLegal(row?.nome_legal ?? "");
+        setNif(row?.nif ?? "");
+      } catch { /* ignore */ }
     };
-    read();
-    const onStorage = (e: StorageEvent) => { if (!e.key || e.key === profKey || e.key === onbKey) read(); };
-    window.addEventListener("storage", onStorage);
-    window.addEventListener("focus", read);
-    return () => { window.removeEventListener("storage", onStorage); window.removeEventListener("focus", read); };
+    load();
+    const onFocus = () => load();
+    window.addEventListener("focus", onFocus);
+    return () => { cancelled = true; window.removeEventListener("focus", onFocus); };
   }, [email]);
   return (
     <div className="space-y-4">

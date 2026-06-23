@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useFaculdades, useCursos } from "@/lib/useInstitution";
 import { loadDocentes, loadStaff } from "@/lib/peopleStorage";
+import { supabase } from "@/integrations/supabase/client";
 
 type Instituicao = {
   nomeLegal: string; nomeOficial: string; sigla: string; nif: string; fundacao: string; natureza: string;
@@ -118,6 +119,22 @@ export default function AdminPerfil() {
     pushProfile(user?.email, instituicao);
   }, [instituicao, PROFILE_KEY, user?.email]);
 
+  // Hydrate Nome Legal / NIF from the real database
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase.rpc("get_institution_fiscal");
+        const row = Array.isArray(data) ? data[0] : data;
+        if (!row) return;
+        setInstituicao((prev) => ({
+          ...prev,
+          nomeLegal: row.nome_legal ?? prev.nomeLegal,
+          nif: row.nif ?? prev.nif,
+        }));
+      } catch { /* ignore */ }
+    })();
+  }, [user?.email]);
+
   const emailValid = /^[^\s@]+@[^\s@]+\.com$/i.test((instituicao.email || "").trim());
   const locked = !editing;
 
@@ -130,7 +147,7 @@ export default function AdminPerfil() {
     setSnapshot(null);
     setEditing(false);
   };
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!instituicao.nomeOficial.trim()) {
       toast.error("Nome oficial é obrigatório");
       return;
@@ -141,6 +158,17 @@ export default function AdminPerfil() {
     }
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
     pushProfile(user?.email, instituicao);
+    // Persist fiscal identifiers (Nome Legal & NIF) into the real database
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth?.user?.id;
+      if (uid) {
+        await supabase
+          .from("profiles")
+          .update({ nome_legal: instituicao.nomeLegal || null, nif: instituicao.nif || null })
+          .eq("id", uid);
+      }
+    } catch { /* ignore */ }
     setSnapshot(null);
     setEditing(false);
     toast.success("Dados da instituição atualizados");
