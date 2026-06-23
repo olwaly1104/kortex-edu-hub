@@ -631,16 +631,19 @@ function DespesasSection({ email }: { email?: string | null }) {
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{estados.length} estado{estados.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[1fr_180px_120px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+          <div className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Designação</div>
+            <div>Descrição</div>
             <div>Cor</div>
             <div>Pré-visualização</div>
             <div className="text-right">Ação</div>
           </div>
           {estados.map((es) => (
-            <div key={es.id} className="grid grid-cols-[1fr_180px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+            <div key={es.id} className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
               <Input className="h-9" placeholder="Ex: Aprovada" value={es.nome}
                 onChange={(e) => setEstados((s) => s.map((x) => x.id === es.id ? { ...x, nome: e.target.value } : x))} />
+              <Input className="h-9" placeholder="Descrição curta do estado" value={es.descricao || ""}
+                onChange={(e) => setEstados((s) => s.map((x) => x.id === es.id ? { ...x, descricao: e.target.value } : x))} />
               <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={es.cor}
                 onChange={(e) => setEstados((s) => s.map((x) => x.id === es.id ? { ...x, cor: e.target.value } : x))}>
                 {COR_OPCOES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
@@ -655,7 +658,7 @@ function DespesasSection({ email }: { email?: string | null }) {
         </div>
         <div className="px-5 py-3 border-t bg-muted/10">
           <Button size="sm" variant="outline" className="gap-1.5"
-            onClick={() => setEstados((s) => [...s, { id: newId(), nome: "", cor: COR_OPCOES[0].value }])}>
+            onClick={() => setEstados((s) => [...s, { id: newId(), nome: "", cor: COR_OPCOES[0].value, descricao: "" }])}>
             <Plus className="w-3.5 h-3.5" /> Adicionar estado
           </Button>
         </div>
