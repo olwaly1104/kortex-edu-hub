@@ -302,7 +302,7 @@ export default function Despesas() {
               <td className="p-3 text-right text-xs font-semibold text-destructive">-{formatCurrency(d.amount)}</td>
               <td className="p-3 text-xs text-muted-foreground">{d.category === "Salários" ? "—" : (d.requestedBy || "—")}</td>
               <td className="p-3 text-xs text-foreground">{d.responsavel || "—"}</td>
-              <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", statusColors[d.status])}>{statusLabels[d.status] || d.status}</Badge></td>
+              <td className="p-3 text-center"><Badge variant="outline" className={cn("text-[10px]", estadoColor[(d.status || "").toLowerCase()] || "bg-muted text-muted-foreground border-border")}>{estadoLabels[(d.status || "").toLowerCase()] || d.status}</Badge></td>
               <td className="p-3 text-center" onClick={e => e.stopPropagation()}>
                 {(() => {
                   const total = (d as any).docsRequired ?? 0;
