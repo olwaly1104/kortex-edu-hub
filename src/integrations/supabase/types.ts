@@ -379,6 +379,102 @@ export type Database = {
         }
         Relationships: []
       }
+      docentes: {
+        Row: {
+          anos_experiencia: string | null
+          bilhete: string | null
+          bilhete_file_name: string | null
+          cargo: string | null
+          categoria: string | null
+          contacto: string | null
+          contrato: string | null
+          created_at: string
+          cv_file_name: string | null
+          departamento: string | null
+          diploma_file_name: string | null
+          email: string | null
+          endereco: string | null
+          especialidade: string | null
+          faculdade: string | null
+          foto_data_url: string | null
+          genero: string | null
+          grau: string | null
+          id: string
+          instituicao_formacao: string | null
+          modulo_kortex: string | null
+          municipio: string | null
+          nascimento: string | null
+          owner_user_id: string
+          prefixo: string | null
+          primeiro_nome: string
+          provincia: string | null
+          ultimo_nome: string
+          updated_at: string
+        }
+        Insert: {
+          anos_experiencia?: string | null
+          bilhete?: string | null
+          bilhete_file_name?: string | null
+          cargo?: string | null
+          categoria?: string | null
+          contacto?: string | null
+          contrato?: string | null
+          created_at?: string
+          cv_file_name?: string | null
+          departamento?: string | null
+          diploma_file_name?: string | null
+          email?: string | null
+          endereco?: string | null
+          especialidade?: string | null
+          faculdade?: string | null
+          foto_data_url?: string | null
+          genero?: string | null
+          grau?: string | null
+          id?: string
+          instituicao_formacao?: string | null
+          modulo_kortex?: string | null
+          municipio?: string | null
+          nascimento?: string | null
+          owner_user_id: string
+          prefixo?: string | null
+          primeiro_nome: string
+          provincia?: string | null
+          ultimo_nome: string
+          updated_at?: string
+        }
+        Update: {
+          anos_experiencia?: string | null
+          bilhete?: string | null
+          bilhete_file_name?: string | null
+          cargo?: string | null
+          categoria?: string | null
+          contacto?: string | null
+          contrato?: string | null
+          created_at?: string
+          cv_file_name?: string | null
+          departamento?: string | null
+          diploma_file_name?: string | null
+          email?: string | null
+          endereco?: string | null
+          especialidade?: string | null
+          faculdade?: string | null
+          foto_data_url?: string | null
+          genero?: string | null
+          grau?: string | null
+          id?: string
+          instituicao_formacao?: string | null
+          modulo_kortex?: string | null
+          municipio?: string | null
+          nascimento?: string | null
+          owner_user_id?: string
+          prefixo?: string | null
+          primeiro_nome?: string
+          provincia?: string | null
+          ultimo_nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       edificios: {
         Row: {
           created_at: string
@@ -814,6 +910,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      staff: {
+        Row: {
+          contacto: string | null
+          created_at: string
+          departamento: string | null
+          email: string | null
+          funcao: string | null
+          id: string
+          modulo_kortex: string | null
+          owner_user_id: string
+          prefixo: string | null
+          primeiro_nome: string
+          ultimo_nome: string
+          updated_at: string
+        }
+        Insert: {
+          contacto?: string | null
+          created_at?: string
+          departamento?: string | null
+          email?: string | null
+          funcao?: string | null
+          id?: string
+          modulo_kortex?: string | null
+          owner_user_id: string
+          prefixo?: string | null
+          primeiro_nome: string
+          ultimo_nome: string
+          updated_at?: string
+        }
+        Update: {
+          contacto?: string | null
+          created_at?: string
+          departamento?: string | null
+          email?: string | null
+          funcao?: string | null
+          id?: string
+          modulo_kortex?: string | null
+          owner_user_id?: string
+          prefixo?: string | null
+          primeiro_nome?: string
+          ultimo_nome?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
