@@ -119,6 +119,22 @@ export default function AdminPerfil() {
     pushProfile(user?.email, instituicao);
   }, [instituicao, PROFILE_KEY, user?.email]);
 
+  // Hydrate Nome Legal / NIF from the real database
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data } = await supabase.rpc("get_institution_fiscal");
+        const row = Array.isArray(data) ? data[0] : data;
+        if (!row) return;
+        setInstituicao((prev) => ({
+          ...prev,
+          nomeLegal: row.nome_legal ?? prev.nomeLegal,
+          nif: row.nif ?? prev.nif,
+        }));
+      } catch { /* ignore */ }
+    })();
+  }, [user?.email]);
+
   const emailValid = /^[^\s@]+@[^\s@]+\.com$/i.test((instituicao.email || "").trim());
   const locked = !editing;
 
