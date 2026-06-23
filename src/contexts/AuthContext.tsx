@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { User, UserRole, detectRole, currentStudent, currentProfessor, currentCoordenadorCurso, currentDecano, currentReitor, currentSecretaria, currentFinancas, currentGap, currentInscricoes, currentAcademica2, currentAdmin } from "@/data/mockData";
+import { syncDocentesFromDb, syncStaffFromDb } from "@/lib/peopleStorage";
 
 interface LoginOptions {
   sourceEmail?: string;
@@ -48,6 +49,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return null;
     }
   });
+
+  // Refresh institutional people cache from real DB whenever a user is active.
+  useEffect(() => {
+    if (!user) return;
+    syncDocentesFromDb().catch(() => {});
+    syncStaffFromDb().catch(() => {});
+  }, [user?.email]);
 
   const persist = (u: User | null) => {
     setUser(u);
