@@ -10,7 +10,7 @@ import {
 import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar,
   GraduationCap, FileText, Building2, IdCard, Loader2, Award, Eye, Download,
-  Wallet, Receipt, CircleDollarSign,
+  Wallet, Receipt, CircleDollarSign, CheckCircle2, Clock, AlertCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -316,6 +316,124 @@ export default function AdminDiscenteProfile() {
                   <InfoRow label="Prazo" value="—" icon={<Calendar className="w-4 h-4 text-primary" />} />
                   <InfoRow label="Data de matriculação" value={dataMatricula} icon={<Calendar className="w-4 h-4 text-primary" />} />
                 </SectionCard>
+
+                {(() => {
+                  // Ano lectivo: Setembro → Junho (10 meses)
+                  const MESES = ["Set", "Out", "Nov", "Dez", "Jan", "Fev", "Mar", "Abr", "Mai", "Jun"];
+                  const now = new Date();
+                  const month = now.getMonth(); // 0-based
+                  // Ano lectivo arranca em Setembro (mes 8). Meses decorridos:
+                  const elapsed = month >= 8 ? month - 8 + 1 : month + 4 + 1;
+                  const monthsPaid = isBolseiro ? MESES.length : Math.max(0, Math.min(MESES.length, elapsed - 1));
+                  const totalMeses = MESES.length;
+                  const pct = Math.round((monthsPaid / totalMeses) * 100);
+                  const valorPago = isBolseiro ? 0 : valorMensal * monthsPaid;
+                  const valorTotalAno = valorMensal * totalMeses;
+                  const valorRestante = Math.max(0, valorTotalAno - valorPago);
+
+                  return (
+                    <Card className="overflow-hidden">
+                      <div className="p-4 border-b bg-muted/30 flex items-center justify-between gap-3">
+                        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                          <CircleDollarSign className="w-4 h-4 text-primary" /> Progresso de Pagamento — Ano Lectivo
+                        </h3>
+                        <Badge variant="outline" className={cn("text-[10px] px-2 py-0.5",
+                          isBolseiro ? "bg-amber-50 text-amber-700 border-amber-200" :
+                          pct >= 100 ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                          "bg-blue-50 text-blue-700 border-blue-200")}>
+                          {isBolseiro ? "Bolseiro · isento" : `${monthsPaid} de ${totalMeses} mensalidades`}
+                        </Badge>
+                      </div>
+                      <div className="p-5 space-y-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground">Pago: <span className="font-semibold text-foreground tabular-nums">{fmtAOA(valorPago)}</span></span>
+                            <span className="text-muted-foreground">Total ano: <span className="font-semibold text-foreground tabular-nums">{fmtAOA(valorTotalAno)}</span></span>
+                          </div>
+                          <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
+                            <div className={cn("h-full transition-all", isBolseiro ? "bg-amber-400" : "bg-emerald-500")} style={{ width: `${isBolseiro ? 100 : pct}%` }} />
+                          </div>
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="font-semibold tabular-nums text-foreground">{isBolseiro ? 100 : pct}%</span>
+                            <span className="text-muted-foreground">Em falta: <span className="font-semibold text-foreground tabular-nums">{fmtAOA(isBolseiro ? 0 : valorRestante)}</span></span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-5 sm:grid-cols-10 gap-1.5 pt-1">
+                          {MESES.map((m, i) => {
+                            const paid = isBolseiro || i < monthsPaid;
+                            const current = !isBolseiro && i === monthsPaid;
+                            return (
+                              <div key={m} className={cn(
+                                "rounded-md border text-center py-1.5 text-[10px] font-semibold",
+                                paid ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                                current ? "bg-blue-50 text-blue-700 border-blue-200" :
+                                "bg-muted/40 text-muted-foreground border-border"
+                              )} title={m}>
+                                {m}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })()}
+
+                {(() => {
+                  const MESES_FULL = ["Setembro", "Outubro", "Novembro", "Dezembro", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho"];
+                  const now = new Date();
+                  const month = now.getMonth();
+                  const elapsed = month >= 8 ? month - 8 + 1 : month + 4 + 1;
+                  const monthsPaid = isBolseiro ? MESES_FULL.length : Math.max(0, Math.min(MESES_FULL.length, elapsed - 1));
+                  const refYear = month >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+
+                  const history = MESES_FULL.map((nome, i) => {
+                    const ano = i <= 3 ? refYear : refYear + 1; // Set-Dez do ano refYear, resto do seguinte
+                    const paid = isBolseiro || i < monthsPaid;
+                    const current = !isBolseiro && i === monthsPaid;
+                    const status: "pago" | "pendente" | "futuro" | "bolseiro" =
+                      isBolseiro ? "bolseiro" : paid ? "pago" : current ? "pendente" : "futuro";
+                    return { nome, ano, status };
+                  });
+
+                  return (
+                    <Card className="overflow-hidden">
+                      <div className="p-4 border-b bg-muted/30">
+                        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                          <Receipt className="w-4 h-4 text-primary" /> Histórico de Pagamentos
+                        </h3>
+                      </div>
+                      <div className="divide-y divide-border">
+                        {history.map((h) => {
+                          const meta =
+                            h.status === "pago" ? { label: "Pago", cls: "bg-emerald-50 text-emerald-700 border-emerald-200", Icon: CheckCircle2 } :
+                            h.status === "pendente" ? { label: "Pendente", cls: "bg-amber-50 text-amber-700 border-amber-200", Icon: Clock } :
+                            h.status === "bolseiro" ? { label: "Isento", cls: "bg-amber-50 text-amber-700 border-amber-200", Icon: Award } :
+                            { label: "Futuro", cls: "bg-muted text-muted-foreground border-border", Icon: AlertCircle };
+                          const Icon = meta.Icon;
+                          const valor = h.status === "bolseiro" ? "Isento" : fmtAOA(valorMensal);
+                          return (
+                            <div key={`${h.nome}-${h.ano}`} className="flex items-center justify-between px-5 py-3 gap-3">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                                  <Calendar className="w-4 h-4 text-primary" />
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="text-sm font-semibold text-foreground truncate">{h.nome} {h.ano}</p>
+                                  <p className="text-[11px] text-muted-foreground tabular-nums">{valor}</p>
+                                </div>
+                              </div>
+                              <Badge variant="outline" className={cn("text-[10px] gap-1 px-2 py-0.5", meta.cls)}>
+                                <Icon className="w-3 h-3" /> {meta.label}
+                              </Badge>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </Card>
+                  );
+                })()}
               </>
             );
           })()}
