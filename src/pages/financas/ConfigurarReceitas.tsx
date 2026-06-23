@@ -378,7 +378,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
           <div className="min-w-[1100px] divide-y">
             <div className="grid gap-3 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10" style={{ gridTemplateColumns: COLS }}>
               <div>Faculdade · Curso</div>
-              <div>Propina líquida mensal</div>
+              <div>Propina mensal</div>
               <div>Regime</div>
               <div>Meses</div>
               <div className="text-right">Propina mensal c/ IVA incl.</div>
