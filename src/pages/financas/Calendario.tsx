@@ -932,7 +932,7 @@ export default function FinancasCalendario() {
 
 
       {/* ── Event detail ── */}
-      <EventDetailDialog event={detailEvent} onClose={() => setDetailEvent(null)} onDelete={handleDelete} />
+      <EventDetailDialog event={detailEvent} onClose={() => setDetailEvent(null)} onDelete={handleDelete} canDelete={!!detailEvent && userEvents.some(e => e.id === detailEvent.id)} />
 
       {/* ── Request detail ── */}
       <RequestDetailDialog request={detailRequest} onClose={() => setDetailRequest(null)} onRespond={respondRequest}
@@ -1064,11 +1064,11 @@ function EventRow({ ev, onOpen, compact = false, onParticipants }: { ev: AgendaE
 }
 
 /* ── Event detail dialog (per category) ── */
-function EventDetailDialog({ event, onClose, onDelete }: { event: AgendaEvent | null; onClose: () => void; onDelete: (id: string) => void }) {
+function EventDetailDialog({ event, onClose, onDelete, canDelete }: { event: AgendaEvent | null; onClose: () => void; onDelete: (id: string) => void; canDelete?: boolean }) {
   if (!event) return null;
   const m = TYPE_META[event.type];
   const Icon = m.icon;
-  const isUser = event.id.startsWith("u-");
+  const isUser = canDelete ?? event.id.startsWith("u-");
 
   return (
     <Dialog open={!!event} onOpenChange={(o) => !o && onClose()}>
