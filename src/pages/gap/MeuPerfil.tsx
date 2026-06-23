@@ -31,9 +31,8 @@ const PROVINCIAS_MUNICIPIOS: Record<string, string[]> = {
   "Zaire": ["Mbanza Kongo", "Soyo", "N'zeto"],
 };
 
-const MODULO = "GAP";
-
-export default function GapMeuPerfil() {
+export default function GapMeuPerfil({ modulo = "GAP" }: { modulo?: string } = {}) {
+  const MODULO = modulo;
   const fileInputPhoto = useRef<HTMLInputElement>(null);
   const fileInputCv = useRef<HTMLInputElement>(null);
   const fileInputId = useRef<HTMLInputElement>(null);

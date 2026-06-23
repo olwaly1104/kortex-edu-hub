@@ -142,6 +142,7 @@ import FinancasOrcamentos from "./pages/financas/Orcamentos";
 import FinancasSolicitacoes from "./pages/financas/Solicitacoes";
 import FinancasSolicitacaoDetail from "./pages/financas/SolicitacaoDetail";
 import FinancasPessoalFinancas from "./pages/financas/PessoalFinancas";
+import FinancasMeuPerfil from "./pages/financas/MeuPerfil";
 import FinancasCalendario from "./pages/financas/Calendario";
 import FinancasDiscentes from "./pages/financas/Discentes";
 
@@ -471,7 +472,7 @@ function AppRoutes() {
         <Route path="/financas/email" element={<StudentEmail />} />
         <Route path="/financas/contactos" element={<StudentContacts />} />
         <Route path="/financas/pessoal/financas" element={<FinancasPessoalFinancas />} />
-        <Route path="/financas/perfil" element={<StudentProfile />} />
+        <Route path="/financas/perfil" element={<FinancasMeuPerfil />} />
         {/* GAP — Gabinete de Apoio Psicopedagógico */}
         <Route path="/gap" element={<GapInicio />} />
         <Route path="/gap/dashboard" element={<GapDashboard />} />

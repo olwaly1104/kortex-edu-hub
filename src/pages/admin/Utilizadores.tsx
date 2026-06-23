@@ -259,8 +259,8 @@ export default function AdminUtilizadores() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Adicionar utilizador</DialogTitle>
-            <DialogDescription>Cria uma conta real ligada à cloud. O módulo escolhido define o painel a que o utilizador acede.</DialogDescription>
+            <DialogTitle>Adicionar utilizador · Conta simplificada</DialogTitle>
+            <DialogDescription>Criamos uma conta mínima com apenas primeiro nome, último nome e módulo. O próprio utilizador completa o restante perfil (telefone, BI, morada, CV, documento) ao entrar pela primeira vez.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAdd} className="space-y-4">
             <div className="space-y-2">
