@@ -453,25 +453,30 @@ export default function Despesas() {
 
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium">Estado inicial</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(["pendente", "aprovada", "rejeitada"] as const).map(s => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => setField("status", s)}
-                      className={cn(
-                        "h-9 rounded-md border text-xs font-medium capitalize transition-colors",
-                        form.status === s
-                          ? s === "aprovada" ? "bg-accent/15 border-accent text-accent"
-                          : s === "rejeitada" ? "bg-destructive/10 border-destructive text-destructive"
-                          : "bg-amber-50 border-amber-300 text-amber-700"
-                          : "bg-background border-input text-muted-foreground hover:border-primary hover:text-primary"
-                      )}
-                    >
-                      {statusLabels[s]}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {cfgEstados.map(es => {
+                    const active = form.status === es.nome;
+                    return (
+                      <button
+                        key={es.id}
+                        type="button"
+                        onClick={() => setField("status", es.nome)}
+                        title={es.descricao || es.nome}
+                        className={cn(
+                          "h-9 rounded-md border text-xs font-medium transition-colors px-2",
+                          active
+                            ? es.cor
+                            : "bg-background border-input text-muted-foreground hover:border-primary hover:text-primary",
+                        )}
+                      >
+                        {es.nome}
+                      </button>
+                    );
+                  })}
                 </div>
+                {form.status && estadoDescricao[form.status.toLowerCase()] && (
+                  <p className="text-[10px] text-muted-foreground">{estadoDescricao[form.status.toLowerCase()]}</p>
+                )}
               </div>
 
               <div className="space-y-1.5">
