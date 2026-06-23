@@ -131,7 +131,7 @@ export default function AdminPerfil() {
     setSnapshot(null);
     setEditing(false);
   };
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!instituicao.nomeOficial.trim()) {
       toast.error("Nome oficial é obrigatório");
       return;
@@ -142,6 +142,17 @@ export default function AdminPerfil() {
     }
     try { localStorage.setItem(PROFILE_KEY, JSON.stringify(instituicao)); } catch { /* ignore */ }
     pushProfile(user?.email, instituicao);
+    // Persist fiscal identifiers (Nome Legal & NIF) into the real database
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      const uid = auth?.user?.id;
+      if (uid) {
+        await supabase
+          .from("profiles")
+          .update({ nome_legal: instituicao.nomeLegal || null, nif: instituicao.nif || null })
+          .eq("id", uid);
+      }
+    } catch { /* ignore */ }
     setSnapshot(null);
     setEditing(false);
     toast.success("Dados da instituição atualizados");
