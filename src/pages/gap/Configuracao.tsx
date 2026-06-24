@@ -259,7 +259,7 @@ export default function GapConfiguracao() {
       const agendadas = cdEtapas.filter(e => e.agenda);
       const byKey = new Map(prev.map(s => [s.etapaKey, s]));
       return agendadas.map(e => byKey.get(e.key) || {
-        etapaKey: e.key, mode: "single" as const, datas: [], hora: "09:00",
+        etapaKey: e.key, mode: "dia" as const, datas: [], hora: "09:00",
         local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30,
       });
     });
