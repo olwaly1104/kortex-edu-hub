@@ -113,7 +113,7 @@ export default function OnboardingEspacos() {
     const edif = filtroEdif !== "all" ? filtroEdif : edificios[0].id;
     const id = uuid();
     setEspacos((prev) => [...prev, { id, edificioId: edif, nome: "", tipo, piso: "0", capacidade: tipo === "Gabinete" ? 4 : 30 }]);
-    setEditEsp((p) => ({ ...p, [id]: true }));
+    toggleEdit(tipo, true);
   };
   const updateEspaco = (id: string, patch: Partial<Espaco>) =>
     setEspacos((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
