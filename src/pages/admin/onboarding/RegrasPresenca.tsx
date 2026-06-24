@@ -48,7 +48,7 @@ export default function OnboardingRegrasPresenca() {
   const [novoNome, setNovoNome] = useState("");
   const [novoValor, setNovoValor] = useState<number>(0);
   const [novoTipo, setNovoTipo] = useState<AplicaA>("Ambos");
-  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [cardEdit, setCardEdit] = useState(false);
 
   useEffect(() => {
     try { localStorage.setItem(MULTAS_KEY, JSON.stringify(multas)); } catch { /* */ }
