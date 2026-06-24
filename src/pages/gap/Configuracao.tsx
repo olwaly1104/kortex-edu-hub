@@ -251,12 +251,12 @@ export default function GapConfiguracao() {
     { key: "aprovado", label: "Aprovado", color: "bg-green-50 text-green-700 border-green-200" },
     { key: "agendado", label: "Agendado", color: "bg-blue-50 text-blue-700 border-blue-200" },
     { key: "remarcado", label: "Remarcado", color: "bg-amber-50 text-amber-700 border-amber-200" },
-    { key: "falta", label: "Falta", color: "bg-red-50 text-red-700 border-red-200" },
+    
     { key: "reprovado", label: "Reprovado", color: "bg-red-50 text-red-700 border-red-200" },
   ]);
   const [cdEtapas, setCdEtapas] = useState<CdEtapa[]>([
     { key: "submissao", label: "Submissão da candidatura", agenda: false, obrigatoria: true, estadosPossiveis: ["completo"] },
-    { key: "entrevista", label: "Entrevista", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado", "falta"] },
+    { key: "entrevista", label: "Entrevista", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado"] },
     { key: "curso_preparatorio", label: "Curso Preparatório", agenda: true, obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
     { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
@@ -894,18 +894,18 @@ export default function GapConfiguracao() {
                 <Settings2 className="w-4 h-4 text-muted-foreground" />
                 <h2 className="text-sm font-semibold text-foreground">Parâmetros gerais</h2>
               </div>
-              <CardEditToggle id="cd-params" />
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Apenas leitura</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Início das candidaturas</label>
-                <Input type="date" value={cdPeriodoInicio} disabled={!isCardEditing("cd-params")} onChange={e => setCdPeriodoInicio(e.target.value)} />
-                <p className="text-[10px] text-muted-foreground mt-1">Data a partir da qual abre a submissão</p>
+                <Input type="date" value={cdPeriodoInicio} disabled readOnly />
+                <p className="text-[10px] text-muted-foreground mt-1">Definido em Académica · apenas leitura</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Fim das candidaturas</label>
-                <Input type="date" value={cdPeriodoFim} disabled={!isCardEditing("cd-params")} onChange={e => setCdPeriodoFim(e.target.value)} />
-                <p className="text-[10px] text-muted-foreground mt-1">Data limite para submissão</p>
+                <Input type="date" value={cdPeriodoFim} disabled readOnly />
+                <p className="text-[10px] text-muted-foreground mt-1">Definido em Académica · apenas leitura</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nota mínima de aprovação</label>
@@ -914,15 +914,16 @@ export default function GapConfiguracao() {
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Taxa de candidatura (Kz)</label>
-                <Input type="number" min={0} step={500} value={cdTaxa} disabled readOnly onChange={e => setCdTaxa(e.target.value === "" ? "" : Number(e.target.value))} />
+                <Input type="number" min={0} step={500} value={cdTaxa} disabled readOnly />
                 <p className="text-[10px] text-muted-foreground mt-1">Definido em Finanças · apenas leitura</p>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Máx. opções de curso</label>
-                <Input type="number" min={1} max={10} value={cdMaxOpcoes} disabled={!isCardEditing("cd-params")} onChange={e => setCdMaxOpcoes(e.target.value === "" ? "" : Number(e.target.value))} />
-                <p className="text-[10px] text-muted-foreground mt-1">N.º de cursos que o candidato pode escolher</p>
+                <Input type="number" min={1} max={10} value={cdMaxOpcoes} disabled readOnly />
+                <p className="text-[10px] text-muted-foreground mt-1">Definido em Académica · apenas leitura</p>
               </div>
             </div>
+
           </Card>
 
 
