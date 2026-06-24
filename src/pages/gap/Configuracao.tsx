@@ -754,16 +754,32 @@ export default function GapConfiguracao() {
                         <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Duração (min)</label>
                         <Input type="number" min={10} step={5} value={newAgMotDur} onChange={e => setNewAgMotDur(Number(e.target.value) || 30)} />
                       </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
+                        <Select value={newAgMotResp} onValueChange={setNewAgMotResp}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>{STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Local</label>
+                        <Select value={newAgMotLocal} onValueChange={setNewAgMotLocal}>
+                          <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
+                          <SelectContent>{agSalas.map(s => <SelectItem key={s.key} value={s.label}>{s.label}</SelectItem>)}</SelectContent>
+                        </Select>
+                      </div>
                     </div>
                     <DialogFooter className="gap-2 sm:gap-2">
                       <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
                       <Button onClick={() => {
                         if (!newAgMotLabel.trim() || !newAgMotCat) return;
-                        setAgMotivos(prev => [...prev, { key: slugify(newAgMotLabel), label: newAgMotLabel.trim(), categoria: newAgMotCat, duracao: newAgMotDur }]);
+                        setAgMotivos(prev => [...prev, { key: slugify(newAgMotLabel), label: newAgMotLabel.trim(), categoria: newAgMotCat, duracao: newAgMotDur, responsavel: newAgMotResp, local: newAgMotLocal }]);
                         setNewAgMotLabel(""); setNewAgMotCat(""); setNewAgMotDur(45);
+                        setNewAgMotResp(STAFF_OPTIONS[0]); setNewAgMotLocal(agSalas[0]?.label || "");
                         setAgMotOpen(false);
                         toast({ title: "Motivo adicionado" });
                       }} disabled={!newAgMotLabel.trim() || !newAgMotCat}>Adicionar</Button>
+
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
