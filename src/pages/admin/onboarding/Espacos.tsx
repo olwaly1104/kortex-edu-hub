@@ -92,7 +92,7 @@ export default function OnboardingEspacos() {
       .single();
     if (error || !data) { toast.error(error?.message || "Falha ao criar edifício."); return; }
     setEdificios((prev) => [...prev, { id: data.id, sigla: data.sigla, nome: data.nome, pisos: data.pisos, salas: data.salas }]);
-    setEditEdif((p) => ({ ...p, [data.id]: true }));
+    toggleEdit("edificios", true);
   };
   const updateEdif = async (id: string, patch: Partial<Edificio>) => {
     setEdificios((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
