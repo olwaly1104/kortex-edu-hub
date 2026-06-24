@@ -118,11 +118,7 @@ export default function OnboardingSalarios() {
                   ? <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[10px] gap-1"><CheckCircle2 className="w-3 h-3" /> Confirmado</Badge>
                   : <Badge variant="outline" className="text-[10px]">Pendente</Badge>}
               </div>
-              <RowLockControls
-                editing={isEdit}
-                onEdit={() => setEditing(p => ({ ...p, [r.id]: true }))}
-                onConfirm={() => { confirmar(r.id); setEditing(p => ({ ...p, [r.id]: false })); }}
-              />
+              <RowLockControls editing={isEdit} />
             </div>
             );
           })}
