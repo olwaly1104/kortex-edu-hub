@@ -40,6 +40,8 @@ export default function OnboardingEspacos() {
   const [espacos, setEspacos] = useState<Espaco[]>([]);
   const [tab, setTab] = useState<"edificios" | Tipo>("edificios");
   const [filtroEdif, setFiltroEdif] = useState<string>("all");
+  const [editEdif, setEditEdif] = useState<Record<string, boolean>>({});
+  const [editEsp, setEditEsp] = useState<Record<string, boolean>>({});
 
   const addEdificio = () => {
     const n = edificios.length + 1;
