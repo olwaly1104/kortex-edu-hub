@@ -15,6 +15,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
+import { loadDocentes, syncDocentesFromDb, type DocenteRow } from "@/lib/peopleStorage";
 import { ChevronDown } from "lucide-react";
 import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil, CalendarClock, GraduationCap, MapPin, Clock, FileCheck2, Unlock, Check, Users } from "lucide-react";
 import AdminDiscentes from "@/pages/admin/Discentes";
