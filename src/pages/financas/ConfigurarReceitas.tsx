@@ -527,17 +527,10 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                                   </label>
                                 );
                               })}
-                                  <label key={pc.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
-                                    <Checkbox checked={checked} onCheckedChange={() => toggleMes(m)} />
-                                    <span>{pc.nome}</span>
-                                  </label>
-                                );
-                              })}
                             </PopoverContent>
                           </Popover>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(bruto * (1 + taxa))} Kz</div>
-                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(brutaAnual)} Kz</div>
-                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidaAnual)} Kz</div>
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(propinaAnual)} Kz</div>
                           <div className="flex justify-end gap-1">
                             <Button size="sm" variant={dirty ? "default" : "outline"}
                               disabled={!dirty || updatePropina.isPending}
