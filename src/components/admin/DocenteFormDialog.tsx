@@ -128,23 +128,21 @@ export function DocenteFormDialog({
               </Field>
             </div>
 
-            <Field label="Módulo Kortex *">
-              <Select value={draft.moduloKortex || "professor"} onValueChange={(v) => setF("moduloKortex", v)}>
-                <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {MODULOS_DOCENTE.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </Field>
-
-            <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between gap-2">
-              <div className="min-w-0">
-                <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Email Kortex (auto)</div>
-                <div className="font-mono text-[12px] text-foreground/90 truncate">
-                  {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Field label="Módulo Kortex *">
+                <Select value={draft.moduloKortex || "professor"} onValueChange={(v) => setF("moduloKortex", v)}>
+                  <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {MODULOS_DOCENTE.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Email Kortex (auto)">
+                <div className="h-9 px-2.5 flex items-center justify-between gap-2 text-[12px] bg-muted/30 border border-input rounded-md">
+                  <span className="truncate font-mono text-foreground/90">{previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}</span>
+                  <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
                 </div>
-              </div>
-              <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
+              </Field>
             </div>
 
             <div className="flex items-center justify-between gap-2">
