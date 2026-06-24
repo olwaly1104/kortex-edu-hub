@@ -83,11 +83,11 @@ export default function OnboardingEspacos() {
 
   /* ───────── Edifícios (DB) ───────── */
   const addEdificio = async () => {
-    if (!user?.id) { toast.error("Sessão inválida."); return; }
+    if (!authUid) { toast.error("Sessão inválida."); return; }
     const n = edificios.length + 1;
     const { data, error } = await supabase
       .from("edificios")
-      .insert({ owner_user_id: user.id, sigla: `E${n}`, nome: `Novo Edifício ${n}`, pisos: 2, salas: 0 })
+      .insert({ owner_user_id: authUid, sigla: `E${n}`, nome: `Novo Edifício ${n}`, pisos: 2, salas: 0 })
       .select("id, sigla, nome, pisos, salas")
       .single();
     if (error || !data) { toast.error(error?.message || "Falha ao criar edifício."); return; }
