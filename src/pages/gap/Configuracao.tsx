@@ -1108,32 +1108,6 @@ export default function GapConfiguracao() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Sala Dialog */}
-      <Dialog open={!!editAgSala} onOpenChange={(o) => !o && setEditAgSala(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>Editar sala</DialogTitle></DialogHeader>
-          {editAgSala && (
-            <div className="space-y-3 py-2">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nome da sala</label>
-                <Input value={editAgSala.label} onChange={e => setEditAgSala({ ...editAgSala, label: e.target.value })} />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Lotação</label>
-                <Input type="number" min={1} value={editAgSala.lotacao} onChange={e => setEditAgSala({ ...editAgSala, lotacao: Number(e.target.value) || 1 })} />
-              </div>
-            </div>
-          )}
-          <DialogFooter className="gap-2 sm:gap-2">
-            <Button variant="outline" onClick={() => setEditAgSala(null)}>Cancelar</Button>
-            <Button onClick={() => {
-              if (!editAgSala || !editAgSala.label.trim()) return;
-              setAgSalas(prev => prev.map(s => s.key === editAgSala.key ? editAgSala : s));
-              toast({ title: "Sala atualizada" }); setEditAgSala(null);
-            }} disabled={!editAgSala?.label.trim()}>Guardar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Edit Motivo Dialog */}
       <Dialog open={!!editMotivo} onOpenChange={(o) => !o && setEditMotivo(null)}>
