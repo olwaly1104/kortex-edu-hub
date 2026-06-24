@@ -401,12 +401,6 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{prazosCfg.length} prazo{prazosCfg.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[140px_160px_1fr_44px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
-            <div>Nº de meses</div>
-            <div>Período de pagamento</div>
-            <div>Pré-visualização</div>
-            <div className="text-right">Ação</div>
-          </div>
           <div className="grid grid-cols-[140px_1fr_44px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Nº de meses</div>
             <div>Período de pagamento</div>
