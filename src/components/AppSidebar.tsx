@@ -22,7 +22,7 @@ const studentSections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/student" },
     { label: "Calendário", icon: Calendar, path: "/student/calendar" },
     { label: "Anúncios", icon: Megaphone, path: "/student/announcements", badge: 4 },
-    { label: "Solicitações", icon: HelpCircle, path: "/student/solicitacoes" },
+    { label: "Minhas Solicitações", icon: HelpCircle, path: "/student/solicitacoes" },
   ]},
   { title: "Académico", items: [
     { label: "As Minhas Cadeiras", icon: BookOpen, path: "/student/disciplines" },
