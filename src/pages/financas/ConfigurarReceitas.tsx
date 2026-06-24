@@ -133,9 +133,9 @@ const nomeForImposto = (regime: string, taxa: number) =>
 
 const LOCKED_IMPOSTOS: Imposto[] = [
   { id: "isento", nome: "Isento — 0%", taxa: 0, regime: "Isento", locked: true },
-  { id: "iva-geral", nome: nomeForImposto("Geral", 0.14), taxa: 0.14, regime: "Geral" },
-  { id: "iva-intermedio", nome: nomeForImposto("Intermédio", 0.07), taxa: 0.07, regime: "Intermédio" },
-  { id: "iva-reduzido", nome: nomeForImposto("Reduzido", 0.05), taxa: 0.05, regime: "Reduzido" },
+  { id: "iva-reduzido", nome: nomeForImposto("Reduzido", 0.05), taxa: 0.05, regime: "Reduzido", locked: true },
+  { id: "iva-intermedio", nome: nomeForImposto("Intermédio", 0.07), taxa: 0.07, regime: "Intermédio", locked: true },
+  { id: "iva-geral", nome: nomeForImposto("Geral", 0.14), taxa: 0.14, regime: "Geral", locked: true },
 ];
 
 const COR_OPCOES_GLOBAL = [
