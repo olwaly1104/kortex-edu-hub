@@ -220,7 +220,7 @@ export default function AdminDiscentes() {
 
   const cursoFacSigla = useMemo(() => {
     const facMap = new Map<string, string>();
-    faculdades.forEach((f: any) => facMap.set(f.id, f.sigla || f.codigo || f.nome || "—"));
+    faculdades.forEach((f: any) => facMap.set(f.id, f.nome || f.name || f.designacao || f.sigla || f.codigo || "—"));
     const m = new Map<string, string>();
     cursos.forEach((c: any) => m.set(c.id, facMap.get(c.faculdade_id) || "—"));
     return m;
@@ -481,7 +481,7 @@ export default function AdminDiscentes() {
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold w-fit ${r.regime === "bolseiro" ? "bg-amber-50 text-amber-700" : "bg-muted text-muted-foreground"}`}>
                     {r.regime === "bolseiro" ? "Bolseiro" : "Normal"}
                   </span>
-                  <span className="text-xs font-mono font-semibold">{r.faculdadeSigla}</span>
+                  <span className="text-xs truncate">{r.faculdadeSigla}</span>
                   <span className="text-xs font-mono truncate">{r.curso}</span>
                   <span className="text-xs tabular-nums">{r.ano}º</span>
                   <span className="text-xs tabular-nums text-muted-foreground">{docsDone}/{docsTotal}</span>
