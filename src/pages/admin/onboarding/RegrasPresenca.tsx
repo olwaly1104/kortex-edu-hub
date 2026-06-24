@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Clock, Percent, AlertTriangle, Scale, Plus, Trash2, ShieldCheck, Coins, Save } from "lucide-react";
+import { Clock, Percent, AlertTriangle, Scale, Plus, ShieldCheck, Coins, Save } from "lucide-react";
+import { RowLockControls } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
