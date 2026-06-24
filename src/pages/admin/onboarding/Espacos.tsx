@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { OnboardingStepBanner } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,69 +8,132 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Building2, Plus, DoorOpen, Briefcase, Wrench } from "lucide-react";
 import { RowLockControls, CardLockBadge } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
-type Tipo = "Sala" | "Gabinete" | "Instalação";
+/**
+ * Onboarding › Edifícios e Espaços
+ *
+ * Edifícios são persistidos na tabela `edificios` (mesma fonte usada por
+ * Geopontos, Finanças › Calendário, etc.). Espaços (salas, gabinetes,
+ * instalações) ainda vivem em localStorage até existir uma tabela dedicada,
+ * mas o id usa UUID válido para evitar erros downstream.
+ */
 
+type EspacoTipo = "Sala" | "Gabinete" | "Instalação";
 type Espaco = {
   id: string;
   edificioId: string;
   nome: string;
-  tipo: Tipo;
+  tipo: EspacoTipo;
   piso: string;
   capacidade: number;
   ocupante?: string;
 };
+type Edificio = { id: string; sigla: string; nome: string; pisos: number; salas: number };
 
-type Edificio = {
-  id: string;
-  nome: string;
-  codigo: string;
-  pisos: number;
-  endereco?: string;
-};
+const ESPACOS_KEY = "upra:onboarding:espacos";
+const TIPO_LABEL: Record<EspacoTipo, string> = { Sala: "salas", Gabinete: "gabinetes", "Instalação": "instalações" };
 
-const TIPOS: { value: Tipo; icon: typeof DoorOpen; label: string }[] = [
+function loadLS<T>(key: string): T[] {
+  try { const r = localStorage.getItem(key); return r ? JSON.parse(r) : []; } catch { return []; }
+}
+const uuid = () =>
+  (crypto as any)?.randomUUID?.() ??
+  "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === "x" ? r : (r & 0x3) | 0x8).toString(16);
+  });
+
+const TIPOS: { value: EspacoTipo; icon: typeof DoorOpen; label: string }[] = [
   { value: "Sala", icon: DoorOpen, label: "Salas" },
   { value: "Gabinete", icon: Briefcase, label: "Gabinetes" },
   { value: "Instalação", icon: Wrench, label: "Instalações" },
 ];
 
+const confirmDelete = () =>
+  window.confirm("Tem a certeza que pretende eliminar este registo? Esta acção é irreversível.");
+
 export default function OnboardingEspacos() {
+  const { user } = useAuth();
   const [edificios, setEdificios] = useState<Edificio[]>([]);
-  const [espacos, setEspacos] = useState<Espaco[]>([]);
-  const [tab, setTab] = useState<"edificios" | Tipo>("edificios");
+  const [espacos, setEspacos] = useState<Espaco[]>(() => loadLS<Espaco>(ESPACOS_KEY));
+  const [tab, setTab] = useState<"edificios" | EspacoTipo>("edificios");
   const [filtroEdif, setFiltroEdif] = useState<string>("all");
   const [editEdif, setEditEdif] = useState<Record<string, boolean>>({});
   const [editEsp, setEditEsp] = useState<Record<string, boolean>>({});
 
-  const addEdificio = () => {
+  useEffect(() => {
+    try { localStorage.setItem(ESPACOS_KEY, JSON.stringify(espacos)); } catch { /* ignore */ }
+  }, [espacos]);
+
+  // Load from DB
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await supabase
+        .from("edificios")
+        .select("id, sigla, nome, pisos, salas")
+        .order("created_at");
+      if (error) { toast.error(error.message); return; }
+      if (data) setEdificios(data.map((e: any) => ({ id: e.id, sigla: e.sigla || "", nome: e.nome || "", pisos: e.pisos ?? 1, salas: e.salas ?? 0 })));
+    })();
+  }, [user?.id]);
+
+  /* ───────── Edifícios (DB) ───────── */
+  const addEdificio = async () => {
+    if (!user?.id) { toast.error("Sessão inválida."); return; }
     const n = edificios.length + 1;
-    setEdificios(prev => [...prev, { id: `e${Date.now()}`, nome: `Novo Edifício ${n}`, codigo: `E${n}`, pisos: 2, endereco: "" }]);
+    const { data, error } = await supabase
+      .from("edificios")
+      .insert({ owner_user_id: user.id, sigla: `E${n}`, nome: `Novo Edifício ${n}`, pisos: 2, salas: 0 })
+      .select("id, sigla, nome, pisos, salas")
+      .single();
+    if (error || !data) { toast.error(error?.message || "Falha ao criar edifício."); return; }
+    setEdificios((prev) => [...prev, { id: data.id, sigla: data.sigla, nome: data.nome, pisos: data.pisos, salas: data.salas }]);
+    setEditEdif((p) => ({ ...p, [data.id]: true }));
   };
-  const updateEdif = (id: string, patch: Partial<Edificio>) =>
-    setEdificios(prev => prev.map(e => e.id === id ? { ...e, ...patch } : e));
-  const removeEdif = (id: string) => {
-    if (espacos.some(s => s.edificioId === id)) { toast.error("Remova primeiro os espaços deste edifício"); return; }
-    setEdificios(prev => prev.filter(e => e.id !== id));
+  const updateEdif = async (id: string, patch: Partial<Edificio>) => {
+    setEdificios((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+    const { error } = await supabase.from("edificios").update(patch).eq("id", id);
+    if (error) toast.error(error.message);
+  };
+  const removeEdif = async (id: string) => {
+    if (!confirmDelete()) return;
+    if (espacos.some((s) => s.edificioId === id)) { toast.error("Remova primeiro os espaços deste edifício."); return; }
+    const { error } = await supabase.from("edificios").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    setEdificios((prev) => prev.filter((e) => e.id !== id));
   };
 
-  const addEspaco = (tipo: Tipo) => {
-    if (edificios.length === 0) { toast.error("Crie primeiro um edifício"); return; }
+  /* ───────── Espaços (local) ───────── */
+  const addEspaco = (tipo: EspacoTipo) => {
+    if (edificios.length === 0) { toast.error("Crie primeiro um edifício."); return; }
     const edif = filtroEdif !== "all" ? filtroEdif : edificios[0].id;
-    setEspacos(prev => [...prev, { id: `s${Date.now()}`, edificioId: edif, nome: "", tipo, piso: "0", capacidade: tipo === "Gabinete" ? 4 : 30 }]);
+    const id = uuid();
+    setEspacos((prev) => [...prev, { id, edificioId: edif, nome: "", tipo, piso: "0", capacidade: tipo === "Gabinete" ? 4 : 30 }]);
+    setEditEsp((p) => ({ ...p, [id]: true }));
   };
   const updateEspaco = (id: string, patch: Partial<Espaco>) =>
-    setEspacos(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s));
-  const removeEspaco = (id: string) => setEspacos(prev => prev.filter(s => s.id !== id));
+    setEspacos((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
+  const removeEspaco = (id: string) => {
+    if (!confirmDelete()) return;
+    setEspacos((prev) => prev.filter((s) => s.id !== id));
+  };
 
   const countsByTipo = useMemo(() => {
     const m: Record<string, number> = { Sala: 0, Gabinete: 0, "Instalação": 0 };
-    espacos.forEach(s => { m[s.tipo] = (m[s.tipo] || 0) + 1; });
+    espacos.forEach((s) => { m[s.tipo] = (m[s.tipo] || 0) + 1; });
     return m;
   }, [espacos]);
 
-  const renderEspacosTable = (tipo: Tipo, placeholderNome: string) => {
-    const filtrados = espacos.filter(s => s.tipo === tipo && (filtroEdif === "all" || s.edificioId === filtroEdif));
+  /* ───────── Render ───────── */
+  const renderEspacosTable = (tipo: EspacoTipo, placeholderNome: string) => {
+    const filtrados = espacos.filter((s) => s.tipo === tipo && (filtroEdif === "all" || s.edificioId === filtroEdif));
+    const isGabinete = tipo === "Gabinete";
+    // Hide capacidade column for Gabinete; otherwise show it.
+    const cols = isGabinete
+      ? "grid-cols-[1.2fr_1fr_70px_1.2fr_220px]"
+      : "grid-cols-[1.2fr_1fr_70px_90px_1.2fr_220px]";
     return (
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -78,37 +141,44 @@ export default function OnboardingEspacos() {
             <SelectTrigger className="h-8 text-xs w-[220px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os edifícios</SelectItem>
-              {edificios.map(e => <SelectItem key={e.id} value={e.id}>{e.nome}</SelectItem>)}
+              {edificios.map((e) => <SelectItem key={e.id} value={e.id}>{e.nome}</SelectItem>)}
             </SelectContent>
           </Select>
-          <span className="text-[11px] text-muted-foreground ml-auto">{filtrados.length} {tipo === "Instalação" ? "instalações" : tipo === "Gabinete" ? "gabinetes" : "salas"}</span>
+          <span className="text-[11px] text-muted-foreground ml-auto">{filtrados.length} {TIPO_LABEL[tipo]}</span>
         </div>
         <Card className="overflow-hidden relative">
           <CardLockBadge />
 
-          <div className="grid grid-cols-[1.2fr_1fr_70px_90px_1.2fr_220px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-            <span>Edifício</span><span>Nome / Nº</span><span>Piso</span><span>Capacidade</span><span>{tipo === "Gabinete" ? "Ocupante" : "Notas"}</span><span className="text-right">Ações</span>
+          <div className={`grid ${cols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
+            <span>Edifício</span>
+            <span>Nome / Nº</span>
+            <span>Piso</span>
+            {!isGabinete && <span>Capacidade</span>}
+            <span>{isGabinete ? "Ocupante" : "Notas"}</span>
+            <span className="text-right">Ações</span>
           </div>
           <div className="divide-y">
-            {filtrados.map(s => {
+            {filtrados.map((s) => {
               const isEdit = !!editEsp[s.id];
               return (
-              <div key={s.id} className="grid grid-cols-[1.2fr_1fr_70px_90px_1.2fr_220px] gap-2 px-4 py-2 items-center">
-                <Select value={s.edificioId} onValueChange={v => updateEspaco(s.id, { edificioId: v })} disabled={!isEdit}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>{edificios.map(e => <SelectItem key={e.id} value={e.id}>{e.nome}</SelectItem>)}</SelectContent>
-                </Select>
-                <Input value={s.nome} disabled={!isEdit} onChange={ev => updateEspaco(s.id, { nome: ev.target.value })} className="h-8 text-xs" placeholder={placeholderNome} />
-                <Input value={s.piso} disabled={!isEdit} onChange={ev => updateEspaco(s.id, { piso: ev.target.value })} className="h-8 text-xs" />
-                <Input type="number" min={0} disabled={!isEdit} value={s.capacidade} onChange={ev => updateEspaco(s.id, { capacidade: Number(ev.target.value) })} className="h-8 text-xs" />
-                <Input value={s.ocupante || ""} disabled={!isEdit} onChange={ev => updateEspaco(s.id, { ocupante: ev.target.value })} className="h-8 text-xs" placeholder={tipo === "Gabinete" ? "Pessoa ocupante" : "—"} />
-                <RowLockControls
-                  editing={isEdit}
-                  onEdit={() => setEditEsp(p => ({ ...p, [s.id]: true }))}
-                  onConfirm={() => setEditEsp(p => ({ ...p, [s.id]: false }))}
-                  onDelete={() => removeEspaco(s.id)}
-                />
-              </div>
+                <div key={s.id} className={`grid ${cols} gap-2 px-4 py-2 items-center`}>
+                  <Select value={s.edificioId} onValueChange={(v) => updateEspaco(s.id, { edificioId: v })} disabled={!isEdit}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>{edificios.map((e) => <SelectItem key={e.id} value={e.id}>{e.nome}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <Input value={s.nome} disabled={!isEdit} onChange={(ev) => updateEspaco(s.id, { nome: ev.target.value })} className="h-8 text-xs" placeholder={placeholderNome} />
+                  <Input value={s.piso} disabled={!isEdit} onChange={(ev) => updateEspaco(s.id, { piso: ev.target.value })} className="h-8 text-xs" />
+                  {!isGabinete && (
+                    <Input type="number" min={0} disabled={!isEdit} value={s.capacidade} onChange={(ev) => updateEspaco(s.id, { capacidade: Number(ev.target.value) })} className="h-8 text-xs" />
+                  )}
+                  <Input value={s.ocupante || ""} disabled={!isEdit} onChange={(ev) => updateEspaco(s.id, { ocupante: ev.target.value })} className="h-8 text-xs" placeholder={isGabinete ? "Pessoa ocupante" : "—"} />
+                  <RowLockControls
+                    editing={isEdit}
+                    onEdit={() => setEditEsp((p) => ({ ...p, [s.id]: true }))}
+                    onConfirm={() => setEditEsp((p) => ({ ...p, [s.id]: false }))}
+                    onDelete={() => removeEspaco(s.id)}
+                  />
+                </div>
               );
             })}
             {filtrados.length === 0 && (
@@ -147,7 +217,7 @@ export default function OnboardingEspacos() {
             <p className="text-base font-semibold leading-none">{edificios.length}</p>
           </div>
         </Card>
-        {TIPOS.map(t => {
+        {TIPOS.map((t) => {
           const I = t.icon;
           return (
             <Card key={t.value} className="p-3 flex items-center gap-2">
@@ -173,25 +243,25 @@ export default function OnboardingEspacos() {
           <Card className="overflow-hidden relative">
             <CardLockBadge />
 
-            <div className="grid grid-cols-[1.3fr_90px_80px_1.3fr_220px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-              <span>Nome</span><span>Código</span><span>Pisos</span><span>Endereço</span><span className="text-right">Ações</span>
+            <div className="grid grid-cols-[90px_1.3fr_70px_70px_220px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+              <span>Sigla</span><span>Nome</span><span>Pisos</span><span>Salas</span><span className="text-right">Ações</span>
             </div>
             <div className="divide-y">
-              {edificios.map(e => {
+              {edificios.map((e) => {
                 const isEdit = !!editEdif[e.id];
                 return (
-                <div key={e.id} className="grid grid-cols-[1.3fr_90px_80px_1.3fr_220px] gap-2 px-4 py-2 items-center">
-                  <Input value={e.nome} disabled={!isEdit} onChange={ev => updateEdif(e.id, { nome: ev.target.value })} className="h-8 text-xs" />
-                  <Input value={e.codigo} disabled={!isEdit} onChange={ev => updateEdif(e.id, { codigo: ev.target.value.toUpperCase() })} className="h-8 text-xs" />
-                  <Input type="number" min={1} max={20} disabled={!isEdit} value={e.pisos} onChange={ev => updateEdif(e.id, { pisos: Number(ev.target.value) })} className="h-8 text-xs" />
-                  <Input value={e.endereco || ""} disabled={!isEdit} onChange={ev => updateEdif(e.id, { endereco: ev.target.value })} className="h-8 text-xs" placeholder="Campus, rua…" />
-                  <RowLockControls
-                    editing={isEdit}
-                    onEdit={() => setEditEdif(p => ({ ...p, [e.id]: true }))}
-                    onConfirm={() => setEditEdif(p => ({ ...p, [e.id]: false }))}
-                    onDelete={() => removeEdif(e.id)}
-                  />
-                </div>
+                  <div key={e.id} className="grid grid-cols-[90px_1.3fr_70px_70px_220px] gap-2 px-4 py-2 items-center">
+                    <Input value={e.sigla} disabled={!isEdit} onChange={(ev) => updateEdif(e.id, { sigla: ev.target.value.toUpperCase() })} className="h-8 text-xs font-mono" />
+                    <Input value={e.nome} disabled={!isEdit} onChange={(ev) => updateEdif(e.id, { nome: ev.target.value })} className="h-8 text-xs" />
+                    <Input type="number" min={1} max={20} disabled={!isEdit} value={e.pisos} onChange={(ev) => updateEdif(e.id, { pisos: Number(ev.target.value) })} className="h-8 text-xs" />
+                    <Input type="number" min={0} disabled={!isEdit} value={e.salas} onChange={(ev) => updateEdif(e.id, { salas: Number(ev.target.value) })} className="h-8 text-xs" />
+                    <RowLockControls
+                      editing={isEdit}
+                      onEdit={() => setEditEdif((p) => ({ ...p, [e.id]: true }))}
+                      onConfirm={() => setEditEdif((p) => ({ ...p, [e.id]: false }))}
+                      onDelete={() => removeEdif(e.id)}
+                    />
+                  </div>
                 );
               })}
               {edificios.length === 0 && (
