@@ -122,7 +122,7 @@ const reitorSections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/reitor" },
     { label: "Calendário", icon: Calendar, path: "/reitor/calendario" },
     { label: "Anúncios", icon: Megaphone, path: "/reitor/anuncios", badge: 4 },
-    { label: "Solicitações", icon: CheckSquare, path: "/reitor/solicitacoes" },
+    { label: "Minhas Solicitações", icon: CheckSquare, path: "/reitor/solicitacoes" },
   ]},
   { title: "Académico", items: [
     { label: "Faculdades", icon: Building2, path: "/reitor/faculdades" },
