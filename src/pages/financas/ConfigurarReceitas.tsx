@@ -417,7 +417,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
               <div>Faculdade · Curso</div>
               <div>Propina mensal</div>
               <div>Regime</div>
-              <div>Meses</div>
+              <div>Prazos</div>
               <div className="text-right">Propina mensal c/ IVA incl.</div>
               <div className="text-right">Propina bruta total</div>
               <div className="text-right">Propina líquida total</div>
