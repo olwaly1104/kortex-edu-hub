@@ -80,7 +80,7 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
 
   const remove = (id: string) => persist(rows.filter((r) => r.id !== id));
 
-  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [cardEdit, setCardEdit] = useState(false);
   const gridCols = "grid-cols-[40px_1.2fr_1.3fr_0.9fr_0.9fr_0.8fr_0.8fr_220px]";
 
   return (
