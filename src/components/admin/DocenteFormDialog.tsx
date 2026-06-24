@@ -297,8 +297,8 @@ export function DocenteFormDialog({
 
             <section>
               <SectionTitle index={6} icon={<GraduationCap className="w-3.5 h-3.5" />} title="Módulo Kortex" hint="Acesso atribuído ao docente" />
-              <div className="flex items-end gap-2">
-                <div className="flex-1">
+              <div className="flex items-end justify-between gap-6 flex-wrap">
+                <div className="w-56">
                   <Field label="Módulo Kortex *">
                     <Select value={draft.moduloKortex || "professor"} onValueChange={(v) => setF("moduloKortex", v)}>
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
@@ -308,10 +308,12 @@ export function DocenteFormDialog({
                     </Select>
                   </Field>
                 </div>
-                <Button variant="outline" className="h-8" onClick={() => onOpenChange(false)}>Cancelar</Button>
-                <Button onClick={submit} disabled={!requiredOk} className="h-8 gap-1.5">
-                  <Plus className="w-3.5 h-3.5" /> Adicionar Docente
-                </Button>
+                <div className="flex items-end gap-2 ml-auto">
+                  <Button variant="outline" className="h-8" onClick={() => onOpenChange(false)}>Cancelar</Button>
+                  <Button onClick={submit} disabled={!requiredOk} className="h-8 gap-1.5">
+                    <Plus className="w-3.5 h-3.5" /> Adicionar Docente
+                  </Button>
+                </div>
               </div>
             </section>
           </div>
