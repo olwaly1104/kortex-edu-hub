@@ -394,19 +394,19 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{prazosCfg.length} prazo{prazosCfg.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[1.4fr_140px_140px_44px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
-            <div>Designação</div>
+          <div className="grid grid-cols-[140px_1fr_44px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Nº de meses</div>
             <div>Pré-visualização</div>
             <div className="text-right">Ação</div>
           </div>
           {prazosCfg.map((pr) => (
-            <div key={pr.id} className="grid grid-cols-[1.4fr_140px_140px_44px] gap-3 px-5 py-2.5 items-center text-sm">
-              <Input className="h-9" placeholder="Ex: 10 meses" value={pr.nome}
-                onChange={(e) => setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, nome: e.target.value } : x))} />
+            <div key={pr.id} className="grid grid-cols-[140px_1fr_44px] gap-3 px-5 py-2.5 items-center text-sm">
               <Input type="number" min={1} max={24} className="h-9 tabular-nums" value={pr.meses}
-                onChange={(e) => setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, meses: Math.max(1, Number(e.target.value) || 1) } : x))} />
-              <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-md border border-border bg-muted/30 text-xs font-medium tabular-nums">{pr.nome || `${pr.meses} meses`}</span>
+                onChange={(e) => {
+                  const meses = Math.max(1, Number(e.target.value) || 1);
+                  setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, meses, nome: String(meses) } : x));
+                }} />
+              <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-md border border-border bg-muted/30 text-xs font-medium tabular-nums w-fit">{pr.meses}</span>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                   onClick={() => setPrazosCfg((s) => s.filter((x) => x.id !== pr.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
