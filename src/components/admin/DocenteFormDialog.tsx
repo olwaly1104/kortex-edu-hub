@@ -215,10 +215,30 @@ export function DocenteFormDialog({
             </section>
 
             <section>
-              <SectionTitle index={2} icon={<Mail className="w-3.5 h-3.5" />} title="Contacto" hint="Telefone pessoal" />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                <Field label="Telemóvel">
+              <SectionTitle index={2} icon={<Mail className="w-3.5 h-3.5" />} title="Contacto Institucional" hint="Telefone e email institucionais" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <Field label="Telemóvel institucional">
                   <Input className="h-8 text-xs" value={draft.contacto} onChange={(e) => setF("contacto", e.target.value)} placeholder="+244 9XX XXX XXX" />
+                </Field>
+                <Field label="Email institucional (auto)">
+                  <div className="h-8 px-2.5 flex items-center justify-between gap-2 text-[11px] bg-muted/40 border border-input rounded-md">
+                    <span className="truncate font-mono text-foreground/80">{previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}</span>
+                    <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
+                  </div>
+                </Field>
+              </div>
+              <div className="grid grid-cols-[110px_1fr_1fr] gap-2 mt-2">
+                <Field label="Prefixo">
+                  <Select value={draft.prefixo} onValueChange={(v) => setF("prefixo", v)}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>{prefixosPool.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Primeiro nome">
+                  <Input className="h-8 text-xs" value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} placeholder="Ana" />
+                </Field>
+                <Field label="Último nome">
+                  <Input className="h-8 text-xs" value={draft.ultimoNome} onChange={(e) => setF("ultimoNome", e.target.value)} placeholder="Silva" />
                 </Field>
               </div>
             </section>
