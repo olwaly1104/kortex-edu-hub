@@ -48,7 +48,7 @@ const professorSections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/professor" },
     { label: "Calendário", icon: Calendar, path: "/professor/calendar" },
     { label: "Anúncios", icon: Megaphone, path: "/professor/announcements", badge: 4 },
-    { label: "Solicitações", icon: CheckSquare, path: "/professor/solicitacoes" },
+    { label: "Minhas Solicitações", icon: CheckSquare, path: "/professor/solicitacoes" },
   ]},
   { title: "Académico", items: [
     { label: "As Minhas Turmas", icon: BookOpen, path: "/professor/disciplines" },
