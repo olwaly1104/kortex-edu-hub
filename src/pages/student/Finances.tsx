@@ -14,6 +14,8 @@ import {
   ChevronUp, ChevronDown, ArrowUpDown, Filter, GraduationCap, Receipt,
   ShieldCheck, BookOpen, MoreHorizontal, Building2, HandCoins, Scale,
 } from "lucide-react";
+import { TabelaInfracoesButton } from "@/components/shared/TabelaInfracoesButton";
+
 import { cn } from "@/lib/utils";
 import {
   payments as allPayments, tuitionPayments, annualBreakdown, totalAnnual,
@@ -297,10 +299,8 @@ export default function Finances() {
                 <FileText className="w-4 h-4 shrink-0" />
                 <span className="truncate">Tabela de Emolumentos (PDF)</span>
               </Button>
-              <Button variant="outline" size="sm" className="w-full h-9 justify-start gap-2 text-xs" onClick={() => toast({ title: "PDF gerado", description: "Tabela de multas a descarregar..." })}>
-                <FileText className="w-4 h-4 shrink-0" />
-                <span className="truncate">Tabela de Multas (PDF)</span>
-              </Button>
+              <TabelaInfracoesButton fullWidth className="h-9 gap-2 text-xs" icon={<FileText className="w-4 h-4 shrink-0" />} />
+
               <Button variant="outline" size="sm" className="w-full h-9 justify-start gap-2 text-xs" onClick={() => toast({ title: "PDF gerado", description: "Regras & condições a descarregar..." })}>
                 <FileText className="w-4 h-4 shrink-0" />
                 <span className="truncate">Regras & Condições (PDF)</span>

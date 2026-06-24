@@ -38,6 +38,9 @@ const newId = () => Math.random().toString(36).slice(2, 10);
 const fmt = (v: number) => v.toLocaleString("pt-AO", { maximumFractionDigits: 0 });
 const readJSON = <T,>(k: string, fb: T): T => { try { const r = localStorage.getItem(k); return r ? (JSON.parse(r) as T) : fb; } catch { return fb; } };
 const writeJSON = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* */ } };
+const confirmDelete = (label = "este registo") =>
+  window.confirm(`Tem a certeza que pretende eliminar ${label}? Esta acção é irreversível.`);
+
 
 const TAB_DEFS: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: "receitas", label: "Receitas", icon: TrendingUp },
@@ -436,7 +439,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                 </div>
                 <div className="flex justify-end">
                   <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                    onClick={() => setPrazosCfg((s) => s.filter((x) => x.id !== pr.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+                    onClick={() => { if (!confirmDelete("este prazo")) return; setPrazosCfg((s) => s.filter((x) => x.id !== pr.id)); }}><Trash2 className="w-3.5 h-3.5" /></Button>
                 </div>
               </div>
             );
@@ -653,9 +656,11 @@ function DespesasSection({ email }: { email?: string | null }) {
   };
 
   const removeCategoria = async (id: string) => {
+    if (!confirmDelete("esta categoria")) return;
     setCategorias((s) => s.filter((x) => x.id !== id));
     await supabase.from("fin_despesa_categorias").delete().eq("id", id);
   };
+
 
   const confirmCreateCategoria = async () => {
     const nome = draftNome.trim();
@@ -833,7 +838,7 @@ function DespesasSection({ email }: { email?: string | null }) {
               <span className={`inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium ${es.cor}`}>{es.nome || "—"}</span>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  onClick={() => setEstados((s) => s.filter((x) => x.id !== es.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+                  onClick={() => { if (!confirmDelete("este estado")) return; setEstados((s) => s.filter((x) => x.id !== es.id)); }}><Trash2 className="w-3.5 h-3.5" /></Button>
               </div>
             </div>
           ))}
@@ -880,7 +885,7 @@ function DespesasSection({ email }: { email?: string | null }) {
                 onChange={(e) => setResponsaveis((s) => s.map((x) => x.id === r.id ? { ...x, limite: Number(e.target.value) || 0 } : x))} />
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  onClick={() => setResponsaveis((s) => s.filter((x) => x.id !== r.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+                  onClick={() => { if (!confirmDelete("este responsável")) return; setResponsaveis((s) => s.filter((x) => x.id !== r.id)); }}><Trash2 className="w-3.5 h-3.5" /></Button>
               </div>
             </div>
           ))}
@@ -953,8 +958,11 @@ function SalariosSection({ email }: { email?: string | null }) {
   const addImposto = () =>
     setImpostos((arr) => [...arr, { id: `imp-${Date.now()}`, nome: "Novo imposto", percentagem: 0 }]);
 
-  const removeImposto = (id: string) =>
+  const removeImposto = (id: string) => {
+    if (!confirmDelete("este imposto")) return;
     setImpostos((arr) => arr.filter((i) => i.id !== id));
+  };
+
 
   const toggles: { key: typeof tab; label: string; icon: React.ComponentType<{ className?: string }>; count: number }[] = [
     { key: "docentes", label: "Docentes", icon: GraduationCap, count: docentes.length },
@@ -1155,7 +1163,7 @@ function MultasSection({ email }: { email?: string | null }) {
   }]);
   const updMulta = (id: string, patch: Partial<RhMulta>) =>
     setCurrentList((s) => s.map((m) => m.id === id ? { ...m, ...patch } : m));
-  const delMulta = (id: string) => setCurrentList((s) => s.filter((m) => m.id !== id));
+  const delMulta = (id: string) => { if (!confirmDelete("esta multa")) return; setCurrentList((s) => s.filter((m) => m.id !== id)); };
 
 
   return (
@@ -1241,7 +1249,7 @@ function MultasSection({ email }: { email?: string | null }) {
                     <span className="text-[10px] text-muted-foreground px-1.5 py-0.5 rounded bg-muted border" title="Estado fixo do sistema">Fixo</span>
                   ) : (
                     <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                      onClick={() => setFinEstados((s) => s.filter((x) => x.id !== es.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+                      onClick={() => { if (!confirmDelete("este estado")) return; setFinEstados((s) => s.filter((x) => x.id !== es.id)); }}><Trash2 className="w-3.5 h-3.5" /></Button>
                   )}
                 </div>
               </div>
@@ -1318,7 +1326,8 @@ function EmolumentosBlock({ email, impostos }: { email?: string | null; impostos
 
   const addCat = () => setCats((s) => [...s, { nome: "", cor: COR_OPCOES_GLOBAL[6].value }]);
   const updCat = (idx: number, patch: Partial<CatItem>) => setCats((s) => s.map((c, i) => i === idx ? { ...c, ...patch } : c));
-  const delCat = (idx: number) => setCats((s) => s.filter((_, i) => i !== idx));
+  const delCat = (idx: number) => { if (!confirmDelete("esta categoria")) return; setCats((s) => s.filter((_, i) => i !== idx)); };
+
 
   return (
     <div className="space-y-6">
@@ -1392,7 +1401,7 @@ function ServicosAcademicosBlock({ email, impostos }: { email?: string | null; i
 
   const addCat = () => setCats((s) => [...s, { nome: "", cor: COR_OPCOES_GLOBAL[6].value }]);
   const updCat = (idx: number, patch: Partial<CatItem>) => setCats((s) => s.map((c, i) => i === idx ? { ...c, ...patch } : c));
-  const delCat = (idx: number) => setCats((s) => s.filter((_, i) => i !== idx));
+  const delCat = (idx: number) => { if (!confirmDelete("esta categoria")) return; setCats((s) => s.filter((_, i) => i !== idx)); };
 
   return (
     <div className="space-y-6">
@@ -1488,7 +1497,7 @@ function LineItemsBlock({
     ...(withTax ? { impostoId: impostos[0]?.id ?? "" } : {}),
   }]);
   const update = (id: string, patch: Partial<LineItem>) => setRows((r) => r.map((x) => x.id === id ? { ...x, ...patch } : x));
-  const remove = (id: string) => setRows((r) => r.filter((x) => x.id !== id));
+  const remove = (id: string) => { if (!confirmDelete("esta linha")) return; setRows((r) => r.filter((x) => x.id !== id)); };
 
   const total = rows.reduce((s, r) => s + (r.valor || 0), 0);
 
