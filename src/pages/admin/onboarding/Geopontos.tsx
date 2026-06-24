@@ -40,6 +40,8 @@ export default function OnboardingGeopontos() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [espacos, setEspacos] = useState<Espaco[]>(() => loadLS<Espaco>(ESPACOS_KEY));
   const [filtroEdif, setFiltroEdif] = useState<string>("all");
+  const [editEdif, setEditEdif] = useState<Record<string, boolean>>({});
+  const [editEsp, setEditEsp] = useState<Record<string, boolean>>({});
 
   useEffect(() => { try { localStorage.setItem(ESPACOS_KEY, JSON.stringify(espacos)); } catch {} }, [espacos]);
 
