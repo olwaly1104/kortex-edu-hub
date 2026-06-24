@@ -111,14 +111,12 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
               <span className="text-xs truncate">{r.departamento || <span className="text-muted-foreground italic">—</span>}</span>
               <span className="text-xs">{r.grau || "—"}</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-primary/10 text-primary w-fit">{r.cargo}</span>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                onClick={(e) => { e.stopPropagation(); remove(r.id); }}
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
+              <RowLockControls
+                editing={!!editing[r.id]}
+                onEdit={() => setEditing((p) => ({ ...p, [r.id]: true }))}
+                onConfirm={() => setEditing((p) => ({ ...p, [r.id]: false }))}
+                onDelete={() => remove(r.id)}
+              />
             </div>
           ))}
           {rows.length === 0 && (
