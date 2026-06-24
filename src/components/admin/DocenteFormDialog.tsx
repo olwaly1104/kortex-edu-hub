@@ -185,11 +185,8 @@ export function DocenteFormDialog({
                   <input ref={fotoInput} type="file" accept="image/*" className="hidden" onChange={(e) => onFoto(e.target.files?.[0] || null)} />
                 </button>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-1">
-                  <Field label="Prefixo">
-                    <Select value={draft.prefixo} onValueChange={(v) => setF("prefixo", v)}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>{prefixosPool.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                    </Select>
+                  <Field label="Data de nascimento">
+                    <Input className="h-8 text-xs" type="date" value={draft.nascimento || ""} onChange={(e) => setF("nascimento", e.target.value)} />
                   </Field>
                   <Field label="Data de nascimento">
                     <Input className="h-8 text-xs" type="date" value={draft.nascimento || ""} onChange={(e) => setF("nascimento", e.target.value)} />
