@@ -26,8 +26,8 @@ import { useToast } from "@/hooks/use-toast";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
 
-type EstadoItem = { key: string; label: string; color: string };
-type CategoriaItem = { key: string; label: string; color: string };
+type EstadoItem = { key: string; label: string; color: string; descricao?: string };
+type CategoriaItem = { key: string; label: string; color: string; descricao?: string };
 type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number; multa: string };
 type MultaItem = { key: string; label: string; diasAposPrazo: number; valor: number; descricao: string };
 
