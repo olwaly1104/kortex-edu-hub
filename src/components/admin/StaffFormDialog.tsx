@@ -7,8 +7,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import {
   Briefcase, Plus, User, Mail, Camera, Upload, Check, X, FileText, IdCard, MapPin, Building2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { type StaffRow } from "@/lib/peopleStorage";
 import { supabase } from "@/integrations/supabase/client";
+
+const MODULOS_STAFF = [
+  { value: "academica", label: "Académica" },
+  { value: "financas", label: "Finanças" },
+  { value: "gap", label: "GAP" },
+  { value: "inscricoes", label: "Inscrições" },
+];
 
 const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Eng.", "Me."];
 const PROVINCIAS = [
