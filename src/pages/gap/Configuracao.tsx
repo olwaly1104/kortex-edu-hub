@@ -1159,16 +1159,30 @@ export default function GapConfiguracao() {
                           </td>
                           <td className="px-3 py-2.5">
                             {editing ? (
-                              <Select value={s.responsavel} onValueChange={v => updateSessao(s.etapaKey, { responsavel: v })}>
-                                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                                <SelectContent>{STAFF_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                              <Select value={s.responsavel || undefined} onValueChange={v => updateSessao(s.etapaKey, { responsavel: v })}>
+                                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecionar docente" /></SelectTrigger>
+                                <SelectContent>
+                                  {docentesList.length === 0
+                                    ? <div className="px-2 py-1.5 text-[11px] text-muted-foreground">Nenhum docente registado</div>
+                                    : docentesList.map(d => {
+                                        const name = `${d.prefixo ? d.prefixo + " " : ""}${d.primeiroNome} ${d.ultimoNome}`.trim();
+                                        return <SelectItem key={d.id} value={d.id}>{name}</SelectItem>;
+                                      })}
+                                </SelectContent>
                               </Select>
-                            ) : <span className="text-xs text-muted-foreground">{s.responsavel}</span>}
+                            ) : (
+                              <span className="text-xs text-muted-foreground">
+                                {(() => {
+                                  const d = docentesList.find(x => x.id === s.responsavel);
+                                  return d ? `${d.prefixo ? d.prefixo + " " : ""}${d.primeiroNome} ${d.ultimoNome}`.trim() : "—";
+                                })()}
+                              </span>
+                            )}
                           </td>
                           <td className="px-3 py-2.5 text-center">
                             {editing
-                              ? <Input type="number" min={1} className="h-8 text-xs text-center" value={s.capacidade} onChange={e => updateSessao(s.etapaKey, { capacidade: Number(e.target.value) || 1 })} />
-                              : <span className="text-xs tabular-nums">{s.capacidade}</span>}
+                              ? <Input type="number" min={1} className="h-8 text-xs text-center" value={s.capacidade} onChange={e => updateSessao(s.etapaKey, { capacidade: e.target.value === "" ? "" : (Number(e.target.value) || 1) })} placeholder="—" />
+                              : <span className="text-xs tabular-nums">{s.capacidade || "—"}</span>}
                           </td>
                         </tr>
                       );
