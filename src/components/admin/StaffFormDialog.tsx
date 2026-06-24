@@ -200,15 +200,16 @@ export function StaffFormDialog({
             <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
               <Field label="Departamento">
                 <Select value={draft.departamento} onValueChange={(v) => setF("departamento", v)}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>{DEPARTAMENTOS_POOL.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={departamentos.length ? "Selecionar" : "Sem departamentos"} /></SelectTrigger>
+                  <SelectContent>
+                    {departamentos.map((d) => (
+                      <SelectItem key={d.id} value={d.designacao}>{d.designacao}{d.sigla ? ` (${d.sigla})` : ""}</SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </Field>
               <Field label="Função">
-                <Select value={draft.funcao} onValueChange={(v) => setF("funcao", v)}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>{funcoesPool.map((f) => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
-                </Select>
+                <Input className="h-8 text-xs" value={draft.funcao} onChange={(e) => setF("funcao", e.target.value)} placeholder="Ex.: Assistente Administrativo" />
               </Field>
             </div>
           </section>
