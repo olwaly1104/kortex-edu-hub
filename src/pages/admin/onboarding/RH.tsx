@@ -90,7 +90,7 @@ function DepartamentosPanel() {
     if (error) { toast.error(error.message); setRows(prev); }
   };
 
-  const gridCols = "grid-cols-[200px_100px_1.4fr_1.4fr_64px]";
+  const gridCols = "grid-cols-[80px_120px_1.4fr_1.6fr_64px]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -104,29 +104,17 @@ function DepartamentosPanel() {
         </div>
       </div>
 
-
-
-
-
       <Card className="overflow-hidden">
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span>Pré-visualização</span><span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
+          <span></span><span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
         </div>
         <div className="divide-y">
           {rows.map((r) => {
-            const count = docentes.filter((d) => (d.departamento || "").trim().toLowerCase() === (r.designacao || "").trim().toLowerCase()).length;
+            const selected = people.find((p) => p.nome === r.responsavel);
             return (
             <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2 items-center`}>
-              <div className="flex items-center gap-2 min-w-0">
-                <div className="w-9 h-9 rounded-md flex items-center justify-center text-[10px] font-bold text-white shrink-0" style={{ background: r.cor || "#1B3A6B" }}>
-                  {(r.sigla || "—").slice(0, 4)}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[11px] font-semibold truncate">{r.designacao || "Sem designação"}</p>
-                  <p className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
-                    <Users className="w-2.5 h-2.5" /> {count} docente(s)
-                  </p>
-                </div>
+              <div className="w-12 h-9 rounded-md flex items-center justify-center text-[10px] font-bold text-white" style={{ background: r.cor || "#1B3A6B" }}>
+                {(r.sigla || "—").slice(0, 4)}
               </div>
               <Input
                 value={r.sigla}
@@ -143,18 +131,35 @@ function DepartamentosPanel() {
                 placeholder="Designação"
                 className="h-8 text-xs"
               />
-              <Select
-                value={r.responsavel || ""}
-                onValueChange={(v) => { const val = v === "__none__" ? null : v; upd(r.id, { responsavel: val }); persist(r.id, { responsavel: val }); }}
-              >
-                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecionar docente" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">— Sem responsável —</SelectItem>
-                  {docentes.map((d) => (
-                    <SelectItem key={d.id} value={d.nome}>{d.nome}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" className="h-8 text-xs justify-between font-normal">
+                    <span className="truncate">{r.responsavel || "Selecionar responsável"}</span>
+                    <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0 w-[280px]" align="start">
+                  <Command>
+                    <CommandInput placeholder="Procurar pessoa..." className="h-9" />
+                    <CommandList>
+                      <CommandEmpty>Sem resultados.</CommandEmpty>
+                      <CommandGroup>
+                        <CommandItem value="__none__" onSelect={() => { upd(r.id, { responsavel: null }); persist(r.id, { responsavel: null }); }}>
+                          <Check className={cn("mr-2 h-3 w-3", !r.responsavel ? "opacity-100" : "opacity-0")} />
+                          — Sem responsável —
+                        </CommandItem>
+                        {people.map((p) => (
+                          <CommandItem key={`${p.tipo}-${p.id}`} value={`${p.nome} ${p.tipo}`} onSelect={() => { upd(r.id, { responsavel: p.nome }); persist(r.id, { responsavel: p.nome }); }}>
+                            <Check className={cn("mr-2 h-3 w-3", selected?.id === p.id ? "opacity-100" : "opacity-0")} />
+                            <span className="flex-1 truncate">{p.nome}</span>
+                            <span className="text-[10px] text-muted-foreground ml-2">{p.tipo}</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                   <Trash2 className="w-3.5 h-3.5" />
