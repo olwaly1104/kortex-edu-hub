@@ -9,6 +9,7 @@ import { Building2, Plus, DoorOpen, Briefcase, Wrench } from "lucide-react";
 import { RowLockControls, CardLockBadge } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAuthUid } from "@/hooks/useAuthUid";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
