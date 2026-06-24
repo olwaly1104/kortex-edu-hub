@@ -190,8 +190,7 @@ export default function GapConfiguracao() {
 
   // ===== AGENDAMENTOS =====
   type AgCategoria = { key: string; label: string; color: string; descricao?: string };
-  type AgMotivo = { key: string; label: string; categoria: string; duracao: number; responsavel?: string; local?: string };
-  type AgSala = { key: string; label: string; lotacao: number };
+  type AgMotivo = { key: string; label: string; categoria: string };
 
   const [agCategorias, setAgCategorias] = useState<AgCategoria[]>([
     { key: "psicologico", label: "Psicológico", color: "bg-purple-100 text-purple-800 border-purple-200", descricao: "Sessões de apoio psicológico individual ou em grupo." },
@@ -203,17 +202,11 @@ export default function GapConfiguracao() {
     { key: "documentacao", label: "Documentação", color: "bg-slate-100 text-slate-700 border-slate-200", descricao: "Apoio na emissão e gestão de documentos." },
   ]);
   const [agMotivos, setAgMotivos] = useState<AgMotivo[]>([
-    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico", duracao: 50, responsavel: "Dra. Helena Cabral · GAP", local: "Gab. GAP 1" },
-    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico", duracao: 40, responsavel: "Dr. João Tavares · GAP", local: "Gab. GAP 2" },
-    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional", duracao: 60, responsavel: "Dra. Helena Cabral · GAP", local: "Gab. GAP 1" },
-    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional", duracao: 30, responsavel: "Dr. João Tavares · GAP", local: "Gab. GAP 2" },
-    { key: "mediacao", label: "Mediação de conflito", categoria: "Social", duracao: 60, responsavel: "Dra. Helena Cabral · GAP", local: "Sala de Reuniões GAP" },
-  ]);
-
-  const [agSalas, setAgSalas] = useState<AgSala[]>([
-    { key: "gap1", label: "Gab. GAP 1", lotacao: 4 },
-    { key: "gap2", label: "Gab. GAP 2", lotacao: 4 },
-    { key: "gap3", label: "Sala de Reuniões GAP", lotacao: 8 },
+    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico" },
+    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico" },
+    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional" },
+    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional" },
+    { key: "mediacao", label: "Mediação de conflito", categoria: "Social" },
   ]);
   const [agHoraInicio, setAgHoraInicio] = useState("08:00");
   const [agHoraFim, setAgHoraFim] = useState("17:00");
