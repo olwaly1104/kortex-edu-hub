@@ -323,7 +323,7 @@ export default function OnboardingEstudantes() {
         </div>
         <div className="divide-y">
           {rows.map(r => {
-            const isEdit = !!editing[r.id];
+            const isEdit = cardEdit;
             return (
             <div key={r.id} className="grid grid-cols-[1fr_1.4fr_80px_60px_70px_200px] gap-2 px-4 py-2 items-center text-xs">
               <span className="font-medium">{r.nome}</span>
