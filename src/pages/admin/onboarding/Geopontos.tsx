@@ -125,14 +125,14 @@ export default function OnboardingGeopontos() {
           <span className="text-[11px] text-muted-foreground ml-auto">{filtrados.length} {TIPO_LABEL[tipo]}</span>
         </div>
         <Card className="overflow-hidden relative">
-          <CardLockBadge />
+          <CardLockBadge editing={!!cardEdit[tipo]} onEdit={() => toggleEdit(tipo, true)} onConfirm={() => toggleEdit(tipo, false)} />
 
           <div className={`grid ${cols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
             <span>Edifício</span><span>Nome / Nº</span><span>Piso</span>{!isGab && <span>Capacidade</span>}<span>{isGab ? "Ocupante" : "Notas"}</span><span className="text-right">Ações</span>
           </div>
           <div className="divide-y">
             {filtrados.map(s => {
-              const isEdit = !!editEsp[s.id];
+              const isEdit = !!cardEdit[tipo];
               return (
               <div key={s.id} className={`grid ${cols} gap-2 px-4 py-2 items-center`}>
                 <Select value={s.edificioId} disabled={!isEdit} onValueChange={v => updEspaco(s.id, { edificioId: v })}>
@@ -145,12 +145,7 @@ export default function OnboardingGeopontos() {
                   <Input type="number" min={0} disabled={!isEdit} value={s.capacidade} onChange={ev => updEspaco(s.id, { capacidade: Number(ev.target.value) })} className="h-8 text-xs" />
                 )}
                 <Input value={s.notas || ""} disabled={!isEdit} onChange={ev => updEspaco(s.id, { notas: ev.target.value })} className="h-8 text-xs" placeholder={isGab ? "Pessoa ocupante" : "—"} />
-                <RowLockControls
-                  editing={isEdit}
-                  onEdit={() => setEditEsp(p => ({ ...p, [s.id]: true }))}
-                  onConfirm={() => setEditEsp(p => ({ ...p, [s.id]: false }))}
-                  onDelete={() => rmEspaco(s.id)}
-                />
+                <RowLockControls editing={isEdit} onDelete={() => rmEspaco(s.id)} />
               </div>
               );
             })}
