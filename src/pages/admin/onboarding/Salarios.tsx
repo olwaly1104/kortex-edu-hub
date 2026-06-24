@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Banknote, GraduationCap, Briefcase, CheckCircle2, Percent, Wallet, Save } from "lucide-react";
+import { Banknote, GraduationCap, Briefcase, CheckCircle2, Percent, Wallet } from "lucide-react";
+import { RowLockControls } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
 
 type Categoria = "docente" | "staff";
