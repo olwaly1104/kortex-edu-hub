@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Briefcase, Trash2, User, Plus } from "lucide-react";
+import { GraduationCap, Briefcase, User, Plus } from "lucide-react";
+import { RowLockControls } from "@/components/admin/RowLockControls";
 
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
