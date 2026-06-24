@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,10 +7,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import {
   Briefcase, Plus, User, Mail, Camera, Upload, Check, X, FileText, IdCard, MapPin, Building2,
 } from "lucide-react";
-import { DEPARTAMENTOS_POOL, type StaffRow } from "@/lib/peopleStorage";
+import { type StaffRow } from "@/lib/peopleStorage";
+import { supabase } from "@/integrations/supabase/client";
 
 const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Eng.", "Me."];
-const funcoesPool = ["Assistente", "Coordenador", "Técnico", "Auxiliar", "Diretor", "Analista", "Gestor"];
 const PROVINCIAS = [
   "Bengo","Benguela","Bié","Cabinda","Cuando Cubango","Cuanza Norte","Cuanza Sul","Cunene",
   "Huambo","Huíla","Luanda","Lunda Norte","Lunda Sul","Malanje","Moxico","Namibe","Uíge","Zaire",
@@ -48,7 +48,7 @@ type StaffDraft = StaffRow & {
 
 export const emptyStaff = (): StaffDraft => ({
   id: "", prefixo: "Sr.", primeiroNome: "", ultimoNome: "", email: "", contacto: "",
-  departamento: DEPARTAMENTOS_POOL[0], funcao: funcoesPool[0], moduloKortex: "academica",
+  departamento: "", funcao: "", moduloKortex: "academica",
   nascimento: "", genero: "M", bilhete: "", bilheteFileName: "", fotoDataUrl: "",
   provincia: "", municipio: "", endereco: "", cvFileName: "",
 });
@@ -61,9 +61,21 @@ export function StaffFormDialog({
   onSave: (row: StaffRow & { fotoDataUrl?: string }) => void;
 }) {
   const [draft, setDraft] = useState<StaffDraft>(emptyStaff());
+  const [departamentos, setDepartamentos] = useState<{ id: string; designacao: string; sigla: string }[]>([]);
   const fotoInput = useRef<HTMLInputElement>(null);
   const biInput = useRef<HTMLInputElement>(null);
   const cvInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    (async () => {
+      const { data, error } = await (supabase as any)
+        .from("departamentos")
+        .select("id, designacao, sigla")
+        .order("designacao", { ascending: true });
+      if (!error && data) setDepartamentos(data);
+    })();
+  }, [open]);
 
   const setF = <K extends keyof StaffDraft>(k: K, v: StaffDraft[K]) => setDraft((d) => ({ ...d, [k]: v }));
   const previewEmail = useMemo(() => buildStaffEmail(draft.primeiroNome, draft.ultimoNome), [draft.primeiroNome, draft.ultimoNome]);
@@ -188,15 +200,16 @@ export function StaffFormDialog({
             <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
               <Field label="Departamento">
                 <Select value={draft.departamento} onValueChange={(v) => setF("departamento", v)}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>{DEPARTAMENTOS_POOL.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                  <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={departamentos.length ? "Selecionar" : "Sem departamentos"} /></SelectTrigger>
+                  <SelectContent>
+                    {departamentos.map((d) => (
+                      <SelectItem key={d.id} value={d.designacao}>{d.designacao}{d.sigla ? ` (${d.sigla})` : ""}</SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </Field>
               <Field label="Função">
-                <Select value={draft.funcao} onValueChange={(v) => setF("funcao", v)}>
-                  <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                  <SelectContent>{funcoesPool.map((f) => <SelectItem key={f} value={f}>{f}</SelectItem>)}</SelectContent>
-                </Select>
+                <Input className="h-8 text-xs" value={draft.funcao} onChange={(e) => setF("funcao", e.target.value)} placeholder="Ex.: Assistente Administrativo" />
               </Field>
             </div>
           </section>
