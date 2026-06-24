@@ -40,9 +40,10 @@ function DepartamentosPanel() {
 
   const addDept = async () => {
     if (!user?.id) { toast.error("Sessão expirada."); return; }
+    const placeholderSigla = `D${(rows.length + 1).toString().padStart(2, "0")}`;
     const { data, error } = await (supabase as any)
       .from("departamentos")
-      .insert({ owner_user_id: user.id, sigla: "", designacao: "", responsavel: null, cor: "#1B3A6B" })
+      .insert({ owner_user_id: user.id, sigla: placeholderSigla, designacao: "Novo departamento", responsavel: null, cor: "#1B3A6B" })
       .select("id, sigla, designacao, responsavel, cor")
       .single();
     if (error) { toast.error(error.message); return; }
