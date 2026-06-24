@@ -60,7 +60,27 @@ export function DocenteFormDialog({
 
   const setF = <K extends keyof DocenteRow>(k: K, v: DocenteRow[K]) => setDraft((d) => ({ ...d, [k]: v }));
   const previewEmail = useMemo(() => buildDocenteEmail(draft.primeiroNome, draft.ultimoNome), [draft.primeiroNome, draft.ultimoNome]);
-  const requiredOk = !!draft.primeiroNome.trim() && !!draft.ultimoNome.trim();
+  const requiredOk =
+    !!draft.prefixo &&
+    !!draft.primeiroNome.trim() &&
+    !!draft.ultimoNome.trim() &&
+    !!draft.nascimento &&
+    !!draft.genero &&
+    !!draft.bilhete.trim() &&
+    !!draft.faculdade &&
+    !!draft.departamento &&
+    !!draft.categoria &&
+    !!draft.cargo &&
+    !!draft.contrato &&
+    !!draft.contacto.trim() &&
+    !!draft.provincia &&
+    !!(draft.municipio || "").trim() &&
+    !!(draft.endereco || "").trim() &&
+    !!draft.grau &&
+    !!draft.especialidade.trim() &&
+    !!(draft.instituicaoFormacao || "").trim() &&
+    !!String(draft.anosExperiencia ?? "").trim() &&
+    !!draft.moduloKortex;
 
   const onFoto = (f: File | null) => {
     if (!f) return;
