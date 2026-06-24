@@ -9,7 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Upload, UserPlus, Users, GraduationCap, CheckCircle2, Mail, Loader2 } from "lucide-react";
-import { RowLockControls } from "@/components/admin/RowLockControls";
+import { RowLockControls, CardLockBadge } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
 import {
   useCursos,
@@ -311,7 +311,9 @@ export default function OnboardingEstudantes() {
         </TabsContent>
       </Tabs>
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden relative">
+        <CardLockBadge />
+
         <div className="px-4 py-2.5 border-b flex items-center justify-between">
           <h3 className="text-sm font-semibold">Estudantes registados</h3>
           <span className="text-xs text-muted-foreground">{rows.length} {rows.length === 1 ? "estudante" : "estudantes"}</span>

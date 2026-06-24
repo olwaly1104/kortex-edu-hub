@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Banknote, GraduationCap, Briefcase, CheckCircle2, Percent, Wallet } from "lucide-react";
-import { RowLockControls } from "@/components/admin/RowLockControls";
+import { RowLockControls, CardLockBadge } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
 
 type Categoria = "docente" | "staff";
@@ -78,7 +78,9 @@ export default function OnboardingSalarios() {
         <Button onClick={confirmarTodos} className="gap-1.5"><CheckCircle2 className="w-4 h-4" /> Confirmar todos</Button>
       </div>
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden relative">
+        <CardLockBadge />
+
         <div className="grid grid-cols-[1.3fr_1fr_130px_85px_130px_100px_200px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
           <span>Nome</span>
           <span>Cargo</span>

@@ -4,7 +4,7 @@ import { markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner"
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { GraduationCap, Briefcase, User, Plus } from "lucide-react";
-import { RowLockControls } from "@/components/admin/RowLockControls";
+import { RowLockControls, CardLockBadge } from "@/components/admin/RowLockControls";
 
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -91,7 +91,9 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
         subtitle="Registo completo do corpo docente. O email institucional @upra.kor é gerado automaticamente."
       />
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden relative">
+        <CardLockBadge />
+
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
           <span></span><span>Docente</span><span>Email</span><span>Faculdade</span><span>Departamento</span><span>Grau</span><span>Cargo</span><span></span>
         </div>
@@ -180,7 +182,9 @@ function StaffOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
         subtitle="Registo do pessoal administrativo. O email institucional @upra.kor é gerado automaticamente."
       />
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden relative">
+        <CardLockBadge />
+
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
           <span></span><span>Funcionário</span><span>Email</span><span>Departamento</span><span>Função</span><span>Módulo</span><span className="text-right">Ações</span>
         </div>
