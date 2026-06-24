@@ -88,7 +88,6 @@ export default function GapConfiguracao() {
         : "";
       return {
         key, label: v.label, categoria: v.categoria, destino: v.destino,
-        responsavel: (v as any).responsavelDestino || defaultResponsavelByDestino(v.destino),
         slaAceitacao: Math.max(1, Math.ceil(slaConcl / 3)),
         slaConclusao: slaConcl,
         multa: multaDefault,
@@ -105,11 +104,27 @@ export default function GapConfiguracao() {
   const [newCatLabel, setNewCatLabel] = useState("");
   const [newMotLabel, setNewMotLabel] = useState("");
   const [newMotCat, setNewMotCat] = useState<string>("");
-  const [newMotDest, setNewMotDest] = useState<string>("CTI");
+  const [newMotDest, setNewMotDest] = useState<string>("");
   const [newMotSlaAceit, setNewMotSlaAceit] = useState<number>(2);
   const [newMotSlaConcl, setNewMotSlaConcl] = useState<number>(5);
-  const [newMotResp, setNewMotResp] = useState<string>(STAFF_OPTIONS[0]);
   const [newMotMulta, setNewMotMulta] = useState<string>("__none__");
+
+  // Real departamentos from DB used as Destino
+  const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await (supabase as any)
+        .from("departamentos")
+        .select("id, sigla, designacao")
+        .order("designacao", { ascending: true });
+      if (!error && data) {
+        setDepartamentos(data as Departamento[]);
+        if (data.length && !newMotDest) setNewMotDest((data[0] as any).designacao);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const destLabel = (k: string) => departamentos.find(d => d.designacao === k || d.sigla === k)?.designacao || k;
 
   const slugify = (s: string) =>
     s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -136,12 +151,13 @@ export default function GapConfiguracao() {
     const key = slugify(newMotLabel);
     setMotivos(prev => [...prev, {
       key, label: newMotLabel.trim(), categoria: newMotCat, destino: newMotDest,
-      responsavel: newMotResp, slaAceitacao: newMotSlaAceit, slaConclusao: newMotSlaConcl,
+      slaAceitacao: newMotSlaAceit, slaConclusao: newMotSlaConcl,
       multa: newMotMulta === "__none__" ? "" : newMotMulta,
     }]);
-    setNewMotLabel(""); setNewMotCat(""); setNewMotDest("CTI");
+    setNewMotLabel(""); setNewMotCat("");
+    setNewMotDest(departamentos[0]?.designacao || "");
     setNewMotSlaAceit(2); setNewMotSlaConcl(5);
-    setNewMotResp(STAFF_OPTIONS[0]); setNewMotMulta("__none__");
+    setNewMotMulta("__none__");
     setMotivoOpen(false);
     toast({ title: "Motivo criado" });
   };
