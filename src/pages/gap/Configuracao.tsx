@@ -289,15 +289,9 @@ export default function GapConfiguracao() {
 
   const [cdEstadoOpen, setCdEstadoOpen] = useState(false);
   const [cdEtapaOpen, setCdEtapaOpen] = useState(false);
-  const [cdSessOpen, setCdSessOpen] = useState(false);
 
   const [newCdEstadoLabel, setNewCdEstadoLabel] = useState("");
   const [newCdEtapaLabel, setNewCdEtapaLabel] = useState("");
-  const [newCdSessEtapa, setNewCdSessEtapa] = useState("Curso Preparatório");
-  const [newCdSessData, setNewCdSessData] = useState("");
-  const [newCdSessHora, setNewCdSessHora] = useState("09:00");
-  const [newCdSessLocal, setNewCdSessLocal] = useState("");
-  const [newCdSessCap, setNewCdSessCap] = useState(60);
 
   const CD_COLORS = [
     "bg-blue-50 text-blue-700 border-blue-200",
