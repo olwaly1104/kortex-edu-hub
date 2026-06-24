@@ -249,9 +249,9 @@ export default function GapConfiguracao() {
     { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
   const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([
-    { etapaKey: "entrevista", mode: "single", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30 },
-    { etapaKey: "curso_preparatorio", mode: "range", datas: [""], dataFim: "", hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 60 },
-    { etapaKey: "exame", mode: "single", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 80 },
+    { etapaKey: "entrevista", mode: "dias", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30 },
+    { etapaKey: "curso_preparatorio", mode: "periodo", datas: [""], dataFim: "", hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 60 },
+    { etapaKey: "exame", mode: "dia", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 80 },
   ]);
   // Auto-sync: ensure one sessão row per etapa with agenda=true
   useEffect(() => {
