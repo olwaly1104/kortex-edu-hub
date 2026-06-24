@@ -770,7 +770,7 @@ export default function GapConfiguracao() {
                         <td className="p-3">
                           {catCfg ? <Badge variant="outline" className={cn("text-[10px]", catCfg.color)}>{catCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.categoria}</span>}
                         </td>
-                        <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel || <span className="text-muted-foreground">—</span>}</td>
+                        
                         {isCardEditing("ag-motivos") && (
                           <td className="p-3 text-right">
                             <button onClick={() => setAgMotivos(prev => prev.filter(x => x.key !== m.key))} className="text-muted-foreground hover:text-destructive">
