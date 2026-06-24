@@ -318,11 +318,17 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
 const PRAZOS_CFG_KEY = (email?: string | null) => KEY("propinas.prazos.cfg", email);
 
-type PrazoPeriodo = "mensal" | "semestral" | "anual";
-type PrazoCfg = { id: string; nome: string; meses: number; periodo?: PrazoPeriodo };
+type PrazoPeriodo = "mensal" | "trimestral" | "semestral" | "anual";
+const PERIODO_OPCOES: { value: PrazoPeriodo; label: string }[] = [
+  { value: "mensal", label: "Mensal" },
+  { value: "trimestral", label: "Trimestral" },
+  { value: "semestral", label: "Semestral" },
+  { value: "anual", label: "Anual" },
+];
+type PrazoCfg = { id: string; nome: string; meses: number; periodos?: PrazoPeriodo[] };
 const DEFAULT_PRAZOS: PrazoCfg[] = [
-  { id: "p10", nome: "10", meses: 10, periodo: "mensal" },
-  { id: "p12", nome: "12", meses: 12, periodo: "mensal" },
+  { id: "p10", nome: "10", meses: 10, periodos: ["mensal"] },
+  { id: "p12", nome: "12", meses: 12, periodos: ["mensal"] },
 ];
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
