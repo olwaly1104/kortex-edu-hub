@@ -189,26 +189,27 @@ export default function GapConfiguracao() {
   const formatMultaDias = (d: number) => `${d}d após prazo`;
 
   // ===== AGENDAMENTOS =====
-  type AgCategoria = { key: string; label: string; color: string };
-  type AgMotivo = { key: string; label: string; categoria: string; duracao: number };
+  type AgCategoria = { key: string; label: string; color: string; descricao?: string };
+  type AgMotivo = { key: string; label: string; categoria: string; duracao: number; responsavel?: string; local?: string };
   type AgSala = { key: string; label: string; lotacao: number };
 
   const [agCategorias, setAgCategorias] = useState<AgCategoria[]>([
-    { key: "psicologico", label: "Psicológico", color: "bg-purple-100 text-purple-800 border-purple-200" },
-    { key: "academico", label: "Académico", color: "bg-blue-100 text-blue-800 border-blue-200" },
-    { key: "carreira", label: "Carreira / Vocacional", color: "bg-emerald-100 text-emerald-800 border-emerald-200" },
-    { key: "social", label: "Social", color: "bg-amber-100 text-amber-800 border-amber-200" },
-    { key: "saude", label: "Saúde", color: "bg-rose-100 text-rose-800 border-rose-200" },
-    { key: "financeiro", label: "Financeiro", color: "bg-cyan-100 text-cyan-800 border-cyan-200" },
-    { key: "documentacao", label: "Documentação", color: "bg-slate-100 text-slate-700 border-slate-200" },
+    { key: "psicologico", label: "Psicológico", color: "bg-purple-100 text-purple-800 border-purple-200", descricao: "Sessões de apoio psicológico individual ou em grupo." },
+    { key: "academico", label: "Académico", color: "bg-blue-100 text-blue-800 border-blue-200", descricao: "Orientação académica, métodos de estudo e desempenho." },
+    { key: "carreira", label: "Carreira / Vocacional", color: "bg-emerald-100 text-emerald-800 border-emerald-200", descricao: "Orientação vocacional, estágios e plano de carreira." },
+    { key: "social", label: "Social", color: "bg-amber-100 text-amber-800 border-amber-200", descricao: "Mediação de conflitos e apoio social ao discente." },
+    { key: "saude", label: "Saúde", color: "bg-rose-100 text-rose-800 border-rose-200", descricao: "Encaminhamento para serviços de saúde e bem-estar." },
+    { key: "financeiro", label: "Financeiro", color: "bg-cyan-100 text-cyan-800 border-cyan-200", descricao: "Apoio em questões de bolsas e plano financeiro." },
+    { key: "documentacao", label: "Documentação", color: "bg-slate-100 text-slate-700 border-slate-200", descricao: "Apoio na emissão e gestão de documentos." },
   ]);
   const [agMotivos, setAgMotivos] = useState<AgMotivo[]>([
-    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico", duracao: 50 },
-    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico", duracao: 40 },
-    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional", duracao: 60 },
-    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional", duracao: 30 },
-    { key: "mediacao", label: "Mediação de conflito", categoria: "Social", duracao: 60 },
+    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico", duracao: 50, responsavel: "Dra. Helena Cabral · GAP", local: "Gab. GAP 1" },
+    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico", duracao: 40, responsavel: "Dr. João Tavares · GAP", local: "Gab. GAP 2" },
+    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional", duracao: 60, responsavel: "Dra. Helena Cabral · GAP", local: "Gab. GAP 1" },
+    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional", duracao: 30, responsavel: "Dr. João Tavares · GAP", local: "Gab. GAP 2" },
+    { key: "mediacao", label: "Mediação de conflito", categoria: "Social", duracao: 60, responsavel: "Dra. Helena Cabral · GAP", local: "Sala de Reuniões GAP" },
   ]);
+
   const [agSalas, setAgSalas] = useState<AgSala[]>([
     { key: "gap1", label: "Gab. GAP 1", lotacao: 4 },
     { key: "gap2", label: "Gab. GAP 2", lotacao: 4 },
