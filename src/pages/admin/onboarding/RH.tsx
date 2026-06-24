@@ -93,7 +93,7 @@ function DepartamentosPanel() {
   };
 
   const gridCols = "grid-cols-[110px_1.2fr_1.4fr_70px_220px]";
-  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [cardEdit, setCardEdit] = useState(false);
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
