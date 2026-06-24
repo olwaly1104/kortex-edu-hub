@@ -32,7 +32,7 @@ const liquido = (r: Row) => Math.round(r.bruto * (1 - r.imposto / 100));
 export default function OnboardingSalarios() {
   const [rows, setRows] = useState<Row[]>([...seedDocentes, ...seedStaff]);
   const [tab, setTab] = useState<"todos" | Categoria>("todos");
-  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [cardEdit, setCardEdit] = useState(false);
 
   const filtered = useMemo(
     () => rows.filter(r => tab === "todos" || r.categoria === tab),
