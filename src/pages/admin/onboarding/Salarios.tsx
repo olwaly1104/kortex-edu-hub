@@ -79,7 +79,11 @@ export default function OnboardingSalarios() {
       </div>
 
       <Card className="overflow-hidden relative">
-        <CardLockBadge />
+        <CardLockBadge
+          editing={cardEdit}
+          onEdit={() => setCardEdit(true)}
+          onConfirm={() => { filtered.forEach(r => confirmar(r.id)); setCardEdit(false); }}
+        />
 
         <div className="grid grid-cols-[1.3fr_1fr_130px_85px_130px_100px_200px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
           <span>Nome</span>
