@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,10 +7,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import {
   Briefcase, Plus, User, Mail, Camera, Upload, Check, X, FileText, IdCard, MapPin, Building2,
 } from "lucide-react";
-import { DEPARTAMENTOS_POOL, type StaffRow } from "@/lib/peopleStorage";
+import { type StaffRow } from "@/lib/peopleStorage";
+import { supabase } from "@/integrations/supabase/client";
 
 const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Eng.", "Me."];
-const funcoesPool = ["Assistente", "Coordenador", "Técnico", "Auxiliar", "Diretor", "Analista", "Gestor"];
 const PROVINCIAS = [
   "Bengo","Benguela","Bié","Cabinda","Cuando Cubango","Cuanza Norte","Cuanza Sul","Cunene",
   "Huambo","Huíla","Luanda","Lunda Norte","Lunda Sul","Malanje","Moxico","Namibe","Uíge","Zaire",
@@ -48,7 +48,7 @@ type StaffDraft = StaffRow & {
 
 export const emptyStaff = (): StaffDraft => ({
   id: "", prefixo: "Sr.", primeiroNome: "", ultimoNome: "", email: "", contacto: "",
-  departamento: DEPARTAMENTOS_POOL[0], funcao: funcoesPool[0], moduloKortex: "academica",
+  departamento: "", funcao: "", moduloKortex: "academica",
   nascimento: "", genero: "M", bilhete: "", bilheteFileName: "", fotoDataUrl: "",
   provincia: "", municipio: "", endereco: "", cvFileName: "",
 });
