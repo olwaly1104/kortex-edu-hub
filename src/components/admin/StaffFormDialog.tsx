@@ -302,11 +302,12 @@ export function StaffFormDialog({
               </Field>
             </div>
           </section>
+          </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="px-6 pb-5">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={handleSave} disabled={!draft.primeiroNome.trim() || !previewEmail} className="gap-1.5">
+          <Button onClick={handleSave} disabled={!requiredOk || !previewEmail} className="gap-1.5">
             <Plus className="w-3.5 h-3.5" /> Adicionar Staff
           </Button>
         </DialogFooter>
