@@ -113,12 +113,7 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
               <span className="text-xs truncate">{r.departamento || <span className="text-muted-foreground italic">—</span>}</span>
               <span className="text-xs">{r.grau || "—"}</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-primary/10 text-primary w-fit">{r.cargo}</span>
-              <RowLockControls
-                editing={!!editing[r.id]}
-                onEdit={() => setEditing((p) => ({ ...p, [r.id]: true }))}
-                onConfirm={() => setEditing((p) => ({ ...p, [r.id]: false }))}
-                onDelete={() => remove(r.id)}
-              />
+              <RowLockControls editing={cardEdit} onDelete={() => remove(r.id)} />
             </div>
           ))}
           {rows.length === 0 && (
