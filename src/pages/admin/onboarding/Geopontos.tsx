@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Building2, Plus, Trash2, DoorOpen, Briefcase, Wrench } from "lucide-react";
+import { Building2, Plus, DoorOpen, Briefcase, Wrench } from "lucide-react";
+import { RowLockControls } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +40,8 @@ export default function OnboardingGeopontos() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [espacos, setEspacos] = useState<Espaco[]>(() => loadLS<Espaco>(ESPACOS_KEY));
   const [filtroEdif, setFiltroEdif] = useState<string>("all");
+  const [editEdif, setEditEdif] = useState<Record<string, boolean>>({});
+  const [editEsp, setEditEsp] = useState<Record<string, boolean>>({});
 
   useEffect(() => { try { localStorage.setItem(ESPACOS_KEY, JSON.stringify(espacos)); } catch {} }, [espacos]);
 
@@ -111,27 +114,31 @@ export default function OnboardingGeopontos() {
           <span className="text-[11px] text-muted-foreground ml-auto">{filtrados.length} {TIPO_LABEL[tipo]}</span>
         </div>
         <Card className="overflow-hidden">
-          <div className="grid grid-cols-[1.2fr_1fr_80px_100px_1.6fr_64px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-            <span>Edifício</span><span>Nome / Nº</span><span>Piso</span><span>Capacidade</span><span>{tipo === "Gabinete" ? "Ocupante" : "Notas"}</span><span></span>
+          <div className="grid grid-cols-[1.2fr_1fr_70px_90px_1.2fr_220px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+            <span>Edifício</span><span>Nome / Nº</span><span>Piso</span><span>Capacidade</span><span>{tipo === "Gabinete" ? "Ocupante" : "Notas"}</span><span className="text-right">Ações</span>
           </div>
           <div className="divide-y">
-            {filtrados.map(s => (
-              <div key={s.id} className="grid grid-cols-[1.2fr_1fr_80px_100px_1.6fr_64px] gap-2 px-4 py-2 items-center">
-                <Select value={s.edificioId} onValueChange={v => updEspaco(s.id, { edificioId: v })}>
+            {filtrados.map(s => {
+              const isEdit = !!editEsp[s.id];
+              return (
+              <div key={s.id} className="grid grid-cols-[1.2fr_1fr_70px_90px_1.2fr_220px] gap-2 px-4 py-2 items-center">
+                <Select value={s.edificioId} disabled={!isEdit} onValueChange={v => updEspaco(s.id, { edificioId: v })}>
                   <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>{edificios.map(e => <SelectItem key={e.id} value={e.id}>{e.nome}</SelectItem>)}</SelectContent>
                 </Select>
-                <Input value={s.nome} onChange={ev => updEspaco(s.id, { nome: ev.target.value })} className="h-8 text-xs" placeholder={placeholder} />
-                <Input value={s.piso} onChange={ev => updEspaco(s.id, { piso: ev.target.value })} className="h-8 text-xs" />
-                <Input type="number" min={0} value={s.capacidade} onChange={ev => updEspaco(s.id, { capacidade: Number(ev.target.value) })} className="h-8 text-xs" />
-                <Input value={s.notas || ""} onChange={ev => updEspaco(s.id, { notas: ev.target.value })} className="h-8 text-xs" placeholder={tipo === "Gabinete" ? "Pessoa ocupante" : "—"} />
-                <div className="flex justify-end">
-                  <Button size="icon" variant="ghost" onClick={() => rmEspaco(s.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
+                <Input value={s.nome} disabled={!isEdit} onChange={ev => updEspaco(s.id, { nome: ev.target.value })} className="h-8 text-xs" placeholder={placeholder} />
+                <Input value={s.piso} disabled={!isEdit} onChange={ev => updEspaco(s.id, { piso: ev.target.value })} className="h-8 text-xs" />
+                <Input type="number" min={0} disabled={!isEdit} value={s.capacidade} onChange={ev => updEspaco(s.id, { capacidade: Number(ev.target.value) })} className="h-8 text-xs" />
+                <Input value={s.notas || ""} disabled={!isEdit} onChange={ev => updEspaco(s.id, { notas: ev.target.value })} className="h-8 text-xs" placeholder={tipo === "Gabinete" ? "Pessoa ocupante" : "—"} />
+                <RowLockControls
+                  editing={isEdit}
+                  onEdit={() => setEditEsp(p => ({ ...p, [s.id]: true }))}
+                  onConfirm={() => setEditEsp(p => ({ ...p, [s.id]: false }))}
+                  onDelete={() => rmEspaco(s.id)}
+                />
               </div>
-            ))}
+              );
+            })}
             {filtrados.length === 0 && (
               <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem registos.</p>
             )}
@@ -187,30 +194,34 @@ export default function OnboardingGeopontos() {
 
         <TabsContent value="edificios" className="mt-0">
           <Card className="overflow-hidden">
-            <div className="grid grid-cols-[100px_1.4fr_80px_80px_1.4fr_64px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-              <span>Sigla</span><span>Nome</span><span>Pisos</span><span>Salas</span><span>Responsável</span><span></span>
+            <div className="grid grid-cols-[90px_1.3fr_70px_70px_1.3fr_220px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+              <span>Sigla</span><span>Nome</span><span>Pisos</span><span>Salas</span><span>Responsável</span><span className="text-right">Ações</span>
             </div>
             <div className="divide-y">
-              {edificios.map(e => (
-                <div key={e.id} className="grid grid-cols-[100px_1.4fr_80px_80px_1.4fr_64px] gap-2 px-4 py-2 items-center">
-                  <Input value={e.sigla} onChange={ev => updEdif(e.id, { sigla: ev.target.value.toUpperCase() })} className="h-8 text-xs" />
-                  <Input value={e.nome} onChange={ev => updEdif(e.id, { nome: ev.target.value })} className="h-8 text-xs" />
-                  <Input type="number" min={1} max={20} value={e.pisos} onChange={ev => updEdif(e.id, { pisos: Number(ev.target.value) })} className="h-8 text-xs" />
-                  <Input type="number" min={0} value={e.salas} onChange={ev => updEdif(e.id, { salas: Number(ev.target.value) })} className="h-8 text-xs" />
-                  <Select value={e.responsavel ?? "none"} onValueChange={v => updEdif(e.id, { responsavel: v === "none" ? null : v })}>
+              {edificios.map(e => {
+                const isEdit = !!editEdif[e.id];
+                return (
+                <div key={e.id} className="grid grid-cols-[90px_1.3fr_70px_70px_1.3fr_220px] gap-2 px-4 py-2 items-center">
+                  <Input value={e.sigla} disabled={!isEdit} onChange={ev => updEdif(e.id, { sigla: ev.target.value.toUpperCase() })} className="h-8 text-xs" />
+                  <Input value={e.nome} disabled={!isEdit} onChange={ev => updEdif(e.id, { nome: ev.target.value })} className="h-8 text-xs" />
+                  <Input type="number" min={1} max={20} disabled={!isEdit} value={e.pisos} onChange={ev => updEdif(e.id, { pisos: Number(ev.target.value) })} className="h-8 text-xs" />
+                  <Input type="number" min={0} disabled={!isEdit} value={e.salas} onChange={ev => updEdif(e.id, { salas: Number(ev.target.value) })} className="h-8 text-xs" />
+                  <Select value={e.responsavel ?? "none"} disabled={!isEdit} onValueChange={v => updEdif(e.id, { responsavel: v === "none" ? null : v })}>
                     <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">— Sem responsável —</SelectItem>
                       {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.display_name || c.email}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  <div className="flex justify-end">
-                    <Button size="icon" variant="ghost" onClick={() => rmEdif(e.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
+                  <RowLockControls
+                    editing={isEdit}
+                    onEdit={() => setEditEdif(p => ({ ...p, [e.id]: true }))}
+                    onConfirm={() => setEditEdif(p => ({ ...p, [e.id]: false }))}
+                    onDelete={() => rmEdif(e.id)}
+                  />
                 </div>
-              ))}
+                );
+              })}
               {edificios.length === 0 && (
                 <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem edifícios registados.</p>
               )}

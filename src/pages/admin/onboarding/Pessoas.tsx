@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Briefcase, Trash2, User, Plus } from "lucide-react";
+import { GraduationCap, Briefcase, User, Plus } from "lucide-react";
+import { RowLockControls } from "@/components/admin/RowLockControls";
 
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -79,7 +80,8 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
 
   const remove = (id: string) => persist(rows.filter((r) => r.id !== id));
 
-  const gridCols = "grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.9fr_0.9fr_48px]";
+  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const gridCols = "grid-cols-[40px_1.2fr_1.3fr_0.9fr_0.9fr_0.8fr_0.8fr_220px]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -109,14 +111,12 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
               <span className="text-xs truncate">{r.departamento || <span className="text-muted-foreground italic">—</span>}</span>
               <span className="text-xs">{r.grau || "—"}</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-primary/10 text-primary w-fit">{r.cargo}</span>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                onClick={(e) => { e.stopPropagation(); remove(r.id); }}
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
+              <RowLockControls
+                editing={!!editing[r.id]}
+                onEdit={() => setEditing((p) => ({ ...p, [r.id]: true }))}
+                onConfirm={() => setEditing((p) => ({ ...p, [r.id]: false }))}
+                onDelete={() => remove(r.id)}
+              />
             </div>
           ))}
           {rows.length === 0 && (
@@ -169,7 +169,8 @@ function StaffOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
 
   const remove = (id: string) => persist(rows.filter((r) => r.id !== id));
 
-  const gridCols = "grid-cols-[40px_1.4fr_1.4fr_1fr_0.9fr_0.9fr_48px]";
+  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const gridCols = "grid-cols-[40px_1.2fr_1.3fr_0.9fr_0.8fr_0.8fr_220px]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -181,7 +182,7 @@ function StaffOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
 
       <Card className="overflow-hidden">
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span></span><span>Funcionário</span><span>Email</span><span>Departamento</span><span>Função</span><span>Módulo</span><span></span>
+          <span></span><span>Funcionário</span><span>Email</span><span>Departamento</span><span>Função</span><span>Módulo</span><span className="text-right">Ações</span>
         </div>
         <div className="divide-y">
           {rows.map((r) => (
@@ -194,9 +195,12 @@ function StaffOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
               <span className="text-xs truncate">{r.departamento || <span className="text-muted-foreground italic">—</span>}</span>
               <span className="text-xs truncate">{r.funcao || "—"}</span>
               <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-primary/10 text-primary w-fit capitalize">{r.moduloKortex || "—"}</span>
-              <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => remove(r.id)}>
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
+              <RowLockControls
+                editing={!!editing[r.id]}
+                onEdit={() => setEditing((p) => ({ ...p, [r.id]: true }))}
+                onConfirm={() => setEditing((p) => ({ ...p, [r.id]: false }))}
+                onDelete={() => remove(r.id)}
+              />
             </div>
           ))}
           {rows.length === 0 && (

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Trash2, Check, ChevronsUpDown, Pencil, Save } from "lucide-react";
+import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Check, ChevronsUpDown } from "lucide-react";
+import { RowLockControls } from "@/components/admin/RowLockControls";
 import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -91,9 +92,8 @@ function DepartamentosPanel() {
     if (error) { toast.error(error.message); setRows(prev); }
   };
 
-  const gridCols = "grid-cols-[120px_1.4fr_1.6fr_90px_96px]";
+  const gridCols = "grid-cols-[110px_1.2fr_1.4fr_70px_220px]";
   const [editing, setEditing] = useState<Record<string, boolean>>({});
-  const toggleEdit = (id: string) => setEditing((p) => ({ ...p, [id]: !p[id] }));
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -180,14 +180,12 @@ function DepartamentosPanel() {
               <div className="flex justify-center">
                 <span className="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-md bg-muted text-[11px] font-semibold tabular-nums">{docCount}</span>
               </div>
-              <div className="flex justify-end gap-1">
-                <Button size="icon" variant="ghost" onClick={() => toggleEdit(r.id)} className="h-8 w-8 text-muted-foreground hover:text-primary" title={isEdit ? "Concluir" : "Editar"}>
-                  {isEdit ? <Save className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
-                </Button>
-                <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive" title="Eliminar">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
-              </div>
+              <RowLockControls
+                editing={isEdit}
+                onEdit={() => setEditing((p) => ({ ...p, [r.id]: true }))}
+                onConfirm={() => setEditing((p) => ({ ...p, [r.id]: false }))}
+                onDelete={() => remove(r.id)}
+              />
             </div>
             );
           })}

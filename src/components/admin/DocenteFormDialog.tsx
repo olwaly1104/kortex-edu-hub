@@ -315,27 +315,12 @@ export function DocenteFormDialog({
               </div>
             </section>
 
-            <section>
-              <SectionTitle index={6} icon={<GraduationCap className="w-3.5 h-3.5" />} title="Módulo Kortex" hint="Acesso atribuído ao docente" />
-              <div className="flex items-end justify-between gap-6 flex-wrap">
-                <div className="w-56">
-                  <Field label="Módulo Kortex *">
-                    <Select value={draft.moduloKortex || "professor"} onValueChange={(v) => setF("moduloKortex", v)}>
-                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        {MODULOS_DOCENTE.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                </div>
-                <div className="flex items-end gap-2 ml-auto">
-                  <Button variant="outline" className="h-8" onClick={() => onOpenChange(false)}>Cancelar</Button>
-                  <Button onClick={submit} disabled={!requiredOk} className="h-8 gap-1.5">
-                    <Plus className="w-3.5 h-3.5" /> Adicionar Docente
-                  </Button>
-                </div>
-              </div>
-            </section>
+            <div className="flex items-center justify-end gap-2 pt-2 border-t">
+              <Button variant="outline" className="h-8" onClick={() => onOpenChange(false)}>Cancelar</Button>
+              <Button onClick={submit} disabled={!requiredOk} className="h-8 gap-1.5">
+                <Plus className="w-3.5 h-3.5" /> Adicionar Docente
+              </Button>
+            </div>
           </div>
         </div>
 
