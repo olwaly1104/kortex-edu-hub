@@ -256,7 +256,7 @@ export default function GapConfiguracao() {
   ]);
   const [cdEtapas, setCdEtapas] = useState<CdEtapa[]>([
     { key: "submissao", label: "Submissão da candidatura", agenda: false, obrigatoria: true, estadosPossiveis: ["completo"] },
-    { key: "entrevista", label: "Entrevista", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado", "falta"] },
+    { key: "entrevista", label: "Entrevista", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "completo", "remarcado"] },
     { key: "curso_preparatorio", label: "Curso Preparatório", agenda: true, obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
     { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
