@@ -96,7 +96,7 @@ export default function OnboardingSalarios() {
         </div>
         <div className="divide-y">
           {filtered.map(r => {
-            const isEdit = !!editing[r.id];
+            const isEdit = cardEdit;
             return (
             <div key={r.id} className="grid grid-cols-[1.3fr_1fr_130px_85px_130px_100px_200px] gap-2 px-4 py-2 items-center">
               <div className="min-w-0">
