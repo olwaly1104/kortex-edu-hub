@@ -172,7 +172,7 @@ export default function AdminUtilizadores() {
         alert("Falha ao eliminar: " + (serverError || error?.message || "erro desconhecido"));
         return;
       }
-      setRows((prev) => prev.filter((r) => r.id !== id));
+      setRows((prev) => prev.filter((r) => r.id !== id && r.email.toLowerCase() !== email.toLowerCase()));
       try {
         const { removeDevCred } = await import("@/lib/devCreds");
         removeDevCred(email);
