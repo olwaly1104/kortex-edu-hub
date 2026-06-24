@@ -79,18 +79,20 @@ export default function OnboardingSalarios() {
       </div>
 
       <Card className="overflow-hidden">
-        <div className="grid grid-cols-[1.4fr_1fr_140px_90px_140px_110px_90px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+        <div className="grid grid-cols-[1.3fr_1fr_130px_85px_130px_100px_200px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
           <span>Nome</span>
           <span>Cargo</span>
           <span className="text-right">Bruto (Kz)</span>
           <span className="text-right">Imposto</span>
           <span className="text-right">Líquido (Kz)</span>
           <span className="text-center">Estado</span>
-          <span></span>
+          <span className="text-right">Ações</span>
         </div>
         <div className="divide-y">
-          {filtered.map(r => (
-            <div key={r.id} className="grid grid-cols-[1.4fr_1fr_140px_90px_140px_110px_90px] gap-2 px-4 py-2 items-center">
+          {filtered.map(r => {
+            const isEdit = !!editing[r.id];
+            return (
+            <div key={r.id} className="grid grid-cols-[1.3fr_1fr_130px_85px_130px_100px_200px] gap-2 px-4 py-2 items-center">
               <div className="min-w-0">
                 <p className="text-sm font-medium truncate">{r.nome}</p>
                 <p className="text-[11px] text-muted-foreground truncate">{r.email}</p>
@@ -99,9 +101,9 @@ export default function OnboardingSalarios() {
                 <Badge variant="outline" className="text-[10px] capitalize">{r.categoria}</Badge>
                 <span className="text-muted-foreground truncate">{r.cargo}</span>
               </div>
-              <Input type="number" value={r.bruto} onChange={e => update(r.id, { bruto: Number(e.target.value) || 0 })} className="h-8 text-xs text-right" />
+              <Input type="number" disabled={!isEdit} value={r.bruto} onChange={e => update(r.id, { bruto: Number(e.target.value) || 0 })} className="h-8 text-xs text-right" />
               <div className="relative">
-                <Input type="number" value={r.imposto} onChange={e => update(r.id, { imposto: Math.max(0, Math.min(100, Number(e.target.value) || 0)) })} className="h-8 text-xs text-right pr-6" />
+                <Input type="number" disabled={!isEdit} value={r.imposto} onChange={e => update(r.id, { imposto: Math.max(0, Math.min(100, Number(e.target.value) || 0)) })} className="h-8 text-xs text-right pr-6" />
                 <Percent className="w-3 h-3 absolute right-1.5 top-2.5 text-muted-foreground" />
               </div>
               <div className="text-right text-sm font-semibold tabular-nums">{fmt(liquido(r))}</div>
@@ -110,11 +112,14 @@ export default function OnboardingSalarios() {
                   ? <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[10px] gap-1"><CheckCircle2 className="w-3 h-3" /> Confirmado</Badge>
                   : <Badge variant="outline" className="text-[10px]">Pendente</Badge>}
               </div>
-              <Button size="sm" variant={r.confirmado ? "outline" : "default"} onClick={() => confirmar(r.id)} className="h-8 text-xs gap-1">
-                <Save className="w-3 h-3" /> {r.confirmado ? "Re-confirmar" : "Confirmar"}
-              </Button>
+              <RowLockControls
+                editing={isEdit}
+                onEdit={() => setEditing(p => ({ ...p, [r.id]: true }))}
+                onConfirm={() => { confirmar(r.id); setEditing(p => ({ ...p, [r.id]: false })); }}
+              />
             </div>
-          ))}
+            );
+          })}
           {filtered.length === 0 && (
             <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem registos nesta categoria. Registe docentes ou staff nos passos anteriores.</p>
           )}
