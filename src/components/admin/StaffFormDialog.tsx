@@ -95,11 +95,24 @@ export function StaffFormDialog({
     reader.readAsDataURL(f);
   };
 
-  const requiredOk = !!draft.primeiroNome.trim() && !!draft.ultimoNome.trim();
+  const requiredOk =
+    !!draft.prefixo &&
+    !!draft.primeiroNome.trim() &&
+    !!draft.ultimoNome.trim() &&
+    !!draft.nascimento &&
+    !!draft.genero &&
+    !!(draft.bilhete || "").trim() &&
+    !!draft.departamento &&
+    !!draft.funcao.trim() &&
+    !!draft.contacto.trim() &&
+    !!draft.provincia &&
+    !!(draft.municipio || "").trim() &&
+    !!(draft.endereco || "").trim() &&
+    !!draft.moduloKortex;
 
   const handleSave = () => {
     if (!requiredOk || !previewEmail) {
-      toast.error("Preencha primeiro e último nome");
+      toast.error("Preencha todos os campos obrigatórios (exceto Documentação Anexa)");
       return;
     }
     onSave({
@@ -111,10 +124,17 @@ export function StaffFormDialog({
     setDraft(emptyStaff());
   };
 
+  const simpleOk = !!draft.primeiroNome.trim() && !!draft.ultimoNome.trim();
   const submitSimplificado = () => {
-    if (!requiredOk) { toast.error("Preencha primeiro e último nome"); return; }
+    if (!simpleOk) { toast.error("Preencha primeiro e último nome"); return; }
     if (!window.confirm("Tem a certeza que pretende criar este staff?")) return;
-    handleSave();
+    onSave({
+      ...draft,
+      email: previewEmail,
+      id: draft.id || `${Date.now()}`,
+      moduloKortex: draft.moduloKortex || moduloFromDepartamento(draft.departamento),
+    });
+    setDraft(emptyStaff());
   };
 
   return (
@@ -174,7 +194,7 @@ export function StaffFormDialog({
 
             <div className="flex items-center justify-between gap-2">
               <span className="text-[11px] text-muted-foreground">Restantes campos podem ser editados depois.</span>
-              <Button size="sm" onClick={submitSimplificado} disabled={!requiredOk} className="h-7 px-2.5 text-[11px] gap-1">
+              <Button size="sm" onClick={submitSimplificado} disabled={!simpleOk} className="h-7 px-2.5 text-[11px] gap-1">
                 <Plus className="w-3 h-3" /> Criar simplificado
               </Button>
             </div>
