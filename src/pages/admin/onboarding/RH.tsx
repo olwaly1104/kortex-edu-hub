@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Trash2, Check, ChevronsUpDown } from "lucide-react";
+import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Trash2, Check, ChevronsUpDown, Pencil, Save } from "lucide-react";
 import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,6 +71,7 @@ function DepartamentosPanel() {
       .single();
     if (error) { toast.error(error.message); return; }
     setRows((prev) => [...prev, data as Departamento]);
+    setEditing((p) => ({ ...p, [(data as any).id]: true }));
   };
 
   const upd = (id: string, patch: Partial<Departamento>) => {
@@ -90,7 +91,9 @@ function DepartamentosPanel() {
     if (error) { toast.error(error.message); setRows(prev); }
   };
 
-  const gridCols = "grid-cols-[80px_120px_1.4fr_1.6fr_64px]";
+  const gridCols = "grid-cols-[120px_1.4fr_1.6fr_96px]";
+  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const toggleEdit = (id: string) => setEditing((p) => ({ ...p, [id]: !p[id] }));
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -106,62 +109,78 @@ function DepartamentosPanel() {
 
       <Card className="overflow-hidden">
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span></span><span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
+          <span>Sigla</span><span>Designação</span><span>Responsável</span><span className="text-right">Ações</span>
         </div>
         <div className="divide-y">
           {rows.map((r) => {
             const selected = people.find((p) => p.nome === r.responsavel);
+            const isEdit = !!editing[r.id];
             return (
             <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2 items-center`}>
-              <div className="w-12 h-9 rounded-md flex items-center justify-center text-[10px] font-bold text-white" style={{ background: r.cor || "#1B3A6B" }}>
-                {(r.sigla || "—").slice(0, 4)}
-              </div>
-              <Input
-                value={r.sigla}
-                onChange={(ev) => upd(r.id, { sigla: ev.target.value.toUpperCase() })}
-                onBlur={(ev) => persist(r.id, { sigla: ev.target.value.toUpperCase() })}
-                placeholder="Sigla"
-                maxLength={8}
-                className="h-8 text-xs font-mono font-semibold"
-              />
-              <Input
-                value={r.designacao}
-                onChange={(ev) => upd(r.id, { designacao: ev.target.value })}
-                onBlur={(ev) => persist(r.id, { designacao: ev.target.value })}
-                placeholder="Designação"
-                className="h-8 text-xs"
-              />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" role="combobox" className="h-8 text-xs justify-between font-normal">
-                    <span className="truncate">{r.responsavel || "Selecionar responsável"}</span>
-                    <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0 w-[280px]" align="start">
-                  <Command>
-                    <CommandInput placeholder="Procurar pessoa..." className="h-9" />
-                    <CommandList>
-                      <CommandEmpty>Sem resultados.</CommandEmpty>
-                      <CommandGroup>
-                        <CommandItem value="__none__" onSelect={() => { upd(r.id, { responsavel: null }); persist(r.id, { responsavel: null }); }}>
-                          <Check className={cn("mr-2 h-3 w-3", !r.responsavel ? "opacity-100" : "opacity-0")} />
-                          — Sem responsável —
-                        </CommandItem>
-                        {people.map((p) => (
-                          <CommandItem key={`${p.tipo}-${p.id}`} value={`${p.nome} ${p.tipo}`} onSelect={() => { upd(r.id, { responsavel: p.nome }); persist(r.id, { responsavel: p.nome }); }}>
-                            <Check className={cn("mr-2 h-3 w-3", selected?.id === p.id ? "opacity-100" : "opacity-0")} />
-                            <span className="flex-1 truncate">{p.nome}</span>
-                            <span className="text-[10px] text-muted-foreground ml-2">{p.tipo}</span>
+              {isEdit ? (
+                <Input
+                  value={r.sigla}
+                  onChange={(ev) => upd(r.id, { sigla: ev.target.value.toUpperCase() })}
+                  onBlur={(ev) => persist(r.id, { sigla: ev.target.value.toUpperCase() })}
+                  placeholder="Sigla"
+                  maxLength={8}
+                  className="h-8 text-xs font-mono font-semibold"
+                />
+              ) : (
+                <span className="text-xs font-mono font-semibold truncate">{r.sigla || "—"}</span>
+              )}
+              {isEdit ? (
+                <Input
+                  value={r.designacao}
+                  onChange={(ev) => upd(r.id, { designacao: ev.target.value })}
+                  onBlur={(ev) => persist(r.id, { designacao: ev.target.value })}
+                  placeholder="Designação"
+                  className="h-8 text-xs"
+                />
+              ) : (
+                <span className="text-xs truncate">{r.designacao || "—"}</span>
+              )}
+              {isEdit ? (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" role="combobox" className="h-8 text-xs justify-between font-normal">
+                      <span className="truncate">{r.responsavel || "Selecionar responsável"}</span>
+                      <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0 w-[280px]" align="start">
+                    <Command>
+                      <CommandInput placeholder="Procurar pessoa..." className="h-9" />
+                      <CommandList>
+                        <CommandEmpty>Sem resultados.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem value="__none__" onSelect={() => { upd(r.id, { responsavel: null }); persist(r.id, { responsavel: null }); }}>
+                            <Check className={cn("mr-2 h-3 w-3", !r.responsavel ? "opacity-100" : "opacity-0")} />
+                            — Sem responsável —
                           </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <div className="flex justify-end">
-                <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                          {people.map((p) => (
+                            <CommandItem key={`${p.tipo}-${p.id}`} value={`${p.nome} ${p.tipo}`} onSelect={() => { upd(r.id, { responsavel: p.nome }); persist(r.id, { responsavel: p.nome }); }}>
+                              <Check className={cn("mr-2 h-3 w-3", selected?.id === p.id ? "opacity-100" : "opacity-0")} />
+                              <span className="flex-1 truncate">{p.nome}</span>
+                              <span className="text-[10px] text-muted-foreground ml-2">{p.tipo}</span>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              ) : (
+                <span className="text-xs truncate">
+                  {r.responsavel || <span className="text-muted-foreground italic">—</span>}
+                  {selected && <span className="ml-1 text-[10px] text-muted-foreground">({selected.tipo})</span>}
+                </span>
+              )}
+              <div className="flex justify-end gap-1">
+                <Button size="icon" variant="ghost" onClick={() => toggleEdit(r.id)} className="h-8 w-8 text-muted-foreground hover:text-primary" title={isEdit ? "Concluir" : "Editar"}>
+                  {isEdit ? <Save className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
+                </Button>
+                <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive" title="Eliminar">
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>
               </div>
