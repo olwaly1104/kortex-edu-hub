@@ -341,6 +341,11 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
     });
     return norm;
   });
+  const [prazosCfg, setPrazosCfg] = useState<PrazoCfg[]>(() => {
+    const raw = readJSON<PrazoCfg[]>(PRAZOS_CFG_KEY(email), DEFAULT_PRAZOS);
+    return Array.isArray(raw) && raw.length ? raw : DEFAULT_PRAZOS;
+  });
+  useEffect(() => writeJSON(PRAZOS_CFG_KEY(email), prazosCfg), [prazosCfg, email]);
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => writeJSON(ANOS_KEY(email), anosByCurso), [anosByCurso, email]);
