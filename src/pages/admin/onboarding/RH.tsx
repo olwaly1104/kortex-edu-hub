@@ -71,6 +71,7 @@ function DepartamentosPanel() {
       .single();
     if (error) { toast.error(error.message); return; }
     setRows((prev) => [...prev, data as Departamento]);
+    setEditing((p) => ({ ...p, [(data as any).id]: true }));
   };
 
   const upd = (id: string, patch: Partial<Departamento>) => {
