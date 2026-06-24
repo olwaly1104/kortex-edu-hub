@@ -16,7 +16,7 @@ import OnboardingPessoas from "./Pessoas";
 import OnboardingRegrasPresenca from "./RegrasPresenca";
 
 type Departamento = { id: string; sigla: string; designacao: string; responsavel: string | null; cor: string | null };
-type PersonOpt = { id: string; nome: string; tipo: "Docente" | "Staff" };
+type PersonOpt = { id: string; nome: string; tipo: "Docente" | "Staff"; departamento?: string | null };
 
 function DepartamentosPanel() {
   const { user } = useAuth();
@@ -27,11 +27,11 @@ function DepartamentosPanel() {
   useEffect(() => {
     (async () => {
       const [doc, st] = await Promise.all([
-        (supabase as any).from("docentes").select("id, primeiro_nome, ultimo_nome").order("primeiro_nome", { ascending: true }),
+        (supabase as any).from("docentes").select("id, primeiro_nome, ultimo_nome, departamento").order("primeiro_nome", { ascending: true }),
         (supabase as any).from("staff").select("id, primeiro_nome, ultimo_nome").order("primeiro_nome", { ascending: true }),
       ]);
       const docs: PersonOpt[] = ((doc.data || []) as any[]).map((d) => ({
-        id: d.id, nome: `${d.primeiro_nome || ""} ${d.ultimo_nome || ""}`.trim() || "—", tipo: "Docente",
+        id: d.id, nome: `${d.primeiro_nome || ""} ${d.ultimo_nome || ""}`.trim() || "—", tipo: "Docente", departamento: d.departamento || null,
       }));
       const staff: PersonOpt[] = ((st.data || []) as any[]).map((d) => ({
         id: d.id, nome: `${d.primeiro_nome || ""} ${d.ultimo_nome || ""}`.trim() || "—", tipo: "Staff",
@@ -91,7 +91,7 @@ function DepartamentosPanel() {
     if (error) { toast.error(error.message); setRows(prev); }
   };
 
-  const gridCols = "grid-cols-[120px_1.4fr_1.6fr_96px]";
+  const gridCols = "grid-cols-[120px_1.4fr_1.6fr_90px_96px]";
   const [editing, setEditing] = useState<Record<string, boolean>>({});
   const toggleEdit = (id: string) => setEditing((p) => ({ ...p, [id]: !p[id] }));
 
@@ -109,12 +109,13 @@ function DepartamentosPanel() {
 
       <Card className="overflow-hidden">
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span>Sigla</span><span>Designação</span><span>Responsável</span><span className="text-right">Ações</span>
+          <span>Sigla</span><span>Designação</span><span>Responsável</span><span className="text-center">Docentes</span><span className="text-right">Ações</span>
         </div>
         <div className="divide-y">
           {rows.map((r) => {
             const selected = people.find((p) => p.nome === r.responsavel);
             const isEdit = !!editing[r.id];
+            const docCount = people.filter((p) => p.tipo === "Docente" && (p.departamento || "").trim().toLowerCase() === (r.designacao || "").trim().toLowerCase()).length;
             return (
             <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2 items-center`}>
               {isEdit ? (
@@ -176,6 +177,9 @@ function DepartamentosPanel() {
                   {selected && <span className="ml-1 text-[10px] text-muted-foreground">({selected.tipo})</span>}
                 </span>
               )}
+              <div className="flex justify-center">
+                <span className="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-md bg-muted text-[11px] font-semibold tabular-nums">{docCount}</span>
+              </div>
               <div className="flex justify-end gap-1">
                 <Button size="icon" variant="ghost" onClick={() => toggleEdit(r.id)} className="h-8 w-8 text-muted-foreground hover:text-primary" title={isEdit ? "Concluir" : "Editar"}>
                   {isEdit ? <Save className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
