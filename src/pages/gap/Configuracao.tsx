@@ -219,19 +219,10 @@ export default function GapConfiguracao() {
   // Ag dialogs
   const [agCatOpen, setAgCatOpen] = useState(false);
   const [agMotOpen, setAgMotOpen] = useState(false);
-  const [agSalaOpen, setAgSalaOpen] = useState(false);
 
   const [newAgCat, setNewAgCat] = useState("");
   const [newAgMotLabel, setNewAgMotLabel] = useState("");
   const [newAgMotCat, setNewAgMotCat] = useState("");
-  
-  const [newAgMotDur, setNewAgMotDur] = useState(45);
-  const [newAgMotResp, setNewAgMotResp] = useState(STAFF_OPTIONS[0]);
-  const [newAgMotLocal, setNewAgMotLocal] = useState("Gab. GAP 1");
-  const [newAgSalaLabel, setNewAgSalaLabel] = useState("");
-  const [newAgSalaLot, setNewAgSalaLot] = useState(4);
-
-  const [editAgSala, setEditAgSala] = useState<AgSala | null>(null);
 
   // ===== CANDIDATURAS =====
   type CdEstado = { key: string; label: string; color: string; descricao?: string };
