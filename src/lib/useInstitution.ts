@@ -405,11 +405,7 @@ export type EstudanteInput = {
 };
 
 async function provisionStudentAccount(name: string, email: string) {
-  try {
-    await provisionKortexUser({ name, email, modulo: "estudante" });
-  } catch (e: any) {
-    console.warn("provisionStudentAccount failed:", e?.message);
-  }
+  return provisionKortexUser({ name, email, modulo: "estudante" });
 }
 
 export function useCreateEstudante() {
@@ -418,8 +414,10 @@ export function useCreateEstudante() {
     mutationFn: async (input: EstudanteInput) => {
       const inst = await currentInstitutionId();
       if (!inst) throw new Error("Sessão expirada.");
+      const account = await provisionStudentAccount(input.nome, input.email);
       const { data, error } = await (supabase.from("estudantes" as any) as any)
         .insert({
+          id: account.id,
           owner_user_id: inst,
           ano: "1",
           turma: "A",
@@ -430,8 +428,6 @@ export function useCreateEstudante() {
         .single();
       if (error) throw error;
       const row = data as EstudanteRow;
-      // Every student becomes a Kortex user automatically.
-      await provisionStudentAccount(input.nome, input.email);
       return row;
     },
     onSuccess: () => {
@@ -448,7 +444,9 @@ export function useBulkCreateEstudantes() {
       const inst = await currentInstitutionId();
       if (!inst) throw new Error("Sessão expirada.");
       if (inputs.length === 0) return [];
-      const rows = inputs.map((i) => ({
+      const accounts = await Promise.all(inputs.map((i) => provisionStudentAccount(i.nome, i.email)));
+      const rows = inputs.map((i, index) => ({
+        id: accounts[index].id,
         owner_user_id: inst,
         ano: "1",
         turma: "A",
@@ -459,8 +457,6 @@ export function useBulkCreateEstudantes() {
         .insert(rows)
         .select();
       if (error) throw error;
-      // Provision auth accounts in parallel — failures are non-fatal.
-      await Promise.all(inputs.map((i) => provisionStudentAccount(i.nome, i.email)));
       return (data ?? []) as EstudanteRow[];
     },
     onSuccess: () => {

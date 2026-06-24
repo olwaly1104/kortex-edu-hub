@@ -38,17 +38,53 @@ Deno.serve(async (req) => {
       }
     }
 
+    const { data: callerProfile } = await admin
+      .from("profiles")
+      .select("institution_id")
+      .eq("id", callerId)
+      .maybeSingle();
+    const callerInstitutionId = (callerProfile?.institution_id as string) || callerId;
+
     const body = await req.json().catch(() => ({}));
-    const targetId = String((body as any).user_id || "").trim();
-    if (!targetId) return json({ error: "user_id em falta." }, 400);
+    let targetId = String((body as any).user_id || "").trim();
+    const targetEmailFromBody = String((body as any).email || "").trim().toLowerCase();
+    if (!targetId && !targetEmailFromBody) return json({ error: "user_id em falta." }, 400);
+
+    if (!targetId && targetEmailFromBody) {
+      const { data: profileByEmail } = await admin
+        .from("profiles")
+        .select("id")
+        .eq("email", targetEmailFromBody)
+        .maybeSingle();
+      targetId = profileByEmail?.id || "";
+    }
+    if (!targetId) return json({ error: "Utilizador não encontrado." }, 404);
     if (targetId === callerId) return json({ error: "Não pode remover a sua própria conta." }, 400);
 
-    // Verify same institution (target.profile.institution_id === callerId, since admin's institution_id = own uid)
+    const { data: authTarget } = await admin.auth.admin.getUserById(targetId);
+
+    // Verify same institution and capture identity before deleting auth/profile.
     const { data: targetProfile } = await admin
-      .from("profiles").select("institution_id").eq("id", targetId).maybeSingle();
-    if (targetProfile && targetProfile.institution_id && targetProfile.institution_id !== callerId) {
+      .from("profiles")
+      .select("institution_id,email")
+      .eq("id", targetId)
+      .maybeSingle();
+    if (targetProfile && targetProfile.institution_id && targetProfile.institution_id !== callerInstitutionId) {
       return json({ error: "Utilizador não pertence à sua instituição." }, 403);
     }
+    const targetEmail = String(targetProfile?.email || authTarget?.user?.email || targetEmailFromBody || "").trim().toLowerCase();
+
+    const deleteInstitutionRows = async (table: "estudantes" | "staff" | "docentes") => {
+      await admin.from(table).delete().eq("id", targetId).eq("owner_user_id", callerInstitutionId);
+      if (targetEmail) {
+        await admin.from(table).delete().eq("email", targetEmail).eq("owner_user_id", callerInstitutionId);
+      }
+    };
+
+    // Remove the institutional records used by GAP, Finanças, Académica, etc.
+    await deleteInstitutionRows("estudantes");
+    await deleteInstitutionRows("staff");
+    await deleteInstitutionRows("docentes");
 
     // Delete dependent rows first (in case FK is not on-delete-cascade)
     await admin.from("user_roles").delete().eq("user_id", targetId);
