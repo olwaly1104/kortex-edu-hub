@@ -247,7 +247,29 @@ export default function GapConfiguracao() {
     { key: "curso_preparatorio", label: "Curso Preparatório", agenda: true, obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
     { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
-  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([]);
+  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([
+    { etapaKey: "entrevista", mode: "single", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30 },
+    { etapaKey: "curso_preparatorio", mode: "range", datas: [""], dataFim: "", hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 60 },
+    { etapaKey: "exame", mode: "single", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 80 },
+  ]);
+  // Auto-sync: ensure one sessão row per etapa with agenda=true
+  useEffect(() => {
+    setCdSessoes(prev => {
+      const agendadas = cdEtapas.filter(e => e.agenda);
+      const byKey = new Map(prev.map(s => [s.etapaKey, s]));
+      return agendadas.map(e => byKey.get(e.key) || {
+        etapaKey: e.key, mode: "single" as const, datas: [], hora: "09:00",
+        local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30,
+      });
+    });
+  }, [cdEtapas]);
+  const updateSessao = (etapaKey: string, patch: Partial<CdSessao>) =>
+    setCdSessoes(prev => prev.map(s => s.etapaKey === etapaKey ? { ...s, ...patch } : s));
+  const toggleSessaoData = (etapaKey: string, data: string) => setCdSessoes(prev => prev.map(s => {
+    if (s.etapaKey !== etapaKey) return s;
+    const has = s.datas.includes(data);
+    return { ...s, datas: has ? s.datas.filter(d => d !== data) : [...s.datas, data].sort() };
+  }));
   const [cdNotaMinima, setCdNotaMinima] = useState<number | "">(() => {
     if (typeof window === "undefined") return "";
     const v = window.localStorage.getItem("academica.notaMinimaAcesso");
