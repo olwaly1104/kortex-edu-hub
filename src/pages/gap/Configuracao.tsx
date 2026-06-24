@@ -12,6 +12,9 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ChevronDown } from "lucide-react";
 import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil, CalendarClock, GraduationCap, MapPin, Clock, FileCheck2, Unlock, Check, Users } from "lucide-react";
 import AdminDiscentes from "@/pages/admin/Discentes";
 import {
