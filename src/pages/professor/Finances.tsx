@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Wallet, TrendingUp, Calendar, FileText, Download, Eye, AlertTriangle, MessageSquare, X, ChevronRight } from "lucide-react";
+import { TabelaInfracoesButton } from "@/components/shared/TabelaInfracoesButton";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -102,10 +104,8 @@ export default function ProfessorFinances() {
                 </Button>
               </div>
             </div>
-            <Button variant="outline" size="sm" className="text-xs h-7 gap-1.5 rounded-lg"
-              onClick={() => toast({ title: "PDF gerado", description: "Tabela de multas a descarregar..." })}>
-              <FileText className="w-3.5 h-3.5" /> Tabela de Multas (PDF)
-            </Button>
+            <TabelaInfracoesButton />
+
           </div>
         </div>
       </div>
