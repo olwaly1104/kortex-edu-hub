@@ -492,18 +492,14 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     return (
                       <div key={c.id}>
                         <div className="grid gap-3 px-5 py-3 items-center text-sm" style={{ gridTemplateColumns: COLS }}>
-                          <div className="flex items-center gap-2 min-w-0">
-                            <Building2 className="w-4 h-4 text-muted-foreground shrink-0" />
-                            <p className="font-medium truncate">{f.name}</p>
+                          <div className="min-w-0">
+                            <p className="font-medium break-words">{f.name}</p>
                           </div>
-                          <div className="flex items-center gap-2 min-w-0">
-                            <GraduationCap className="w-4 h-4 text-muted-foreground shrink-0" />
-                            <div className="min-w-0">
-                              <p className="font-medium truncate">{c.name}</p>
-                              <p className="text-[11px] text-muted-foreground font-mono truncate">
-                                {c.code} · {c.years} anos
-                              </p>
-                            </div>
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{c.name}</p>
+                            <p className="text-[11px] text-muted-foreground font-mono truncate">
+                              {c.code} · {c.years} anos
+                            </p>
                           </div>
                           <Input type="number" min={0} className="h-9 tabular-nums"
                             value={valorVal}
