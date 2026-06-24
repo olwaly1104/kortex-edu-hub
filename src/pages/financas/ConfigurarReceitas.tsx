@@ -380,7 +380,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
 
   // Column template — explicit so headers + rows align perfectly
   // Faculdade·Curso | Propina mensal | Regime | Meses | Propina mensal c/ IVA incl. | Propina bruta total | Líquido total | Ação
-  const COLS = "minmax(220px,1.6fr) 150px 160px 140px 170px 170px 130px";
+  const COLS = "minmax(160px,1fr) minmax(200px,1.4fr) 150px 160px 140px 170px 170px 130px";
 
   return (
     <div className="space-y-6">
@@ -406,7 +406,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                   const meses = Math.max(1, Number(e.target.value) || 1);
                   setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, meses, nome: String(meses) } : x));
                 }} />
-              <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-md border border-border bg-muted/30 text-xs font-medium tabular-nums w-fit">{pr.meses}</span>
+              <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-md border border-border bg-muted/30 text-xs font-medium tabular-nums w-fit">{pr.meses}M</span>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                   onClick={() => setPrazosCfg((s) => s.filter((x) => x.id !== pr.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
@@ -452,7 +452,8 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
         <div className="overflow-x-auto">
           <div className="min-w-[1100px] divide-y">
             <div className="grid gap-3 px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10" style={{ gridTemplateColumns: COLS }}>
-              <div>Faculdade · Curso</div>
+              <div>Faculdade</div>
+              <div>Curso</div>
               <div>Propina mensal</div>
               <div>Regime</div>
               <div>Prazos</div>
@@ -486,17 +487,21 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                       return { ...s, [c.id]: next };
                     });
                     const mesesLabel = mesesArr.length
-                      ? mesesArr.join(", ")
+                      ? mesesArr.map((m) => `${m}M`).join(", ")
                       : "— Selecionar —";
                     return (
                       <div key={c.id}>
                         <div className="grid gap-3 px-5 py-3 items-center text-sm" style={{ gridTemplateColumns: COLS }}>
                           <div className="flex items-center gap-2 min-w-0">
+                            <Building2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                            <p className="font-medium truncate">{f.name}</p>
+                          </div>
+                          <div className="flex items-center gap-2 min-w-0">
                             <GraduationCap className="w-4 h-4 text-muted-foreground shrink-0" />
                             <div className="min-w-0">
                               <p className="font-medium truncate">{c.name}</p>
                               <p className="text-[11px] text-muted-foreground font-mono truncate">
-                                {f.name} · {c.code} · {c.years} anos
+                                {c.code} · {c.years} anos
                               </p>
                             </div>
                           </div>
@@ -523,7 +528,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                                 return (
                                   <label key={pc.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
                                     <Checkbox checked={checked} onCheckedChange={() => toggleMes(m)} />
-                                    <span className="tabular-nums">{m} meses</span>
+                                    <span className="tabular-nums">{m}M</span>
                                   </label>
                                 );
                               })}
