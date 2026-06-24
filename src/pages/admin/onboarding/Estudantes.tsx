@@ -312,7 +312,7 @@ export default function OnboardingEstudantes() {
       </Tabs>
 
       <Card className="overflow-hidden relative">
-        <CardLockBadge />
+        <CardLockBadge editing={cardEdit} onEdit={() => setCardEdit(true)} onConfirm={() => setCardEdit(false)} />
 
         <div className="px-4 py-2.5 border-b flex items-center justify-between">
           <h3 className="text-sm font-semibold">Estudantes registados</h3>
