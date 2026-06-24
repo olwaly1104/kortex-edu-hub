@@ -247,9 +247,6 @@ export default function OnboardingGeopontos() {
         <TabsContent value="Instalação" className="mt-0">{renderEspacos("Instalação", "Ginásio / Cantina…")}</TabsContent>
       </Tabs>
 
-      <div className="flex justify-end">
-        <Button onClick={save}>Guardar</Button>
-      </div>
     </div>
   );
 }
