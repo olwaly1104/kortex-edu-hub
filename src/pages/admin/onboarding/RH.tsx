@@ -91,7 +91,7 @@ function DepartamentosPanel() {
     if (error) { toast.error(error.message); setRows(prev); }
   };
 
-  const gridCols = "grid-cols-[120px_1.4fr_1.6fr_96px]";
+  const gridCols = "grid-cols-[120px_1.4fr_1.6fr_90px_96px]";
   const [editing, setEditing] = useState<Record<string, boolean>>({});
   const toggleEdit = (id: string) => setEditing((p) => ({ ...p, [id]: !p[id] }));
 
@@ -109,12 +109,13 @@ function DepartamentosPanel() {
 
       <Card className="overflow-hidden">
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span>Sigla</span><span>Designação</span><span>Responsável</span><span className="text-right">Ações</span>
+          <span>Sigla</span><span>Designação</span><span>Responsável</span><span className="text-center">Docentes</span><span className="text-right">Ações</span>
         </div>
         <div className="divide-y">
           {rows.map((r) => {
             const selected = people.find((p) => p.nome === r.responsavel);
             const isEdit = !!editing[r.id];
+            const docCount = people.filter((p) => p.tipo === "Docente" && (p.departamento || "").trim().toLowerCase() === (r.designacao || "").trim().toLowerCase()).length;
             return (
             <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2 items-center`}>
               {isEdit ? (
