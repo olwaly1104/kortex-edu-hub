@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Trash2, Check, ChevronsUpDown, Pencil, Save } from "lucide-react";
+import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Check, ChevronsUpDown } from "lucide-react";
+import { RowLockControls } from "@/components/admin/RowLockControls";
 import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
