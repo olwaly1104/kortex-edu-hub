@@ -297,26 +297,26 @@ export function DocenteFormDialog({
 
             <section>
               <SectionTitle index={6} icon={<GraduationCap className="w-3.5 h-3.5" />} title="Módulo Kortex" hint="Acesso atribuído ao docente" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <Field label="Módulo Kortex *">
-                  <Select value={draft.moduloKortex || "professor"} onValueChange={(v) => setF("moduloKortex", v)}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      {MODULOS_DOCENTE.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </Field>
+              <div className="flex items-end gap-2">
+                <div className="flex-1">
+                  <Field label="Módulo Kortex *">
+                    <Select value={draft.moduloKortex || "professor"} onValueChange={(v) => setF("moduloKortex", v)}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {MODULOS_DOCENTE.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                </div>
+                <Button variant="outline" className="h-8" onClick={() => onOpenChange(false)}>Cancelar</Button>
+                <Button onClick={submit} disabled={!requiredOk} className="h-8 gap-1.5">
+                  <Plus className="w-3.5 h-3.5" /> Adicionar Docente
+                </Button>
               </div>
             </section>
           </div>
         </div>
 
-        <DialogFooter className="px-6 pb-5">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={submit} disabled={!requiredOk} className="gap-1.5">
-            <Plus className="w-3.5 h-3.5" /> Adicionar Docente
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
