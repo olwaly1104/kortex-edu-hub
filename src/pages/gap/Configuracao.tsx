@@ -13,6 +13,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ChevronDown } from "lucide-react";
 import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil, CalendarClock, GraduationCap, MapPin, Clock, FileCheck2, Unlock, Check, Users } from "lucide-react";
@@ -230,7 +231,7 @@ export default function GapConfiguracao() {
   // ===== CANDIDATURAS =====
   type CdEstado = { key: string; label: string; color: string; descricao?: string };
  type CdEtapa = { key: string; label: string; agenda: boolean; obrigatoria: boolean; estadosPossiveis: string[] };
- type CdSessao = { etapaKey: string; mode: "single" | "range"; datas: string[]; dataFim?: string; hora: string; local: string; responsavel: string; capacidade: number };
+ type CdSessao = { etapaKey: string; mode: "dia" | "dias" | "periodo"; datas: string[]; dataFim?: string; hora: string; local: string; responsavel: string; capacidade: number };
 
 
   const [cdEstados, setCdEstados] = useState<CdEstado[]>([
@@ -248,9 +249,9 @@ export default function GapConfiguracao() {
     { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
   const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([
-    { etapaKey: "entrevista", mode: "single", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30 },
-    { etapaKey: "curso_preparatorio", mode: "range", datas: [""], dataFim: "", hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 60 },
-    { etapaKey: "exame", mode: "single", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 80 },
+    { etapaKey: "entrevista", mode: "dias", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30 },
+    { etapaKey: "curso_preparatorio", mode: "periodo", datas: [""], dataFim: "", hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 60 },
+    { etapaKey: "exame", mode: "dia", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 80 },
   ]);
   // Auto-sync: ensure one sessão row per etapa with agenda=true
   useEffect(() => {
@@ -258,7 +259,7 @@ export default function GapConfiguracao() {
       const agendadas = cdEtapas.filter(e => e.agenda);
       const byKey = new Map(prev.map(s => [s.etapaKey, s]));
       return agendadas.map(e => byKey.get(e.key) || {
-        etapaKey: e.key, mode: "single" as const, datas: [], hora: "09:00",
+        etapaKey: e.key, mode: "dia" as const, datas: [], hora: "09:00",
         local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30,
       });
     });
@@ -1060,19 +1061,20 @@ export default function GapConfiguracao() {
                           <td className="px-4 py-2.5 text-sm font-medium text-foreground">{etapa?.label || s.etapaKey}</td>
                           <td className="px-3 py-2.5">
                             {editing ? (
-                              <Select value={s.mode} onValueChange={(v: "single" | "range") => updateSessao(s.etapaKey, { mode: v, datas: v === "range" ? [s.datas[0] || ""] : [], dataFim: v === "range" ? (s.dataFim || "") : undefined })}>
+                              <Select value={s.mode} onValueChange={(v: "dia" | "dias" | "periodo") => updateSessao(s.etapaKey, { mode: v, datas: v === "periodo" ? [s.datas[0] || ""] : (v === "dia" ? s.datas.slice(0, 1) : s.datas), dataFim: v === "periodo" ? (s.dataFim || "") : undefined })}>
                                 <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="single">Dia(s) único(s)</SelectItem>
-                                  <SelectItem value="range">Período</SelectItem>
+                                  <SelectItem value="dia">Dia</SelectItem>
+                                  <SelectItem value="dias">Dias</SelectItem>
+                                  <SelectItem value="periodo">Período</SelectItem>
                                 </SelectContent>
                               </Select>
                             ) : (
-                              <span className="text-[11px] text-muted-foreground">{s.mode === "range" ? "Período" : "Dia(s) único(s)"}</span>
+                              <span className="text-[11px] text-muted-foreground capitalize">{s.mode}</span>
                             )}
                           </td>
                           <td className="px-3 py-2.5">
-                            {s.mode === "range" ? (
+                            {s.mode === "periodo" ? (
                               editing ? (
                                 <div className="flex items-center gap-1.5">
                                   <Input type="date" className="h-8 text-xs" value={s.datas[0] || ""} onChange={e => updateSessao(s.etapaKey, { datas: [e.target.value] })} />
@@ -1082,19 +1084,55 @@ export default function GapConfiguracao() {
                               ) : (
                                 <span className="text-xs tabular-nums">{s.datas[0] || "—"} → {s.dataFim || "—"}</span>
                               )
+                            ) : s.mode === "dia" ? (
+                              editing ? (
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button variant="outline" size="sm" className="h-8 text-xs justify-start font-normal w-full">
+                                      {s.datas[0] || <span className="text-muted-foreground">Selecionar dia</span>}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent align="start" className="w-auto p-0 pointer-events-auto">
+                                    <Calendar
+                                      mode="single"
+                                      selected={s.datas[0] ? new Date(s.datas[0]) : undefined}
+                                      onSelect={(d) => updateSessao(s.etapaKey, { datas: d ? [d.toISOString().slice(0, 10)] : [] })}
+                                      initialFocus
+                                      className="p-3 pointer-events-auto"
+                                    />
+                                  </PopoverContent>
+                                </Popover>
+                              ) : (
+                                <span className="text-xs tabular-nums">{s.datas[0] || "—"}</span>
+                              )
                             ) : (
                               editing ? (
-                                <div className="space-y-1.5">
-                                  <div className="flex flex-wrap gap-1">
-                                    {s.datas.map(d => (
-                                      <span key={d} className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 px-1.5 py-0.5 text-[10px] tabular-nums">
-                                        {d}
-                                        <button onClick={() => toggleSessaoData(s.etapaKey, d)} className="hover:text-red-600"><Trash2 className="w-2.5 h-2.5" /></button>
-                                      </span>
-                                    ))}
-                                  </div>
-                                  <Input type="date" className="h-8 text-xs" value="" onChange={e => e.target.value && toggleSessaoData(s.etapaKey, e.target.value)} placeholder="Adicionar dia" />
-                                </div>
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button variant="outline" size="sm" className="h-8 text-xs justify-start font-normal w-full">
+                                      {s.datas.length > 0 ? `${s.datas.length} dia(s) selecionado(s)` : <span className="text-muted-foreground">Selecionar dias</span>}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent align="start" className="w-auto p-0 pointer-events-auto">
+                                    <Calendar
+                                      mode="multiple"
+                                      selected={s.datas.map(d => new Date(d))}
+                                      onSelect={(ds) => updateSessao(s.etapaKey, { datas: (ds || []).map(d => d.toISOString().slice(0, 10)).sort() })}
+                                      initialFocus
+                                      className="p-3 pointer-events-auto"
+                                    />
+                                    {s.datas.length > 0 && (
+                                      <div className="flex flex-wrap gap-1 p-2 border-t border-border max-w-[280px]">
+                                        {s.datas.map(d => (
+                                          <span key={d} className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 px-1.5 py-0.5 text-[10px] tabular-nums">
+                                            {d}
+                                            <button onClick={() => toggleSessaoData(s.etapaKey, d)} className="hover:text-red-600"><Trash2 className="w-2.5 h-2.5" /></button>
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </PopoverContent>
+                                </Popover>
                               ) : (
                                 <div className="flex flex-wrap gap-1">
                                   {s.datas.length === 0
@@ -1104,6 +1142,7 @@ export default function GapConfiguracao() {
                               )
                             )}
                           </td>
+
                           <td className="px-3 py-2.5">
                             {editing
                               ? <Input type="time" className="h-8 text-xs" value={s.hora} onChange={e => updateSessao(s.etapaKey, { hora: e.target.value })} />
