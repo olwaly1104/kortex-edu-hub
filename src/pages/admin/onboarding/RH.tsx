@@ -109,8 +109,21 @@ function DepartamentosPanel() {
           <span>Pré-visualização</span><span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
         </div>
         <div className="divide-y">
-          {rows.map((r) => (
+          {rows.map((r) => {
+            const count = docentes.filter((d) => (d.departamento || "").trim().toLowerCase() === (r.designacao || "").trim().toLowerCase()).length;
+            return (
             <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2 items-center`}>
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-9 h-9 rounded-md flex items-center justify-center text-[10px] font-bold text-white shrink-0" style={{ background: r.cor || "#1B3A6B" }}>
+                  {(r.sigla || "—").slice(0, 4)}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold truncate">{r.designacao || "Sem designação"}</p>
+                  <p className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
+                    <Users className="w-2.5 h-2.5" /> {count} docente(s)
+                  </p>
+                </div>
+              </div>
               <Input
                 value={r.sigla}
                 onChange={(ev) => upd(r.id, { sigla: ev.target.value.toUpperCase() })}
