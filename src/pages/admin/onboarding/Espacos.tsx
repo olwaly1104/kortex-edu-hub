@@ -62,8 +62,8 @@ export default function OnboardingEspacos() {
   const [espacos, setEspacos] = useState<Espaco[]>(() => loadLS<Espaco>(ESPACOS_KEY));
   const [tab, setTab] = useState<"edificios" | EspacoTipo>("edificios");
   const [filtroEdif, setFiltroEdif] = useState<string>("all");
-  const [editEdif, setEditEdif] = useState<Record<string, boolean>>({});
-  const [editEsp, setEditEsp] = useState<Record<string, boolean>>({});
+  const [cardEdit, setCardEdit] = useState<Record<string, boolean>>({});
+  const toggleEdit = (key: string, v: boolean) => setCardEdit(p => ({ ...p, [key]: v }));
 
   useEffect(() => {
     try { localStorage.setItem(ESPACOS_KEY, JSON.stringify(espacos)); } catch { /* ignore */ }
