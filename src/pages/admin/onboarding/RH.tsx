@@ -86,7 +86,7 @@ function DepartamentosPanel() {
     if (error) { toast.error(error.message); setRows(prev); }
   };
 
-  const gridCols = "grid-cols-[100px_1.4fr_1.4fr_64px]";
+  const gridCols = "grid-cols-[200px_100px_1.4fr_1.4fr_64px]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
