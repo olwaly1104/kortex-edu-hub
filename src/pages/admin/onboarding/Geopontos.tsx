@@ -72,6 +72,7 @@ export default function OnboardingGeopontos() {
     if (error) toast.error(error.message);
   };
   const rmEdif = async (id: string) => {
+    if (!window.confirm("Tem a certeza que pretende eliminar este edifício? Esta acção é irreversível.")) return;
     if (espacos.some(s => s.edificioId === id)) { toast.error("Remova primeiro os espaços deste edifício"); return; }
     const { error } = await supabase.from("edificios").delete().eq("id", id);
     if (error) { toast.error(error.message); return; }
@@ -85,7 +86,11 @@ export default function OnboardingGeopontos() {
     setEspacos(p => [...p, { id: `s${Date.now()}`, edificioId: edif, nome: "", tipo, piso: "0", capacidade: tipo === "Gabinete" ? 4 : 30 }]);
   };
   const updEspaco = (id: string, patch: Partial<Espaco>) => setEspacos(p => p.map(s => s.id === id ? { ...s, ...patch } : s));
-  const rmEspaco = (id: string) => setEspacos(p => p.filter(s => s.id !== id));
+  const rmEspaco = (id: string) => {
+    if (!window.confirm("Tem a certeza que pretende eliminar este espaço? Esta acção é irreversível.")) return;
+    setEspacos(p => p.filter(s => s.id !== id));
+  };
+
 
   const counts = useMemo(() => ({
     edif: edificios.length,
