@@ -248,19 +248,22 @@ export default function GapConfiguracao() {
     { key: "curso_preparatorio", label: "Curso Preparatório", agenda: true, obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
     { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
-  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([
-    { etapaKey: "entrevista", mode: "dias", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30 },
-    { etapaKey: "curso_preparatorio", mode: "periodo", datas: [""], dataFim: "", hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 60 },
-    { etapaKey: "exame", mode: "dia", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 80 },
-  ]);
-  // Auto-sync: ensure one sessão row per etapa with agenda=true
+  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([]);
+  const [docentesList, setDocentesList] = useState<DocenteRow[]>(() => loadDocentes());
+  useEffect(() => {
+    syncDocentesFromDb().then(setDocentesList).catch(() => {});
+    const onChange = () => setDocentesList(loadDocentes());
+    window.addEventListener("upra:people-changed", onChange);
+    return () => window.removeEventListener("upra:people-changed", onChange);
+  }, []);
+  // Auto-sync: ensure one sessão row per etapa with agenda=true (no prefilled values)
   useEffect(() => {
     setCdSessoes(prev => {
       const agendadas = cdEtapas.filter(e => e.agenda);
       const byKey = new Map(prev.map(s => [s.etapaKey, s]));
       return agendadas.map(e => byKey.get(e.key) || {
-        etapaKey: e.key, mode: "dia" as const, datas: [], hora: "09:00",
-        local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30,
+        etapaKey: e.key, mode: "" as const, datas: [], hora: "",
+        local: "", responsavel: "", capacidade: "" as const,
       });
     });
   }, [cdEtapas]);
