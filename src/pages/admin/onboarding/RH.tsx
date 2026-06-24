@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Trash2 } from "lucide-react";
+import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Trash2, Users } from "lucide-react";
 import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -13,11 +14,27 @@ import OnboardingPessoas from "./Pessoas";
 import OnboardingRegrasPresenca from "./RegrasPresenca";
 
 type Departamento = { id: string; sigla: string; designacao: string; responsavel: string | null; cor: string | null };
+type DocenteOpt = { id: string; nome: string; departamento: string | null };
 
 function DepartamentosPanel() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Departamento[]>([]);
+  const [docentes, setDocentes] = useState<DocenteOpt[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("docentes")
+        .select("id, primeiro_nome, ultimo_nome, departamento")
+        .order("primeiro_nome", { ascending: true });
+      setDocentes(((data || []) as any[]).map((d) => ({
+        id: d.id,
+        nome: `${d.primeiro_nome || ""} ${d.ultimo_nome || ""}`.trim() || "—",
+        departamento: d.departamento || null,
+      })));
+    })();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -83,6 +100,34 @@ function DepartamentosPanel() {
         </div>
       </div>
 
+      {rows.length > 0 && (
+        <Card className="p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Pré-visualização</span>
+            <span className="text-[10px] text-muted-foreground">{rows.length} departamento(s)</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {rows.map((r) => {
+              const count = docentes.filter((d) => (d.departamento || "").trim().toLowerCase() === (r.designacao || "").trim().toLowerCase()).length;
+              return (
+                <div key={`prev-${r.id}`} className="flex items-center gap-3 rounded-md border bg-card px-3 py-2">
+                  <div className="w-9 h-9 rounded-md flex items-center justify-center text-[10px] font-bold text-white shrink-0" style={{ background: r.cor || "#1B3A6B" }}>
+                    {(r.sigla || "—").slice(0, 4)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold truncate">{r.designacao || "Sem designação"}</p>
+                    <p className="text-[10px] text-muted-foreground truncate">
+                      {r.responsavel || "Sem responsável"} · <Users className="inline w-2.5 h-2.5 -mt-0.5" /> {count} docente(s)
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
+
+
       <Card className="overflow-hidden">
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
           <span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
@@ -105,13 +150,18 @@ function DepartamentosPanel() {
                 placeholder="Designação"
                 className="h-8 text-xs"
               />
-              <Input
+              <Select
                 value={r.responsavel || ""}
-                onChange={(ev) => upd(r.id, { responsavel: ev.target.value || null })}
-                onBlur={(ev) => persist(r.id, { responsavel: ev.target.value.trim() || null })}
-                placeholder="Responsável do departamento"
-                className="h-8 text-xs"
-              />
+                onValueChange={(v) => { const val = v === "__none__" ? null : v; upd(r.id, { responsavel: val }); persist(r.id, { responsavel: val }); }}
+              >
+                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecionar docente" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">— Sem responsável —</SelectItem>
+                  {docentes.map((d) => (
+                    <SelectItem key={d.id} value={d.nome}>{d.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                   <Trash2 className="w-3.5 h-3.5" />
