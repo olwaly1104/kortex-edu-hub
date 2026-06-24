@@ -60,7 +60,6 @@ export default function OnboardingGeopontos() {
 
   // ---- Edifícios (DB)
   const addEdif = async () => {
-  const addEdif = async () => {
     if (!authUid) { toast.error("Sessão não iniciada."); return; }
     const n = edificios.length + 1;
     const { data, error } = await supabase.from("edificios").insert({
