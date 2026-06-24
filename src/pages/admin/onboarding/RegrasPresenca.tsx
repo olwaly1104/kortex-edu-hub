@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Clock, Percent, AlertTriangle, Scale, Plus, ShieldCheck, Coins, Save } from "lucide-react";
-import { RowLockControls } from "@/components/admin/RowLockControls";
+import { RowLockControls, CardLockBadge } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -213,7 +213,9 @@ export default function OnboardingRegrasPresenca() {
             </Card>
 
             {/* Tabela de Multas */}
-            <Card className="overflow-hidden">
+            <Card className="overflow-hidden relative">
+              <CardLockBadge />
+
               {/* Table header */}
               <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b">
                 <div className="flex items-center gap-2 text-muted-foreground">

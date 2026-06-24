@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Building2, Plus, DoorOpen, Briefcase, Wrench } from "lucide-react";
-import { RowLockControls } from "@/components/admin/RowLockControls";
+import { RowLockControls, CardLockBadge } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
 
 type Tipo = "Sala" | "Gabinete" | "Instalação";
@@ -83,7 +83,9 @@ export default function OnboardingEspacos() {
           </Select>
           <span className="text-[11px] text-muted-foreground ml-auto">{filtrados.length} {tipo === "Instalação" ? "instalações" : tipo === "Gabinete" ? "gabinetes" : "salas"}</span>
         </div>
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden relative">
+          <CardLockBadge />
+
           <div className="grid grid-cols-[1.2fr_1fr_70px_90px_1.2fr_220px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
             <span>Edifício</span><span>Nome / Nº</span><span>Piso</span><span>Capacidade</span><span>{tipo === "Gabinete" ? "Ocupante" : "Notas"}</span><span className="text-right">Ações</span>
           </div>
@@ -168,7 +170,9 @@ export default function OnboardingEspacos() {
         </TabsList>
 
         <TabsContent value="edificios" className="mt-0">
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden relative">
+            <CardLockBadge />
+
             <div className="grid grid-cols-[1.3fr_90px_80px_1.3fr_220px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
               <span>Nome</span><span>Código</span><span>Pisos</span><span>Endereço</span><span className="text-right">Ações</span>
             </div>

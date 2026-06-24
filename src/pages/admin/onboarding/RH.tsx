@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Check, ChevronsUpDown } from "lucide-react";
-import { RowLockControls } from "@/components/admin/RowLockControls";
+import { RowLockControls, CardLockBadge } from "@/components/admin/RowLockControls";
 import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,7 +107,9 @@ function DepartamentosPanel() {
         </div>
       </div>
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden relative">
+        <CardLockBadge />
+
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
           <span>Sigla</span><span>Designação</span><span>Responsável</span><span className="text-center">Docentes</span><span className="text-right">Ações</span>
         </div>
