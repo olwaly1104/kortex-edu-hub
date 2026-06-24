@@ -223,26 +223,30 @@ export default function OnboardingRegrasPresenca() {
                 <Badge variant="outline" className="text-[10px]">{totalMultas} {totalMultas === 1 ? "registo" : "registos"}</Badge>
               </div>
 
-              <div className="grid grid-cols-[1fr_120px_120px_56px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+              <div className="grid grid-cols-[1fr_120px_120px_220px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
                 <span>Infração</span>
                 <span>Aplica a</span>
                 <span className="text-right">Valor</span>
-                <span />
+                <span className="text-right">Ações</span>
               </div>
 
               <div className="divide-y">
-                {multas.map(m => (
-                  <div key={m.id} className="grid grid-cols-[1fr_120px_120px_56px] items-center gap-2 px-4 py-2.5 hover:bg-muted/40 transition-colors">
+                {multas.map(m => {
+                  const isEdit = !!editing[m.id];
+                  return (
+                  <div key={m.id} className="grid grid-cols-[1fr_120px_120px_220px] items-center gap-2 px-4 py-2.5 hover:bg-muted/40 transition-colors">
                     <span className="text-sm font-medium truncate">{m.nome}</span>
                     <Badge variant="outline" className="text-[10px] w-fit">{m.aplicaA}</Badge>
                     <span className="text-sm tabular-nums text-right">{m.valor.toLocaleString("pt-PT")} Kz</span>
-                    <div className="flex justify-end">
-                      <Button size="icon" variant="ghost" onClick={() => setMultas(prev => prev.filter(x => x.id !== m.id))} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
+                    <RowLockControls
+                      editing={isEdit}
+                      onEdit={() => setEditing(p => ({ ...p, [m.id]: true }))}
+                      onConfirm={() => setEditing(p => ({ ...p, [m.id]: false }))}
+                      onDelete={() => setMultas(prev => prev.filter(x => x.id !== m.id))}
+                    />
                   </div>
-                ))}
+                  );
+                })}
                 {multas.length === 0 && (
                   <div className="text-xs text-muted-foreground text-center py-6">
                     Sem infrações configuradas.
