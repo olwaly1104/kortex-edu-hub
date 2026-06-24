@@ -241,7 +241,7 @@ export default function GapConfiguracao() {
   const [editAgSala, setEditAgSala] = useState<AgSala | null>(null);
 
   // ===== CANDIDATURAS =====
-  type CdEstado = { key: string; label: string; color: string };
+  type CdEstado = { key: string; label: string; color: string; descricao?: string };
  type CdEtapa = { key: string; label: string; agenda: boolean; obrigatoria: boolean; estadosPossiveis: string[] };
  type CdSessao = { key: string; etapa: string; data: string; hora: string; local: string; capacidade: number };
 
