@@ -302,6 +302,11 @@ export default function GapConfiguracao() {
   const removeCdEtapa = (key: string) => setCdEtapas(es => es.filter(e => e.key !== key));
   const toggleEtapaObrig = (key: string) => setCdEtapas(es => es.map(e => e.key === key ? { ...e, obrigatoria: !e.obrigatoria } : e));
   const toggleEtapaAgenda = (key: string) => setCdEtapas(es => es.map(e => e.key === key ? { ...e, agenda: !e.agenda } : e));
+  const toggleEtapaEstado = (etapaKey: string, estadoKey: string) => setCdEtapas(es => es.map(e => {
+    if (e.key !== etapaKey) return e;
+    const has = e.estadosPossiveis.includes(estadoKey);
+    return { ...e, estadosPossiveis: has ? e.estadosPossiveis.filter(k => k !== estadoKey) : [...e.estadosPossiveis, estadoKey] };
+  }));
   const addCdSessao = () => {
     if (!newCdSessEtapa.trim()) { toast({ title: "Selecione a etapa", variant: "destructive" }); return; }
     if (!newCdSessData) { toast({ title: "Defina a data", variant: "destructive" }); return; }
