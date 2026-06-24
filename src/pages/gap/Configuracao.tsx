@@ -190,8 +190,7 @@ export default function GapConfiguracao() {
 
   // ===== AGENDAMENTOS =====
   type AgCategoria = { key: string; label: string; color: string; descricao?: string };
-  type AgMotivo = { key: string; label: string; categoria: string; duracao: number; responsavel?: string; local?: string };
-  type AgSala = { key: string; label: string; lotacao: number };
+  type AgMotivo = { key: string; label: string; categoria: string };
 
   const [agCategorias, setAgCategorias] = useState<AgCategoria[]>([
     { key: "psicologico", label: "Psicológico", color: "bg-purple-100 text-purple-800 border-purple-200", descricao: "Sessões de apoio psicológico individual ou em grupo." },
@@ -203,17 +202,11 @@ export default function GapConfiguracao() {
     { key: "documentacao", label: "Documentação", color: "bg-slate-100 text-slate-700 border-slate-200", descricao: "Apoio na emissão e gestão de documentos." },
   ]);
   const [agMotivos, setAgMotivos] = useState<AgMotivo[]>([
-    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico", duracao: 50, responsavel: "Dra. Helena Cabral · GAP", local: "Gab. GAP 1" },
-    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico", duracao: 40, responsavel: "Dr. João Tavares · GAP", local: "Gab. GAP 2" },
-    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional", duracao: 60, responsavel: "Dra. Helena Cabral · GAP", local: "Gab. GAP 1" },
-    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional", duracao: 30, responsavel: "Dr. João Tavares · GAP", local: "Gab. GAP 2" },
-    { key: "mediacao", label: "Mediação de conflito", categoria: "Social", duracao: 60, responsavel: "Dra. Helena Cabral · GAP", local: "Sala de Reuniões GAP" },
-  ]);
-
-  const [agSalas, setAgSalas] = useState<AgSala[]>([
-    { key: "gap1", label: "Gab. GAP 1", lotacao: 4 },
-    { key: "gap2", label: "Gab. GAP 2", lotacao: 4 },
-    { key: "gap3", label: "Sala de Reuniões GAP", lotacao: 8 },
+    { key: "acomp_psico", label: "Acompanhamento psicológico", categoria: "Psicológico" },
+    { key: "metodos_estudo", label: "Orientação académica — métodos de estudo", categoria: "Académico" },
+    { key: "vocacional", label: "Orientação vocacional", categoria: "Carreira / Vocacional" },
+    { key: "estagio", label: "Acompanhamento de estágio", categoria: "Carreira / Vocacional" },
+    { key: "mediacao", label: "Mediação de conflito", categoria: "Social" },
   ]);
   const [agHoraInicio, setAgHoraInicio] = useState("08:00");
   const [agHoraFim, setAgHoraFim] = useState("17:00");
@@ -226,19 +219,10 @@ export default function GapConfiguracao() {
   // Ag dialogs
   const [agCatOpen, setAgCatOpen] = useState(false);
   const [agMotOpen, setAgMotOpen] = useState(false);
-  const [agSalaOpen, setAgSalaOpen] = useState(false);
 
   const [newAgCat, setNewAgCat] = useState("");
   const [newAgMotLabel, setNewAgMotLabel] = useState("");
   const [newAgMotCat, setNewAgMotCat] = useState("");
-  
-  const [newAgMotDur, setNewAgMotDur] = useState(45);
-  const [newAgMotResp, setNewAgMotResp] = useState(STAFF_OPTIONS[0]);
-  const [newAgMotLocal, setNewAgMotLocal] = useState("Gab. GAP 1");
-  const [newAgSalaLabel, setNewAgSalaLabel] = useState("");
-  const [newAgSalaLot, setNewAgSalaLot] = useState(4);
-
-  const [editAgSala, setEditAgSala] = useState<AgSala | null>(null);
 
   // ===== CANDIDATURAS =====
   type CdEstado = { key: string; label: string; color: string; descricao?: string };
@@ -750,32 +734,13 @@ export default function GapConfiguracao() {
                           <SelectContent>{agCategorias.map(c => <SelectItem key={c.key} value={c.label}>{c.label}</SelectItem>)}</SelectContent>
                         </Select>
                       </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Duração (min)</label>
-                        <Input type="number" min={10} step={5} value={newAgMotDur} onChange={e => setNewAgMotDur(Number(e.target.value) || 30)} />
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
-                        <Select value={newAgMotResp} onValueChange={setNewAgMotResp}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>{STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Local</label>
-                        <Select value={newAgMotLocal} onValueChange={setNewAgMotLocal}>
-                          <SelectTrigger><SelectValue placeholder="Selecionar..." /></SelectTrigger>
-                          <SelectContent>{agSalas.map(s => <SelectItem key={s.key} value={s.label}>{s.label}</SelectItem>)}</SelectContent>
-                        </Select>
-                      </div>
                     </div>
                     <DialogFooter className="gap-2 sm:gap-2">
                       <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
                       <Button onClick={() => {
                         if (!newAgMotLabel.trim() || !newAgMotCat) return;
-                        setAgMotivos(prev => [...prev, { key: slugify(newAgMotLabel), label: newAgMotLabel.trim(), categoria: newAgMotCat, duracao: newAgMotDur, responsavel: newAgMotResp, local: newAgMotLocal }]);
-                        setNewAgMotLabel(""); setNewAgMotCat(""); setNewAgMotDur(45);
-                        setNewAgMotResp(STAFF_OPTIONS[0]); setNewAgMotLocal(agSalas[0]?.label || "");
+                        setAgMotivos(prev => [...prev, { key: slugify(newAgMotLabel), label: newAgMotLabel.trim(), categoria: newAgMotCat }]);
+                        setNewAgMotLabel(""); setNewAgMotCat("");
                         setAgMotOpen(false);
                         toast({ title: "Motivo adicionado" });
                       }} disabled={!newAgMotLabel.trim() || !newAgMotCat}>Adicionar</Button>
@@ -793,9 +758,6 @@ export default function GapConfiguracao() {
                   <tr className="border-b bg-muted/30">
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Responsável</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Local</th>
-                    <th className="text-center p-3 font-medium text-muted-foreground text-xs">Duração</th>
                     {isCardEditing("ag-motivos") && <th className="w-12" />}
                   </tr>
                 </thead>
@@ -808,13 +770,7 @@ export default function GapConfiguracao() {
                         <td className="p-3">
                           {catCfg ? <Badge variant="outline" className={cn("text-[10px]", catCfg.color)}>{catCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.categoria}</span>}
                         </td>
-                        <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel || <span className="text-muted-foreground">—</span>}</td>
-                        <td className="p-3 text-xs text-foreground whitespace-nowrap">
-                          {m.local ? (
-                            <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3 text-muted-foreground" />{m.local}</span>
-                          ) : <span className="text-muted-foreground">—</span>}
-                        </td>
-                        <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.duracao} min</td>
+                        
                         {isCardEditing("ag-motivos") && (
                           <td className="p-3 text-right">
                             <button onClick={() => setAgMotivos(prev => prev.filter(x => x.key !== m.key))} className="text-muted-foreground hover:text-destructive">
@@ -827,60 +783,6 @@ export default function GapConfiguracao() {
                   })}
                 </tbody>
               </table>
-            </div>
-          </Card>
-
-          {/* Salas / Gabinetes */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Salas / Gabinetes</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {agSalas.length}</span>
-              </div>
-              <div className="flex items-center gap-2">
-              {isCardEditing("ag-salas") && (
-                <Dialog open={agSalaOpen} onOpenChange={setAgSalaOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader><DialogTitle>Nova sala / gabinete</DialogTitle></DialogHeader>
-                    <div className="space-y-3 py-2">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nome da sala</label>
-                        <Input value={newAgSalaLabel} onChange={e => setNewAgSalaLabel(e.target.value)} placeholder="Ex: Gab. GAP 4" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Lotação</label>
-                        <Input type="number" min={1} value={newAgSalaLot} onChange={e => setNewAgSalaLot(Number(e.target.value) || 1)} />
-                      </div>
-                    </div>
-                    <DialogFooter className="gap-2 sm:gap-2">
-                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                      <Button onClick={() => {
-                        if (!newAgSalaLabel.trim()) return;
-                        setAgSalas(prev => [...prev, { key: slugify(newAgSalaLabel), label: newAgSalaLabel.trim(), lotacao: newAgSalaLot }]);
-                        setNewAgSalaLabel(""); setNewAgSalaLot(4); setAgSalaOpen(false);
-                        toast({ title: "Sala adicionada" });
-                      }} disabled={!newAgSalaLabel.trim()}>Adicionar</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
-                <CardEditToggle id="ag-salas" />
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {agSalas.map(s => (
-                <div key={s.key} className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/30 px-3 py-1 text-xs">
-                  <MapPin className="w-3 h-3 text-muted-foreground" />
-                  <span className="font-medium text-foreground">{s.label}</span>
-                  <span className="text-muted-foreground tabular-nums">· {s.lotacao} lug.</span>
-                  <EditIcon onClick={() => setEditAgSala(s)} label={`Editar ${s.label}`} editing={isCardEditing("ag-salas")} />
-                  <RemoveIcon onClick={() => setAgSalas(prev => prev.filter(x => x.key !== s.key))} label={`Remover ${s.label}`} editing={isCardEditing("ag-salas")} />
-                </div>
-              ))}
             </div>
           </Card>
         </TabsContent>
@@ -1206,32 +1108,6 @@ export default function GapConfiguracao() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Sala Dialog */}
-      <Dialog open={!!editAgSala} onOpenChange={(o) => !o && setEditAgSala(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>Editar sala</DialogTitle></DialogHeader>
-          {editAgSala && (
-            <div className="space-y-3 py-2">
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nome da sala</label>
-                <Input value={editAgSala.label} onChange={e => setEditAgSala({ ...editAgSala, label: e.target.value })} />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Lotação</label>
-                <Input type="number" min={1} value={editAgSala.lotacao} onChange={e => setEditAgSala({ ...editAgSala, lotacao: Number(e.target.value) || 1 })} />
-              </div>
-            </div>
-          )}
-          <DialogFooter className="gap-2 sm:gap-2">
-            <Button variant="outline" onClick={() => setEditAgSala(null)}>Cancelar</Button>
-            <Button onClick={() => {
-              if (!editAgSala || !editAgSala.label.trim()) return;
-              setAgSalas(prev => prev.map(s => s.key === editAgSala.key ? editAgSala : s));
-              toast({ title: "Sala atualizada" }); setEditAgSala(null);
-            }} disabled={!editAgSala?.label.trim()}>Guardar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Edit Motivo Dialog */}
       <Dialog open={!!editMotivo} onOpenChange={(o) => !o && setEditMotivo(null)}>
