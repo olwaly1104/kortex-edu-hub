@@ -369,98 +369,107 @@ export default function GapConfiguracao() {
 
         <TabsContent value="solicitacoes" className="space-y-6 mt-0">
           {/* Estados */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Estados</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {estados.length}</span>
-              </div>
-              <div className="flex items-center gap-2">
-              {isCardEditing("sol-estados") && (
-                <Dialog open={estadoOpen} onOpenChange={setEstadoOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
-                      <Plus className="w-3.5 h-3.5" /> Adicionar
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader><DialogTitle>Novo estado</DialogTitle></DialogHeader>
-                    <div className="space-y-3 py-2">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
-                        <Input value={newEstadoLabel} onChange={e => setNewEstadoLabel(e.target.value)} placeholder="Ex: Em revisão" />
-                      </div>
+          {(() => {
+            const COR_OPCOES = [
+              { label: "Verde", value: "bg-green-100 text-green-700 border-green-200" },
+              { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
+              { label: "Vermelho", value: "bg-red-100 text-red-700 border-red-200" },
+              { label: "Azul", value: "bg-blue-100 text-blue-700 border-blue-200" },
+              { label: "Cinza", value: "bg-slate-100 text-slate-700 border-slate-200" },
+              { label: "Violeta", value: "bg-violet-100 text-violet-700 border-violet-200" },
+            ];
+            return (
+              <>
+                <Card className="overflow-hidden">
+                  <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-primary" />
+                    <div className="min-w-0">
+                      <h2 className="text-sm font-bold text-foreground">Estados de solicitação</h2>
+                      <p className="text-[11px] text-muted-foreground">Fases do ciclo de vida de uma solicitação (ex: Pendente, Em execução, Concluída).</p>
                     </div>
-                    <DialogFooter className="gap-2 sm:gap-2">
-                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                      <Button onClick={handleAddEstado} disabled={!newEstadoLabel.trim()}>Adicionar</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
-                <CardEditToggle id="sol-estados" />
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {estados.map(e => (
-                <div key={e.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
-                  <span className="font-medium">{e.label}</span>
-                  <EditIcon onClick={() => setEditEstado(e)} label={`Editar ${e.label}`} editing={isCardEditing("sol-estados")} />
-                  <RemoveIcon onClick={() => removeEstado(e.key)} label={`Remover ${e.label}`} editing={isCardEditing("sol-estados")} />
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* Categorias */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Layers className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Categorias</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {categorias.length}</span>
-              </div>
-              <div className="flex items-center gap-2">
-              {isCardEditing("sol-categorias") && (
-                <Dialog open={catOpen} onOpenChange={setCatOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs">
-                      <Plus className="w-3.5 h-3.5" /> Adicionar
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader><DialogTitle>Nova categoria</DialogTitle></DialogHeader>
-                    <div className="space-y-3 py-2">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
-                        <Input value={newCatLabel} onChange={e => setNewCatLabel(e.target.value)} placeholder="Ex: Social" />
-                      </div>
-                    </div>
-                    <DialogFooter className="gap-2 sm:gap-2">
-                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                      <Button onClick={handleAddCategoria} disabled={!newCatLabel.trim()}>Adicionar</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
-                <CardEditToggle id="sol-categorias" />
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {categorias.map(c => {
-                const count = motivos.filter(m => m.categoria === c.label).length;
-                return (
-                  <div key={c.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
-                    <span className="font-medium">{c.label}</span>
-                    <span className="opacity-60 tabular-nums">· {count} motivos</span>
-                    <EditIcon onClick={() => setEditCategoria(c)} label={`Editar ${c.label}`} editing={isCardEditing("sol-categorias")} />
-                    <RemoveIcon onClick={() => removeCategoria(c.key)} label={`Remover ${c.label}`} editing={isCardEditing("sol-categorias")} />
+                    <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{estados.length} estado{estados.length === 1 ? "" : "s"}</span>
                   </div>
-                );
-              })}
-            </div>
-          </Card>
+                  <div className="divide-y">
+                    <div className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+                      <div>Designação</div>
+                      <div>Descrição</div>
+                      <div>Cor</div>
+                      <div>Pré-visualização</div>
+                      <div className="text-right">Ação</div>
+                    </div>
+                    {estados.map((es) => (
+                      <div key={es.key} className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+                        <Input className="h-9" placeholder="Ex: Pendente" value={es.label}
+                          onChange={(e) => setEstados((s) => s.map((x) => x.key === es.key ? { ...x, label: e.target.value } : x))} />
+                        <Input className="h-9" placeholder="Descrição curta do estado" value={es.descricao || ""}
+                          onChange={(e) => setEstados((s) => s.map((x) => x.key === es.key ? { ...x, descricao: e.target.value } : x))} />
+                        <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={es.color}
+                          onChange={(e) => setEstados((s) => s.map((x) => x.key === es.key ? { ...x, color: e.target.value } : x))}>
+                          {COR_OPCOES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                        </select>
+                        <span className={cn("inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium", es.color)}>{es.label || "—"}</span>
+                        <div className="flex justify-end">
+                          <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            onClick={() => removeEstado(es.key)}><Trash2 className="w-3.5 h-3.5" /></Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="px-5 py-3 border-t bg-muted/10">
+                    <Button size="sm" variant="outline" className="gap-1.5"
+                      onClick={() => setEstados((s) => [...s, { key: `estado_${Date.now()}`, label: "", color: COR_OPCOES[0].value, descricao: "" }])}>
+                      <Plus className="w-3.5 h-3.5" /> Adicionar estado
+                    </Button>
+                  </div>
+                </Card>
+
+                {/* Categorias */}
+                <Card className="overflow-hidden">
+                  <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-primary" />
+                    <div className="min-w-0">
+                      <h2 className="text-sm font-bold text-foreground">Categorias de solicitação</h2>
+                      <p className="text-[11px] text-muted-foreground">Agrupam os motivos (ex: Académico, Tecnológico, Financeiro).</p>
+                    </div>
+                    <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{categorias.length} categoria{categorias.length === 1 ? "" : "s"}</span>
+                  </div>
+                  <div className="divide-y">
+                    <div className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+                      <div>Designação</div>
+                      <div>Descrição</div>
+                      <div>Cor</div>
+                      <div>Pré-visualização</div>
+                      <div className="text-right">Ação</div>
+                    </div>
+                    {categorias.map((c) => (
+                      <div key={c.key} className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+                        <Input className="h-9" placeholder="Ex: Académico" value={c.label}
+                          onChange={(e) => setCategorias((s) => s.map((x) => x.key === c.key ? { ...x, label: e.target.value } : x))} />
+                        <Input className="h-9" placeholder="Descrição curta da categoria" value={c.descricao || ""}
+                          onChange={(e) => setCategorias((s) => s.map((x) => x.key === c.key ? { ...x, descricao: e.target.value } : x))} />
+                        <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={c.color}
+                          onChange={(e) => setCategorias((s) => s.map((x) => x.key === c.key ? { ...x, color: e.target.value } : x))}>
+                          {COR_OPCOES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                        </select>
+                        <span className={cn("inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium", c.color)}>{c.label || "—"}</span>
+                        <div className="flex justify-end">
+                          <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            onClick={() => removeCategoria(c.key)}><Trash2 className="w-3.5 h-3.5" /></Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="px-5 py-3 border-t bg-muted/10">
+                    <Button size="sm" variant="outline" className="gap-1.5"
+                      onClick={() => setCategorias((s) => [...s, { key: `cat_${Date.now()}`, label: "", color: COR_OPCOES[0].value, descricao: "" }])}>
+                      <Plus className="w-3.5 h-3.5" /> Adicionar categoria
+                    </Button>
+                  </div>
+                </Card>
+              </>
+            );
+          })()}
+
 
           {/* Motivos */}
           <Card className="p-5">
