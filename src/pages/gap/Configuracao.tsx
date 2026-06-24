@@ -662,52 +662,65 @@ export default function GapConfiguracao() {
           </Card>
 
           {/* Categorias de atendimento */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Layers className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Categorias de atendimento</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {agCategorias.length}</span>
-              </div>
-              <div className="flex items-center gap-2">
-              {isCardEditing("ag-categorias") && (
-                <Dialog open={agCatOpen} onOpenChange={setAgCatOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader><DialogTitle>Nova categoria de atendimento</DialogTitle></DialogHeader>
-                    <div className="space-y-3 py-2">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
-                        <Input value={newAgCat} onChange={e => setNewAgCat(e.target.value)} placeholder="Ex: Social" />
+          {(() => {
+            const AG_COR_OPCOES = [
+              { label: "Verde", value: "bg-green-100 text-green-700 border-green-200" },
+              { label: "Âmbar", value: "bg-amber-100 text-amber-700 border-amber-200" },
+              { label: "Vermelho", value: "bg-red-100 text-red-700 border-red-200" },
+              { label: "Azul", value: "bg-blue-100 text-blue-700 border-blue-200" },
+              { label: "Cinza", value: "bg-slate-100 text-slate-700 border-slate-200" },
+              { label: "Violeta", value: "bg-violet-100 text-violet-700 border-violet-200" },
+              { label: "Roxo", value: "bg-purple-100 text-purple-800 border-purple-200" },
+              { label: "Esmeralda", value: "bg-emerald-100 text-emerald-800 border-emerald-200" },
+              { label: "Rosa", value: "bg-rose-100 text-rose-800 border-rose-200" },
+              { label: "Ciano", value: "bg-cyan-100 text-cyan-800 border-cyan-200" },
+            ];
+            return (
+              <Card className="overflow-hidden">
+                <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-primary" />
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-bold text-foreground">Categorias de atendimento</h2>
+                    <p className="text-[11px] text-muted-foreground">Agrupam os motivos de agendamento (ex: Psicológico, Académico, Social).</p>
+                  </div>
+                  <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{agCategorias.length} categoria{agCategorias.length === 1 ? "" : "s"}</span>
+                </div>
+                <div className="divide-y">
+                  <div className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+                    <div>Designação</div>
+                    <div>Descrição</div>
+                    <div>Cor</div>
+                    <div>Pré-visualização</div>
+                    <div className="text-right">Ação</div>
+                  </div>
+                  {agCategorias.map((c) => (
+                    <div key={c.key} className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+                      <Input className="h-9" placeholder="Ex: Psicológico" value={c.label}
+                        onChange={(e) => setAgCategorias((s) => s.map((x) => x.key === c.key ? { ...x, label: e.target.value } : x))} />
+                      <Input className="h-9" placeholder="Descrição curta da categoria" value={c.descricao || ""}
+                        onChange={(e) => setAgCategorias((s) => s.map((x) => x.key === c.key ? { ...x, descricao: e.target.value } : x))} />
+                      <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={c.color}
+                        onChange={(e) => setAgCategorias((s) => s.map((x) => x.key === c.key ? { ...x, color: e.target.value } : x))}>
+                        {AG_COR_OPCOES.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+                      </select>
+                      <span className={cn("inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium", c.color)}>{c.label || "—"}</span>
+                      <div className="flex justify-end">
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          onClick={() => setAgCategorias((s) => s.filter((x) => x.key !== c.key))}><Trash2 className="w-3.5 h-3.5" /></Button>
                       </div>
                     </div>
-                    <DialogFooter className="gap-2 sm:gap-2">
-                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                      <Button onClick={() => {
-                        if (!newAgCat.trim()) return;
-                        const key = slugify(newAgCat);
-                        setAgCategorias(prev => [...prev, { key, label: newAgCat.trim(), color: "bg-slate-100 text-slate-700 border-slate-200" }]);
-                        setNewAgCat(""); setAgCatOpen(false);
-                        toast({ title: "Categoria adicionada" });
-                      }} disabled={!newAgCat.trim()}>Adicionar</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
-                <CardEditToggle id="ag-categorias" />
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {agCategorias.map(c => (
-                <div key={c.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", c.color)}>
-                  <span className="font-medium">{c.label}</span>
-                  <RemoveIcon onClick={() => setAgCategorias(prev => prev.filter(x => x.key !== c.key))} label={`Remover ${c.label}`} editing={isCardEditing("ag-categorias")} />
+                  ))}
                 </div>
-              ))}
-            </div>
-          </Card>
+                <div className="px-5 py-3 border-t bg-muted/10">
+                  <Button size="sm" variant="outline" className="gap-1.5"
+                    onClick={() => setAgCategorias((s) => [...s, { key: `agcat_${Date.now()}`, label: "", color: AG_COR_OPCOES[0].value, descricao: "" }])}>
+                    <Plus className="w-3.5 h-3.5" /> Adicionar categoria
+                  </Button>
+                </div>
+              </Card>
+            );
+          })()}
+
 
           {/* Motivos de agendamento */}
           <Card className="p-5">
