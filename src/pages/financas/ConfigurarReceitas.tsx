@@ -531,7 +531,16 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             </PopoverContent>
                           </Popover>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(bruto * (1 + taxa))} Kz</div>
-                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(propinaAnual)} Kz</div>
+                          <div className="min-h-9 flex flex-col items-end justify-center gap-0.5 px-2 py-1 rounded-md bg-muted/30">
+                            {mesesArr.length === 0 ? (
+                              <span className="tabular-nums text-sm font-medium text-muted-foreground">—</span>
+                            ) : mesesArr.map((m) => (
+                              <div key={m} className="flex items-baseline gap-1.5 tabular-nums">
+                                <span className="text-[10px] font-semibold text-muted-foreground">{m}M</span>
+                                <span className="text-sm font-medium text-foreground">{fmt(bruto * (1 + taxa) * m)} Kz</span>
+                              </div>
+                            ))}
+                          </div>
                           <div className="flex justify-end gap-1">
                             <Button size="sm" variant={dirty ? "default" : "outline"}
                               disabled={!dirty || updatePropina.isPending}
