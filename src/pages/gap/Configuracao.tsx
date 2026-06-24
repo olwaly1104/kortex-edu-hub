@@ -230,7 +230,7 @@ export default function GapConfiguracao() {
   // ===== CANDIDATURAS =====
   type CdEstado = { key: string; label: string; color: string; descricao?: string };
  type CdEtapa = { key: string; label: string; agenda: boolean; obrigatoria: boolean; estadosPossiveis: string[] };
- type CdSessao = { key: string; etapa: string; data: string; hora: string; local: string; capacidade: number };
+ type CdSessao = { etapaKey: string; mode: "single" | "range"; datas: string[]; dataFim?: string; hora: string; local: string; responsavel: string; capacidade: number };
 
 
   const [cdEstados, setCdEstados] = useState<CdEstado[]>([
@@ -247,7 +247,29 @@ export default function GapConfiguracao() {
     { key: "curso_preparatorio", label: "Curso Preparatório", agenda: true, obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
     { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
-  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([]);
+  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([
+    { etapaKey: "entrevista", mode: "single", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30 },
+    { etapaKey: "curso_preparatorio", mode: "range", datas: [""], dataFim: "", hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 60 },
+    { etapaKey: "exame", mode: "single", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 80 },
+  ]);
+  // Auto-sync: ensure one sessão row per etapa with agenda=true
+  useEffect(() => {
+    setCdSessoes(prev => {
+      const agendadas = cdEtapas.filter(e => e.agenda);
+      const byKey = new Map(prev.map(s => [s.etapaKey, s]));
+      return agendadas.map(e => byKey.get(e.key) || {
+        etapaKey: e.key, mode: "single" as const, datas: [], hora: "09:00",
+        local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30,
+      });
+    });
+  }, [cdEtapas]);
+  const updateSessao = (etapaKey: string, patch: Partial<CdSessao>) =>
+    setCdSessoes(prev => prev.map(s => s.etapaKey === etapaKey ? { ...s, ...patch } : s));
+  const toggleSessaoData = (etapaKey: string, data: string) => setCdSessoes(prev => prev.map(s => {
+    if (s.etapaKey !== etapaKey) return s;
+    const has = s.datas.includes(data);
+    return { ...s, datas: has ? s.datas.filter(d => d !== data) : [...s.datas, data].sort() };
+  }));
   const [cdNotaMinima, setCdNotaMinima] = useState<number | "">(() => {
     if (typeof window === "undefined") return "";
     const v = window.localStorage.getItem("academica.notaMinimaAcesso");
@@ -267,15 +289,9 @@ export default function GapConfiguracao() {
 
   const [cdEstadoOpen, setCdEstadoOpen] = useState(false);
   const [cdEtapaOpen, setCdEtapaOpen] = useState(false);
-  const [cdSessOpen, setCdSessOpen] = useState(false);
 
   const [newCdEstadoLabel, setNewCdEstadoLabel] = useState("");
   const [newCdEtapaLabel, setNewCdEtapaLabel] = useState("");
-  const [newCdSessEtapa, setNewCdSessEtapa] = useState("Curso Preparatório");
-  const [newCdSessData, setNewCdSessData] = useState("");
-  const [newCdSessHora, setNewCdSessHora] = useState("09:00");
-  const [newCdSessLocal, setNewCdSessLocal] = useState("");
-  const [newCdSessCap, setNewCdSessCap] = useState(60);
 
   const CD_COLORS = [
     "bg-blue-50 text-blue-700 border-blue-200",
@@ -307,16 +323,6 @@ export default function GapConfiguracao() {
     const has = e.estadosPossiveis.includes(estadoKey);
     return { ...e, estadosPossiveis: has ? e.estadosPossiveis.filter(k => k !== estadoKey) : [...e.estadosPossiveis, estadoKey] };
   }));
-  const addCdSessao = () => {
-    if (!newCdSessEtapa.trim()) { toast({ title: "Selecione a etapa", variant: "destructive" }); return; }
-    if (!newCdSessData) { toast({ title: "Defina a data", variant: "destructive" }); return; }
-    if (!newCdSessHora) { toast({ title: "Defina a hora", variant: "destructive" }); return; }
-    if (!newCdSessLocal.trim()) { toast({ title: "Indique o local", variant: "destructive" }); return; }
-    if (!Number.isFinite(newCdSessCap) || newCdSessCap <= 0) { toast({ title: "Capacidade deve ser maior que zero", variant: "destructive" }); return; }
-    setCdSessoes(s => [...s, { key: `s-${Date.now()}`, etapa: newCdSessEtapa, data: newCdSessData, hora: newCdSessHora, local: newCdSessLocal.trim(), capacidade: newCdSessCap }]);
-    setNewCdSessData(""); setNewCdSessLocal(""); setNewCdSessCap(60); setCdSessOpen(false);
-  };
-  const removeCdSessao = (key: string) => setCdSessoes(s => s.filter(x => x.key !== key));
 
   const confirmCurrentStep = () => {
     const key = tab === "discentes" ? "gap.disc" : tab === "agendamentos" ? "gap.age" : tab === "candidaturas" ? "gap.cand" : "gap.sol";
@@ -1025,84 +1031,111 @@ export default function GapConfiguracao() {
                 <h2 className="text-sm font-semibold text-foreground">Sessões agendadas</h2>
                 <span className="text-[11px] text-muted-foreground tabular-nums">· {cdSessoes.length}</span>
               </div>
-              <div className="flex items-center gap-2">
-              {isCardEditing("cd-sessoes") && (
-                <Dialog open={cdSessOpen} onOpenChange={setCdSessOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader><DialogTitle>Nova sessão</DialogTitle></DialogHeader>
-                    <div className="space-y-3 py-2">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Etapa</label>
-                        <Select value={newCdSessEtapa} onValueChange={setNewCdSessEtapa}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>{cdEtapas.filter(e => e.key !== "submissao").map(e => <SelectItem key={e.key} value={e.label}>{e.label}</SelectItem>)}</SelectContent>
-                        </Select>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Data</label>
-                          <Input type="date" value={newCdSessData} onChange={e => setNewCdSessData(e.target.value)} />
-                        </div>
-                        <div>
-                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Hora</label>
-                          <Input type="time" value={newCdSessHora} onChange={e => setNewCdSessHora(e.target.value)} />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Local</label>
-                        <Input value={newCdSessLocal} onChange={e => setNewCdSessLocal(e.target.value)} placeholder="Ex: Anfiteatro A" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Capacidade</label>
-                        <Input type="number" min={1} value={newCdSessCap} onChange={e => setNewCdSessCap(Number(e.target.value) || 1)} />
-                      </div>
-                    </div>
-                    <DialogFooter className="gap-2 sm:gap-2">
-                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                      <Button onClick={addCdSessao} disabled={!newCdSessData || !newCdSessLocal.trim()}>Adicionar</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
-                <CardEditToggle id="cd-sessoes" />
-              </div>
+              <CardEditToggle id="cd-sessoes" />
             </div>
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
-                    <th className="text-left font-semibold px-4 py-2">Etapa</th>
-                    <th className="text-left font-semibold px-3 py-2">Data</th>
-                    <th className="text-left font-semibold px-3 py-2">Hora</th>
-                    <th className="text-left font-semibold px-3 py-2">Local</th>
-                    <th className="text-center font-semibold px-3 py-2">Capacidade</th>
-                    {isCardEditing("cd-sessoes") && <th className="w-12"></th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {cdSessoes.map(s => (
-                    <tr key={s.key} className="border-b border-border/50 last:border-0">
-                      <td className="px-4 py-2.5 text-sm font-medium text-foreground">{s.etapa}</td>
-                      <td className="px-3 py-2.5 text-xs tabular-nums">{s.data}</td>
-                      <td className="px-3 py-2.5 text-xs tabular-nums">{s.hora}</td>
-                      <td className="px-3 py-2.5 text-xs text-muted-foreground">{s.local}</td>
-                      <td className="px-3 py-2.5 text-center text-xs tabular-nums">{s.capacidade}</td>
-                      {isCardEditing("cd-sessoes") && (
-                        <td className="px-2 py-2.5 text-right">
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => removeCdSessao(s.key)} title="Remover">
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </td>
-                      )}
+            {cdSessoes.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic px-1 py-3">
+                Sem etapas agendáveis. Ative "Agenda" numa etapa do processo para criar uma sessão.
+              </p>
+            ) : (
+              <div className="overflow-x-auto rounded-lg border border-border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-[10px] uppercase tracking-wider text-muted-foreground border-b border-border bg-muted/30">
+                      <th className="text-left font-semibold px-4 py-2">Etapa</th>
+                      <th className="text-left font-semibold px-3 py-2 w-32">Tipo</th>
+                      <th className="text-left font-semibold px-3 py-2">Data(s)</th>
+                      <th className="text-left font-semibold px-3 py-2 w-24">Hora</th>
+                      <th className="text-left font-semibold px-3 py-2">Local</th>
+                      <th className="text-left font-semibold px-3 py-2">Responsável</th>
+                      <th className="text-center font-semibold px-3 py-2 w-24">Capacidade</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {cdSessoes.map(s => {
+                      const etapa = cdEtapas.find(e => e.key === s.etapaKey);
+                      const editing = isCardEditing("cd-sessoes");
+                      return (
+                        <tr key={s.etapaKey} className="border-b border-border/50 last:border-0 align-top">
+                          <td className="px-4 py-2.5 text-sm font-medium text-foreground">{etapa?.label || s.etapaKey}</td>
+                          <td className="px-3 py-2.5">
+                            {editing ? (
+                              <Select value={s.mode} onValueChange={(v: "single" | "range") => updateSessao(s.etapaKey, { mode: v, datas: v === "range" ? [s.datas[0] || ""] : [], dataFim: v === "range" ? (s.dataFim || "") : undefined })}>
+                                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="single">Dia(s) único(s)</SelectItem>
+                                  <SelectItem value="range">Período</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              <span className="text-[11px] text-muted-foreground">{s.mode === "range" ? "Período" : "Dia(s) único(s)"}</span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2.5">
+                            {s.mode === "range" ? (
+                              editing ? (
+                                <div className="flex items-center gap-1.5">
+                                  <Input type="date" className="h-8 text-xs" value={s.datas[0] || ""} onChange={e => updateSessao(s.etapaKey, { datas: [e.target.value] })} />
+                                  <span className="text-[10px] text-muted-foreground">até</span>
+                                  <Input type="date" className="h-8 text-xs" value={s.dataFim || ""} onChange={e => updateSessao(s.etapaKey, { dataFim: e.target.value })} />
+                                </div>
+                              ) : (
+                                <span className="text-xs tabular-nums">{s.datas[0] || "—"} → {s.dataFim || "—"}</span>
+                              )
+                            ) : (
+                              editing ? (
+                                <div className="space-y-1.5">
+                                  <div className="flex flex-wrap gap-1">
+                                    {s.datas.map(d => (
+                                      <span key={d} className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 px-1.5 py-0.5 text-[10px] tabular-nums">
+                                        {d}
+                                        <button onClick={() => toggleSessaoData(s.etapaKey, d)} className="hover:text-red-600"><Trash2 className="w-2.5 h-2.5" /></button>
+                                      </span>
+                                    ))}
+                                  </div>
+                                  <Input type="date" className="h-8 text-xs" value="" onChange={e => e.target.value && toggleSessaoData(s.etapaKey, e.target.value)} placeholder="Adicionar dia" />
+                                </div>
+                              ) : (
+                                <div className="flex flex-wrap gap-1">
+                                  {s.datas.length === 0
+                                    ? <span className="text-[11px] text-muted-foreground italic">—</span>
+                                    : s.datas.map(d => <span key={d} className="inline-flex rounded-full bg-blue-50 border border-blue-200 text-blue-700 px-1.5 py-0.5 text-[10px] tabular-nums">{d}</span>)}
+                                </div>
+                              )
+                            )}
+                          </td>
+                          <td className="px-3 py-2.5">
+                            {editing
+                              ? <Input type="time" className="h-8 text-xs" value={s.hora} onChange={e => updateSessao(s.etapaKey, { hora: e.target.value })} />
+                              : <span className="text-xs tabular-nums">{s.hora}</span>}
+                          </td>
+                          <td className="px-3 py-2.5">
+                            {editing
+                              ? <Input className="h-8 text-xs" value={s.local} onChange={e => updateSessao(s.etapaKey, { local: e.target.value })} placeholder="Ex: Anfiteatro A" />
+                              : <span className="text-xs text-muted-foreground">{s.local || "—"}</span>}
+                          </td>
+                          <td className="px-3 py-2.5">
+                            {editing ? (
+                              <Select value={s.responsavel} onValueChange={v => updateSessao(s.etapaKey, { responsavel: v })}>
+                                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                                <SelectContent>{STAFF_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                              </Select>
+                            ) : <span className="text-xs text-muted-foreground">{s.responsavel}</span>}
+                          </td>
+                          <td className="px-3 py-2.5 text-center">
+                            {editing
+                              ? <Input type="number" min={1} className="h-8 text-xs text-center" value={s.capacidade} onChange={e => updateSessao(s.etapaKey, { capacidade: Number(e.target.value) || 1 })} />
+                              : <span className="text-xs tabular-nums">{s.capacidade}</span>}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </Card>
+
 
           <p className="text-[11px] text-muted-foreground">
             Total de candidaturas registadas no sistema: <span className="font-semibold text-foreground tabular-nums">{allCandidaturas.length}</span>
