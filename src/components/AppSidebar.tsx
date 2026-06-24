@@ -22,7 +22,7 @@ const studentSections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/student" },
     { label: "Calendário", icon: Calendar, path: "/student/calendar" },
     { label: "Anúncios", icon: Megaphone, path: "/student/announcements", badge: 4 },
-    { label: "Solicitações", icon: HelpCircle, path: "/student/solicitacoes" },
+    { label: "Minhas Solicitações", icon: HelpCircle, path: "/student/solicitacoes" },
   ]},
   { title: "Académico", items: [
     { label: "As Minhas Cadeiras", icon: BookOpen, path: "/student/disciplines" },
@@ -48,7 +48,7 @@ const professorSections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/professor" },
     { label: "Calendário", icon: Calendar, path: "/professor/calendar" },
     { label: "Anúncios", icon: Megaphone, path: "/professor/announcements", badge: 4 },
-    { label: "Solicitações", icon: CheckSquare, path: "/professor/solicitacoes" },
+    { label: "Minhas Solicitações", icon: CheckSquare, path: "/professor/solicitacoes" },
   ]},
   { title: "Académico", items: [
     { label: "As Minhas Turmas", icon: BookOpen, path: "/professor/disciplines" },
@@ -73,7 +73,7 @@ const coordenadorCursoSections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/coordenador" },
     { label: "Calendário", icon: Calendar, path: "/coordenador/calendario" },
     { label: "Anúncios", icon: Megaphone, path: "/coordenador/anuncios", badge: 4 },
-    { label: "Solicitações", icon: CheckSquare, path: "/coordenador/solicitacoes" },
+    { label: "Minhas Solicitações", icon: CheckSquare, path: "/coordenador/solicitacoes" },
   ]},
   { title: "O Meu Curso", items: [
     { label: "Os Meus Anos", icon: Layers, path: "/coordenador/anos" },
@@ -122,7 +122,7 @@ const reitorSections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/reitor" },
     { label: "Calendário", icon: Calendar, path: "/reitor/calendario" },
     { label: "Anúncios", icon: Megaphone, path: "/reitor/anuncios", badge: 4 },
-    { label: "Solicitações", icon: CheckSquare, path: "/reitor/solicitacoes" },
+    { label: "Minhas Solicitações", icon: CheckSquare, path: "/reitor/solicitacoes" },
   ]},
   { title: "Académico", items: [
     { label: "Faculdades", icon: Building2, path: "/reitor/faculdades" },
@@ -144,7 +144,7 @@ const secretariaSections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/secretaria" },
     { label: "Calendário", icon: Calendar, path: "/secretaria/calendario" },
     { label: "Anúncios", icon: Megaphone, path: "/secretaria/anuncios", badge: 4 },
-    { label: "Solicitações", icon: CheckSquare, path: "/secretaria/solicitacoes" },
+    { label: "Minhas Solicitações", icon: CheckSquare, path: "/secretaria/solicitacoes" },
   ]},
   { title: "Área Académica", items: [
     { label: "Dashboard", icon: BarChart3, path: "/secretaria/dashboard" },
@@ -167,7 +167,7 @@ const financasSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/financas" },
     { label: "Calendário", icon: Calendar, path: "/financas/calendario" },
-    { label: "Solicitações", icon: CheckSquare, path: "/financas/solicitacoes" },
+    { label: "Minhas Solicitações", icon: CheckSquare, path: "/financas/solicitacoes" },
   ]},
 
   { title: "Finanças", items: [
@@ -221,7 +221,7 @@ const academica2Sections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/areaacademica" },
     { label: "Calendário", icon: Calendar, path: "/areaacademica/calendario" },
     { label: "Anúncios", icon: Megaphone, path: "/areaacademica/anuncios", badge: 4 },
-    { label: "Solicitações", icon: CheckSquare, path: "/areaacademica/solicitacoes" },
+    { label: "Minhas Solicitações", icon: CheckSquare, path: "/areaacademica/solicitacoes" },
   ]},
   { title: "Área Académica", items: [
     { label: "Criador de Ano Letivo", icon: Wand2, path: "/areaacademica/criador" },
