@@ -38,6 +38,9 @@ const newId = () => Math.random().toString(36).slice(2, 10);
 const fmt = (v: number) => v.toLocaleString("pt-AO", { maximumFractionDigits: 0 });
 const readJSON = <T,>(k: string, fb: T): T => { try { const r = localStorage.getItem(k); return r ? (JSON.parse(r) as T) : fb; } catch { return fb; } };
 const writeJSON = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* */ } };
+const confirmDelete = (label = "este registo") =>
+  window.confirm(`Tem a certeza que pretende eliminar ${label}? Esta acção é irreversível.`);
+
 
 const TAB_DEFS: { id: Tab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: "receitas", label: "Receitas", icon: TrendingUp },
