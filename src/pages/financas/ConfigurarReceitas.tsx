@@ -401,12 +401,6 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{prazosCfg.length} prazo{prazosCfg.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[140px_160px_1fr_44px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
-            <div>Nº de meses</div>
-            <div>Período de pagamento</div>
-            <div>Pré-visualização</div>
-            <div className="text-right">Ação</div>
-          </div>
           <div className="grid grid-cols-[140px_1fr_44px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Nº de meses</div>
             <div>Período de pagamento</div>
@@ -546,25 +540,27 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                             <option value="">— Selecionar —</option>
                             {impostos.map((i) => <option key={i.id} value={i.id}>{i.nome}</option>)}
                           </select>
-                          <div className="flex flex-wrap items-center gap-1.5 min-h-9 py-1">
-                            {prazosCfg.length === 0 ? (
-                              <span className="text-xs text-muted-foreground">Sem prazos</span>
-                            ) : prazosCfg.map((pc) => {
-                              const m = pc.meses;
-                              const checked = mesesArr.includes(m);
-                              return (
-                                <button key={pc.id} type="button" onClick={() => toggleMes(m)}
-                                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-medium tabular-nums transition-colors ${
-                                    checked
-                                      ? "bg-primary/10 border-primary/30 text-primary"
-                                      : "bg-background border-input text-muted-foreground hover:bg-muted/40"
-                                  }`}>
-                                  {checked && <Check className="w-3 h-3" />}
-                                  {m}M
-                                </button>
-                              );
-                            })}
-                          </div>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button type="button"
+                                className="h-9 rounded-md border border-input bg-background px-2 text-sm flex items-center justify-between gap-2 hover:bg-muted/40">
+                                <span className={mesesArr.length ? "text-foreground truncate" : "text-muted-foreground"}>{mesesLabel}</span>
+                                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="w-44 p-1">
+                              {prazosCfg.map((pc) => {
+                                const m = pc.meses;
+                                const checked = mesesArr.includes(m);
+                                return (
+                                  <label key={pc.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
+                                    <Checkbox checked={checked} onCheckedChange={() => toggleMes(m)} />
+                                    <span className="tabular-nums">{m}M</span>
+                                  </label>
+                                );
+                              })}
+                            </PopoverContent>
+                          </Popover>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(bruto * (1 + taxa))} Kz</div>
                           <div className="min-h-9 flex flex-col items-end justify-center gap-0.5 px-2 py-1 rounded-md bg-muted/30">
                             {mesesArr.length === 0 ? (
