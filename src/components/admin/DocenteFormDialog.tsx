@@ -252,7 +252,7 @@ export function DocenteFormDialog({
                     <SelectContent>{grausPool.map((g) => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
                   </Select>
                 </Field>
-                <Field label="Especialidade">
+                <Field label="Curso">
                   <Input className="h-8 text-xs" value={draft.especialidade || ""} onChange={(e) => setF("especialidade", e.target.value)} placeholder="Ex.: Arquitectura" />
                 </Field>
                 <Field label="Instituição">
