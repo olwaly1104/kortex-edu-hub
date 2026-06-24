@@ -214,7 +214,7 @@ export default function OnboardingRegrasPresenca() {
 
             {/* Tabela de Multas */}
             <Card className="overflow-hidden relative">
-              <CardLockBadge />
+              <CardLockBadge editing={cardEdit} onEdit={() => setCardEdit(true)} onConfirm={() => setCardEdit(false)} />
 
               {/* Table header */}
               <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b">
