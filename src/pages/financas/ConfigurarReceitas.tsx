@@ -477,8 +477,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const bruto = Number(valorVal) || 0;
                     const mesesArr = (prazoByCurso[c.id] ?? []).slice().sort((a, b) => a - b);
                     const mesesMax = mesesArr.length ? Math.max(...mesesArr) : 0;
-                    const brutaAnual = bruto * (1 + taxa) * mesesMax;
-                    const liquidaAnual = bruto * mesesMax;
+                    const propinaAnual = bruto * (1 + taxa) * mesesMax;
                     const dirty = d !== undefined;
                     const toggleMes = (m: number) => setPrazoByCurso((s) => {
                       const cur = s[c.id] ?? [];
@@ -487,7 +486,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                       return { ...s, [c.id]: next };
                     });
                     const mesesLabel = mesesArr.length
-                      ? mesesArr.map((m) => prazosCfg.find((pc) => pc.meses === m)?.nome ?? `${m} meses`).join(" · ")
+                      ? mesesArr.join(", ")
                       : "— Selecionar —";
                     return (
                       <div key={c.id}>
