@@ -316,8 +316,13 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
 }
 
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
+const PRAZOS_CFG_KEY = (email?: string | null) => KEY("propinas.prazos.cfg", email);
 
-const MESES_OPCOES = [10, 12];
+type PrazoCfg = { id: string; nome: string; meses: number };
+const DEFAULT_PRAZOS: PrazoCfg[] = [
+  { id: "p10", nome: "10 meses", meses: 10 },
+  { id: "p12", nome: "12 meses", meses: 12 },
+];
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
