@@ -182,12 +182,7 @@ function DepartamentosPanel() {
               <div className="flex justify-center">
                 <span className="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-md bg-muted text-[11px] font-semibold tabular-nums">{docCount}</span>
               </div>
-              <RowLockControls
-                editing={isEdit}
-                onEdit={() => setEditing((p) => ({ ...p, [r.id]: true }))}
-                onConfirm={() => setEditing((p) => ({ ...p, [r.id]: false }))}
-                onDelete={() => remove(r.id)}
-              />
+              <RowLockControls editing={isEdit} onDelete={() => remove(r.id)} />
             </div>
             );
           })}
