@@ -157,7 +157,8 @@ function DepartamentosPanel() {
                 </Button>
               </div>
             </div>
-          ))}
+            );
+          })}
           {!loading && rows.length === 0 && (
             <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem departamentos registados.</p>
           )}
