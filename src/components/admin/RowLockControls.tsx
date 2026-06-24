@@ -66,8 +66,20 @@ export function RowLockControls({
   );
 }
 
+/** Single "Bloqueado" badge placed at the top-right of a configurator Card. */
+export function CardLockBadge({ className = "" }: { className?: string }) {
+  return (
+    <span
+      className={`absolute top-2 right-3 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-muted text-muted-foreground border ${className}`}
+    >
+      <Lock className="w-2.5 h-2.5" /> Bloqueado
+    </span>
+  );
+}
+
 /** Convenience hook: per-row editing state keyed by id. */
 export function useRowEditing<T extends string | number>() {
   const map = new Map<T, boolean>();
   return map;
 }
+
