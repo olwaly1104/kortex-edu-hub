@@ -450,7 +450,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                       return { ...s, [c.id]: next };
                     });
                     const mesesLabel = mesesArr.length
-                      ? mesesArr.map((m) => `${m} meses`).join(" · ")
+                      ? mesesArr.map((m) => prazosCfg.find((pc) => pc.meses === m)?.nome ?? `${m} meses`).join(" · ")
                       : "— Selecionar —";
                     return (
                       <div key={c.id}>
