@@ -106,7 +106,7 @@ function DepartamentosPanel() {
 
       <Card className="overflow-hidden">
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
+          <span>Pré-visualização</span><span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
         </div>
         <div className="divide-y">
           {rows.map((r) => (
