@@ -205,14 +205,14 @@ export default function OnboardingGeopontos() {
 
         <TabsContent value="edificios" className="mt-0">
           <Card className="overflow-hidden relative">
-            <CardLockBadge />
+            <CardLockBadge editing={!!cardEdit.edificios} onEdit={() => toggleEdit("edificios", true)} onConfirm={() => toggleEdit("edificios", false)} />
 
             <div className="grid grid-cols-[90px_1.3fr_70px_70px_1.3fr_220px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
               <span>Sigla</span><span>Nome</span><span>Pisos</span><span>Salas</span><span>Responsável</span><span className="text-right">Ações</span>
             </div>
             <div className="divide-y">
               {edificios.map(e => {
-                const isEdit = !!editEdif[e.id];
+                const isEdit = !!cardEdit.edificios;
                 return (
                 <div key={e.id} className="grid grid-cols-[90px_1.3fr_70px_70px_1.3fr_220px] gap-2 px-4 py-2 items-center">
                   <Input value={e.sigla} disabled={!isEdit} onChange={ev => updEdif(e.id, { sigla: ev.target.value.toUpperCase() })} className="h-8 text-xs" />
@@ -226,12 +226,7 @@ export default function OnboardingGeopontos() {
                       {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.display_name || c.email}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  <RowLockControls
-                    editing={isEdit}
-                    onEdit={() => setEditEdif(p => ({ ...p, [e.id]: true }))}
-                    onConfirm={() => setEditEdif(p => ({ ...p, [e.id]: false }))}
-                    onDelete={() => rmEdif(e.id)}
-                  />
+                  <RowLockControls editing={isEdit} onDelete={() => rmEdif(e.id)} />
                 </div>
                 );
               })}
