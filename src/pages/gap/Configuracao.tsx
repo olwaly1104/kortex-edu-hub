@@ -927,46 +927,61 @@ export default function GapConfiguracao() {
 
 
           {/* Estados */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Estados</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {cdEstados.length}</span>
-              </div>
-              <div className="flex items-center gap-2">
-              {isCardEditing("cd-estados") && (
-                <Dialog open={cdEstadoOpen} onOpenChange={setCdEstadoOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader><DialogTitle>Novo estado</DialogTitle></DialogHeader>
-                    <div className="space-y-3 py-2">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Designação</label>
-                        <Input value={newCdEstadoLabel} onChange={e => setNewCdEstadoLabel(e.target.value)} placeholder="Ex: Em análise" />
+          {(() => {
+            const CD_COR_OPCOES = [
+              { label: "Verde", value: "bg-green-50 text-green-700 border-green-200" },
+              { label: "Âmbar", value: "bg-amber-50 text-amber-700 border-amber-200" },
+              { label: "Vermelho", value: "bg-red-50 text-red-700 border-red-200" },
+              { label: "Azul", value: "bg-blue-50 text-blue-700 border-blue-200" },
+              { label: "Cinza", value: "bg-slate-50 text-slate-700 border-slate-200" },
+              { label: "Violeta", value: "bg-violet-50 text-violet-700 border-violet-200" },
+            ];
+            return (
+              <Card className="overflow-hidden">
+                <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-primary" />
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-bold text-foreground">Estados de candidatura</h2>
+                    <p className="text-[11px] text-muted-foreground">Fases do ciclo de vida de uma candidatura (ex: Agendado, Aprovado, Reprovado).</p>
+                  </div>
+                  <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{cdEstados.length} estado{cdEstados.length === 1 ? "" : "s"}</span>
+                </div>
+                <div className="divide-y">
+                  <div className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+                    <div>Designação</div>
+                    <div>Descrição</div>
+                    <div>Cor</div>
+                    <div>Pré-visualização</div>
+                    <div className="text-right">Ação</div>
+                  </div>
+                  {cdEstados.map((es) => (
+                    <div key={es.key} className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+                      <Input className="h-9" placeholder="Ex: Agendado" value={es.label}
+                        onChange={(e) => setCdEstados((s) => s.map((x) => x.key === es.key ? { ...x, label: e.target.value } : x))} />
+                      <Input className="h-9" placeholder="Descrição curta do estado" value={es.descricao || ""}
+                        onChange={(e) => setCdEstados((s) => s.map((x) => x.key === es.key ? { ...x, descricao: e.target.value } : x))} />
+                      <select className="h-9 rounded-md border border-input bg-background px-2 text-sm" value={es.color}
+                        onChange={(e) => setCdEstados((s) => s.map((x) => x.key === es.key ? { ...x, color: e.target.value } : x))}>
+                        {CD_COR_OPCOES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+                      </select>
+                      <span className={cn("inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium", es.color)}>{es.label || "—"}</span>
+                      <div className="flex justify-end">
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          onClick={() => removeCdEstado(es.key)}><Trash2 className="w-3.5 h-3.5" /></Button>
                       </div>
                     </div>
-                    <DialogFooter className="gap-2 sm:gap-2">
-                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                      <Button onClick={addCdEstado} disabled={!newCdEstadoLabel.trim()}>Adicionar</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
-                <CardEditToggle id="cd-estados" />
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {cdEstados.map(e => (
-                <div key={e.key} className={cn("inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs", e.color)}>
-                  <span className="font-medium">{e.label}</span>
-                  <RemoveIcon onClick={() => removeCdEstado(e.key)} label={`Remover ${e.label}`} editing={isCardEditing("cd-estados")} />
+                  ))}
                 </div>
-              ))}
-            </div>
-          </Card>
+                <div className="px-5 py-3 border-t bg-muted/10">
+                  <Button size="sm" variant="outline" className="gap-1.5"
+                    onClick={() => setCdEstados((s) => [...s, { key: `cdest_${Date.now()}`, label: "", color: CD_COR_OPCOES[0].value, descricao: "" }])}>
+                    <Plus className="w-3.5 h-3.5" /> Adicionar estado
+                  </Button>
+                </div>
+              </Card>
+            );
+          })()}
+
 
           {/* Etapas do processo */}
           <Card className="p-5">
