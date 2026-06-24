@@ -116,7 +116,7 @@ function DepartamentosPanel() {
         <div className="divide-y">
           {rows.map((r) => {
             const selected = people.find((p) => p.nome === r.responsavel);
-            const isEdit = !!editing[r.id];
+            const isEdit = cardEdit;
             const docCount = people.filter((p) => p.tipo === "Docente" && (p.departamento || "").trim().toLowerCase() === (r.designacao || "").trim().toLowerCase()).length;
             return (
             <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2 items-center`}>
