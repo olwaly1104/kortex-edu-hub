@@ -19,7 +19,22 @@ type DocenteOpt = { id: string; nome: string; departamento: string | null };
 function DepartamentosPanel() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Departamento[]>([]);
+  const [docentes, setDocentes] = useState<DocenteOpt[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("docentes")
+        .select("id, primeiro_nome, ultimo_nome, departamento")
+        .order("primeiro_nome", { ascending: true });
+      setDocentes(((data || []) as any[]).map((d) => ({
+        id: d.id,
+        nome: `${d.primeiro_nome || ""} ${d.ultimo_nome || ""}`.trim() || "—",
+        departamento: d.departamento || null,
+      })));
+    })();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
