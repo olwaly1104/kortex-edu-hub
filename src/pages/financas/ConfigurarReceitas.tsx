@@ -320,8 +320,8 @@ const PRAZOS_CFG_KEY = (email?: string | null) => KEY("propinas.prazos.cfg", ema
 
 type PrazoCfg = { id: string; nome: string; meses: number };
 const DEFAULT_PRAZOS: PrazoCfg[] = [
-  { id: "p10", nome: "10 meses", meses: 10 },
-  { id: "p12", nome: "12 meses", meses: 12 },
+  { id: "p10", nome: "10", meses: 10 },
+  { id: "p12", nome: "12", meses: 12 },
 ];
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
@@ -380,7 +380,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
 
   // Column template — explicit so headers + rows align perfectly
   // Faculdade·Curso | Propina mensal | Regime | Meses | Propina mensal c/ IVA incl. | Propina bruta total | Líquido total | Ação
-  const COLS = "minmax(220px,1.4fr) 150px 160px 120px 150px 150px 150px 130px";
+  const COLS = "minmax(220px,1.6fr) 150px 160px 140px 170px 170px 130px";
 
   return (
     <div className="space-y-6">
@@ -394,19 +394,19 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
           <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{prazosCfg.length} prazo{prazosCfg.length === 1 ? "" : "s"}</span>
         </div>
         <div className="divide-y">
-          <div className="grid grid-cols-[1.4fr_140px_140px_44px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
-            <div>Designação</div>
+          <div className="grid grid-cols-[140px_1fr_44px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
             <div>Nº de meses</div>
             <div>Pré-visualização</div>
             <div className="text-right">Ação</div>
           </div>
           {prazosCfg.map((pr) => (
-            <div key={pr.id} className="grid grid-cols-[1.4fr_140px_140px_44px] gap-3 px-5 py-2.5 items-center text-sm">
-              <Input className="h-9" placeholder="Ex: 10 meses" value={pr.nome}
-                onChange={(e) => setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, nome: e.target.value } : x))} />
+            <div key={pr.id} className="grid grid-cols-[140px_1fr_44px] gap-3 px-5 py-2.5 items-center text-sm">
               <Input type="number" min={1} max={24} className="h-9 tabular-nums" value={pr.meses}
-                onChange={(e) => setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, meses: Math.max(1, Number(e.target.value) || 1) } : x))} />
-              <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-md border border-border bg-muted/30 text-xs font-medium tabular-nums">{pr.nome || `${pr.meses} meses`}</span>
+                onChange={(e) => {
+                  const meses = Math.max(1, Number(e.target.value) || 1);
+                  setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, meses, nome: String(meses) } : x));
+                }} />
+              <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-md border border-border bg-muted/30 text-xs font-medium tabular-nums w-fit">{pr.meses}</span>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                   onClick={() => setPrazosCfg((s) => s.filter((x) => x.id !== pr.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
@@ -416,7 +416,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
         </div>
         <div className="px-5 py-3 border-t bg-muted/10">
           <Button size="sm" variant="outline" className="gap-1.5"
-            onClick={() => setPrazosCfg((s) => [...s, { id: `p_${Date.now()}`, nome: "", meses: 12 }])}>
+            onClick={() => setPrazosCfg((s) => [...s, { id: `p_${Date.now()}`, nome: "12", meses: 12 }])}>
             <Plus className="w-3.5 h-3.5" /> Adicionar prazo
           </Button>
         </div>
@@ -457,8 +457,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
               <div>Regime</div>
               <div>Prazos</div>
               <div className="text-right">Propina mensal c/ IVA incl.</div>
-              <div className="text-right">Propina bruta total</div>
-              <div className="text-right">Propina líquida total</div>
+              <div className="text-right">Propina anual</div>
               <div className="text-right">Ação</div>
             </div>
             {facWithCursos.flatMap((f) =>
@@ -478,8 +477,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                     const bruto = Number(valorVal) || 0;
                     const mesesArr = (prazoByCurso[c.id] ?? []).slice().sort((a, b) => a - b);
                     const mesesMax = mesesArr.length ? Math.max(...mesesArr) : 0;
-                    const brutaAnual = bruto * (1 + taxa) * mesesMax;
-                    const liquidaAnual = bruto * mesesMax;
+                    const propinaAnual = bruto * (1 + taxa) * mesesMax;
                     const dirty = d !== undefined;
                     const toggleMes = (m: number) => setPrazoByCurso((s) => {
                       const cur = s[c.id] ?? [];
@@ -488,7 +486,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                       return { ...s, [c.id]: next };
                     });
                     const mesesLabel = mesesArr.length
-                      ? mesesArr.map((m) => prazosCfg.find((pc) => pc.meses === m)?.nome ?? `${m} meses`).join(" · ")
+                      ? mesesArr.join(", ")
                       : "— Selecionar —";
                     return (
                       <div key={c.id}>
@@ -525,15 +523,14 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                                 return (
                                   <label key={pc.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
                                     <Checkbox checked={checked} onCheckedChange={() => toggleMes(m)} />
-                                    <span>{pc.nome}</span>
+                                    <span className="tabular-nums">{m} meses</span>
                                   </label>
                                 );
                               })}
                             </PopoverContent>
                           </Popover>
                           <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(bruto * (1 + taxa))} Kz</div>
-                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(brutaAnual)} Kz</div>
-                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-xs font-medium text-muted-foreground">{fmt(liquidaAnual)} Kz</div>
+                          <div className="h-9 flex items-center justify-end px-2 rounded-md bg-muted/30 tabular-nums text-sm font-medium text-foreground">{fmt(propinaAnual)} Kz</div>
                           <div className="flex justify-end gap-1">
                             <Button size="sm" variant={dirty ? "default" : "outline"}
                               disabled={!dirty || updatePropina.isPending}
