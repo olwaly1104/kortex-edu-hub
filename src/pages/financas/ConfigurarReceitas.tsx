@@ -406,7 +406,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                   const meses = Math.max(1, Number(e.target.value) || 1);
                   setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, meses, nome: String(meses) } : x));
                 }} />
-              <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-md border border-border bg-muted/30 text-xs font-medium tabular-nums w-fit">{pr.meses}</span>
+              <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-md border border-border bg-muted/30 text-xs font-medium tabular-nums w-fit">{pr.meses}M</span>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
                   onClick={() => setPrazosCfg((s) => s.filter((x) => x.id !== pr.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
