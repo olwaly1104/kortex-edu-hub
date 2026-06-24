@@ -15,6 +15,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
+import { loadDocentes, syncDocentesFromDb, type DocenteRow } from "@/lib/peopleStorage";
 import { ChevronDown } from "lucide-react";
 import { Settings2, Plus, Layers, AlertCircle, FileText, Trash2, Pencil, CalendarClock, GraduationCap, MapPin, Clock, FileCheck2, Unlock, Check, Users } from "lucide-react";
 import AdminDiscentes from "@/pages/admin/Discentes";
@@ -231,7 +232,7 @@ export default function GapConfiguracao() {
   // ===== CANDIDATURAS =====
   type CdEstado = { key: string; label: string; color: string; descricao?: string };
  type CdEtapa = { key: string; label: string; agenda: boolean; obrigatoria: boolean; estadosPossiveis: string[] };
- type CdSessao = { etapaKey: string; mode: "dia" | "dias" | "periodo"; datas: string[]; dataFim?: string; hora: string; local: string; responsavel: string; capacidade: number };
+ type CdSessao = { etapaKey: string; mode: "" | "dia" | "dias" | "periodo"; datas: string[]; dataFim?: string; hora: string; local: string; responsavel: string; capacidade: number | "" };
 
 
   const [cdEstados, setCdEstados] = useState<CdEstado[]>([
@@ -248,19 +249,22 @@ export default function GapConfiguracao() {
     { key: "curso_preparatorio", label: "Curso Preparatório", agenda: true, obrigatoria: false, estadosPossiveis: ["agendado", "completo", "remarcado"] },
     { key: "exame", label: "Exame de Acesso", agenda: true, obrigatoria: true, estadosPossiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
   ]);
-  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([
-    { etapaKey: "entrevista", mode: "dias", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30 },
-    { etapaKey: "curso_preparatorio", mode: "periodo", datas: [""], dataFim: "", hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 60 },
-    { etapaKey: "exame", mode: "dia", datas: [], hora: "09:00", local: "", responsavel: STAFF_OPTIONS[0], capacidade: 80 },
-  ]);
-  // Auto-sync: ensure one sessão row per etapa with agenda=true
+  const [cdSessoes, setCdSessoes] = useState<CdSessao[]>([]);
+  const [docentesList, setDocentesList] = useState<DocenteRow[]>(() => loadDocentes());
+  useEffect(() => {
+    syncDocentesFromDb().then(setDocentesList).catch(() => {});
+    const onChange = () => setDocentesList(loadDocentes());
+    window.addEventListener("upra:people-changed", onChange);
+    return () => window.removeEventListener("upra:people-changed", onChange);
+  }, []);
+  // Auto-sync: ensure one sessão row per etapa with agenda=true (no prefilled values)
   useEffect(() => {
     setCdSessoes(prev => {
       const agendadas = cdEtapas.filter(e => e.agenda);
       const byKey = new Map(prev.map(s => [s.etapaKey, s]));
       return agendadas.map(e => byKey.get(e.key) || {
-        etapaKey: e.key, mode: "dia" as const, datas: [], hora: "09:00",
-        local: "", responsavel: STAFF_OPTIONS[0], capacidade: 30,
+        etapaKey: e.key, mode: "" as const, datas: [], hora: "",
+        local: "", responsavel: "", capacidade: "" as const,
       });
     });
   }, [cdEtapas]);
@@ -1155,16 +1159,30 @@ export default function GapConfiguracao() {
                           </td>
                           <td className="px-3 py-2.5">
                             {editing ? (
-                              <Select value={s.responsavel} onValueChange={v => updateSessao(s.etapaKey, { responsavel: v })}>
-                                <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                                <SelectContent>{STAFF_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                              <Select value={s.responsavel || undefined} onValueChange={v => updateSessao(s.etapaKey, { responsavel: v })}>
+                                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecionar docente" /></SelectTrigger>
+                                <SelectContent>
+                                  {docentesList.length === 0
+                                    ? <div className="px-2 py-1.5 text-[11px] text-muted-foreground">Nenhum docente registado</div>
+                                    : docentesList.map(d => {
+                                        const name = `${d.prefixo ? d.prefixo + " " : ""}${d.primeiroNome} ${d.ultimoNome}`.trim();
+                                        return <SelectItem key={d.id} value={d.id}>{name}</SelectItem>;
+                                      })}
+                                </SelectContent>
                               </Select>
-                            ) : <span className="text-xs text-muted-foreground">{s.responsavel}</span>}
+                            ) : (
+                              <span className="text-xs text-muted-foreground">
+                                {(() => {
+                                  const d = docentesList.find(x => x.id === s.responsavel);
+                                  return d ? `${d.prefixo ? d.prefixo + " " : ""}${d.primeiroNome} ${d.ultimoNome}`.trim() : "—";
+                                })()}
+                              </span>
+                            )}
                           </td>
                           <td className="px-3 py-2.5 text-center">
                             {editing
-                              ? <Input type="number" min={1} className="h-8 text-xs text-center" value={s.capacidade} onChange={e => updateSessao(s.etapaKey, { capacidade: Number(e.target.value) || 1 })} />
-                              : <span className="text-xs tabular-nums">{s.capacidade}</span>}
+                              ? <Input type="number" min={1} className="h-8 text-xs text-center" value={s.capacidade} onChange={e => updateSessao(s.etapaKey, { capacidade: e.target.value === "" ? "" : (Number(e.target.value) || 1) })} placeholder="—" />
+                              : <span className="text-xs tabular-nums">{s.capacidade || "—"}</span>}
                           </td>
                         </tr>
                       );
