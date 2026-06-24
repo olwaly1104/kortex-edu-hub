@@ -144,7 +144,7 @@ const secretariaSections: NavSection[] = [
     { label: "Início", icon: LayoutDashboard, path: "/secretaria" },
     { label: "Calendário", icon: Calendar, path: "/secretaria/calendario" },
     { label: "Anúncios", icon: Megaphone, path: "/secretaria/anuncios", badge: 4 },
-    { label: "Solicitações", icon: CheckSquare, path: "/secretaria/solicitacoes" },
+    { label: "Minhas Solicitações", icon: CheckSquare, path: "/secretaria/solicitacoes" },
   ]},
   { title: "Área Académica", items: [
     { label: "Dashboard", icon: BarChart3, path: "/secretaria/dashboard" },
