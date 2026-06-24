@@ -485,9 +485,9 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                               {prazosCfg.map((pc) => { const m = pc.meses;
                                 const checked = mesesArr.includes(m);
                                 return (
-                                  <label key={m} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
+                                  <label key={pc.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
                                     <Checkbox checked={checked} onCheckedChange={() => toggleMes(m)} />
-                                    <span>{m} meses</span>
+                                    <span>{pc.nome}</span>
                                   </label>
                                 );
                               })}
