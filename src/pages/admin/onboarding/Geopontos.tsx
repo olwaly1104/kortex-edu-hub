@@ -35,6 +35,7 @@ const TIPO_LABEL: Record<EspacoTipo, string> = { Sala: "salas", Gabinete: "gabin
 
 export default function OnboardingGeopontos() {
   const { user } = useAuth();
+  const authUid = useAuthUid();
   const [tab, setTab] = useState<"edificios" | EspacoTipo>("edificios");
 
   const [edificios, setEdificios] = useState<Edificio[]>([]);
