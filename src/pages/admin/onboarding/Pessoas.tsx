@@ -178,7 +178,7 @@ function StaffOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
       />
 
       <Card className="overflow-hidden relative">
-        <CardLockBadge />
+        <CardLockBadge editing={cardEdit} onEdit={() => setCardEdit(true)} onConfirm={() => setCardEdit(false)} />
 
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
           <span></span><span>Funcionário</span><span>Email</span><span>Departamento</span><span>Função</span><span>Módulo</span><span className="text-right">Ações</span>
