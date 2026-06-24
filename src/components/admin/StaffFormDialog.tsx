@@ -124,10 +124,17 @@ export function StaffFormDialog({
     setDraft(emptyStaff());
   };
 
+  const simpleOk = !!draft.primeiroNome.trim() && !!draft.ultimoNome.trim();
   const submitSimplificado = () => {
-    if (!requiredOk) { toast.error("Preencha primeiro e último nome"); return; }
+    if (!simpleOk) { toast.error("Preencha primeiro e último nome"); return; }
     if (!window.confirm("Tem a certeza que pretende criar este staff?")) return;
-    handleSave();
+    onSave({
+      ...draft,
+      email: previewEmail,
+      id: draft.id || `${Date.now()}`,
+      moduloKortex: draft.moduloKortex || moduloFromDepartamento(draft.departamento),
+    });
+    setDraft(emptyStaff());
   };
 
   return (
