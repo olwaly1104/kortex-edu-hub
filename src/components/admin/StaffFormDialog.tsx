@@ -194,7 +194,7 @@ export function StaffFormDialog({
 
             <div className="flex items-center justify-between gap-2">
               <span className="text-[11px] text-muted-foreground">Restantes campos podem ser editados depois.</span>
-              <Button size="sm" onClick={submitSimplificado} disabled={!requiredOk} className="h-7 px-2.5 text-[11px] gap-1">
+              <Button size="sm" onClick={submitSimplificado} disabled={!simpleOk} className="h-7 px-2.5 text-[11px] gap-1">
                 <Plus className="w-3 h-3" /> Criar simplificado
               </Button>
             </div>
