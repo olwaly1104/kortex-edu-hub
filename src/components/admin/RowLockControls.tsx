@@ -1,27 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { Lock, Pencil, Check, Trash2 } from "lucide-react";
+import { Lock, LockOpen, Pencil, Check, Trash2 } from "lucide-react";
 
 /**
- * Standard row controls used across all configurator tables:
- *  - "Bloqueado/Desbloqueado" badge (visual lock)
- *  - "Editar/Confirmar" button — toggles per-row editing state
- *  - Trash button (only while editing)
- * Both Confirmar and Trash trigger a window.confirm before invoking the callback.
+ * Slim per-row controls: shows only a Trash button while the card is in edit mode.
+ * Kept for backwards-compatibility with pages that still pass editing/onDelete.
  */
 export function RowLockControls({
   editing,
-  onEdit,
-  onConfirm,
   onDelete,
-  size = "sm",
-  saveMsg = "Confirmar as alterações a este registo?",
   deleteMsg = "Tem a certeza que pretende eliminar este registo? Esta acção é irreversível.",
-  hideBadge = false,
   className = "",
 }: {
   editing: boolean;
-  onEdit: () => void;
-  onConfirm: () => void;
+  onEdit?: () => void;
+  onConfirm?: () => void;
   onDelete?: () => void;
   size?: "xs" | "sm";
   saveMsg?: string;
@@ -29,57 +21,76 @@ export function RowLockControls({
   hideBadge?: boolean;
   className?: string;
 }) {
-  const btnH = size === "xs" ? "h-7" : "h-7";
+  if (!editing || !onDelete) return <div className={className} />;
   return (
-    <div className={`flex items-center gap-1.5 justify-end ${className}`} onClick={(e) => e.stopPropagation()}>
-
+    <div className={`flex items-center justify-end ${className}`} onClick={(e) => e.stopPropagation()}>
       <Button
-        size="sm"
-        variant={editing ? "default" : "outline"}
-        className={`gap-1 ${btnH} px-2 text-[11px] ${editing ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
+        size="icon"
+        variant="ghost"
+        className="h-7 w-7 text-muted-foreground hover:text-destructive"
         onClick={(e) => {
           e.stopPropagation();
-          if (editing) {
-            if (window.confirm(saveMsg)) onConfirm();
-          } else {
-            onEdit();
-          }
+          if (window.confirm(deleteMsg)) onDelete();
         }}
+        title="Eliminar"
       >
-        {editing ? <><Check className="w-3 h-3" /> Confirmar</> : <><Pencil className="w-3 h-3" /> Editar</>}
+        <Trash2 className="w-3.5 h-3.5" />
       </Button>
-      {editing && onDelete && (
+    </div>
+  );
+}
+
+/**
+ * Card-level header chip placed at the top-right of a configurator Card.
+ * Shows a "Bloqueado / Desbloqueado" badge and an "Editar / Confirmar" toggle button.
+ * When `editing` / `onEdit` / `onConfirm` are omitted, falls back to a static "Bloqueado" badge.
+ */
+export function CardLockBadge({
+  editing,
+  onEdit,
+  onConfirm,
+  saveMsg = "Confirmar as alterações?",
+  className = "",
+}: {
+  editing?: boolean;
+  onEdit?: () => void;
+  onConfirm?: () => void;
+  saveMsg?: string;
+  className?: string;
+}) {
+  const interactive = typeof editing === "boolean" && onEdit && onConfirm;
+  return (
+    <div className={`absolute top-2 right-3 z-10 flex items-center gap-1.5 ${className}`}>
+      <span
+        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold border ${
+          editing
+            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+            : "bg-muted text-muted-foreground"
+        }`}
+      >
+        {editing ? <LockOpen className="w-2.5 h-2.5" /> : <Lock className="w-2.5 h-2.5" />}
+        {editing ? "Desbloqueado" : "Bloqueado"}
+      </span>
+      {interactive && (
         <Button
-          size="icon"
-          variant="ghost"
-          className={`${btnH} w-7 text-muted-foreground hover:text-destructive`}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (window.confirm(deleteMsg)) onDelete();
+          size="sm"
+          variant={editing ? "default" : "outline"}
+          className={`h-7 px-2 text-[11px] gap-1 ${editing ? "bg-emerald-600 hover:bg-emerald-700 text-white" : ""}`}
+          onClick={() => {
+            if (editing) {
+              if (window.confirm(saveMsg)) onConfirm!();
+            } else {
+              onEdit!();
+            }
           }}
-          title="Eliminar"
         >
-          <Trash2 className="w-3.5 h-3.5" />
+          {editing ? <><Check className="w-3 h-3" /> Confirmar</> : <><Pencil className="w-3 h-3" /> Editar</>}
         </Button>
       )}
     </div>
   );
 }
 
-/** Single "Bloqueado" badge placed at the top-right of a configurator Card. */
-export function CardLockBadge({ className = "" }: { className?: string }) {
-  return (
-    <span
-      className={`absolute top-2 right-3 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-muted text-muted-foreground border ${className}`}
-    >
-      <Lock className="w-2.5 h-2.5" /> Bloqueado
-    </span>
-  );
-}
-
-/** Convenience hook: per-row editing state keyed by id. */
 export function useRowEditing<T extends string | number>() {
-  const map = new Map<T, boolean>();
-  return map;
+  return new Map<T, boolean>();
 }
-

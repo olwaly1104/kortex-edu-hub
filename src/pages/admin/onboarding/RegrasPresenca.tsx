@@ -48,7 +48,7 @@ export default function OnboardingRegrasPresenca() {
   const [novoNome, setNovoNome] = useState("");
   const [novoValor, setNovoValor] = useState<number>(0);
   const [novoTipo, setNovoTipo] = useState<AplicaA>("Ambos");
-  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [cardEdit, setCardEdit] = useState(false);
 
   useEffect(() => {
     try { localStorage.setItem(MULTAS_KEY, JSON.stringify(multas)); } catch { /* */ }
@@ -214,7 +214,7 @@ export default function OnboardingRegrasPresenca() {
 
             {/* Tabela de Multas */}
             <Card className="overflow-hidden relative">
-              <CardLockBadge />
+              <CardLockBadge editing={cardEdit} onEdit={() => setCardEdit(true)} onConfirm={() => setCardEdit(false)} />
 
               {/* Table header */}
               <div className="flex items-center justify-between px-4 py-3 bg-muted/30 border-b">
@@ -234,7 +234,7 @@ export default function OnboardingRegrasPresenca() {
 
               <div className="divide-y">
                 {multas.map(m => {
-                  const isEdit = !!editing[m.id];
+                  const isEdit = cardEdit;
                   return (
                   <div key={m.id} className="grid grid-cols-[1fr_120px_120px_220px] items-center gap-2 px-4 py-2.5 hover:bg-muted/40 transition-colors">
                     <span className="text-sm font-medium truncate">{m.nome}</span>
@@ -242,9 +242,11 @@ export default function OnboardingRegrasPresenca() {
                     <span className="text-sm tabular-nums text-right">{m.valor.toLocaleString("pt-PT")} Kz</span>
                     <RowLockControls
                       editing={isEdit}
-                      onEdit={() => setEditing(p => ({ ...p, [m.id]: true }))}
-                      onConfirm={() => setEditing(p => ({ ...p, [m.id]: false }))}
-                      onDelete={() => setMultas(prev => prev.filter(x => x.id !== m.id))}
+                      onDelete={() => {
+                        if (window.confirm("Tem a certeza que pretende eliminar esta infração?")) {
+                          setMultas(prev => prev.filter(x => x.id !== m.id));
+                        }
+                      }}
                     />
                   </div>
                   );

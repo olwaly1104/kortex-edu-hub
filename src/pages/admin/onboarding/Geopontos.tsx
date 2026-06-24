@@ -42,8 +42,8 @@ export default function OnboardingGeopontos() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [espacos, setEspacos] = useState<Espaco[]>(() => loadLS<Espaco>(ESPACOS_KEY));
   const [filtroEdif, setFiltroEdif] = useState<string>("all");
-  const [editEdif, setEditEdif] = useState<Record<string, boolean>>({});
-  const [editEsp, setEditEsp] = useState<Record<string, boolean>>({});
+  const [cardEdit, setCardEdit] = useState<Record<string, boolean>>({});
+  const toggleEdit = (key: string, next: boolean) => setCardEdit(p => ({ ...p, [key]: next }));
 
   useEffect(() => { try { localStorage.setItem(ESPACOS_KEY, JSON.stringify(espacos)); } catch {} }, [espacos]);
 
@@ -125,14 +125,14 @@ export default function OnboardingGeopontos() {
           <span className="text-[11px] text-muted-foreground ml-auto">{filtrados.length} {TIPO_LABEL[tipo]}</span>
         </div>
         <Card className="overflow-hidden relative">
-          <CardLockBadge />
+          <CardLockBadge editing={!!cardEdit[tipo]} onEdit={() => toggleEdit(tipo, true)} onConfirm={() => toggleEdit(tipo, false)} />
 
           <div className={`grid ${cols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
             <span>Edifício</span><span>Nome / Nº</span><span>Piso</span>{!isGab && <span>Capacidade</span>}<span>{isGab ? "Ocupante" : "Notas"}</span><span className="text-right">Ações</span>
           </div>
           <div className="divide-y">
             {filtrados.map(s => {
-              const isEdit = !!editEsp[s.id];
+              const isEdit = !!cardEdit[tipo];
               return (
               <div key={s.id} className={`grid ${cols} gap-2 px-4 py-2 items-center`}>
                 <Select value={s.edificioId} disabled={!isEdit} onValueChange={v => updEspaco(s.id, { edificioId: v })}>
@@ -145,12 +145,7 @@ export default function OnboardingGeopontos() {
                   <Input type="number" min={0} disabled={!isEdit} value={s.capacidade} onChange={ev => updEspaco(s.id, { capacidade: Number(ev.target.value) })} className="h-8 text-xs" />
                 )}
                 <Input value={s.notas || ""} disabled={!isEdit} onChange={ev => updEspaco(s.id, { notas: ev.target.value })} className="h-8 text-xs" placeholder={isGab ? "Pessoa ocupante" : "—"} />
-                <RowLockControls
-                  editing={isEdit}
-                  onEdit={() => setEditEsp(p => ({ ...p, [s.id]: true }))}
-                  onConfirm={() => setEditEsp(p => ({ ...p, [s.id]: false }))}
-                  onDelete={() => rmEspaco(s.id)}
-                />
+                <RowLockControls editing={isEdit} onDelete={() => rmEspaco(s.id)} />
               </div>
               );
             })}
@@ -210,14 +205,14 @@ export default function OnboardingGeopontos() {
 
         <TabsContent value="edificios" className="mt-0">
           <Card className="overflow-hidden relative">
-            <CardLockBadge />
+            <CardLockBadge editing={!!cardEdit.edificios} onEdit={() => toggleEdit("edificios", true)} onConfirm={() => toggleEdit("edificios", false)} />
 
             <div className="grid grid-cols-[90px_1.3fr_70px_70px_1.3fr_220px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
               <span>Sigla</span><span>Nome</span><span>Pisos</span><span>Salas</span><span>Responsável</span><span className="text-right">Ações</span>
             </div>
             <div className="divide-y">
               {edificios.map(e => {
-                const isEdit = !!editEdif[e.id];
+                const isEdit = !!cardEdit.edificios;
                 return (
                 <div key={e.id} className="grid grid-cols-[90px_1.3fr_70px_70px_1.3fr_220px] gap-2 px-4 py-2 items-center">
                   <Input value={e.sigla} disabled={!isEdit} onChange={ev => updEdif(e.id, { sigla: ev.target.value.toUpperCase() })} className="h-8 text-xs" />
@@ -231,12 +226,7 @@ export default function OnboardingGeopontos() {
                       {contacts.map(c => <SelectItem key={c.id} value={c.id}>{c.display_name || c.email}</SelectItem>)}
                     </SelectContent>
                   </Select>
-                  <RowLockControls
-                    editing={isEdit}
-                    onEdit={() => setEditEdif(p => ({ ...p, [e.id]: true }))}
-                    onConfirm={() => setEditEdif(p => ({ ...p, [e.id]: false }))}
-                    onDelete={() => rmEdif(e.id)}
-                  />
+                  <RowLockControls editing={isEdit} onDelete={() => rmEdif(e.id)} />
                 </div>
                 );
               })}

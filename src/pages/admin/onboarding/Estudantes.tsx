@@ -66,7 +66,7 @@ export default function OnboardingEstudantes() {
 
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [novo, setNovo] = useState(() => ({ ...emptyNovo }));
-  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [cardEdit, setCardEdit] = useState(false);
 
   const cursoById = useMemo(() => {
     const m = new Map<string, { code: string; name: string }>();
@@ -312,7 +312,7 @@ export default function OnboardingEstudantes() {
       </Tabs>
 
       <Card className="overflow-hidden relative">
-        <CardLockBadge />
+        <CardLockBadge editing={cardEdit} onEdit={() => setCardEdit(true)} onConfirm={() => setCardEdit(false)} />
 
         <div className="px-4 py-2.5 border-b flex items-center justify-between">
           <h3 className="text-sm font-semibold">Estudantes registados</h3>
@@ -323,7 +323,7 @@ export default function OnboardingEstudantes() {
         </div>
         <div className="divide-y">
           {rows.map(r => {
-            const isEdit = !!editing[r.id];
+            const isEdit = cardEdit;
             return (
             <div key={r.id} className="grid grid-cols-[1fr_1.4fr_80px_60px_70px_200px] gap-2 px-4 py-2 items-center text-xs">
               <span className="font-medium">{r.nome}</span>
@@ -331,12 +331,7 @@ export default function OnboardingEstudantes() {
               <Badge variant="outline" className="text-[10px] justify-center">{cursoById.get(r.curso_id)?.code ?? "—"}</Badge>
               <span>{r.ano}º</span>
               <span>{r.turma}</span>
-              <RowLockControls
-                editing={isEdit}
-                onEdit={() => setEditing(p => ({ ...p, [r.id]: true }))}
-                onConfirm={() => setEditing(p => ({ ...p, [r.id]: false }))}
-                onDelete={() => remove(r.id)}
-              />
+              <RowLockControls editing={isEdit} onDelete={() => remove(r.id)} />
             </div>
             );
           })}

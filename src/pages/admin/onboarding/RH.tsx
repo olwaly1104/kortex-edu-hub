@@ -72,7 +72,7 @@ function DepartamentosPanel() {
       .single();
     if (error) { toast.error(error.message); return; }
     setRows((prev) => [...prev, data as Departamento]);
-    setEditing((p) => ({ ...p, [(data as any).id]: true }));
+    setCardEdit(true);
   };
 
   const upd = (id: string, patch: Partial<Departamento>) => {
@@ -93,7 +93,7 @@ function DepartamentosPanel() {
   };
 
   const gridCols = "grid-cols-[110px_1.2fr_1.4fr_70px_220px]";
-  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [cardEdit, setCardEdit] = useState(false);
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -108,7 +108,7 @@ function DepartamentosPanel() {
       </div>
 
       <Card className="overflow-hidden relative">
-        <CardLockBadge />
+        <CardLockBadge editing={cardEdit} onEdit={() => setCardEdit(true)} onConfirm={() => setCardEdit(false)} />
 
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
           <span>Sigla</span><span>Designação</span><span>Responsável</span><span className="text-center">Docentes</span><span className="text-right">Ações</span>
@@ -116,7 +116,7 @@ function DepartamentosPanel() {
         <div className="divide-y">
           {rows.map((r) => {
             const selected = people.find((p) => p.nome === r.responsavel);
-            const isEdit = !!editing[r.id];
+            const isEdit = cardEdit;
             const docCount = people.filter((p) => p.tipo === "Docente" && (p.departamento || "").trim().toLowerCase() === (r.designacao || "").trim().toLowerCase()).length;
             return (
             <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2 items-center`}>
@@ -182,12 +182,7 @@ function DepartamentosPanel() {
               <div className="flex justify-center">
                 <span className="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-md bg-muted text-[11px] font-semibold tabular-nums">{docCount}</span>
               </div>
-              <RowLockControls
-                editing={isEdit}
-                onEdit={() => setEditing((p) => ({ ...p, [r.id]: true }))}
-                onConfirm={() => setEditing((p) => ({ ...p, [r.id]: false }))}
-                onDelete={() => remove(r.id)}
-              />
+              <RowLockControls editing={isEdit} onDelete={() => remove(r.id)} />
             </div>
             );
           })}

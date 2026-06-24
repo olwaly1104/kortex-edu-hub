@@ -32,7 +32,7 @@ const liquido = (r: Row) => Math.round(r.bruto * (1 - r.imposto / 100));
 export default function OnboardingSalarios() {
   const [rows, setRows] = useState<Row[]>([...seedDocentes, ...seedStaff]);
   const [tab, setTab] = useState<"todos" | Categoria>("todos");
-  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [cardEdit, setCardEdit] = useState(false);
 
   const filtered = useMemo(
     () => rows.filter(r => tab === "todos" || r.categoria === tab),
@@ -79,7 +79,11 @@ export default function OnboardingSalarios() {
       </div>
 
       <Card className="overflow-hidden relative">
-        <CardLockBadge />
+        <CardLockBadge
+          editing={cardEdit}
+          onEdit={() => setCardEdit(true)}
+          onConfirm={() => { filtered.forEach(r => confirmar(r.id)); setCardEdit(false); }}
+        />
 
         <div className="grid grid-cols-[1.3fr_1fr_130px_85px_130px_100px_200px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
           <span>Nome</span>
@@ -92,7 +96,7 @@ export default function OnboardingSalarios() {
         </div>
         <div className="divide-y">
           {filtered.map(r => {
-            const isEdit = !!editing[r.id];
+            const isEdit = cardEdit;
             return (
             <div key={r.id} className="grid grid-cols-[1.3fr_1fr_130px_85px_130px_100px_200px] gap-2 px-4 py-2 items-center">
               <div className="min-w-0">
@@ -114,11 +118,7 @@ export default function OnboardingSalarios() {
                   ? <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[10px] gap-1"><CheckCircle2 className="w-3 h-3" /> Confirmado</Badge>
                   : <Badge variant="outline" className="text-[10px]">Pendente</Badge>}
               </div>
-              <RowLockControls
-                editing={isEdit}
-                onEdit={() => setEditing(p => ({ ...p, [r.id]: true }))}
-                onConfirm={() => { confirmar(r.id); setEditing(p => ({ ...p, [r.id]: false })); }}
-              />
+              <RowLockControls editing={isEdit} />
             </div>
             );
           })}
