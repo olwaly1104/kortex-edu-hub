@@ -505,10 +505,10 @@ export default function GapConfiguracao() {
                           </Select>
                         </div>
                         <div>
-                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino</label>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino (Departamento)</label>
                           <Select value={newMotDest} onValueChange={setNewMotDest}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>{Object.entries(destinoConfig).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}</SelectContent>
+                            <SelectTrigger><SelectValue placeholder={departamentos.length ? "Selecionar..." : "Sem departamentos"} /></SelectTrigger>
+                            <SelectContent>{departamentos.map(d => <SelectItem key={d.id} value={d.designacao}>{d.designacao}{d.sigla ? ` (${d.sigla})` : ""}</SelectItem>)}</SelectContent>
                           </Select>
                         </div>
                       </div>
@@ -539,13 +539,6 @@ export default function GapConfiguracao() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
-                        <Select value={newMotResp} onValueChange={setNewMotResp}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>{STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                        </Select>
-                      </div>
                     </div>
                     <DialogFooter className="gap-2 sm:gap-2">
                       <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
@@ -564,7 +557,6 @@ export default function GapConfiguracao() {
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destino</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
                     <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aceitar</th>
                     <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Concluir</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Multa</th>
@@ -574,17 +566,13 @@ export default function GapConfiguracao() {
                 <tbody>
                   {motivos.map(m => {
                     const catCfg = categorias.find(c => c.label === m.categoria);
-                    const destCfg = destinoConfig[m.destino as keyof typeof destinoConfig];
                     return (
                       <tr key={m.key} className="border-b last:border-0 hover:bg-muted/20">
                         <td className="p-3 text-xs font-medium text-foreground">{m.label}</td>
                         <td className="p-3">
                           {catCfg ? <Badge variant="outline" className={cn("text-[10px]", catCfg.color)}>{catCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.categoria}</span>}
                         </td>
-                        <td className="p-3">
-                          {destCfg ? <Badge variant="outline" className={cn("text-[10px]", destCfg.color)}>{destCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.destino}</span>}
-                        </td>
-                        <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
+                        <td className="p-3 text-xs text-foreground whitespace-nowrap">{destLabel(m.destino)}</td>
                         <td className="p-3 text-center text-xs tabular-nums text-amber-700">{m.slaAceitacao}d</td>
                         <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.slaConclusao}d</td>
                         <td className="p-3 text-xs whitespace-nowrap tabular-nums">
