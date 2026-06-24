@@ -1,56 +1,59 @@
-## Goal
+## 1. Remove "Módulo Kortex" field
 
-Restore the old institutional dashboard layout for `src/pages/financas/Inicio.tsx`, matching the pattern used in Coordenador / Secretaria / Decano dashboards. The right side of the welcome hero (which on those roles shows "Ano Lectivo 2024/2025") will instead show an **Onboarding** progress chip for Finanças.
+Drop the field that sits below "Documentação Anexa" in:
+- `src/components/admin/DocenteFormDialog.tsx`
+- `src/components/admin/StaffFormDialog.tsx`
+- `src/pages/admin/Discentes.tsx` (inline add form)
 
-## Layout (top → bottom)
+Also strip it from the `requiredOk` validation and from save payloads (keep the column in DB untouched — just stop sending/reading it from these forms).
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│ Hero: "Bom dia, {nome} 👋"          Onboarding · 2/4 →       │
-│       Finanças — UPRA                (links to next step)    │
-└──────────────────────────────────────────────────────────────┘
-[ Minha Presença ] [ Solicitações ] [ Agenda ] [ Lançamentos ]
-┌─────────────── Agenda de Hoje (2/3) ────────┐ ┌─ Anúncios ──┐
-│ time | bar | title · sala  · status         │ │ 3 cards     │
-└─────────────────────────────────────────────┘ └─────────────┘
-┌─────────────── Solicitações Pendentes ──────────────────────┐
-│ list with priority + Aprovar / Rejeitar / Ver detalhes      │
-└─────────────────────────────────────────────────────────────┘
-```
+## 2. Bloqueado badge (visual only)
 
-## Pieces
+Reuse the existing badge style from `src/pages/admin/FaculdadesCursos.tsx` (the same pattern already in `ConfigurarReceitas.tsx`).
 
-### 1. Welcome hero
-- `Card` with `border-l-4 border-l-primary`, `p-6`.
-- Left: `h1` greeting + subtitle "Finanças — UPRA".
-- Right: **Onboarding chip** instead of the "Ver Detalhes" link.
-  - Reads finance onboarding steps from `OnboardingStepBanner` (`fin.pro`, `fin.des`, `fin.sal`, `fin.mul`) and the `markOnboardingStepDone` storage key to compute `done/total`.
-  - Displays `Onboarding · {done}/{total}` and links to the next pending step's path (or `/admin` when complete).
-  - Listens to `storage` events so it updates live, same pattern as `OnboardingStepBanner`.
+Add the badge to each row when `row.bloqueado === true` in:
+- Onboarding RH → Departamentos, Docentes table, Staff table
+- Onboarding Espaços, Geopontos, Salários, Estudantes, Regras Presença
+- Faculdades & Cursos (already present — verify both tables)
+- Finanças → Configurar Receitas (Propinas por Curso, Taxas e Serviços)
 
-### 2. KPI strip (4 cards, same visual as Coordenador `stats`)
-- `Minha Presença` — `96%`, primary
-- `Solicitações` — count of pending finance solicitações
-- `Agenda` — events count today
-- `Lançamentos` — recent transactions count
+Tables whose source has no `bloqueado` column today: read it as `row.bloqueado ?? false` so the badge simply never shows until the column exists. No migration in this pass.
 
-Values can come from existing finance mock data (`reitorSolicitacoes` filtered, `coordAgendaEvents`); placeholder zeros where no source exists yet.
+## 3. Edit button on every row
 
-### 3. Agenda de Hoje + Anúncios row
-- `grid lg:grid-cols-3 gap-6`, agenda spans 2 cols.
-- Reuse the exact agenda renderer from Coordenador (time block, color bar, title + sala, status badge with `em_curso` highlight) using `coordAgendaEvents` filtered to TODAY_DATE.
-- Anúncios card shows top 3 of `announcements` with the same `typeStyles` chip + meta + content, "Ver todos" link to `/financas/anuncios`.
+Pattern (already used in RH Departamentos):
+- Default row = read-only text
+- Pencil icon toggles edit mode → inputs/selects appear
+- Save icon commits
 
-### 4. Solicitações Pendentes
-- Full-width card listing top 3 pending finance solicitações using existing styling (icon + title + priority + requester + date + Aprovar/Rejeitar/Ver detalhes).
-- "Ver todas" links to `/financas/solicitacoes`.
+Apply to all tables listed in section 2. Where rows are already always-editable inputs (Pessoas, Espaços, Geopontos, Salários, Estudantes, Regras Presença, ConfigurarReceitas), wrap each row with the same `editing[id]` toggle and swap inputs ↔ read-only text.
 
-## Files
+## 4. Confirm dialogs
 
-- **Edit** `src/pages/financas/Inicio.tsx` — replace the current 60-line placeholder with the layout above. Remove the `FinHeader` import here (the welcome hero replaces it on Início; other pages keep `FinHeader`).
-- No new routes, no new data files. Reuses `mockData`, `institutionData`, `OnboardingStepBanner` storage helpers.
+Add an `AlertDialog` for two actions on every row:
+- **Delete** → "Tem a certeza que pretende eliminar este registo? Esta acção é irreversível." → Confirmar / Cancelar
+- **Confirm Edit (Save)** → "Confirmar as alterações a este registo?" → Confirmar / Cancelar
 
-## Out of scope (for this step)
+Implementation: a small shared helper `useConfirm()` in `src/components/ui/confirm-dialog.tsx` that renders one `AlertDialog` driven by state, returns `confirm(opts) => Promise<boolean>`. Each table imports it and wraps its existing `remove()` / save handlers.
 
-- Receitas and Despesas redesigns — handled in follow-up turns once Início is approved.
-- Real data wiring for KPIs beyond what the other dashboards already use.
+## Files touched
+
+- New: `src/components/ui/confirm-dialog.tsx`
+- Edited:
+  - `src/components/admin/DocenteFormDialog.tsx`
+  - `src/components/admin/StaffFormDialog.tsx`
+  - `src/pages/admin/Discentes.tsx`
+  - `src/pages/admin/onboarding/RH.tsx`
+  - `src/pages/admin/onboarding/Pessoas.tsx`
+  - `src/pages/admin/onboarding/Espacos.tsx`
+  - `src/pages/admin/onboarding/Geopontos.tsx`
+  - `src/pages/admin/onboarding/Salarios.tsx`
+  - `src/pages/admin/onboarding/Estudantes.tsx`
+  - `src/pages/admin/onboarding/RegrasPresenca.tsx`
+  - `src/pages/admin/FaculdadesCursos.tsx`
+  - `src/pages/financas/ConfigurarReceitas.tsx`
+
+## Out of scope (ask later if needed)
+
+- Adding a UI to actually toggle `bloqueado` on/off (you said "just a visual badge").
+- Adding a `bloqueado` column to tables that don't have one yet (no DB migration).
