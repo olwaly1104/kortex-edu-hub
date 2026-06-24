@@ -16,7 +16,7 @@ import OnboardingPessoas from "./Pessoas";
 import OnboardingRegrasPresenca from "./RegrasPresenca";
 
 type Departamento = { id: string; sigla: string; designacao: string; responsavel: string | null; cor: string | null };
-type PersonOpt = { id: string; nome: string; tipo: "Docente" | "Staff" };
+type PersonOpt = { id: string; nome: string; tipo: "Docente" | "Staff"; departamento?: string | null };
 
 function DepartamentosPanel() {
   const { user } = useAuth();
@@ -27,11 +27,11 @@ function DepartamentosPanel() {
   useEffect(() => {
     (async () => {
       const [doc, st] = await Promise.all([
-        (supabase as any).from("docentes").select("id, primeiro_nome, ultimo_nome").order("primeiro_nome", { ascending: true }),
+        (supabase as any).from("docentes").select("id, primeiro_nome, ultimo_nome, departamento").order("primeiro_nome", { ascending: true }),
         (supabase as any).from("staff").select("id, primeiro_nome, ultimo_nome").order("primeiro_nome", { ascending: true }),
       ]);
       const docs: PersonOpt[] = ((doc.data || []) as any[]).map((d) => ({
-        id: d.id, nome: `${d.primeiro_nome || ""} ${d.ultimo_nome || ""}`.trim() || "—", tipo: "Docente",
+        id: d.id, nome: `${d.primeiro_nome || ""} ${d.ultimo_nome || ""}`.trim() || "—", tipo: "Docente", departamento: d.departamento || null,
       }));
       const staff: PersonOpt[] = ((st.data || []) as any[]).map((d) => ({
         id: d.id, nome: `${d.primeiro_nome || ""} ${d.ultimo_nome || ""}`.trim() || "—", tipo: "Staff",
