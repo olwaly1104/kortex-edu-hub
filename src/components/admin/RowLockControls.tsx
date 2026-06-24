@@ -22,7 +22,7 @@ export function RowLockControls({
   editing: boolean;
   onEdit: () => void;
   onConfirm: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
   size?: "xs" | "sm";
   saveMsg?: string;
   deleteMsg?: string;
