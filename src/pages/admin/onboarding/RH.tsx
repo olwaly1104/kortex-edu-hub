@@ -108,7 +108,7 @@ function DepartamentosPanel() {
       </div>
 
       <Card className="overflow-hidden relative">
-        <CardLockBadge />
+        <CardLockBadge editing={cardEdit} onEdit={() => setCardEdit(true)} onConfirm={() => setCardEdit(false)} />
 
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
           <span>Sigla</span><span>Designação</span><span>Responsável</span><span className="text-center">Docentes</span><span className="text-right">Ações</span>
