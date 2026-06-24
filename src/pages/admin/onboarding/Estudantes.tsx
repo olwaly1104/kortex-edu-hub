@@ -66,7 +66,7 @@ export default function OnboardingEstudantes() {
 
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [novo, setNovo] = useState(() => ({ ...emptyNovo }));
-  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const [cardEdit, setCardEdit] = useState(false);
 
   const cursoById = useMemo(() => {
     const m = new Map<string, { code: string; name: string }>();
