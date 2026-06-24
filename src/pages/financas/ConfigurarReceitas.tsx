@@ -160,7 +160,7 @@ const migrateCats = (raw: unknown, fallback: string[]): CatItem[] => {
   return fallback.map((n) => ({ nome: n, cor: COR_OPCOES_GLOBAL[6].value }));
 };
 
-type RecSub = "impostos" | "propinas" | "emolumentos" | "servicos";
+type RecSub = "impostos" | "propinas" | "emolumentos";
 
 function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddCursos: () => void }) {
   const [sub, setSub] = useState<RecSub>("impostos");
@@ -175,18 +175,16 @@ function ReceitasSection({ email, onAddCursos }: { email?: string | null; onAddC
   return (
     <div className="space-y-6">
       <Tabs value={sub} onValueChange={(v) => setSub(v as RecSub)}>
-        <TabsList className="grid grid-cols-4 w-full max-w-2xl">
+        <TabsList className="grid grid-cols-3 w-full max-w-2xl">
           <TabsTrigger value="impostos" className="gap-1.5"><Percent className="w-3.5 h-3.5" /> Impostos</TabsTrigger>
           <TabsTrigger value="propinas" className="gap-1.5"><Wallet className="w-3.5 h-3.5" /> Propinas</TabsTrigger>
           <TabsTrigger value="emolumentos" className="gap-1.5"><Receipt className="w-3.5 h-3.5" /> Emolumentos</TabsTrigger>
-          <TabsTrigger value="servicos" className="gap-1.5"><BookOpenCheck className="w-3.5 h-3.5" /> Serviços Académicos</TabsTrigger>
         </TabsList>
       </Tabs>
 
       {sub === "impostos" && <ImpostosBlock impostos={impostos} setImpostos={setImpostos} email={email} />}
       {sub === "propinas" && <PropinasBlock email={email} impostos={impostos} onAddCursos={onAddCursos} />}
       {sub === "emolumentos" && <EmolumentosBlock email={email} impostos={impostos} />}
-      {sub === "servicos" && <ServicosAcademicosBlock email={email} impostos={impostos} />}
     </div>
   );
 }
