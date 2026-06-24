@@ -555,21 +555,21 @@ export default function AdminDiscentes() {
                 </Field>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Email Kortex (auto)</div>
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">ID do Discente (auto)</div>
                     <div className="font-mono text-[12px] text-foreground/90 truncate">
-                      {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
+                      {previewId || "DISC-————"}
                     </div>
                   </div>
                   <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
                 </div>
                 <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">ID do Discente (auto)</div>
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Email Kortex (auto)</div>
                     <div className="font-mono text-[12px] text-foreground/90 truncate">
-                      {previewId || "DISC-————"}
+                      {previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}
                     </div>
                   </div>
                   <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
@@ -711,7 +711,7 @@ export default function AdminDiscentes() {
                 {/* 3. Contacto */}
                 <section>
                   <SectionTitle index={3} title="Contacto" hint="Telemóvel pessoal e email institucional" />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <Field label="Telemóvel">
                       <Input value={draft.telemovel} onChange={(e) => setF("telemovel", e.target.value)} placeholder="+244 9XX XXX XXX" className="h-8 text-xs" />
                     </Field>
