@@ -12,7 +12,7 @@ import {
   ArrowLeft, Banknote, Building2, GraduationCap, Loader2, Save, AlertCircle,
   Receipt, Wallet, Plus, Trash2, TrendingUp, TrendingDown, CreditCard,
   Users, Briefcase, BookOpenCheck, Settings2, Percent, Check, FileText, FileCheck2,
-  ChevronDown,
+  ChevronDown, CalendarDays,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useFaculdades, useCursos, usePropinas, useUpdatePropina } from "@/lib/useInstitution";
@@ -316,8 +316,13 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
 }
 
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
+const PRAZOS_CFG_KEY = (email?: string | null) => KEY("propinas.prazos.cfg", email);
 
-const MESES_OPCOES = [10, 12];
+type PrazoCfg = { id: string; nome: string; meses: number };
+const DEFAULT_PRAZOS: PrazoCfg[] = [
+  { id: "p10", nome: "10 meses", meses: 10 },
+  { id: "p12", nome: "12 meses", meses: 12 },
+];
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
   const { data: faculdades = [], isLoading: lF } = useFaculdades();
@@ -336,6 +341,11 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
     });
     return norm;
   });
+  const [prazosCfg, setPrazosCfg] = useState<PrazoCfg[]>(() => {
+    const raw = readJSON<PrazoCfg[]>(PRAZOS_CFG_KEY(email), DEFAULT_PRAZOS);
+    return Array.isArray(raw) && raw.length ? raw : DEFAULT_PRAZOS;
+  });
+  useEffect(() => writeJSON(PRAZOS_CFG_KEY(email), prazosCfg), [prazosCfg, email]);
   const [open, setOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => writeJSON(ANOS_KEY(email), anosByCurso), [anosByCurso, email]);
@@ -375,6 +385,44 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
   return (
     <div className="space-y-6">
       <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <CalendarDays className="w-4 h-4 text-primary" />
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">Prazos de pagamento</h2>
+            <p className="text-[11px] text-muted-foreground">Defina os planos de pagamento disponíveis (ex: 10 meses, 12 meses). Cada curso pode escolher quais oferecer aos estudantes.</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">{prazosCfg.length} prazo{prazosCfg.length === 1 ? "" : "s"}</span>
+        </div>
+        <div className="divide-y">
+          <div className="grid grid-cols-[1.4fr_140px_140px_44px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Designação</div>
+            <div>Nº de meses</div>
+            <div>Pré-visualização</div>
+            <div className="text-right">Ação</div>
+          </div>
+          {prazosCfg.map((pr) => (
+            <div key={pr.id} className="grid grid-cols-[1.4fr_140px_140px_44px] gap-3 px-5 py-2.5 items-center text-sm">
+              <Input className="h-9" placeholder="Ex: 10 meses" value={pr.nome}
+                onChange={(e) => setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, nome: e.target.value } : x))} />
+              <Input type="number" min={1} max={24} className="h-9 tabular-nums" value={pr.meses}
+                onChange={(e) => setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, meses: Math.max(1, Number(e.target.value) || 1) } : x))} />
+              <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-md border border-border bg-muted/30 text-xs font-medium tabular-nums">{pr.nome || `${pr.meses} meses`}</span>
+              <div className="flex justify-end">
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => setPrazosCfg((s) => s.filter((x) => x.id !== pr.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="px-5 py-3 border-t bg-muted/10">
+          <Button size="sm" variant="outline" className="gap-1.5"
+            onClick={() => setPrazosCfg((s) => [...s, { id: `p_${Date.now()}`, nome: "", meses: 12 }])}>
+            <Plus className="w-3.5 h-3.5" /> Adicionar prazo
+          </Button>
+        </div>
+      </Card>
+
+      <Card className="overflow-hidden">
       <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
         <Wallet className="w-4 h-4 text-primary" />
         <div className="min-w-0">
@@ -407,7 +455,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
               <div>Faculdade · Curso</div>
               <div>Propina mensal</div>
               <div>Regime</div>
-              <div>Meses</div>
+              <div>Prazos</div>
               <div className="text-right">Propina mensal c/ IVA incl.</div>
               <div className="text-right">Propina bruta total</div>
               <div className="text-right">Propina líquida total</div>
@@ -440,7 +488,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                       return { ...s, [c.id]: next };
                     });
                     const mesesLabel = mesesArr.length
-                      ? mesesArr.map((m) => `${m} meses`).join(" · ")
+                      ? mesesArr.map((m) => prazosCfg.find((pc) => pc.meses === m)?.nome ?? `${m} meses`).join(" · ")
                       : "— Selecionar —";
                     return (
                       <div key={c.id}>
@@ -472,12 +520,12 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                               </button>
                             </PopoverTrigger>
                             <PopoverContent align="start" className="w-44 p-1">
-                              {MESES_OPCOES.map((m) => {
+                              {prazosCfg.map((pc) => { const m = pc.meses;
                                 const checked = mesesArr.includes(m);
                                 return (
-                                  <label key={m} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
+                                  <label key={pc.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
                                     <Checkbox checked={checked} onCheckedChange={() => toggleMes(m)} />
-                                    <span>{m} meses</span>
+                                    <span>{pc.nome}</span>
                                   </label>
                                 );
                               })}
