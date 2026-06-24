@@ -92,9 +92,8 @@ function DepartamentosPanel() {
     if (error) { toast.error(error.message); setRows(prev); }
   };
 
-  const gridCols = "grid-cols-[120px_1.4fr_1.6fr_90px_96px]";
+  const gridCols = "grid-cols-[110px_1.2fr_1.4fr_70px_220px]";
   const [editing, setEditing] = useState<Record<string, boolean>>({});
-  const toggleEdit = (id: string) => setEditing((p) => ({ ...p, [id]: !p[id] }));
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
