@@ -758,7 +758,6 @@ export default function GapConfiguracao() {
                   <tr className="border-b bg-muted/30">
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
-                  </tr>
                     {isCardEditing("ag-motivos") && <th className="w-12" />}
                   </tr>
                 </thead>
