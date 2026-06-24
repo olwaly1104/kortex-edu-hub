@@ -80,7 +80,8 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
 
   const remove = (id: string) => persist(rows.filter((r) => r.id !== id));
 
-  const gridCols = "grid-cols-[40px_1.4fr_1.4fr_1fr_1fr_0.9fr_0.9fr_48px]";
+  const [editing, setEditing] = useState<Record<string, boolean>>({});
+  const gridCols = "grid-cols-[40px_1.2fr_1.3fr_0.9fr_0.9fr_0.8fr_0.8fr_220px]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
