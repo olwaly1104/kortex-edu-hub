@@ -61,9 +61,21 @@ export function StaffFormDialog({
   onSave: (row: StaffRow & { fotoDataUrl?: string }) => void;
 }) {
   const [draft, setDraft] = useState<StaffDraft>(emptyStaff());
+  const [departamentos, setDepartamentos] = useState<{ id: string; designacao: string; sigla: string }[]>([]);
   const fotoInput = useRef<HTMLInputElement>(null);
   const biInput = useRef<HTMLInputElement>(null);
   const cvInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    (async () => {
+      const { data, error } = await (supabase as any)
+        .from("departamentos")
+        .select("id, designacao, sigla")
+        .order("designacao", { ascending: true });
+      if (!error && data) setDepartamentos(data);
+    })();
+  }, [open]);
 
   const setF = <K extends keyof StaffDraft>(k: K, v: StaffDraft[K]) => setDraft((d) => ({ ...d, [k]: v }));
   const previewEmail = useMemo(() => buildStaffEmail(draft.primeiroNome, draft.ultimoNome), [draft.primeiroNome, draft.ultimoNome]);
