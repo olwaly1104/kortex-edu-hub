@@ -316,22 +316,28 @@ export default function OnboardingEstudantes() {
           <h3 className="text-sm font-semibold">Estudantes registados</h3>
           <span className="text-xs text-muted-foreground">{rows.length} {rows.length === 1 ? "estudante" : "estudantes"}</span>
         </div>
-        <div className="grid grid-cols-[1fr_1.4fr_80px_70px_80px_40px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-          <span>Nome</span><span>Email</span><span>Curso</span><span>Ano</span><span>Turma</span><span></span>
+        <div className="grid grid-cols-[1fr_1.4fr_80px_60px_70px_200px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+          <span>Nome</span><span>Email</span><span>Curso</span><span>Ano</span><span>Turma</span><span className="text-right">Ações</span>
         </div>
         <div className="divide-y">
-          {rows.map(r => (
-            <div key={r.id} className="grid grid-cols-[1fr_1.4fr_80px_70px_80px_40px] gap-2 px-4 py-2 items-center text-xs">
+          {rows.map(r => {
+            const isEdit = !!editing[r.id];
+            return (
+            <div key={r.id} className="grid grid-cols-[1fr_1.4fr_80px_60px_70px_200px] gap-2 px-4 py-2 items-center text-xs">
               <span className="font-medium">{r.nome}</span>
               <span className="text-muted-foreground truncate">{r.email}</span>
               <Badge variant="outline" className="text-[10px] justify-center">{cursoById.get(r.curso_id)?.code ?? "—"}</Badge>
               <span>{r.ano}º</span>
               <span>{r.turma}</span>
-              <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
+              <RowLockControls
+                editing={isEdit}
+                onEdit={() => setEditing(p => ({ ...p, [r.id]: true }))}
+                onConfirm={() => setEditing(p => ({ ...p, [r.id]: false }))}
+                onDelete={() => remove(r.id)}
+              />
             </div>
-          ))}
+            );
+          })}
           {rows.length === 0 && !loadingRows && (
             <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem estudantes. Use os separadores acima para começar.</p>
           )}
