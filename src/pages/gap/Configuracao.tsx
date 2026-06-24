@@ -23,18 +23,19 @@ import {
   tipoConfig as initialTipoConfig,
   categoriaConfig as initialCategoriaConfig,
   estadoSolicitacaoConfig as initialEstadoConfig,
-  destinoConfig,
 } from "@/data/gapData";
 import { candidaturas as allCandidaturas } from "@/data/admissoesData";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 type EstadoItem = { key: string; label: string; color: string; descricao?: string };
 type CategoriaItem = { key: string; label: string; color: string; descricao?: string };
-type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number; multa: string };
+type MotivoItem = { key: string; label: string; categoria: string; destino: string; slaAceitacao: number; slaConclusao: number; multa: string };
 type MultaItem = { key: string; label: string; diasAposPrazo: number; valor: number; descricao: string };
+type Departamento = { id: string; sigla: string; designacao: string };
 
 const INITIAL_MULTAS: MultaItem[] = [
   { key: "atraso_relatorio", label: "Atraso na entrega de relatório", diasAposPrazo: 5, valor: 4000, descricao: "Aplicada 5 dias após o prazo de conclusão do relatório obrigatório." },
@@ -44,29 +45,8 @@ const INITIAL_MULTAS: MultaItem[] = [
   { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 5, valor: 8000, descricao: "Aplicada 5 dias após o prazo de regularização do uso de recursos." },
 ];
 
-const STAFF_OPTIONS = [
-  "Dra. Helena Cabral · GAP",
-  "Dr. João Tavares · GAP",
-  "Eng. Paulo Mendes · CTI",
-  "Eng.ª Sara Lima · CTI",
-  "Dra. Cita · Secretaria Académica",
-  "Dra. Ana Belmiro · Académica",
-  "Dra. Lúcia Mateus · Tesouraria",
-  "Sr. Adriano Paka · Cobranças",
-  "Dra. Catarina Lopes · Financeiro",
-  "Coord. Faculdade de Ciências Exatas",
-  "Coord. Faculdade de Medicina",
-];
 
-const defaultResponsavelByDestino = (destino: string) => {
-  switch (destino) {
-    case "CTI": return "Eng. Paulo Mendes · CTI";
-    case "Académica": return "Dra. Cita · Secretaria Académica";
-    case "Financeiro": return "Dra. Lúcia Mateus · Tesouraria";
-    case "Faculdade": return "Coord. Faculdade de Ciências Exatas";
-    default: return "Dra. Helena Cabral · GAP";
-  }
-};
+
 
 export default function GapConfiguracao() {
   const isOnboarding = useIsOnboardingStep();
