@@ -95,11 +95,24 @@ export function StaffFormDialog({
     reader.readAsDataURL(f);
   };
 
-  const requiredOk = !!draft.primeiroNome.trim() && !!draft.ultimoNome.trim();
+  const requiredOk =
+    !!draft.prefixo &&
+    !!draft.primeiroNome.trim() &&
+    !!draft.ultimoNome.trim() &&
+    !!draft.nascimento &&
+    !!draft.genero &&
+    !!(draft.bilhete || "").trim() &&
+    !!draft.departamento &&
+    !!draft.funcao.trim() &&
+    !!draft.contacto.trim() &&
+    !!draft.provincia &&
+    !!(draft.municipio || "").trim() &&
+    !!(draft.endereco || "").trim() &&
+    !!draft.moduloKortex;
 
   const handleSave = () => {
     if (!requiredOk || !previewEmail) {
-      toast.error("Preencha primeiro e último nome");
+      toast.error("Preencha todos os campos obrigatórios (exceto Documentação Anexa)");
       return;
     }
     onSave({
