@@ -380,7 +380,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
 
   // Column template — explicit so headers + rows align perfectly
   // Faculdade·Curso | Propina mensal | Regime | Meses | Propina mensal c/ IVA incl. | Propina bruta total | Líquido total | Ação
-  const COLS = "minmax(220px,1.4fr) 150px 160px 120px 150px 150px 150px 130px";
+  const COLS = "minmax(220px,1.6fr) 150px 160px 140px 170px 170px 130px";
 
   return (
     <div className="space-y-6">
