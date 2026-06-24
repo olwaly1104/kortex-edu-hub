@@ -231,7 +231,7 @@ export default function GapConfiguracao() {
   // ===== CANDIDATURAS =====
   type CdEstado = { key: string; label: string; color: string; descricao?: string };
  type CdEtapa = { key: string; label: string; agenda: boolean; obrigatoria: boolean; estadosPossiveis: string[] };
- type CdSessao = { etapaKey: string; mode: "dia" | "dias" | "periodo"; datas: string[]; dataFim?: string; hora: string; local: string; responsavel: string; capacidade: number };
+ type CdSessao = { etapaKey: string; mode: "" | "dia" | "dias" | "periodo"; datas: string[]; dataFim?: string; hora: string; local: string; responsavel: string; capacidade: number | "" };
 
 
   const [cdEstados, setCdEstados] = useState<CdEstado[]>([
