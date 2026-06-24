@@ -220,9 +220,6 @@ export function DocenteFormDialog({
                   <Field label="Nº Bilhete de Identidade">
                     <Input className="h-8 text-xs" value={draft.bilhete || ""} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" />
                   </Field>
-                  <Field label="Upload Bilhete de Identidade">
-                    <FileButton fileName={draft.bilheteFileName} onPick={(f) => setF("bilheteFileName", f?.name || "")} inputRef={biInput} accept="image/*,application/pdf" Icon={IdCard} />
-                  </Field>
                 </div>
               </div>
             </section>
