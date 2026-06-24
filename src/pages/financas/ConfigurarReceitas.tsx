@@ -528,7 +528,7 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
                                 return (
                                   <label key={pc.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-muted/60 cursor-pointer text-sm">
                                     <Checkbox checked={checked} onCheckedChange={() => toggleMes(m)} />
-                                    <span className="tabular-nums">{m} meses</span>
+                                    <span className="tabular-nums">{m}M</span>
                                   </label>
                                 );
                               })}
