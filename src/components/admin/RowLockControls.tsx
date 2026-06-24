@@ -56,7 +56,7 @@ export function RowLockControls({
       >
         {editing ? <><Check className="w-3 h-3" /> Confirmar</> : <><Pencil className="w-3 h-3" /> Editar</>}
       </Button>
-      {editing && (
+      {editing && onDelete && (
         <Button
           size="icon"
           variant="ghost"
