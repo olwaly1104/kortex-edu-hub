@@ -1,11 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Trash2 } from "lucide-react";
+import { Building2, GraduationCap, Briefcase, ClipboardCheck, Plus, Trash2, Users } from "lucide-react";
 import { OnboardingStepBanner, markOnboardingStepDone } from "@/components/admin/OnboardingStepBanner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -13,6 +14,7 @@ import OnboardingPessoas from "./Pessoas";
 import OnboardingRegrasPresenca from "./RegrasPresenca";
 
 type Departamento = { id: string; sigla: string; designacao: string; responsavel: string | null; cor: string | null };
+type DocenteOpt = { id: string; nome: string; departamento: string | null };
 
 function DepartamentosPanel() {
   const { user } = useAuth();
