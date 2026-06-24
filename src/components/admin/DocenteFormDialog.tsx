@@ -91,7 +91,7 @@ export function DocenteFormDialog({
 
   const submit = () => {
     if (!requiredOk || !previewEmail) {
-      toast.error("Preencha primeiro e último nome");
+      toast.error("Preencha todos os campos obrigatórios (exceto Documentação Anexa)");
       return;
     }
     if (!window.confirm("Tem a certeza que pretende criar este docente?")) return;
