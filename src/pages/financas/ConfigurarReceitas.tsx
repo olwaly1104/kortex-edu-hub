@@ -318,11 +318,17 @@ function ImpostosBlock({ impostos, setImpostos, email }: { impostos: Imposto[]; 
 const PRAZO_KEY = (email?: string | null) => KEY("propinas.prazo", email);
 const PRAZOS_CFG_KEY = (email?: string | null) => KEY("propinas.prazos.cfg", email);
 
-type PrazoPeriodo = "mensal" | "semestral" | "anual";
-type PrazoCfg = { id: string; nome: string; meses: number; periodo?: PrazoPeriodo };
+type PrazoPeriodo = "mensal" | "trimestral" | "semestral" | "anual";
+const PERIODO_OPCOES: { value: PrazoPeriodo; label: string }[] = [
+  { value: "mensal", label: "Mensal" },
+  { value: "trimestral", label: "Trimestral" },
+  { value: "semestral", label: "Semestral" },
+  { value: "anual", label: "Anual" },
+];
+type PrazoCfg = { id: string; nome: string; meses: number; periodos?: PrazoPeriodo[] };
 const DEFAULT_PRAZOS: PrazoCfg[] = [
-  { id: "p10", nome: "10", meses: 10, periodo: "mensal" },
-  { id: "p12", nome: "12", meses: 12, periodo: "mensal" },
+  { id: "p10", nome: "10", meses: 10, periodos: ["mensal"] },
+  { id: "p12", nome: "12", meses: 12, periodos: ["mensal"] },
 ];
 
 function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null; impostos: Imposto[]; onAddCursos: () => void }) {
@@ -401,31 +407,52 @@ function PropinasBlock({ email, impostos, onAddCursos }: { email?: string | null
             <div>Pré-visualização</div>
             <div className="text-right">Ação</div>
           </div>
-          {prazosCfg.map((pr) => (
-            <div key={pr.id} className="grid grid-cols-[140px_160px_1fr_44px] gap-3 px-5 py-2.5 items-center text-sm">
-              <Input type="number" min={1} max={24} className="h-9 tabular-nums" value={pr.meses}
-                onChange={(e) => {
-                  const meses = Math.max(1, Number(e.target.value) || 1);
-                  setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, meses, nome: String(meses) } : x));
-                }} />
-              <select className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-                value={pr.periodo ?? "mensal"}
-                onChange={(e) => setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, periodo: e.target.value as PrazoPeriodo } : x))}>
-                <option value="mensal">Mensal</option>
-                <option value="semestral">Semestral</option>
-                <option value="anual">Anual</option>
-              </select>
-              <span className="inline-flex items-center justify-center px-2.5 py-1 rounded-md border border-border bg-muted/30 text-xs font-medium tabular-nums w-fit capitalize">{pr.meses}M · {pr.periodo ?? "mensal"}</span>
-              <div className="flex justify-end">
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  onClick={() => setPrazosCfg((s) => s.filter((x) => x.id !== pr.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+          <div className="grid grid-cols-[140px_1fr_44px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Nº de meses</div>
+            <div>Período de pagamento</div>
+            <div className="text-right">Ação</div>
+          </div>
+          {prazosCfg.map((pr) => {
+            const periodos = pr.periodos ?? [];
+            const togglePeriodo = (p: PrazoPeriodo) => setPrazosCfg((s) => s.map((x) => {
+              if (x.id !== pr.id) return x;
+              const cur = x.periodos ?? [];
+              return { ...x, periodos: cur.includes(p) ? cur.filter((q) => q !== p) : [...cur, p] };
+            }));
+            return (
+              <div key={pr.id} className="grid grid-cols-[140px_1fr_44px] gap-3 px-5 py-2.5 items-center text-sm">
+                <Input type="number" min={1} max={24} className="h-9 tabular-nums" value={pr.meses}
+                  onChange={(e) => {
+                    const meses = Math.max(1, Number(e.target.value) || 1);
+                    setPrazosCfg((s) => s.map((x) => x.id === pr.id ? { ...x, meses, nome: String(meses) } : x));
+                  }} />
+                <div className="flex flex-wrap items-center gap-1.5 min-h-9 py-1">
+                  {PERIODO_OPCOES.map((opt) => {
+                    const checked = periodos.includes(opt.value);
+                    return (
+                      <button key={opt.value} type="button" onClick={() => togglePeriodo(opt.value)}
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded-md border text-xs font-medium transition-colors ${
+                          checked
+                            ? "bg-primary/10 border-primary/30 text-primary"
+                            : "bg-background border-input text-muted-foreground hover:bg-muted/40"
+                        }`}>
+                        {checked && <Check className="w-3 h-3" />}
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-end">
+                  <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    onClick={() => setPrazosCfg((s) => s.filter((x) => x.id !== pr.id))}><Trash2 className="w-3.5 h-3.5" /></Button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="px-5 py-3 border-t bg-muted/10">
           <Button size="sm" variant="outline" className="gap-1.5"
-            onClick={() => setPrazosCfg((s) => [...s, { id: `p_${Date.now()}`, nome: "12", meses: 12, periodo: "mensal" }])}>
+            onClick={() => setPrazosCfg((s) => [...s, { id: `p_${Date.now()}`, nome: "12", meses: 12, periodos: ["mensal"] }])}>
             <Plus className="w-3.5 h-3.5" /> Adicionar prazo
           </Button>
         </div>
