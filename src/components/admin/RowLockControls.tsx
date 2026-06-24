@@ -32,15 +32,7 @@ export function RowLockControls({
   const btnH = size === "xs" ? "h-7" : "h-7";
   return (
     <div className={`flex items-center gap-1.5 justify-end ${className}`} onClick={(e) => e.stopPropagation()}>
-      {!hideBadge && (
-        <span
-          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ${
-            editing ? "bg-emerald-100 text-emerald-700 border border-emerald-200" : "bg-muted text-muted-foreground"
-          }`}
-        >
-          {editing ? <><LockOpen className="w-2.5 h-2.5" /> Desbloqueado</> : <><Lock className="w-2.5 h-2.5" /> Bloqueado</>}
-        </span>
-      )}
+
       <Button
         size="sm"
         variant={editing ? "default" : "outline"}
