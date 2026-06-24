@@ -329,16 +329,6 @@ export default function GapConfiguracao() {
     const has = e.estadosPossiveis.includes(estadoKey);
     return { ...e, estadosPossiveis: has ? e.estadosPossiveis.filter(k => k !== estadoKey) : [...e.estadosPossiveis, estadoKey] };
   }));
-  const addCdSessao = () => {
-    if (!newCdSessEtapa.trim()) { toast({ title: "Selecione a etapa", variant: "destructive" }); return; }
-    if (!newCdSessData) { toast({ title: "Defina a data", variant: "destructive" }); return; }
-    if (!newCdSessHora) { toast({ title: "Defina a hora", variant: "destructive" }); return; }
-    if (!newCdSessLocal.trim()) { toast({ title: "Indique o local", variant: "destructive" }); return; }
-    if (!Number.isFinite(newCdSessCap) || newCdSessCap <= 0) { toast({ title: "Capacidade deve ser maior que zero", variant: "destructive" }); return; }
-    setCdSessoes(s => [...s, { key: `s-${Date.now()}`, etapa: newCdSessEtapa, data: newCdSessData, hora: newCdSessHora, local: newCdSessLocal.trim(), capacidade: newCdSessCap }]);
-    setNewCdSessData(""); setNewCdSessLocal(""); setNewCdSessCap(60); setCdSessOpen(false);
-  };
-  const removeCdSessao = (key: string) => setCdSessoes(s => s.filter(x => x.key !== key));
 
   const confirmCurrentStep = () => {
     const key = tab === "discentes" ? "gap.disc" : tab === "agendamentos" ? "gap.age" : tab === "candidaturas" ? "gap.cand" : "gap.sol";
