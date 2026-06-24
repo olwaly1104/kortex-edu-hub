@@ -242,9 +242,11 @@ export default function OnboardingRegrasPresenca() {
                     <span className="text-sm tabular-nums text-right">{m.valor.toLocaleString("pt-PT")} Kz</span>
                     <RowLockControls
                       editing={isEdit}
-                      onEdit={() => setEditing(p => ({ ...p, [m.id]: true }))}
-                      onConfirm={() => setEditing(p => ({ ...p, [m.id]: false }))}
-                      onDelete={() => setMultas(prev => prev.filter(x => x.id !== m.id))}
+                      onDelete={() => {
+                        if (window.confirm("Tem a certeza que pretende eliminar esta infração?")) {
+                          setMultas(prev => prev.filter(x => x.id !== m.id));
+                        }
+                      }}
                     />
                   </div>
                   );
