@@ -785,60 +785,6 @@ export default function GapConfiguracao() {
               </table>
             </div>
           </Card>
-
-          {/* Salas / Gabinetes */}
-          <Card className="p-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-muted-foreground" />
-                <h2 className="text-sm font-semibold text-foreground">Salas / Gabinetes</h2>
-                <span className="text-[11px] text-muted-foreground tabular-nums">· {agSalas.length}</span>
-              </div>
-              <div className="flex items-center gap-2">
-              {isCardEditing("ag-salas") && (
-                <Dialog open={agSalaOpen} onOpenChange={setAgSalaOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs"><Plus className="w-3.5 h-3.5" /> Adicionar</Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-md">
-                    <DialogHeader><DialogTitle>Nova sala / gabinete</DialogTitle></DialogHeader>
-                    <div className="space-y-3 py-2">
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Nome da sala</label>
-                        <Input value={newAgSalaLabel} onChange={e => setNewAgSalaLabel(e.target.value)} placeholder="Ex: Gab. GAP 4" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Lotação</label>
-                        <Input type="number" min={1} value={newAgSalaLot} onChange={e => setNewAgSalaLot(Number(e.target.value) || 1)} />
-                      </div>
-                    </div>
-                    <DialogFooter className="gap-2 sm:gap-2">
-                      <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
-                      <Button onClick={() => {
-                        if (!newAgSalaLabel.trim()) return;
-                        setAgSalas(prev => [...prev, { key: slugify(newAgSalaLabel), label: newAgSalaLabel.trim(), lotacao: newAgSalaLot }]);
-                        setNewAgSalaLabel(""); setNewAgSalaLot(4); setAgSalaOpen(false);
-                        toast({ title: "Sala adicionada" });
-                      }} disabled={!newAgSalaLabel.trim()}>Adicionar</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              )}
-                <CardEditToggle id="ag-salas" />
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {agSalas.map(s => (
-                <div key={s.key} className="inline-flex items-center gap-2 rounded-full border border-border bg-muted/30 px-3 py-1 text-xs">
-                  <MapPin className="w-3 h-3 text-muted-foreground" />
-                  <span className="font-medium text-foreground">{s.label}</span>
-                  <span className="text-muted-foreground tabular-nums">· {s.lotacao} lug.</span>
-                  <EditIcon onClick={() => setEditAgSala(s)} label={`Editar ${s.label}`} editing={isCardEditing("ag-salas")} />
-                  <RemoveIcon onClick={() => setAgSalas(prev => prev.filter(x => x.key !== s.key))} label={`Remover ${s.label}`} editing={isCardEditing("ag-salas")} />
-                </div>
-              ))}
-            </div>
-          </Card>
         </TabsContent>
 
         {/* ============ CANDIDATURAS ============ */}
