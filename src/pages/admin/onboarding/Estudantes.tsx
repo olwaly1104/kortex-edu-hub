@@ -331,12 +331,7 @@ export default function OnboardingEstudantes() {
               <Badge variant="outline" className="text-[10px] justify-center">{cursoById.get(r.curso_id)?.code ?? "—"}</Badge>
               <span>{r.ano}º</span>
               <span>{r.turma}</span>
-              <RowLockControls
-                editing={isEdit}
-                onEdit={() => setEditing(p => ({ ...p, [r.id]: true }))}
-                onConfirm={() => setEditing(p => ({ ...p, [r.id]: false }))}
-                onDelete={() => remove(r.id)}
-              />
+              <RowLockControls editing={isEdit} onDelete={() => remove(r.id)} />
             </div>
             );
           })}
