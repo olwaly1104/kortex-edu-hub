@@ -122,13 +122,18 @@ function DepartamentosPanel() {
                 placeholder="Designação"
                 className="h-8 text-xs"
               />
-              <Input
+              <Select
                 value={r.responsavel || ""}
-                onChange={(ev) => upd(r.id, { responsavel: ev.target.value || null })}
-                onBlur={(ev) => persist(r.id, { responsavel: ev.target.value.trim() || null })}
-                placeholder="Responsável do departamento"
-                className="h-8 text-xs"
-              />
+                onValueChange={(v) => { const val = v === "__none__" ? null : v; upd(r.id, { responsavel: val }); persist(r.id, { responsavel: val }); }}
+              >
+                <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecionar docente" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">— Sem responsável —</SelectItem>
+                  {docentes.map((d) => (
+                    <SelectItem key={d.id} value={d.nome}>{d.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <div className="flex justify-end">
                 <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
                   <Trash2 className="w-3.5 h-3.5" />
