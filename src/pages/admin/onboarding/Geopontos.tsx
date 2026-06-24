@@ -106,6 +106,10 @@ export default function OnboardingGeopontos() {
 
   const renderEspacos = (tipo: EspacoTipo, placeholder: string) => {
     const filtrados = espacos.filter(s => s.tipo === tipo && (filtroEdif === "all" || s.edificioId === filtroEdif));
+    const isGab = tipo === "Gabinete";
+    const cols = isGab
+      ? "grid-cols-[1.2fr_1fr_70px_1.2fr_220px]"
+      : "grid-cols-[1.2fr_1fr_70px_90px_1.2fr_220px]";
     return (
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -121,22 +125,24 @@ export default function OnboardingGeopontos() {
         <Card className="overflow-hidden relative">
           <CardLockBadge />
 
-          <div className="grid grid-cols-[1.2fr_1fr_70px_90px_1.2fr_220px] gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-            <span>Edifício</span><span>Nome / Nº</span><span>Piso</span><span>Capacidade</span><span>{tipo === "Gabinete" ? "Ocupante" : "Notas"}</span><span className="text-right">Ações</span>
+          <div className={`grid ${cols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
+            <span>Edifício</span><span>Nome / Nº</span><span>Piso</span>{!isGab && <span>Capacidade</span>}<span>{isGab ? "Ocupante" : "Notas"}</span><span className="text-right">Ações</span>
           </div>
           <div className="divide-y">
             {filtrados.map(s => {
               const isEdit = !!editEsp[s.id];
               return (
-              <div key={s.id} className="grid grid-cols-[1.2fr_1fr_70px_90px_1.2fr_220px] gap-2 px-4 py-2 items-center">
+              <div key={s.id} className={`grid ${cols} gap-2 px-4 py-2 items-center`}>
                 <Select value={s.edificioId} disabled={!isEdit} onValueChange={v => updEspaco(s.id, { edificioId: v })}>
                   <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>{edificios.map(e => <SelectItem key={e.id} value={e.id}>{e.nome}</SelectItem>)}</SelectContent>
                 </Select>
                 <Input value={s.nome} disabled={!isEdit} onChange={ev => updEspaco(s.id, { nome: ev.target.value })} className="h-8 text-xs" placeholder={placeholder} />
                 <Input value={s.piso} disabled={!isEdit} onChange={ev => updEspaco(s.id, { piso: ev.target.value })} className="h-8 text-xs" />
-                <Input type="number" min={0} disabled={!isEdit} value={s.capacidade} onChange={ev => updEspaco(s.id, { capacidade: Number(ev.target.value) })} className="h-8 text-xs" />
-                <Input value={s.notas || ""} disabled={!isEdit} onChange={ev => updEspaco(s.id, { notas: ev.target.value })} className="h-8 text-xs" placeholder={tipo === "Gabinete" ? "Pessoa ocupante" : "—"} />
+                {!isGab && (
+                  <Input type="number" min={0} disabled={!isEdit} value={s.capacidade} onChange={ev => updEspaco(s.id, { capacidade: Number(ev.target.value) })} className="h-8 text-xs" />
+                )}
+                <Input value={s.notas || ""} disabled={!isEdit} onChange={ev => updEspaco(s.id, { notas: ev.target.value })} className="h-8 text-xs" placeholder={isGab ? "Pessoa ocupante" : "—"} />
                 <RowLockControls
                   editing={isEdit}
                   onEdit={() => setEditEsp(p => ({ ...p, [s.id]: true }))}
@@ -150,6 +156,7 @@ export default function OnboardingGeopontos() {
               <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem registos.</p>
             )}
           </div>
+
           <div className="border-t bg-muted/10 px-4 py-2.5">
             <Button variant="ghost" size="sm" onClick={() => addEspaco(tipo)} className="h-8 gap-1.5 text-primary hover:text-primary hover:bg-primary/5">
               <Plus className="w-3.5 h-3.5" /> Adicionar {tipo.toLowerCase()}
