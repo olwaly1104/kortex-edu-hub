@@ -282,12 +282,15 @@ export function DocenteFormDialog({
 
             <section>
               <SectionTitle index={5} icon={<Award className="w-3.5 h-3.5" />} title="Documentação Anexa" hint="CV e diploma" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <Field label="Curriculum Vitae (CV)">
                   <FileButton fileName={draft.cvFileName} onPick={(f) => setF("cvFileName", f?.name || "")} inputRef={cvInput} accept="application/pdf,.doc,.docx" Icon={FileText} />
                 </Field>
                 <Field label={diplomaLabel(draft.grau)}>
                   <FileButton fileName={draft.diplomaFileName} onPick={(f) => setF("diplomaFileName", f?.name || "")} inputRef={diplomaInput} accept="image/*,application/pdf" Icon={Award} />
+                </Field>
+                <Field label="Upload Bilhete de Identidade">
+                  <FileButton fileName={draft.bilheteFileName} onPick={(f) => setF("bilheteFileName", f?.name || "")} inputRef={biInput} accept="image/*,application/pdf" Icon={IdCard} />
                 </Field>
               </div>
             </section>
