@@ -92,7 +92,7 @@ function DocentesOnboardingPanel({ userEmail }: { userEmail?: string | null }) {
       />
 
       <Card className="overflow-hidden relative">
-        <CardLockBadge />
+        <CardLockBadge editing={cardEdit} onEdit={() => setCardEdit(true)} onConfirm={() => setCardEdit(false)} />
 
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
           <span></span><span>Docente</span><span>Email</span><span>Faculdade</span><span>Departamento</span><span>Grau</span><span>Cargo</span><span></span>
