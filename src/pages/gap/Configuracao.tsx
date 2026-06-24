@@ -23,18 +23,19 @@ import {
   tipoConfig as initialTipoConfig,
   categoriaConfig as initialCategoriaConfig,
   estadoSolicitacaoConfig as initialEstadoConfig,
-  destinoConfig,
 } from "@/data/gapData";
 import { candidaturas as allCandidaturas } from "@/data/admissoesData";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 type EstadoItem = { key: string; label: string; color: string; descricao?: string };
 type CategoriaItem = { key: string; label: string; color: string; descricao?: string };
-type MotivoItem = { key: string; label: string; categoria: string; destino: string; responsavel: string; slaAceitacao: number; slaConclusao: number; multa: string };
+type MotivoItem = { key: string; label: string; categoria: string; destino: string; slaAceitacao: number; slaConclusao: number; multa: string };
 type MultaItem = { key: string; label: string; diasAposPrazo: number; valor: number; descricao: string };
+type Departamento = { id: string; sigla: string; designacao: string };
 
 const INITIAL_MULTAS: MultaItem[] = [
   { key: "atraso_relatorio", label: "Atraso na entrega de relatório", diasAposPrazo: 5, valor: 4000, descricao: "Aplicada 5 dias após o prazo de conclusão do relatório obrigatório." },
@@ -44,29 +45,8 @@ const INITIAL_MULTAS: MultaItem[] = [
   { key: "uso_indevido", label: "Uso indevido de recursos institucionais", diasAposPrazo: 5, valor: 8000, descricao: "Aplicada 5 dias após o prazo de regularização do uso de recursos." },
 ];
 
-const STAFF_OPTIONS = [
-  "Dra. Helena Cabral · GAP",
-  "Dr. João Tavares · GAP",
-  "Eng. Paulo Mendes · CTI",
-  "Eng.ª Sara Lima · CTI",
-  "Dra. Cita · Secretaria Académica",
-  "Dra. Ana Belmiro · Académica",
-  "Dra. Lúcia Mateus · Tesouraria",
-  "Sr. Adriano Paka · Cobranças",
-  "Dra. Catarina Lopes · Financeiro",
-  "Coord. Faculdade de Ciências Exatas",
-  "Coord. Faculdade de Medicina",
-];
 
-const defaultResponsavelByDestino = (destino: string) => {
-  switch (destino) {
-    case "CTI": return "Eng. Paulo Mendes · CTI";
-    case "Académica": return "Dra. Cita · Secretaria Académica";
-    case "Financeiro": return "Dra. Lúcia Mateus · Tesouraria";
-    case "Faculdade": return "Coord. Faculdade de Ciências Exatas";
-    default: return "Dra. Helena Cabral · GAP";
-  }
-};
+
 
 export default function GapConfiguracao() {
   const isOnboarding = useIsOnboardingStep();
@@ -108,7 +88,6 @@ export default function GapConfiguracao() {
         : "";
       return {
         key, label: v.label, categoria: v.categoria, destino: v.destino,
-        responsavel: (v as any).responsavelDestino || defaultResponsavelByDestino(v.destino),
         slaAceitacao: Math.max(1, Math.ceil(slaConcl / 3)),
         slaConclusao: slaConcl,
         multa: multaDefault,
@@ -125,11 +104,27 @@ export default function GapConfiguracao() {
   const [newCatLabel, setNewCatLabel] = useState("");
   const [newMotLabel, setNewMotLabel] = useState("");
   const [newMotCat, setNewMotCat] = useState<string>("");
-  const [newMotDest, setNewMotDest] = useState<string>("CTI");
+  const [newMotDest, setNewMotDest] = useState<string>("");
   const [newMotSlaAceit, setNewMotSlaAceit] = useState<number>(2);
   const [newMotSlaConcl, setNewMotSlaConcl] = useState<number>(5);
-  const [newMotResp, setNewMotResp] = useState<string>(STAFF_OPTIONS[0]);
   const [newMotMulta, setNewMotMulta] = useState<string>("__none__");
+
+  // Real departamentos from DB used as Destino
+  const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
+  useEffect(() => {
+    (async () => {
+      const { data, error } = await (supabase as any)
+        .from("departamentos")
+        .select("id, sigla, designacao")
+        .order("designacao", { ascending: true });
+      if (!error && data) {
+        setDepartamentos(data as Departamento[]);
+        if (data.length && !newMotDest) setNewMotDest((data[0] as any).designacao);
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const destLabel = (k: string) => departamentos.find(d => d.designacao === k || d.sigla === k)?.designacao || k;
 
   const slugify = (s: string) =>
     s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
@@ -156,12 +151,13 @@ export default function GapConfiguracao() {
     const key = slugify(newMotLabel);
     setMotivos(prev => [...prev, {
       key, label: newMotLabel.trim(), categoria: newMotCat, destino: newMotDest,
-      responsavel: newMotResp, slaAceitacao: newMotSlaAceit, slaConclusao: newMotSlaConcl,
+      slaAceitacao: newMotSlaAceit, slaConclusao: newMotSlaConcl,
       multa: newMotMulta === "__none__" ? "" : newMotMulta,
     }]);
-    setNewMotLabel(""); setNewMotCat(""); setNewMotDest("CTI");
+    setNewMotLabel(""); setNewMotCat("");
+    setNewMotDest(departamentos[0]?.designacao || "");
     setNewMotSlaAceit(2); setNewMotSlaConcl(5);
-    setNewMotResp(STAFF_OPTIONS[0]); setNewMotMulta("__none__");
+    setNewMotMulta("__none__");
     setMotivoOpen(false);
     toast({ title: "Motivo criado" });
   };
@@ -509,10 +505,10 @@ export default function GapConfiguracao() {
                           </Select>
                         </div>
                         <div>
-                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino</label>
+                          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino (Departamento)</label>
                           <Select value={newMotDest} onValueChange={setNewMotDest}>
-                            <SelectTrigger><SelectValue /></SelectTrigger>
-                            <SelectContent>{Object.entries(destinoConfig).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}</SelectContent>
+                            <SelectTrigger><SelectValue placeholder={departamentos.length ? "Selecionar..." : "Sem departamentos"} /></SelectTrigger>
+                            <SelectContent>{departamentos.map(d => <SelectItem key={d.id} value={d.designacao}>{d.designacao}{d.sigla ? ` (${d.sigla})` : ""}</SelectItem>)}</SelectContent>
                           </Select>
                         </div>
                       </div>
@@ -543,13 +539,6 @@ export default function GapConfiguracao() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
-                        <Select value={newMotResp} onValueChange={setNewMotResp}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>{STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                        </Select>
-                      </div>
                     </div>
                     <DialogFooter className="gap-2 sm:gap-2">
                       <DialogClose asChild><Button variant="outline">Cancelar</Button></DialogClose>
@@ -568,7 +557,6 @@ export default function GapConfiguracao() {
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Motivo</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Categoria</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Destino</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs">Responsável</th>
                     <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Aceitar</th>
                     <th className="text-center p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Concluir</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs whitespace-nowrap">Multa</th>
@@ -578,17 +566,13 @@ export default function GapConfiguracao() {
                 <tbody>
                   {motivos.map(m => {
                     const catCfg = categorias.find(c => c.label === m.categoria);
-                    const destCfg = destinoConfig[m.destino as keyof typeof destinoConfig];
                     return (
                       <tr key={m.key} className="border-b last:border-0 hover:bg-muted/20">
                         <td className="p-3 text-xs font-medium text-foreground">{m.label}</td>
                         <td className="p-3">
                           {catCfg ? <Badge variant="outline" className={cn("text-[10px]", catCfg.color)}>{catCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.categoria}</span>}
                         </td>
-                        <td className="p-3">
-                          {destCfg ? <Badge variant="outline" className={cn("text-[10px]", destCfg.color)}>{destCfg.label}</Badge> : <span className="text-xs text-muted-foreground">{m.destino}</span>}
-                        </td>
-                        <td className="p-3 text-xs text-foreground whitespace-nowrap">{m.responsavel}</td>
+                        <td className="p-3 text-xs text-foreground whitespace-nowrap">{destLabel(m.destino)}</td>
                         <td className="p-3 text-center text-xs tabular-nums text-amber-700">{m.slaAceitacao}d</td>
                         <td className="p-3 text-center text-xs tabular-nums text-blue-700">{m.slaConclusao}d</td>
                         <td className="p-3 text-xs whitespace-nowrap tabular-nums">
@@ -1258,10 +1242,15 @@ export default function GapConfiguracao() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino</label>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino (Departamento)</label>
                   <Select value={editMotivo.destino} onValueChange={(v) => setEditMotivo({ ...editMotivo, destino: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{Object.entries(destinoConfig).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}</SelectContent>
+                    <SelectTrigger><SelectValue placeholder={departamentos.length ? "Selecionar..." : "Sem departamentos"} /></SelectTrigger>
+                    <SelectContent>
+                      {departamentos.map(d => <SelectItem key={d.id} value={d.designacao}>{d.designacao}{d.sigla ? ` (${d.sigla})` : ""}</SelectItem>)}
+                      {editMotivo.destino && !departamentos.some(d => d.designacao === editMotivo.destino) && (
+                        <SelectItem value={editMotivo.destino}>{editMotivo.destino}</SelectItem>
+                      )}
+                    </SelectContent>
                   </Select>
                 </div>
               </div>
@@ -1274,18 +1263,6 @@ export default function GapConfiguracao() {
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ concluir (dias)</label>
                   <Input type="number" min={1} value={editMotivo.slaConclusao} onChange={e => setEditMotivo({ ...editMotivo, slaConclusao: Number(e.target.value) || 1 })} />
                 </div>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
-                <Select value={editMotivo.responsavel} onValueChange={(v) => setEditMotivo({ ...editMotivo, responsavel: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    {editMotivo.responsavel && !STAFF_OPTIONS.includes(editMotivo.responsavel) && (
-                      <SelectItem value={editMotivo.responsavel}>{editMotivo.responsavel}</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Multa associada</label>
