@@ -9,6 +9,7 @@ import { Building2, Plus, DoorOpen, Briefcase, Wrench } from "lucide-react";
 import { RowLockControls, CardLockBadge } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAuthUid } from "@/hooks/useAuthUid";
 import { supabase } from "@/integrations/supabase/client";
 
 type EspacoTipo = "Sala" | "Gabinete" | "Instalação";
@@ -34,6 +35,7 @@ const TIPO_LABEL: Record<EspacoTipo, string> = { Sala: "salas", Gabinete: "gabin
 
 export default function OnboardingGeopontos() {
   const { user } = useAuth();
+  const authUid = useAuthUid();
   const [tab, setTab] = useState<"edificios" | EspacoTipo>("edificios");
 
   const [edificios, setEdificios] = useState<Edificio[]>([]);
@@ -58,10 +60,10 @@ export default function OnboardingGeopontos() {
 
   // ---- Edifícios (DB)
   const addEdif = async () => {
-    if (!user?.id) return;
+    if (!authUid) { toast.error("Sessão não iniciada."); return; }
     const n = edificios.length + 1;
     const { data, error } = await supabase.from("edificios").insert({
-      owner_user_id: user.id, sigla: `E${n}`, nome: `Novo Edifício ${n}`, pisos: 2, salas: 0, responsavel: null,
+      owner_user_id: authUid, sigla: `E${n}`, nome: `Novo Edifício ${n}`, pisos: 2, salas: 0, responsavel: null,
     }).select().single();
     if (error) { toast.error(error.message); return; }
     setEdificios(p => [...p, { id: data.id, sigla: data.sigla, nome: data.nome, pisos: data.pisos, salas: data.salas, responsavel: data.responsavel }]);

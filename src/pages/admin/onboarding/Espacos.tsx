@@ -9,6 +9,7 @@ import { Building2, Plus, DoorOpen, Briefcase, Wrench } from "lucide-react";
 import { RowLockControls, CardLockBadge } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAuthUid } from "@/hooks/useAuthUid";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -56,6 +57,7 @@ const confirmDelete = () =>
 
 export default function OnboardingEspacos() {
   const { user } = useAuth();
+  const authUid = useAuthUid();
   const [edificios, setEdificios] = useState<Edificio[]>([]);
   const [espacos, setEspacos] = useState<Espaco[]>(() => loadLS<Espaco>(ESPACOS_KEY));
   const [tab, setTab] = useState<"edificios" | EspacoTipo>("edificios");
@@ -81,11 +83,11 @@ export default function OnboardingEspacos() {
 
   /* ───────── Edifícios (DB) ───────── */
   const addEdificio = async () => {
-    if (!user?.id) { toast.error("Sessão inválida."); return; }
+    if (!authUid) { toast.error("Sessão inválida."); return; }
     const n = edificios.length + 1;
     const { data, error } = await supabase
       .from("edificios")
-      .insert({ owner_user_id: user.id, sigla: `E${n}`, nome: `Novo Edifício ${n}`, pisos: 2, salas: 0 })
+      .insert({ owner_user_id: authUid, sigla: `E${n}`, nome: `Novo Edifício ${n}`, pisos: 2, salas: 0 })
       .select("id, sigla, nome, pisos, salas")
       .single();
     if (error || !data) { toast.error(error?.message || "Falha ao criar edifício."); return; }
