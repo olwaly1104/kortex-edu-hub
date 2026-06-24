@@ -180,14 +180,12 @@ function DepartamentosPanel() {
               <div className="flex justify-center">
                 <span className="inline-flex items-center justify-center min-w-[28px] h-6 px-2 rounded-md bg-muted text-[11px] font-semibold tabular-nums">{docCount}</span>
               </div>
-              <div className="flex justify-end gap-1">
-                <Button size="icon" variant="ghost" onClick={() => toggleEdit(r.id)} className="h-8 w-8 text-muted-foreground hover:text-primary" title={isEdit ? "Concluir" : "Editar"}>
-                  {isEdit ? <Save className="w-3.5 h-3.5" /> : <Pencil className="w-3.5 h-3.5" />}
-                </Button>
-                <Button size="icon" variant="ghost" onClick={() => remove(r.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive" title="Eliminar">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
-              </div>
+              <RowLockControls
+                editing={isEdit}
+                onEdit={() => setEditing((p) => ({ ...p, [r.id]: true }))}
+                onConfirm={() => setEditing((p) => ({ ...p, [r.id]: false }))}
+                onDelete={() => remove(r.id)}
+              />
             </div>
             );
           })}
