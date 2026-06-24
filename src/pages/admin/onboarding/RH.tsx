@@ -86,7 +86,7 @@ function DepartamentosPanel() {
     if (error) { toast.error(error.message); setRows(prev); }
   };
 
-  const gridCols = "grid-cols-[100px_1.4fr_1.4fr_64px]";
+  const gridCols = "grid-cols-[200px_100px_1.4fr_1.4fr_64px]";
 
   return (
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6 animate-fade-in">
@@ -100,41 +100,30 @@ function DepartamentosPanel() {
         </div>
       </div>
 
-      {rows.length > 0 && (
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Pré-visualização</span>
-            <span className="text-[10px] text-muted-foreground">{rows.length} departamento(s)</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-            {rows.map((r) => {
-              const count = docentes.filter((d) => (d.departamento || "").trim().toLowerCase() === (r.designacao || "").trim().toLowerCase()).length;
-              return (
-                <div key={`prev-${r.id}`} className="flex items-center gap-3 rounded-md border bg-card px-3 py-2">
-                  <div className="w-9 h-9 rounded-md flex items-center justify-center text-[10px] font-bold text-white shrink-0" style={{ background: r.cor || "#1B3A6B" }}>
-                    {(r.sigla || "—").slice(0, 4)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold truncate">{r.designacao || "Sem designação"}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">
-                      {r.responsavel || "Sem responsável"} · <Users className="inline w-2.5 h-2.5 -mt-0.5" /> {count} docente(s)
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      )}
+
+
 
 
       <Card className="overflow-hidden">
         <div className={`grid ${gridCols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
-          <span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
+          <span>Pré-visualização</span><span>Sigla</span><span>Designação</span><span>Responsável</span><span></span>
         </div>
         <div className="divide-y">
-          {rows.map((r) => (
+          {rows.map((r) => {
+            const count = docentes.filter((d) => (d.departamento || "").trim().toLowerCase() === (r.designacao || "").trim().toLowerCase()).length;
+            return (
             <div key={r.id} className={`grid ${gridCols} gap-2 px-4 py-2 items-center`}>
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-9 h-9 rounded-md flex items-center justify-center text-[10px] font-bold text-white shrink-0" style={{ background: r.cor || "#1B3A6B" }}>
+                  {(r.sigla || "—").slice(0, 4)}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold truncate">{r.designacao || "Sem designação"}</p>
+                  <p className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
+                    <Users className="w-2.5 h-2.5" /> {count} docente(s)
+                  </p>
+                </div>
+              </div>
               <Input
                 value={r.sigla}
                 onChange={(ev) => upd(r.id, { sigla: ev.target.value.toUpperCase() })}
@@ -168,7 +157,8 @@ function DepartamentosPanel() {
                 </Button>
               </div>
             </div>
-          ))}
+            );
+          })}
           {!loading && rows.length === 0 && (
             <p className="px-4 py-8 text-xs text-muted-foreground italic text-center">Sem departamentos registados.</p>
           )}
