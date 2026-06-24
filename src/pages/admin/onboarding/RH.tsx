@@ -21,20 +21,22 @@ type PersonOpt = { id: string; nome: string; tipo: "Docente" | "Staff" };
 function DepartamentosPanel() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Departamento[]>([]);
-  const [docentes, setDocentes] = useState<DocenteOpt[]>([]);
+  const [people, setPeople] = useState<PersonOpt[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const { data } = await (supabase as any)
-        .from("docentes")
-        .select("id, primeiro_nome, ultimo_nome, departamento")
-        .order("primeiro_nome", { ascending: true });
-      setDocentes(((data || []) as any[]).map((d) => ({
-        id: d.id,
-        nome: `${d.primeiro_nome || ""} ${d.ultimo_nome || ""}`.trim() || "—",
-        departamento: d.departamento || null,
-      })));
+      const [doc, st] = await Promise.all([
+        (supabase as any).from("docentes").select("id, primeiro_nome, ultimo_nome").order("primeiro_nome", { ascending: true }),
+        (supabase as any).from("staff").select("id, primeiro_nome, ultimo_nome").order("primeiro_nome", { ascending: true }),
+      ]);
+      const docs: PersonOpt[] = ((doc.data || []) as any[]).map((d) => ({
+        id: d.id, nome: `${d.primeiro_nome || ""} ${d.ultimo_nome || ""}`.trim() || "—", tipo: "Docente",
+      }));
+      const staff: PersonOpt[] = ((st.data || []) as any[]).map((d) => ({
+        id: d.id, nome: `${d.primeiro_nome || ""} ${d.ultimo_nome || ""}`.trim() || "—", tipo: "Staff",
+      }));
+      setPeople([...docs, ...staff]);
     })();
   }, []);
 
