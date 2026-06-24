@@ -102,7 +102,13 @@ export function DocenteFormDialog({
         <div className="px-6 py-5 space-y-6">
           {/* Conta Simplificada (top) */}
           <section className="space-y-3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-[110px_1fr_1fr] gap-3">
+              <Field label="Prefixo">
+                <Select value={draft.prefixo} onValueChange={(v) => setF("prefixo", v)}>
+                  <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>{prefixosPool.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
               <Field label="Primeiro nome *">
                 <Input
                   autoFocus
