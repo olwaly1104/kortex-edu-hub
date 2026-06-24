@@ -294,6 +294,20 @@ export function DocenteFormDialog({
                 </Field>
               </div>
             </section>
+
+            <section>
+              <SectionTitle index={6} icon={<GraduationCap className="w-3.5 h-3.5" />} title="Módulo Kortex" hint="Acesso atribuído ao docente" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <Field label="Módulo Kortex *">
+                  <Select value={draft.moduloKortex || "professor"} onValueChange={(v) => setF("moduloKortex", v)}>
+                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {MODULOS_DOCENTE.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </div>
+            </section>
           </div>
         </div>
 
