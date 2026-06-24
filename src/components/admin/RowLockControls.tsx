@@ -60,7 +60,7 @@ export function CardLockBadge({
 }) {
   const interactive = typeof editing === "boolean" && onEdit && onConfirm;
   return (
-    <div className={`absolute top-2 right-3 z-10 flex items-center gap-1.5 ${className}`}>
+    <div className={`flex items-center justify-end gap-1.5 px-3 py-2 border-b bg-muted/20 ${className}`}>
       <span
         className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold border ${
           editing
