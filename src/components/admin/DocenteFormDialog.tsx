@@ -188,9 +188,6 @@ export function DocenteFormDialog({
                   <Field label="Data de nascimento">
                     <Input className="h-8 text-xs" type="date" value={draft.nascimento || ""} onChange={(e) => setF("nascimento", e.target.value)} />
                   </Field>
-                  <Field label="Data de nascimento">
-                    <Input className="h-8 text-xs" type="date" value={draft.nascimento || ""} onChange={(e) => setF("nascimento", e.target.value)} />
-                  </Field>
                   <Field label="Género">
                     <Select value={draft.genero || "M"} onValueChange={(v) => setF("genero", v as DocenteRow["genero"])}>
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
