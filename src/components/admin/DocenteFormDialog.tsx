@@ -225,9 +225,9 @@ export function DocenteFormDialog({
             </section>
 
             <section>
-              <SectionTitle index={2} icon={<Mail className="w-3.5 h-3.5" />} title="Contacto Institucional" hint="Telefone e email institucionais" />
+              <SectionTitle index={2} icon={<Mail className="w-3.5 h-3.5" />} title="Contacto" hint="Telefone pessoal e email institucional" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <Field label="Telemóvel institucional">
+                <Field label="Telemóvel">
                   <Input className="h-8 text-xs" value={draft.contacto} onChange={(e) => setF("contacto", e.target.value)} placeholder="+244 9XX XXX XXX" />
                 </Field>
                 <Field label="Email institucional (auto)">
