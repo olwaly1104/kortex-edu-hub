@@ -57,6 +57,7 @@ const confirmDelete = () =>
 
 export default function OnboardingEspacos() {
   const { user } = useAuth();
+  const authUid = useAuthUid();
   const [edificios, setEdificios] = useState<Edificio[]>([]);
   const [espacos, setEspacos] = useState<Espaco[]>(() => loadLS<Espaco>(ESPACOS_KEY));
   const [tab, setTab] = useState<"edificios" | EspacoTipo>("edificios");
