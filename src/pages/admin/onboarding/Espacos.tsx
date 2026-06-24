@@ -149,7 +149,7 @@ export default function OnboardingEspacos() {
           <span className="text-[11px] text-muted-foreground ml-auto">{filtrados.length} {TIPO_LABEL[tipo]}</span>
         </div>
         <Card className="overflow-hidden relative">
-          <CardLockBadge />
+          <CardLockBadge editing={!!cardEdit[tipo]} onEdit={() => toggleEdit(tipo, true)} onConfirm={() => toggleEdit(tipo, false)} />
 
           <div className={`grid ${cols} gap-2 px-4 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b`}>
             <span>Edifício</span>
@@ -161,7 +161,7 @@ export default function OnboardingEspacos() {
           </div>
           <div className="divide-y">
             {filtrados.map((s) => {
-              const isEdit = !!editEsp[s.id];
+              const isEdit = !!cardEdit[tipo];
               return (
                 <div key={s.id} className={`grid ${cols} gap-2 px-4 py-2 items-center`}>
                   <Select value={s.edificioId} onValueChange={(v) => updateEspaco(s.id, { edificioId: v })} disabled={!isEdit}>
@@ -174,12 +174,7 @@ export default function OnboardingEspacos() {
                     <Input type="number" min={0} disabled={!isEdit} value={s.capacidade} onChange={(ev) => updateEspaco(s.id, { capacidade: Number(ev.target.value) })} className="h-8 text-xs" />
                   )}
                   <Input value={s.ocupante || ""} disabled={!isEdit} onChange={(ev) => updateEspaco(s.id, { ocupante: ev.target.value })} className="h-8 text-xs" placeholder={isGabinete ? "Pessoa ocupante" : "—"} />
-                  <RowLockControls
-                    editing={isEdit}
-                    onEdit={() => setEditEsp((p) => ({ ...p, [s.id]: true }))}
-                    onConfirm={() => setEditEsp((p) => ({ ...p, [s.id]: false }))}
-                    onDelete={() => removeEspaco(s.id)}
-                  />
+                  <RowLockControls editing={isEdit} onDelete={() => removeEspaco(s.id)} />
                 </div>
               );
             })}
