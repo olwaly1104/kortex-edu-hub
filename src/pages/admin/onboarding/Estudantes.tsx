@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Upload, UserPlus, Trash2, Users, GraduationCap, CheckCircle2, Mail, Loader2 } from "lucide-react";
+import { Upload, UserPlus, Users, GraduationCap, CheckCircle2, Mail, Loader2 } from "lucide-react";
+import { RowLockControls } from "@/components/admin/RowLockControls";
 import { toast } from "sonner";
 import {
   useCursos,
