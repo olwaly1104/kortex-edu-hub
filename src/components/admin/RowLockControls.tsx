@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Lock, LockOpen, Pencil, Check, Trash2 } from "lucide-react";
+import { Lock, Pencil, Check, Trash2 } from "lucide-react";
 
 /**
  * Standard row controls used across all configurator tables:
