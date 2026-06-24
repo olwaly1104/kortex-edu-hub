@@ -1242,10 +1242,15 @@ export default function GapConfiguracao() {
                   </Select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino</label>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Destino (Departamento)</label>
                   <Select value={editMotivo.destino} onValueChange={(v) => setEditMotivo({ ...editMotivo, destino: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>{Object.entries(destinoConfig).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}</SelectContent>
+                    <SelectTrigger><SelectValue placeholder={departamentos.length ? "Selecionar..." : "Sem departamentos"} /></SelectTrigger>
+                    <SelectContent>
+                      {departamentos.map(d => <SelectItem key={d.id} value={d.designacao}>{d.designacao}{d.sigla ? ` (${d.sigla})` : ""}</SelectItem>)}
+                      {editMotivo.destino && !departamentos.some(d => d.designacao === editMotivo.destino) && (
+                        <SelectItem value={editMotivo.destino}>{editMotivo.destino}</SelectItem>
+                      )}
+                    </SelectContent>
                   </Select>
                 </div>
               </div>
@@ -1258,18 +1263,6 @@ export default function GapConfiguracao() {
                   <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Limite p/ concluir (dias)</label>
                   <Input type="number" min={1} value={editMotivo.slaConclusao} onChange={e => setEditMotivo({ ...editMotivo, slaConclusao: Number(e.target.value) || 1 })} />
                 </div>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Responsável</label>
-                <Select value={editMotivo.responsavel} onValueChange={(v) => setEditMotivo({ ...editMotivo, responsavel: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {STAFF_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                    {editMotivo.responsavel && !STAFF_OPTIONS.includes(editMotivo.responsavel) && (
-                      <SelectItem value={editMotivo.responsavel}>{editMotivo.responsavel}</SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
               </div>
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Multa associada</label>
