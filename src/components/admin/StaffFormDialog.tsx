@@ -7,8 +7,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import {
   Briefcase, Plus, User, Mail, Camera, Upload, Check, X, FileText, IdCard, MapPin, Building2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { type StaffRow } from "@/lib/peopleStorage";
 import { supabase } from "@/integrations/supabase/client";
+
+const MODULOS_STAFF = [
+  { value: "academica", label: "Académica" },
+  { value: "financas", label: "Finanças" },
+  { value: "gap", label: "GAP" },
+  { value: "inscricoes", label: "Inscrições" },
+];
 
 const prefixosPool = ["Sr.", "Sra.", "Dr.", "Dra.", "Eng.", "Me."];
 const PROVINCIAS = [
@@ -87,26 +95,95 @@ export function StaffFormDialog({
     reader.readAsDataURL(f);
   };
 
+  const requiredOk = !!draft.primeiroNome.trim() && !!draft.ultimoNome.trim();
+
   const handleSave = () => {
-    if (!draft.primeiroNome.trim() || !previewEmail) return;
+    if (!requiredOk || !previewEmail) {
+      toast.error("Preencha primeiro e último nome");
+      return;
+    }
     onSave({
       ...draft,
       email: previewEmail,
       id: draft.id || `${Date.now()}`,
-      moduloKortex: moduloFromDepartamento(draft.departamento),
+      moduloKortex: draft.moduloKortex || moduloFromDepartamento(draft.departamento),
     });
     setDraft(emptyStaff());
   };
 
+  const submitSimplificado = () => {
+    if (!requiredOk) { toast.error("Preencha primeiro e último nome"); return; }
+    if (!window.confirm("Tem a certeza que pretende criar este staff?")) return;
+    handleSave();
+  };
+
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) setDraft(emptyStaff()); onOpenChange(v); }}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> Adicionar Staff</DialogTitle>
-          <DialogDescription>Preencha o registo completo do funcionário. O email institucional é gerado automaticamente.</DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
+        {/* Header */}
+        <div className="px-6 pt-6 pb-5 border-b bg-gradient-to-br from-primary/5 via-background to-background">
+          <DialogHeader className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <Briefcase className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <DialogTitle className="text-base font-bold">Adicionar Staff</DialogTitle>
+                <DialogDescription className="text-[12px]">
+                  Apenas o nome é necessário. A conta Kortex é criada de imediato — restantes dados podem ser editados depois no perfil.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-6 py-2">
+        <div className="px-6 py-5 space-y-6">
+          {/* Conta Simplificada */}
+          <section className="space-y-3">
+            <div className="grid grid-cols-[110px_1fr_1fr] gap-3">
+              <Field label="Prefixo">
+                <Select value={draft.prefixo} onValueChange={(v) => setF("prefixo", v)}>
+                  <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>{prefixosPool.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                </Select>
+              </Field>
+              <Field label="Primeiro nome *">
+                <Input autoFocus value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} placeholder="João" className="h-9 text-sm" />
+              </Field>
+              <Field label="Último nome *">
+                <Input value={draft.ultimoNome} onChange={(e) => setF("ultimoNome", e.target.value)} placeholder="Silva" className="h-9 text-sm" />
+              </Field>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Field label="Módulo Kortex *">
+                <Select value={draft.moduloKortex || "academica"} onValueChange={(v) => setF("moduloKortex", v)}>
+                  <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {MODULOS_STAFF.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Email Kortex (auto)">
+                <div className="h-9 px-2.5 flex items-center justify-between gap-2 text-[12px] bg-muted/30 border border-input rounded-md">
+                  <span className="truncate font-mono text-foreground/90">{previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}</span>
+                  <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
+                </div>
+              </Field>
+            </div>
+
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[11px] text-muted-foreground">Restantes campos podem ser editados depois.</span>
+              <Button size="sm" onClick={submitSimplificado} disabled={!requiredOk} className="h-7 px-2.5 text-[11px] gap-1">
+                <Plus className="w-3 h-3" /> Criar simplificado
+              </Button>
+            </div>
+          </section>
+
+          <div className="space-y-6 border-t pt-4">
+            <p className="text-[11px] text-muted-foreground -mt-1">
+              Restantes campos são opcionais — podem ser editados depois no perfil do staff.
+            </p>
           <section>
             <SectionTitle index={1} icon={<User className="w-3.5 h-3.5" />} title="Identificação Pessoal" hint="Foto, nome e documento de identidade" />
             <div className="flex items-start gap-4">
@@ -225,11 +302,12 @@ export function StaffFormDialog({
               </Field>
             </div>
           </section>
+          </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="px-6 pb-5">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={handleSave} disabled={!draft.primeiroNome.trim() || !previewEmail} className="gap-1.5">
+          <Button onClick={handleSave} disabled={!requiredOk || !previewEmail} className="gap-1.5">
             <Plus className="w-3.5 h-3.5" /> Adicionar Staff
           </Button>
         </DialogFooter>
