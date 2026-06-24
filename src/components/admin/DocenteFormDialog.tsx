@@ -185,6 +185,18 @@ export function DocenteFormDialog({
                   <input ref={fotoInput} type="file" accept="image/*" className="hidden" onChange={(e) => onFoto(e.target.files?.[0] || null)} />
                 </button>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-1">
+                  <Field label="Prefixo">
+                    <Select value={draft.prefixo} onValueChange={(v) => setF("prefixo", v)}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>{prefixosPool.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </Field>
+                  <Field label="Primeiro nome">
+                    <Input className="h-8 text-xs" value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} placeholder="Ana" />
+                  </Field>
+                  <Field label="Último nome">
+                    <Input className="h-8 text-xs" value={draft.ultimoNome} onChange={(e) => setF("ultimoNome", e.target.value)} placeholder="Silva" />
+                  </Field>
                   <Field label="Data de nascimento">
                     <Input className="h-8 text-xs" type="date" value={draft.nascimento || ""} onChange={(e) => setF("nascimento", e.target.value)} />
                   </Field>
@@ -225,20 +237,6 @@ export function DocenteFormDialog({
                     <span className="truncate font-mono text-foreground/80">{previewEmail || `nome.apelido@${EMAIL_DOMAIN}`}</span>
                     <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold shrink-0">Auto</span>
                   </div>
-                </Field>
-              </div>
-              <div className="grid grid-cols-[110px_1fr_1fr] gap-2 mt-2">
-                <Field label="Prefixo">
-                  <Select value={draft.prefixo} onValueChange={(v) => setF("prefixo", v)}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>{prefixosPool.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Primeiro nome">
-                  <Input className="h-8 text-xs" value={draft.primeiroNome} onChange={(e) => setF("primeiroNome", e.target.value)} placeholder="Ana" />
-                </Field>
-                <Field label="Último nome">
-                  <Input className="h-8 text-xs" value={draft.ultimoNome} onChange={(e) => setF("ultimoNome", e.target.value)} placeholder="Silva" />
                 </Field>
               </div>
             </section>
