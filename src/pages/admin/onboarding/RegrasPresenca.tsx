@@ -234,7 +234,7 @@ export default function OnboardingRegrasPresenca() {
 
               <div className="divide-y">
                 {multas.map(m => {
-                  const isEdit = !!editing[m.id];
+                  const isEdit = cardEdit;
                   return (
                   <div key={m.id} className="grid grid-cols-[1fr_120px_120px_220px] items-center gap-2 px-4 py-2.5 hover:bg-muted/40 transition-colors">
                     <span className="text-sm font-medium truncate">{m.nome}</span>
