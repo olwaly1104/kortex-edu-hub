@@ -783,26 +783,23 @@ function DespesasSection({ email }: { email?: string | null }) {
         </div>
         <div className="px-5 py-3 border-t bg-muted/10">
           <Button size="sm" variant="outline" className="gap-1.5"
-            onClick={() => { setDraftNome(""); setConfirmAdd(true); }}>
+            onClick={async () => {
+              const { data: { user: u } } = await supabase.auth.getUser();
+              if (!u) { toast.error("Sessão inválida."); return; }
+              const { data, error } = await supabase
+                .from("fin_despesa_categorias")
+                .insert({ owner_user_id: u.id, nome: "", cor: COR_OPCOES[0].value, documentos: [] })
+                .select("id, nome, cor, documentos")
+                .single();
+              if (error || !data) { toast.error("Falha ao criar categoria."); return; }
+              setCategorias((s) => [...s, {
+                id: data.id, nome: data.nome || "", cor: data.cor,
+                documentos: Array.isArray(data.documentos) ? (data.documentos as string[]) : [],
+              }]);
+            }}>
             <Plus className="w-3.5 h-3.5" /> Adicionar categoria
           </Button>
         </div>
-
-        {confirmAdd && (
-          <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={() => setConfirmAdd(false)}>
-            <div className="bg-background rounded-lg shadow-lg max-w-md w-full p-5 space-y-4" onClick={(e) => e.stopPropagation()}>
-              <div>
-                <h3 className="text-base font-bold">Bloquear nova categoria</h3>
-                <p className="text-xs text-muted-foreground mt-1">Indique a designação. Após bloquear, fica registada na base de dados e poderá editar livremente cor e documentos exigidos.</p>
-              </div>
-              <Input autoFocus value={draftNome} onChange={(e) => setDraftNome(e.target.value)} placeholder="Ex: Infraestrutura" className="h-10" />
-              <div className="flex justify-end gap-2">
-                <Button size="sm" variant="outline" onClick={() => setConfirmAdd(false)}>Cancelar</Button>
-                <Button size="sm" onClick={confirmCreateCategoria}>Bloquear e adicionar</Button>
-              </div>
-            </div>
-          </div>
-        )}
       </Card>
       )}
 
