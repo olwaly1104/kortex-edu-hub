@@ -32,7 +32,7 @@ export default function ProfessorDashboard() {
         <Card className="p-5 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-primary" /> Aulas de Hoje
+              <CalendarIcon className="w-5 h-5 text-primary" /> Agenda Hoje
             </h2>
           </div>
           <div className="flex flex-col items-center justify-center py-10 text-center">
