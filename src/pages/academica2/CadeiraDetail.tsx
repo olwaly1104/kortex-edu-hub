@@ -37,10 +37,7 @@ interface Exame {
   attachments: Attachment[];
 }
 
-const docentesPool = [
-  "Prof. Sofia Martins", "Prof. Carlos Mendes", "Prof. Ana Costa", "Prof. António Silva",
-  "Prof. Pedro Ferreira", "Prof. Hugo Faria", "Prof. Sílvia Antunes", "Prof. Tomás Henriques",
-];
+// Docentes pool is loaded from the real database (public.docentes) — see useDocentesPool() below.
 
 const typeIcon = (t: Attachment["tipo"]) => {
   switch (t) {
