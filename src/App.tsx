@@ -38,6 +38,7 @@ import ProfessorDisciplineDetail from "./pages/professor/DisciplineDetail";
 import ProfessorStudents from "./pages/professor/Students";
 import ProfessorAnnouncements from "./pages/professor/Announcements";
 import ProfessorCalendar from "./pages/professor/Calendar";
+import ProfessorMinhasSolicitacoes from "./pages/professor/MinhasSolicitacoes";
 import ProfessorContacts from "./pages/professor/Contacts";
 import ProfessorLessons from "./pages/professor/Lessons";
 import ProfessorGrades from "./pages/professor/Grades";
