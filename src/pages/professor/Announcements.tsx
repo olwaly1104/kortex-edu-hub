@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { profAnnouncements, profDisciplines } from "@/data/professorData";
-import { announcements } from "@/data/mockData";
+const announcements: any[] = [];
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
