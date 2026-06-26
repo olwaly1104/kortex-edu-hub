@@ -56,6 +56,17 @@ export default function CadeiraDetail() {
   const cadeira = cadeirasAcad.find(c => c.id === cadeiraId) || cadeirasAcad[0];
   const curso = cursoTemplates.find(c => c.code === cadeira.curso);
 
+  // Real docentes pool from public.docentes (cached in localStorage, refreshed on mount).
+  const [docentesDb, setDocentesDb] = useState(() => loadDocentes());
+  useEffect(() => {
+    syncDocentesFromDb().then((rows) => setDocentesDb(rows)).catch(() => {});
+    const refresh = () => setDocentesDb(loadDocentes());
+    window.addEventListener("upra:people-changed", refresh);
+    return () => window.removeEventListener("upra:people-changed", refresh);
+  }, []);
+  const docentesPool = useMemo(() => docentesDb.map((d) => fullName(d)).filter(Boolean), [docentesDb]);
+
+
   const [anoLetivo, setAnoLetivo] = useState(anosLetivos.find(a => a.status === "ativo")?.id || "2025-2026");
   const [meta, setMeta] = useState({
     nome: cadeira.cadeira, ects: cadeira.ects, ano: cadeira.ano,
