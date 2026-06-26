@@ -48,12 +48,18 @@ export default function AdminFaculdadesCursos() {
 
   const [docentes, setDocentes] = useState<DocenteRow[]>(() => loadDocentes());
   useEffect(() => {
+    // Always pull fresh docentes from the real database when this page mounts
+    // so that users created via Admin → Utilizadores (Coordenador, Professor,
+    // Decano, Reitor) show up immediately in the Decano/Coordenador dropdowns.
+    syncDocentesFromDb().then((rows) => setDocentes(rows)).catch(() => {});
     const refresh = () => setDocentes(loadDocentes());
     window.addEventListener("focus", refresh);
     window.addEventListener("storage", refresh);
+    window.addEventListener("upra:people-changed", refresh);
     return () => {
       window.removeEventListener("focus", refresh);
       window.removeEventListener("storage", refresh);
+      window.removeEventListener("upra:people-changed", refresh);
     };
   }, []);
   const decanoOptions = useMemo(() => docentes.map((d) => fullName(d)).filter(Boolean), [docentes]);
