@@ -156,6 +156,47 @@ Deno.serve(async (req) => {
     }
     console.log("admin-create-user success:", { newUserId, email, modulo });
 
+    // Wire the user into the matching people table so other modules (Cadeiras,
+    // Faculdades, Cursos, Departamentos, etc.) see them immediately.
+    // - docente roles → public.docentes (id == auth user id, owner == institution)
+    // - staff roles   → public.staff
+    // estudante is not auto-inserted: estudantes.curso_id is NOT NULL and must
+    // be assigned on the Estudantes onboarding page.
+    const DOCENTE_ROLES = new Set(["professor", "coordenador", "decano", "reitor"]);
+    const STAFF_ROLES = new Set(["financas", "academica", "gap", "inscricoes"]);
+    const parts = name.split(/\s+/);
+    const primeiro = parts[0] || name;
+    const ultimo = parts.slice(1).join(" ") || "";
+    if (DOCENTE_ROLES.has(modulo)) {
+      const cargo = modulo === "professor" ? "Docente"
+        : modulo === "coordenador" ? "Coordenador"
+        : modulo === "decano" ? "Decano" : "Reitor";
+      const { error: docErr } = await admin.from("docentes").upsert({
+        id: newUserId,
+        owner_user_id: institutionId,
+        primeiro_nome: primeiro,
+        ultimo_nome: ultimo,
+        email,
+        cargo,
+        categoria: "Assistente",
+      }, { onConflict: "id" });
+      if (docErr) console.error("docente upsert failed:", docErr.message);
+    } else if (STAFF_ROLES.has(modulo)) {
+      const funcaoMap: Record<string, string> = {
+        financas: "Finanças", academica: "Área Académica", gap: "GAP", inscricoes: "Inscrições",
+      };
+      const { error: stErr } = await admin.from("staff").upsert({
+        id: newUserId,
+        owner_user_id: institutionId,
+        primeiro_nome: primeiro,
+        ultimo_nome: ultimo,
+        email,
+        funcao: funcaoMap[modulo] || modulo,
+        departamento: funcaoMap[modulo] || modulo,
+      }, { onConflict: "id" });
+      if (stErr) console.error("staff upsert failed:", stErr.message);
+    }
+
     return json({
       ok: true,
       user: { id: newUserId, email, name, modulo },
