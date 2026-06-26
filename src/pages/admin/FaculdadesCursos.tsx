@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { loadDocentes, fullName, type DocenteRow } from "@/lib/peopleStorage";
+import { loadDocentes, syncDocentesFromDb, fullName, type DocenteRow } from "@/lib/peopleStorage";
 import {
   useFaculdades, useCursos,
   useCreateFaculdade, useUpdateFaculdade, useDeleteFaculdade,
