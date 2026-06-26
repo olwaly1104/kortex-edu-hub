@@ -38,6 +38,7 @@ import ProfessorDisciplineDetail from "./pages/professor/DisciplineDetail";
 import ProfessorStudents from "./pages/professor/Students";
 import ProfessorAnnouncements from "./pages/professor/Announcements";
 import ProfessorCalendar from "./pages/professor/Calendar";
+import ProfessorMinhasSolicitacoes from "./pages/professor/MinhasSolicitacoes";
 import ProfessorContacts from "./pages/professor/Contacts";
 import ProfessorLessons from "./pages/professor/Lessons";
 import ProfessorGrades from "./pages/professor/Grades";
@@ -357,6 +358,7 @@ function AppRoutes() {
         <Route path="/professor/lessons" element={<ProfessorLessons />} />
         <Route path="/professor/grades" element={<ProfessorGrades />} />
         <Route path="/professor/calendar" element={<ProfessorCalendar />} />
+        <Route path="/professor/solicitacoes" element={<ProfessorMinhasSolicitacoes />} />
         <Route path="/professor/announcements" element={<ProfessorAnnouncements />} />
         <Route path="/professor/tasks" element={<ProfessorTasks />} />
         <Route path="/professor/evaluations" element={<ProfessorEvaluations />} />
