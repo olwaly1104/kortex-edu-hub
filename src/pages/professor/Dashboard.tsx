@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { profDisciplines, profLessons, profStudents, profTasks, profTodayClasses, allTurmas } from "@/data/professorData";
-import { announcements } from "@/data/mockData";
+const announcements: any[] = [];
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
