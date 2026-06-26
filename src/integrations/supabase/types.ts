@@ -143,6 +143,7 @@ export type Database = {
           end_time: string | null
           event_date: string
           id: string
+          institution_id: string | null
           link: string | null
           location: string | null
           modalidade: string | null
@@ -160,6 +161,7 @@ export type Database = {
           end_time?: string | null
           event_date: string
           id?: string
+          institution_id?: string | null
           link?: string | null
           location?: string | null
           modalidade?: string | null
@@ -177,6 +179,7 @@ export type Database = {
           end_time?: string | null
           event_date?: string
           id?: string
+          institution_id?: string | null
           link?: string | null
           location?: string | null
           modalidade?: string | null
