@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { loadDocentes, syncDocentesFromDb, fullName } from "@/lib/peopleStorage";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,10 +37,7 @@ interface Exame {
   attachments: Attachment[];
 }
 
-const docentesPool = [
-  "Prof. Sofia Martins", "Prof. Carlos Mendes", "Prof. Ana Costa", "Prof. António Silva",
-  "Prof. Pedro Ferreira", "Prof. Hugo Faria", "Prof. Sílvia Antunes", "Prof. Tomás Henriques",
-];
+// Docentes pool is loaded from the real database (public.docentes) — see useDocentesPool() below.
 
 const typeIcon = (t: Attachment["tipo"]) => {
   switch (t) {
@@ -57,6 +55,17 @@ export default function CadeiraDetail() {
   const navigate = useNavigate();
   const cadeira = cadeirasAcad.find(c => c.id === cadeiraId) || cadeirasAcad[0];
   const curso = cursoTemplates.find(c => c.code === cadeira.curso);
+
+  // Real docentes pool from public.docentes (cached in localStorage, refreshed on mount).
+  const [docentesDb, setDocentesDb] = useState(() => loadDocentes());
+  useEffect(() => {
+    syncDocentesFromDb().then((rows) => setDocentesDb(rows)).catch(() => {});
+    const refresh = () => setDocentesDb(loadDocentes());
+    window.addEventListener("upra:people-changed", refresh);
+    return () => window.removeEventListener("upra:people-changed", refresh);
+  }, []);
+  const docentesPool = useMemo(() => docentesDb.map((d) => fullName(d)).filter(Boolean), [docentesDb]);
+
 
   const [anoLetivo, setAnoLetivo] = useState(anosLetivos.find(a => a.status === "ativo")?.id || "2025-2026");
   const [meta, setMeta] = useState({
