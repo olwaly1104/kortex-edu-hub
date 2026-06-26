@@ -1,212 +1,57 @@
-import { profDisciplines, profLessons, profTasks, profStudents, allTurmas } from "@/data/professorData";
+import { allTurmas } from "@/data/professorData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Link } from "react-router-dom";
-import { BookOpen, Users, Clock, MapPin, ChevronRight, Video, FileText, GraduationCap, Calendar, CheckCircle, AlertCircle, BarChart3, ClipboardList, UserCheck } from "lucide-react";
+import { GraduationCap, ChevronRight, Users } from "lucide-react";
 
 export default function ProfessorDisciplines() {
-  // Global stats
-  const totalStudents = allTurmas.reduce((s, t) => s + t.students, 0);
-  const allStudentsUnique = profStudents.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
-  const allStudentsWithGrades = allStudentsUnique.filter(s => s.avgGrade !== null);
-  const aprovados = allStudentsWithGrades.filter(s => (s.avgGrade || 0) >= 10).length;
-  const totalWithGrades = allStudentsWithGrades.length;
-  const taxaAprovacao = totalWithGrades > 0 ? Math.round((aprovados / totalWithGrades) * 100) : 0;
-  const overallAvg = allStudentsWithGrades.length > 0
-    ? Math.round(allStudentsWithGrades.reduce((s, st) => s + (st.avgGrade || 0), 0) / allStudentsWithGrades.length * 10) / 10
-    : 0;
-  const overallAttendance = allStudentsUnique.length > 0
-    ? Math.round(allStudentsUnique.reduce((s, st) => s + st.attendance, 0) / allStudentsUnique.length)
-    : 0;
-
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
         <GraduationCap className="w-6 h-6 text-primary" /> As Minhas Turmas
       </h1>
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Estudantes</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
-              <Users className="w-4 h-4 text-primary" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{totalStudents}</p>
-        </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Turmas</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-secondary/10">
-              <GraduationCap className="w-4 h-4 text-secondary" />
-            </div>
-          </div>
-          <p className="text-2xl font-bold text-foreground">{allTurmas.length}</p>
-        </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Presença Geral</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-accent/10">
-              <UserCheck className="w-4 h-4 text-accent" />
-            </div>
-          </div>
-          <p className={`text-2xl font-bold ${overallAttendance >= 75 ? "text-accent" : "text-destructive"}`}>{overallAttendance}%</p>
-        </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Média Geral</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10">
-              <BarChart3 className="w-4 h-4 text-primary" />
-            </div>
-          </div>
-          <p className={`text-2xl font-bold ${overallAvg >= 10 ? "text-accent" : "text-destructive"}`}>{overallAvg}/20</p>
-        </div>
-        <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Estado</p>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-accent/10">
-              <CheckCircle className="w-4 h-4 text-accent" />
-            </div>
-          </div>
-          <Badge className={`text-xs mt-1 border ${taxaAprovacao >= 85 ? "bg-accent/10 text-accent border-accent/30" : taxaAprovacao < 60 ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-primary/10 text-primary border-primary/30"}`}>
-            {taxaAprovacao >= 85 ? "Excelente" : taxaAprovacao < 60 ? "Em Risco" : "Normal"}
-          </Badge>
-        </div>
-      </div>
-
-
-      <div className="grid md:grid-cols-2 gap-5">
-        {allTurmas.map(turma => {
-          const turmaDiscs = profDisciplines.filter(d => d.turmas.some(t => t.id === turma.id));
-          const turmaLessons = profLessons.filter(l => l.turmaId === turma.id);
-          const turmaPublished = turmaLessons.filter(l => l.status === "publicada").length;
-          const turmaTasks = profTasks.filter(t => t.turmaId === turma.id);
-          const turmaActive = turmaTasks.filter(t => t.status === "publicada").length;
-          const turmaStudents = profStudents.filter(s => s.turmaId === turma.id);
-          const uniqueStudents = turmaStudents.filter((s, i, arr) => arr.findIndex(x => x.email === s.email) === i);
-          const avgGrade = uniqueStudents.length > 0 && uniqueStudents.some(s => s.avgGrade !== null)
-            ? Math.round(uniqueStudents.filter(s => s.avgGrade !== null).reduce((s, st) => s + (st.avgGrade || 0), 0) / uniqueStudents.filter(s => s.avgGrade !== null).length * 10) / 10
-            : null;
-          const avgAttendance = uniqueStudents.length > 0
-            ? Math.round(uniqueStudents.reduce((s, st) => s + st.attendance, 0) / uniqueStudents.length)
-            : 0;
-          const lessonPct = turmaLessons.length > 0 ? Math.round((turmaPublished / turmaLessons.length) * 100) : 0;
-          const totalContents = turmaDiscs.reduce((s, d) => s + d.totalMaterials, 0);
-
-          // Taxa aprovação per turma
-          const turmaGraded = uniqueStudents.filter(s => s.avgGrade !== null);
-          const turmaAprov = turmaGraded.filter(s => (s.avgGrade || 0) >= 10).length;
-          const turmaReprov = turmaGraded.filter(s => (s.avgGrade || 0) < 10).length;
-          const turmaAprovPct = turmaGraded.length > 0 ? Math.round((turmaAprov / turmaGraded.length) * 100) : 0;
-          const turmaReprovPct = turmaGraded.length > 0 ? Math.round((turmaReprov / turmaGraded.length) * 100) : 0;
-          const turmaEncerradas = turmaTasks.filter(t => t.status === "encerrada").length;
-          const turmaConclusaoPct = turmaTasks.length > 0 ? Math.round((turmaEncerradas / turmaTasks.length) * 100) : 0;
-
-          const scheduleDays = turmaDiscs.length > 0 ? turmaDiscs[0].schedule.split(" ")[0] : "";
-          const room = turmaDiscs.length > 0 ? turmaDiscs[0].room : "";
-
-          return (
-            <Link key={turma.id} to={`/professor/turma/${turma.id}`}>
-              <Card className="overflow-hidden hover:shadow-lg transition-shadow group">
-                <div className="p-5">
-                  {/* Header */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-foreground text-lg">{turma.name}</h3>
-                      {turmaDiscs.length > 0 && (
-                        <Badge variant="outline" className="text-[10px] gap-1">
-                          <BookOpen className="w-3 h-3" /> {turmaDiscs[0].name}
-                        </Badge>
-                      )}
-                      <Badge className={`text-[10px] border ${turmaAprovPct >= 85 ? "bg-accent/10 text-accent border-accent/30" : turmaAprovPct < 60 || avgAttendance < 75 ? "bg-destructive/10 text-destructive border-destructive/30" : "bg-primary/10 text-primary border-primary/30"}`}>
-                        {turmaAprovPct >= 85 ? "Excelente" : turmaAprovPct < 60 || avgAttendance < 75 ? "Em Risco" : "Normal"}
-                      </Badge>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                  </div>
-
-                  {/* Turma Info - Estudantes, Sala, Dias de Aula */}
-                  <div className="grid grid-cols-3 gap-3 mb-4">
-                    <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                      <div className="flex items-center justify-center gap-1.5 mb-1">
-                        <Users className="w-3.5 h-3.5 text-primary" />
-                        <p className="text-lg font-bold text-foreground">{turma.students}</p>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground">Estudantes</p>
-                    </div>
-                    <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                      <div className="flex items-center justify-center gap-1.5 mb-1">
-                        <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-                        <p className="text-lg font-bold text-foreground">{room || "—"}</p>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground">Sala</p>
-                    </div>
-                    <div className="text-center p-2.5 rounded-lg bg-muted/50">
-                      <div className="flex items-center justify-center gap-1.5 mb-1">
-                        <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                        <p className="text-lg font-bold text-foreground">{scheduleDays || "—"}</p>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground">Dias de Aula</p>
-                    </div>
-                  </div>
-
-                  {/* Presença */}
-                  <div className="flex items-center justify-between text-xs mb-3 pb-3 border-b border-border/50">
-                    <span className="text-muted-foreground flex items-center gap-1.5">
-                      <CheckCircle className="w-3.5 h-3.5 text-muted-foreground" /> Presença
-                    </span>
-                    <span className={`font-semibold ${avgAttendance >= 75 ? "text-accent" : "text-destructive"}`}>{avgAttendance}%</span>
-                  </div>
-
-                  {/* Performance */}
-                  <div className="space-y-2.5 mb-3 pb-3 border-b border-border/50">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <BarChart3 className="w-3.5 h-3.5 text-accent" /> Média Geral
-                      </span>
-                      <span className={`font-semibold ${avgGrade !== null && avgGrade >= 10 ? "text-accent" : avgGrade !== null ? "text-destructive" : "text-muted-foreground"}`}>{avgGrade ?? "—"}/20</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <CheckCircle className="w-3.5 h-3.5 text-accent" /> Taxa Aprovado
-                      </span>
-                      <span className={`font-semibold ${turmaAprovPct >= 70 ? "text-accent" : "text-destructive"}`}>{turmaAprovPct}%</span>
-                    </div>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <AlertCircle className="w-3.5 h-3.5 text-destructive" /> Taxa Reprovado
-                      </span>
-                      <span className={`font-semibold ${turmaReprovPct > 30 ? "text-destructive" : "text-foreground"}`}>{turmaReprovPct}%</span>
-                    </div>
-                  </div>
-
-
-                  {/* Resources */}
-                  <div className="space-y-2.5">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-muted-foreground" /> Conteúdos
-                      </span>
-                      <span className="font-semibold text-foreground">{totalContents}</span>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-muted-foreground flex items-center gap-1.5">
-                          <Video className="w-3.5 h-3.5 text-muted-foreground" /> Aulas Gravadas
-                        </span>
-                        <span className="font-semibold text-foreground">{turmaPublished}/{turmaLessons.length}</span>
-                      </div>
-                      <Progress value={lessonPct} className="h-1.5" />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </Link>
-          );
-        })}
-      </div>
+      <Card className="overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Turma</TableHead>
+              <TableHead>Curso</TableHead>
+              <TableHead className="text-center">Ano</TableHead>
+              <TableHead className="text-center">Estudantes</TableHead>
+              <TableHead className="text-right">Acção</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {allTurmas.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-12 text-sm text-muted-foreground">
+                  Ainda não tem turmas atribuídas.
+                </TableCell>
+              </TableRow>
+            ) : (
+              allTurmas.map((turma) => (
+                <TableRow key={turma.id} className="hover:bg-muted/30">
+                  <TableCell className="font-medium">{turma.name}</TableCell>
+                  <TableCell className="text-muted-foreground">{turma.course}</TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="outline" className="text-[10px]">{turma.year}º</Badge>
+                  </TableCell>
+                  <TableCell className="text-center tabular-nums">
+                    <span className="inline-flex items-center gap-1 text-sm"><Users className="w-3.5 h-3.5 text-muted-foreground" />{turma.students}</span>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Link to={`/professor/turma/${turma.id}`} className="inline-flex items-center text-xs text-primary hover:underline">
+                      Abrir <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   );
 }
