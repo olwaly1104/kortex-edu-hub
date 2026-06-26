@@ -358,6 +358,7 @@ function AppRoutes() {
         <Route path="/professor/lessons" element={<ProfessorLessons />} />
         <Route path="/professor/grades" element={<ProfessorGrades />} />
         <Route path="/professor/calendar" element={<ProfessorCalendar />} />
+        <Route path="/professor/solicitacoes" element={<ProfessorMinhasSolicitacoes />} />
         <Route path="/professor/announcements" element={<ProfessorAnnouncements />} />
         <Route path="/professor/tasks" element={<ProfessorTasks />} />
         <Route path="/professor/evaluations" element={<ProfessorEvaluations />} />
