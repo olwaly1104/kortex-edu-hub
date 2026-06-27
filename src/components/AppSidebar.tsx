@@ -21,7 +21,7 @@ const studentSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/student" },
     { label: "Calendário", icon: Calendar, path: "/student/calendar" },
-    { label: "Anúncios", icon: Megaphone, path: "/student/announcements", badge: 4 },
+    { label: "Anúncios", icon: Megaphone, path: "/student/announcements" },
     { label: "Minhas Solicitações", icon: HelpCircle, path: "/student/solicitacoes" },
   ]},
   { title: "Académico", items: [
@@ -47,7 +47,7 @@ const professorSections: NavSection[] = [
   { title: "Geral", items: [
     { label: "Início", icon: LayoutDashboard, path: "/professor" },
     { label: "Calendário", icon: Calendar, path: "/professor/calendar" },
-    { label: "Anúncios", icon: Megaphone, path: "/professor/announcements", badge: 4 },
+    { label: "Anúncios", icon: Megaphone, path: "/professor/announcements" },
     { label: "Minhas Solicitações", icon: CheckSquare, path: "/professor/solicitacoes" },
   ]},
   { title: "Académico", items: [
