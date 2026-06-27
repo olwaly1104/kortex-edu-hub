@@ -346,13 +346,9 @@ export const lessons: Lesson[] = [
   { id: "l14", disciplineId: "6", title: "Cotagem e Tolerâncias", number: 2, professor: "Prof. Luísa Tavares", uploadDate: "09/02/2024", date: "09/02/2024", duration: "1h 30min", progress: 50, summary: "Regras de cotagem, tolerâncias dimensionais e acabamentos superficiais.", materials: [{ name: "Slides Cotagem", type: "pdf" }, { name: "Tabela de Tolerâncias", type: "pdf" }], transcript: "Hoje vamos aprender as regras fundamentais de cotagem. A cotagem é essencial para a comunicação técnica...", participants: ["Prof. Luísa Tavares", "João Fernandes", "Maria Silva", "Pedro Nascimento", "Ana Gomes", "Bruno Mendes"], tasks: [] },
 ];
 
-// Announcements
-export const announcements: Announcement[] = [
-  { id: "a1", title: "Suspensão de Aulas - Feriado Nacional", content: "Informamos que não haverá aulas no dia 4 de Fevereiro (Dia do Início da Luta Armada). As aulas serão retomadas normalmente no dia 5.", type: "urgente", date: "01/02/2024", author: "Direcção Académica" },
-  { id: "a2", title: "Inscrições para Estágio Curricular", content: "Estão abertas as inscrições para o estágio curricular do 2º semestre. Os interessados devem dirigir-se ao Gabinete de Estágios até 28/02.", type: "academico", date: "05/02/2024", author: "Gabinete de Estágios" },
-  { id: "a3", title: "Semana da Engenharia 2024", content: "A Semana da Engenharia decorrerá de 18 a 22 de Março. Haverá palestras, workshops e visitas técnicas. Inscrições no site.", type: "evento", date: "10/02/2024", author: "Departamento de Engenharia" },
-  { id: "a4", title: "Actualização do Sistema de Notas", content: "O sistema de consulta de notas foi actualizado. Podem agora consultar as notas parciais de todas as disciplinas.", type: "geral", date: "12/02/2024", author: "Serviços Académicos" },
-];
+// Announcements — sourced from the `anuncios` table (see useAnuncios). Kept as
+// an empty export so legacy imports continue to compile while migrating.
+export const announcements: Announcement[] = [];
 
 // Grades
 export const grades: Grade[] = [
