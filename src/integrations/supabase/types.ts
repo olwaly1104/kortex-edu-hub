@@ -85,6 +85,42 @@ export type Database = {
           },
         ]
       }
+      anuncios: {
+        Row: {
+          author: string | null
+          content: string
+          created_at: string
+          id: string
+          institution_id: string
+          owner_user_id: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          institution_id: string
+          owner_user_id: string
+          title: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          institution_id?: string
+          owner_user_id?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cadeiras: {
         Row: {
           ano: number

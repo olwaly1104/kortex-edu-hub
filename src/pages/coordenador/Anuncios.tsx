@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { announcements } from "@/data/mockData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +13,7 @@ import {
   CalendarDays, Tag, Search, Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useAnuncios, formatAnuncioDate, formatAnuncioTime, type Anuncio } from "@/hooks/useAnuncios";
 
 const typeConfig: Record<string, { icon: typeof AlertTriangle; label: string; className: string }> = {
   urgente: { icon: AlertTriangle, label: "Urgente", className: "bg-destructive/10 text-destructive border-destructive/20" },
@@ -23,93 +23,57 @@ const typeConfig: Record<string, { icon: typeof AlertTriangle; label: string; cl
   financas: { icon: Wallet, label: "Finanças", className: "bg-accent/10 text-accent border-accent/20" },
 };
 
-interface MyAnnouncement {
-  id: string;
-  title: string;
-  content: string;
-  type: string;
-  date: string;
-  time: string;
-  status: "publicado" | "rascunho";
-}
-
-const initialMyAnnouncements: MyAnnouncement[] = [
-  {
-    id: "m1",
-    title: "Alteração de Horário — Cálculo II",
-    content: "A aula de Cálculo II de quarta-feira será transferida para sexta-feira, das 10h às 12h, na Sala 204. Esta alteração é válida apenas para esta semana.",
-    type: "academico",
-    date: "12/02/2024",
-    time: "09:30",
-    status: "publicado",
-  },
-  {
-    id: "m2",
-    title: "Reunião de Coordenação — Docentes do 2.º Ano",
-    content: "Convoca-se todos os docentes do 2.º ano para uma reunião de coordenação pedagógica. Ordem de trabalhos: avaliações intercalares e plano de recuperação.",
-    type: "geral",
-    date: "14/02/2024",
-    time: "14:00",
-    status: "publicado",
-  },
-  {
-    id: "m3",
-    title: "Entrega de Notas Parciais — Prazo Limite",
-    content: "Recorda-se aos docentes que o prazo limite para lançamento das notas parciais do 1.º semestre é dia 20 de Fevereiro.",
-    type: "urgente",
-    date: "10/02/2024",
-    time: "08:00",
-    status: "publicado",
-  },
-];
-
 export default function CoordenadorAnuncios() {
+  const { items, loading, uid, create, remove } = useAnuncios();
+
   const [activeTab, setActiveTab] = useState<"institucionais" | "meus">("institucionais");
-  const [selectedAnn, setSelectedAnn] = useState<typeof announcements[0] | null>(null);
+  const [selectedAnn, setSelectedAnn] = useState<Anuncio | null>(null);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
 
-  const filteredAnnouncements = announcements
+  const filteredAnnouncements = items
     .filter(a => filterType === "all" || a.type === filterType)
     .filter(a => a.title.toLowerCase().includes(searchTerm.toLowerCase()) || a.content.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const unreadCount = announcements.filter(a => !readIds.has(a.id)).length;
+  const unreadCount = items.filter(a => !readIds.has(a.id)).length;
 
-  const [myAnns, setMyAnns] = useState<MyAnnouncement[]>(initialMyAnnouncements);
+  const myAnns = items.filter(a => a.owner_user_id === uid);
+
   const [showCreate, setShowCreate] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
   const [newType, setNewType] = useState("academico");
+  const [busy, setBusy] = useState(false);
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!newTitle.trim() || !newContent.trim()) {
       toast.error("Preencha o título e o conteúdo do anúncio.");
       return;
     }
-    const now = new Date();
-    const dateStr = now.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" });
-    const timeStr = now.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
-    const ann: MyAnnouncement = {
-      id: `m${Date.now()}`,
-      title: newTitle.trim(),
-      content: newContent.trim(),
-      type: newType,
-      date: dateStr,
-      time: timeStr,
-      status: "publicado",
-    };
-    setMyAnns(prev => [ann, ...prev]);
-    setNewTitle("");
-    setNewContent("");
-    setNewType("academico");
-    setShowCreate(false);
-    toast.success("Anúncio publicado com sucesso.");
+    setBusy(true);
+    try {
+      await create({ title: newTitle, content: newContent, type: newType });
+      setNewTitle("");
+      setNewContent("");
+      setNewType("academico");
+      setShowCreate(false);
+      toast.success("Anúncio publicado com sucesso.");
+    } catch (e) {
+      toast.error("Não foi possível publicar o anúncio.");
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
-    setMyAnns(prev => prev.filter(a => a.id !== id));
-    toast.success("Anúncio removido.");
+  const handleDelete = async (id: string) => {
+    if (!confirm("Tem a certeza que deseja remover este anúncio?")) return;
+    try {
+      await remove(id);
+      toast.success("Anúncio removido.");
+    } catch {
+      toast.error("Não foi possível remover o anúncio.");
+    }
   };
 
   return (
@@ -216,7 +180,6 @@ export default function CoordenadorAnuncios() {
                 }}
               >
                 <div className="flex">
-                  {/* Type indicator stripe */}
                   <div className={`w-1 shrink-0 ${ann.type === "urgente" ? "bg-destructive" : ann.type === "evento" ? "bg-secondary" : ann.type === "academico" ? "bg-primary" : "bg-muted-foreground/30"}`} />
 
                   <div className="flex-1 p-5">
@@ -236,19 +199,19 @@ export default function CoordenadorAnuncios() {
                     <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-3">{ann.content}</p>
 
                     <div className="flex items-center gap-2.5 flex-wrap">
-                      <Badge
-                        variant="outline"
-                        className="cursor-pointer hover:bg-primary/5 transition-colors gap-1.5 text-[11px] font-medium text-foreground/70 border-border"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <User className="w-3 h-3 text-primary" /> {ann.author}
-                      </Badge>
-                      <span className="text-muted-foreground/30">·</span>
+                      {ann.author && (
+                        <>
+                          <Badge variant="outline" className="gap-1.5 text-[11px] font-medium text-foreground/70 border-border">
+                            <User className="w-3 h-3 text-primary" /> {ann.author}
+                          </Badge>
+                          <span className="text-muted-foreground/30">·</span>
+                        </>
+                      )}
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Calendar className="w-3 h-3" />{ann.date}
+                        <Calendar className="w-3 h-3" />{formatAnuncioDate(ann.created_at)}
                       </span>
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3" />08:00
+                        <Clock className="w-3 h-3" />{formatAnuncioTime(ann.created_at)}
                       </span>
                     </div>
                   </div>
@@ -256,7 +219,7 @@ export default function CoordenadorAnuncios() {
               </Card>
             );
           })}
-          {filteredAnnouncements.length === 0 && (
+          {!loading && filteredAnnouncements.length === 0 && (
             <p className="text-sm text-muted-foreground py-8 text-center">Nenhum anúncio encontrado.</p>
           )}
         </div>
@@ -273,7 +236,7 @@ export default function CoordenadorAnuncios() {
                   <Megaphone className="w-6 h-6 text-muted-foreground/50" />
                 </div>
                 <p className="text-sm font-medium text-foreground mb-1">Sem anúncios publicados</p>
-                <p className="text-xs text-muted-foreground mb-4">Crie o seu primeiro anúncio para comunicar com estudantes e docentes.</p>
+                <p className="text-xs text-muted-foreground mb-4">Crie o seu primeiro anúncio para comunicar com a comunidade.</p>
                 <Button variant="outline" className="gap-2" onClick={() => setShowCreate(true)}>
                   <Plus className="w-4 h-4" /> Criar Primeiro Anúncio
                 </Button>
@@ -294,7 +257,7 @@ export default function CoordenadorAnuncios() {
                           <TypeIcon className="w-3 h-3" /> {config.label}
                         </Badge>
                         <Badge variant="outline" className="text-[11px] gap-1 text-muted-foreground border-border">
-                          <Eye className="w-3 h-3" /> {ann.status === "publicado" ? "Publicado" : "Rascunho"}
+                          <Eye className="w-3 h-3" /> Publicado
                         </Badge>
                       </div>
                       <Button
@@ -312,10 +275,10 @@ export default function CoordenadorAnuncios() {
 
                     <div className="flex items-center gap-2.5">
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Calendar className="w-3 h-3" />{ann.date}
+                        <Calendar className="w-3 h-3" />{formatAnuncioDate(ann.created_at)}
                       </span>
                       <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3" />{ann.time}
+                        <Clock className="w-3 h-3" />{formatAnuncioTime(ann.created_at)}
                       </span>
                     </div>
                   </div>
@@ -335,7 +298,6 @@ export default function CoordenadorAnuncios() {
             const stripeColor = selectedAnn.type === "urgente" ? "from-destructive to-destructive/80" : selectedAnn.type === "evento" ? "from-secondary to-secondary/80" : selectedAnn.type === "academico" ? "from-primary to-primary/80" : "from-muted-foreground/40 to-muted-foreground/20";
             return (
               <>
-                {/* Gradient header */}
                 <div className={`bg-gradient-to-r ${stripeColor} px-6 pt-6 pb-5`}>
                   <div className="flex items-center gap-2 mb-3">
                     <Badge variant="outline" className="gap-1.5 text-[11px] font-medium border border-white/30 bg-white/15 text-white backdrop-blur-sm">
@@ -348,20 +310,20 @@ export default function CoordenadorAnuncios() {
                   </DialogHeader>
                 </div>
 
-                {/* Meta info */}
                 <div className="px-6 pt-4 pb-3 flex items-center gap-3 flex-wrap border-b border-border">
-                  <Badge variant="outline" className="gap-1.5 text-[11px] font-medium text-foreground/70 border-border">
-                    <User className="w-3 h-3 text-primary" /> {selectedAnn.author}
-                  </Badge>
+                  {selectedAnn.author && (
+                    <Badge variant="outline" className="gap-1.5 text-[11px] font-medium text-foreground/70 border-border">
+                      <User className="w-3 h-3 text-primary" /> {selectedAnn.author}
+                    </Badge>
+                  )}
                   <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Calendar className="w-3.5 h-3.5" /> {selectedAnn.date}
+                    <Calendar className="w-3.5 h-3.5" /> {formatAnuncioDate(selectedAnn.created_at)}
                   </span>
                   <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Clock className="w-3.5 h-3.5" /> 08:00
+                    <Clock className="w-3.5 h-3.5" /> {formatAnuncioTime(selectedAnn.created_at)}
                   </span>
                 </div>
 
-                {/* Content */}
                 <div className="px-6 py-5">
                   <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">{selectedAnn.content}</p>
                 </div>
@@ -381,12 +343,12 @@ export default function CoordenadorAnuncios() {
               </div>
               Novo Anúncio
             </DialogTitle>
-            <DialogDescription>Publique um comunicado para estudantes e docentes do curso.</DialogDescription>
+            <DialogDescription>Publique um comunicado para a comunidade da instituição.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
               <Label htmlFor="ann-title">Título</Label>
-              <Input id="ann-title" placeholder="Ex: Alteração de Horário — Cálculo II" value={newTitle} onChange={e => setNewTitle(e.target.value)} />
+              <Input id="ann-title" placeholder="Ex: Alteração de Horário" value={newTitle} onChange={e => setNewTitle(e.target.value)} />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="ann-type">Categoria</Label>
@@ -399,6 +361,7 @@ export default function CoordenadorAnuncios() {
                   <SelectItem value="urgente">Urgente</SelectItem>
                   <SelectItem value="evento">Evento</SelectItem>
                   <SelectItem value="geral">Geral</SelectItem>
+                  <SelectItem value="financas">Finanças</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -409,7 +372,7 @@ export default function CoordenadorAnuncios() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCreate(false)}>Cancelar</Button>
-            <Button onClick={handleCreate} className="gap-2"><Send className="w-4 h-4" /> Publicar</Button>
+            <Button onClick={handleCreate} disabled={busy} className="gap-2"><Send className="w-4 h-4" /> Publicar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
