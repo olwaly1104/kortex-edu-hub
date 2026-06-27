@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { FIN_ANUNCIOS } from "@/data/financasAnunciosData";
+import { useAnuncios } from "@/hooks/useAnuncios";
 
 const STORAGE_KEY = "fin.anuncios.read";
 const EVENT = "fin-anuncios-read-change";
@@ -24,6 +24,7 @@ function saveRead(set: Set<string>) {
 }
 
 export function useFinAnunciosUnread() {
+  const { items } = useAnuncios();
   const [readIds, setReadIds] = useState<Set<string>>(() => loadRead());
 
   useEffect(() => {
@@ -48,7 +49,7 @@ export function useFinAnunciosUnread() {
 
   const isRead = useCallback((id: string) => readIds.has(id), [readIds]);
 
-  const unreadCount = FIN_ANUNCIOS.reduce((n, a) => n + (readIds.has(a.id) ? 0 : 1), 0);
+  const unreadCount = items.reduce((n, a) => n + (readIds.has(a.id) ? 0 : 1), 0);
 
   return { unreadCount, isRead, markRead };
 }
