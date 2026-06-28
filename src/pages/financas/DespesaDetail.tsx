@@ -279,6 +279,59 @@ function PersonBlock({ label, name, role }: { label: string; name: string; role?
   );
 }
 
+function DocCard({
+  icon: Icon,
+  tone,
+  label,
+  ref,
+  date,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  tone: "amber" | "emerald";
+  label: string;
+  ref?: string;
+  date?: string;
+}) {
+  const toneCls =
+    tone === "amber"
+      ? "bg-amber-50 border-amber-200 text-amber-700"
+      : "bg-emerald-50 border-emerald-200 text-emerald-700";
+  return (
+    <div className="rounded-lg border border-border bg-background p-2.5">
+      <div className="flex items-center gap-2">
+        <div className={cn("w-7 h-7 rounded-md border flex items-center justify-center shrink-0", toneCls)}>
+          <Icon className="w-3.5 h-3.5" />
+        </div>
+        <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">{label}</p>
+      </div>
+      <p className="text-[11.5px] font-mono font-semibold text-foreground tabular-nums mt-1.5 truncate">{ref ?? "—"}</p>
+      <p className="text-[10px] text-muted-foreground tabular-nums mt-0.5">{date ? prettyDate(date) : "Pendente"}</p>
+    </div>
+  );
+}
+
+function DetailRow({
+  icon: Icon,
+  label,
+  value,
+  mono,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-2.5 px-2.5 py-2">
+      <div className="w-6 h-6 rounded-md bg-muted/60 text-muted-foreground flex items-center justify-center shrink-0">
+        <Icon className="w-3 h-3" />
+      </div>
+      <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold w-[68px] shrink-0">{label}</span>
+      <span className={cn("text-[11.5px] font-medium text-foreground flex-1 truncate text-right", mono && "font-mono tabular-nums")}>{value}</span>
+    </div>
+  );
+}
+
 function toneFor(accao: string) {
   const a = accao.toLowerCase();
   if (a.includes("rejeit")) return { icon: X,         cls: "bg-destructive text-destructive-foreground ring-4 ring-destructive/15" };
