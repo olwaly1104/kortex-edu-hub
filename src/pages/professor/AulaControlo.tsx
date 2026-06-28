@@ -602,6 +602,45 @@ export default function AulaControlo() {
         </div>
       </div>
 
+      {/* Modo Apresentação — fullscreen overlay */}
+      {apresentacao && (
+        <div className="fixed inset-0 z-[60] bg-black text-white flex flex-col">
+          <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+            <Badge variant="outline" className="text-white border-white/30 bg-white/5 text-[11px] tabular-nums">
+              {slideIdx + 1} / {aula.slides.length}
+            </Badge>
+            <Button size="sm" variant="ghost" className="text-white hover:bg-white/10 hover:text-white" onClick={() => setApresentacao(false)}>
+              <X className="w-4 h-4 mr-1.5" /> Sair (Esc)
+            </Button>
+          </div>
+          <div className="flex-1 flex items-center justify-center px-16">
+            <div className="text-center max-w-5xl">
+              <p className="text-sm uppercase tracking-[0.3em] text-white/50">
+                Slide {slide.n} · {aula.titulo}
+              </p>
+              <p className="text-6xl md:text-7xl font-semibold leading-tight mt-6">{slide.titulo}</p>
+            </div>
+          </div>
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3">
+            <Button size="icon" variant="ghost" className="text-white hover:bg-white/10 hover:text-white" disabled={slideIdx === 0} onClick={() => setSlideIdx((i) => i - 1)}>
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex items-center gap-1.5">
+              {aula.slides.map((s, i) => (
+                <button
+                  key={s.n}
+                  onClick={() => setSlideIdx(i)}
+                  className={cn("h-1.5 rounded-full transition-all", i === slideIdx ? "w-8 bg-white" : "w-1.5 bg-white/30")}
+                />
+              ))}
+            </div>
+            <Button size="icon" variant="ghost" className="text-white hover:bg-white/10 hover:text-white" disabled={slideIdx === aula.slides.length - 1} onClick={() => setSlideIdx((i) => i + 1)}>
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       <Dialog open={confirmEnd} onOpenChange={setConfirmEnd}>
         <DialogContent>
           <DialogHeader>
