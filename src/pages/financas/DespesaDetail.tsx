@@ -1,23 +1,55 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, FileText, Clock, Paperclip, FileImage, FileSpreadsheet, Eye, Download, Check, X, Hourglass, MessageSquare, Mail, Phone, Building2, Receipt, BadgeCheck, Wallet, Landmark, Layers, CalendarDays, CalendarClock } from "lucide-react";
+import { ArrowLeft, FileText, Clock, Paperclip, FileImage, FileSpreadsheet, Eye, Download, Check, X, Hourglass, MessageSquare, Mail, Phone, Building2, Receipt, BadgeCheck, Wallet, Landmark, Layers, CalendarDays, CalendarClock, CheckCircle2, XCircle, Upload, MessageSquareText, Banknote } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import EmptyState from "@/components/EmptyState";
-import { findDespesa, finStatusMetaDespesa, prettyDate, type DespesaAnexo } from "@/data/financasDespesasData";
+import { findDespesa, finStatusMetaDespesa, prettyDate, type DespesaAnexo, type DespesaStatus, type DespesaHistorico } from "@/data/financasDespesasData";
 import { formatCurrency } from "@/data/financeModuleData";
 import FinancasDespesaDocPreview from "./DespesaDocPreview";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function FinancasDespesaDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [docOpen, setDocOpen] = useState(false);
-  const d = findDespesa(id);
+  const base = findDespesa(id);
+  const [d, setD] = useState(base);
+  const [requiredDocs, setRequiredDocs] = useState<string[]>([]);
+  const [pendingAction, setPendingAction] = useState<null | "aprovada" | "rejeitada" | "paga" | "parecer" | "upload">(null);
+  const [actionNote, setActionNote] = useState("");
+
+  useEffect(() => { setD(base); }, [base]);
+
+  useEffect(() => {
+    if (!d?.category) return;
+    (async () => {
+      const { data } = await supabase
+        .from("fin_despesa_categorias")
+        .select("nome, documentos")
+        .eq("nome", d.category)
+        .maybeSingle();
+      setRequiredDocs(Array.isArray(data?.documentos) ? (data!.documentos as string[]) : []);
+    })();
+  }, [d?.category]);
+
+  const docsStatus = useMemo(() => {
+    const anexoNames = (d?.anexos ?? []).map(a => a.nome.toLowerCase());
+    return requiredDocs.map(req => ({
+      nome: req,
+      ok: anexoNames.some(n => n.includes(req.toLowerCase())) ||
+          (req.toLowerCase().includes("factura") && !!d?.facturaNum) ||
+          (req.toLowerCase().includes("comprov") && !!d?.comprovativoNum),
+    }));
+  }, [requiredDocs, d]);
+  const docsOk = docsStatus.filter(x => x.ok).length;
+  const docsTotal = requiredDocs.length;
 
   if (!d) {
     return (
@@ -31,11 +63,80 @@ export default function FinancasDespesaDetail() {
   const st = finStatusMetaDespesa[d.status];
   const dSub = new Date(d.date);
 
+  const appendHistorico = (h: DespesaHistorico, newStatus?: DespesaStatus) => {
+    setD(prev => prev ? { ...prev, historico: [...prev.historico, h], status: newStatus ?? prev.status } : prev);
+  };
+
+  const actionMeta: Record<NonNullable<typeof pendingAction>, { title: string; cta: string; tone: string; icon: any; placeholder: string; accao: string; newStatus?: DespesaStatus }> = {
+    aprovada:  { title: "Aprovar despesa", cta: "Aprovar", tone: "bg-emerald-600 hover:bg-emerald-700 text-white", icon: CheckCircle2, placeholder: "Parecer / Justificação", accao: "Despesa aprovada", newStatus: "aprovada" },
+    rejeitada: { title: "Rejeitar despesa", cta: "Rejeitar", tone: "bg-red-600 hover:bg-red-700 text-white", icon: XCircle, placeholder: "Motivo da rejeição", accao: "Despesa rejeitada", newStatus: "rejeitada" },
+    paga:      { title: "Marcar como paga", cta: "Confirmar pagamento", tone: "bg-blue-600 hover:bg-blue-700 text-white", icon: Banknote, placeholder: "Ref. pagamento, IBAN, observações…", accao: "Pagamento efectuado", newStatus: "paga" },
+    parecer:   { title: "Adicionar parecer", cta: "Registar parecer", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: MessageSquareText, placeholder: "Parecer / Notas internas", accao: "Parecer adicionado" },
+    upload:    { title: "Carregar anexo", cta: "Carregar", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: Upload, placeholder: "Descrição do anexo (ex: Factura definitiva)", accao: "Anexo carregado" },
+  };
+  const pm = pendingAction ? actionMeta[pendingAction] : null;
+
+  const confirmAction = () => {
+    if (!pendingAction || !pm) return;
+    const now = new Date().toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    appendHistorico({ data: now, accao: pm.accao, actor: "Você", nota: actionNote || undefined }, pm.newStatus);
+    toast({ title: pm.accao, description: actionNote || `${d.ref} actualizado.` });
+    setPendingAction(null);
+    setActionNote("");
+  };
+
+  // Available actions per status (linked to chronologia)
+  const availableActions: { key: NonNullable<typeof pendingAction>; label: string; icon: any; cls: string }[] = [];
+  if (d.status === "pendente") {
+    availableActions.push(
+      { key: "aprovada",  label: "Aprovar",        icon: CheckCircle2,    cls: "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent" },
+      { key: "rejeitada", label: "Rejeitar",       icon: XCircle,         cls: "border-red-200 text-red-600 hover:bg-red-50" },
+      { key: "parecer",   label: "Dar parecer",    icon: MessageSquareText, cls: "" },
+      { key: "upload",    label: "Carregar anexo", icon: Upload,          cls: "" },
+    );
+  } else if (d.status === "aprovada") {
+    availableActions.push(
+      { key: "paga",      label: "Marcar como paga",        icon: Banknote,         cls: "bg-blue-600 hover:bg-blue-700 text-white border-transparent" },
+      { key: "upload",    label: "Carregar comprovativo",   icon: Upload,           cls: "" },
+      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
+    );
+  } else if (d.status === "paga") {
+    availableActions.push(
+      { key: "upload",    label: "Carregar anexo",          icon: Upload,           cls: "" },
+      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
+    );
+  } else if (d.status === "rejeitada") {
+    availableActions.push(
+      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
+    );
+  }
+
   return (
-    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+    <div className="p-6 lg:p-8 space-y-4 animate-fade-in">
       <Link to="/financas/despesas" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" /> Voltar a Despesas
       </Link>
+
+      {/* Action bar — outside the card, above the title, linked to cronologia */}
+      {availableActions.length > 0 && (
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-4 py-2.5 shadow-sm">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Hourglass className={cn("w-4 h-4 shrink-0", d.status === "pendente" ? "text-amber-600" : d.status === "aprovada" ? "text-emerald-600" : "text-blue-600")} />
+            <span className="text-sm font-semibold text-foreground truncate">
+              {d.status === "pendente" ? "Aguarda decisão" : d.status === "aprovada" ? "Aprovada — aguarda pagamento" : d.status === "paga" ? "Despesa paga" : "Rejeitada"}
+            </span>
+            <span className="text-[11px] text-muted-foreground hidden md:inline">Cada acção fica registada na cronologia</span>
+          </div>
+          <div className="flex items-center gap-1.5 flex-wrap justify-end">
+            {availableActions.map(a => (
+              <Button key={a.key} size="sm" variant={a.cls.includes("bg-") ? "default" : "outline"} className={cn("h-7 text-[11px] gap-1.5 transition-colors", a.cls)} onClick={() => { setPendingAction(a.key); setActionNote(""); }}>
+                <a.icon className="w-3.5 h-3.5" /> {a.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
 
       <Card className="overflow-hidden p-0 gap-0">
         {/* Breadcrumb */}
@@ -68,20 +169,39 @@ export default function FinancasDespesaDetail() {
 
             <div className="min-w-0 flex-1">
               <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">{d.description}</h1>
-              <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+              <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
                 <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.cls)}>
                   <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />
                   {st.label}
                 </Badge>
                 <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">{d.category}</Badge>
-              </div>
-              <div className="mt-2 text-2xl font-bold text-red-600 tabular-nums tracking-tight">
-                -{formatCurrency(d.amount)}
+                {docsTotal > 0 && (
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1",
+                      docsOk === docsTotal
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        : "bg-amber-50 text-amber-700 border-amber-200",
+                    )}
+                  >
+                    <Paperclip className="w-2.5 h-2.5" />
+                    {docsOk}/{docsTotal} documentos
+                  </Badge>
+                )}
               </div>
             </div>
 
-            {/* Right — REF + Doc pill */}
-            <div className="shrink-0 flex flex-col items-end gap-1.5">
+            {/* Right — Valor + REF + Doc pill */}
+            <div className="shrink-0 flex flex-col items-end gap-2">
+              <div className="rounded-lg border border-border bg-gradient-to-br from-red-50 to-background px-3.5 py-2 text-right shadow-sm">
+                <p className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-semibold">Valor da Despesa</p>
+                <p className="text-[26px] leading-none font-bold text-red-600 tabular-nums tracking-tight mt-1">
+                  −{formatCurrency(d.amount)}
+                </p>
+                <p className="text-[10px] text-muted-foreground tabular-nums mt-1">AOA · {d.metodoPagamento ?? "—"}</p>
+              </div>
+
               <div className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background text-[11px] font-mono font-semibold text-foreground">
                 {d.ref}
               </div>
@@ -104,6 +224,7 @@ export default function FinancasDespesaDetail() {
             </div>
           </div>
         </div>
+
 
         {/* 2-column body: Identificação left · resto right */}
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
@@ -165,6 +286,43 @@ export default function FinancasDespesaDetail() {
                   <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1.5">Justificação</p>
                   <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{d.justificacao}</p>
                 </div>
+
+                {requiredDocs.length > 0 && (
+                  <div className="px-4 py-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">
+                        Documentos Exigidos <span className="text-muted-foreground/70 normal-case tracking-normal tabular-nums">({d.category})</span>
+                      </p>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-[10px] font-semibold tabular-nums",
+                          docsOk === docsTotal
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : "bg-amber-50 text-amber-700 border-amber-200",
+                        )}
+                      >
+                        {docsOk}/{docsTotal}
+                      </Badge>
+                    </div>
+                    <ul className="space-y-1.5">
+                      {docsStatus.map((r, i) => (
+                        <li key={i} className="flex items-center gap-2 text-[12.5px]">
+                          <span className={cn(
+                            "w-4 h-4 rounded-full inline-flex items-center justify-center shrink-0",
+                            r.ok ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600",
+                          )}>
+                            {r.ok ? <Check className="w-2.5 h-2.5" strokeWidth={3.5} /> : <X className="w-2.5 h-2.5" strokeWidth={3.5} />}
+                          </span>
+                          <span className={cn("flex-1 truncate", r.ok ? "text-foreground" : "text-muted-foreground")}>{r.nome}</span>
+                          <span className={cn("text-[10px] font-semibold uppercase tracking-wider", r.ok ? "text-emerald-600" : "text-red-500")}>
+                            {r.ok ? "Carregado" : "Em falta"}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 <div className="px-4 py-3">
                   <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">
@@ -251,6 +409,45 @@ export default function FinancasDespesaDetail() {
           <div className="max-h-[calc(90vh-3rem)] overflow-auto">
             <FinancasDespesaDocPreview despesa={d} />
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Action dialog — Aprovar / Rejeitar / Pagar / Parecer / Upload */}
+      <Dialog open={!!pendingAction} onOpenChange={(o) => { if (!o) { setPendingAction(null); setActionNote(""); } }}>
+        <DialogContent className="max-w-md">
+          {pm && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-base flex items-center gap-2">
+                  <pm.icon className="w-4 h-4" /> {pm.title}
+                </DialogTitle>
+                <DialogDescription className="text-[12px]">
+                  Esta acção será registada na cronologia de <span className="font-mono font-semibold text-foreground">{d.ref}</span>.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3 mt-2">
+                <Textarea
+                  value={actionNote}
+                  onChange={(e) => setActionNote(e.target.value)}
+                  placeholder={pm.placeholder}
+                  rows={4}
+                  className="text-[13px]"
+                />
+                {pendingAction === "upload" && (
+                  <div className="rounded-md border border-dashed border-border bg-muted/30 px-3 py-4 text-center text-[11px] text-muted-foreground">
+                    <Upload className="w-4 h-4 mx-auto mb-1.5 text-muted-foreground/70" />
+                    Arraste o ficheiro ou clique para seleccionar
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center justify-end gap-2 mt-4">
+                <Button variant="outline" size="sm" className="h-8 text-[12px]" onClick={() => { setPendingAction(null); setActionNote(""); }}>Cancelar</Button>
+                <Button size="sm" className={cn("h-8 text-[12px] gap-1.5", pm.tone)} onClick={confirmAction}>
+                  <pm.icon className="w-3.5 h-3.5" /> {pm.cta}
+                </Button>
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
