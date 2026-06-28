@@ -232,10 +232,30 @@ export default function AulaControlo() {
     { n: 3 as Passo, label: "Encerramento", icon: CheckCircle2, hint: "Resumo & sair", done: false, lock: !chamadaConfirmada },
   ];
 
+  const dateLabel = now.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
+  const timeLabel = now.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+
   return (
     <div className="min-h-screen bg-background">
+      {/* TOP UTILITY BAR */}
+      <div className="sticky top-0 z-40 bg-foreground text-background border-b border-foreground/10">
+        <div className="px-6 py-1.5 flex items-center justify-between gap-3 text-[11px]">
+          <div className="flex items-center gap-3 capitalize">
+            <span>{dateLabel}</span>
+            <span className="opacity-50">·</span>
+            <span className="tabular-nums">{timeLabel}</span>
+          </div>
+          <button
+            onClick={() => navigate("/professor")}
+            className="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-background/10 transition-colors"
+          >
+            <ArrowLeft className="w-3 h-3" /> Sair da Aula
+          </button>
+        </div>
+      </div>
+
       {/* HEADER (sticky, no sidebar — modo aula) */}
-      <header className="sticky top-0 z-30 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+      <header className="sticky top-[30px] z-30 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="px-6 py-3 flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -270,9 +290,6 @@ export default function AulaControlo() {
                 <Play className="w-3.5 h-3.5 mr-1.5" /> Iniciar Agora
               </Button>
             )}
-            <Button size="sm" variant="outline" onClick={() => navigate("/professor")}>
-              <ArrowLeft className="w-3.5 h-3.5 mr-1.5" /> Sair da Aula
-            </Button>
             <Button size="sm" variant="destructive" onClick={() => setConfirmEnd(true)}>
               <LogOut className="w-3.5 h-3.5 mr-1.5" /> Terminar Aula
             </Button>
