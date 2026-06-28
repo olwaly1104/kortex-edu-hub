@@ -411,6 +411,45 @@ export default function FinancasDespesaDetail() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Action dialog — Aprovar / Rejeitar / Pagar / Parecer / Upload */}
+      <Dialog open={!!pendingAction} onOpenChange={(o) => { if (!o) { setPendingAction(null); setActionNote(""); } }}>
+        <DialogContent className="max-w-md">
+          {pm && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-base flex items-center gap-2">
+                  <pm.icon className="w-4 h-4" /> {pm.title}
+                </DialogTitle>
+                <DialogDescription className="text-[12px]">
+                  Esta acção será registada na cronologia de <span className="font-mono font-semibold text-foreground">{d.ref}</span>.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-3 mt-2">
+                <Textarea
+                  value={actionNote}
+                  onChange={(e) => setActionNote(e.target.value)}
+                  placeholder={pm.placeholder}
+                  rows={4}
+                  className="text-[13px]"
+                />
+                {pendingAction === "upload" && (
+                  <div className="rounded-md border border-dashed border-border bg-muted/30 px-3 py-4 text-center text-[11px] text-muted-foreground">
+                    <Upload className="w-4 h-4 mx-auto mb-1.5 text-muted-foreground/70" />
+                    Arraste o ficheiro ou clique para seleccionar
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center justify-end gap-2 mt-4">
+                <Button variant="outline" size="sm" className="h-8 text-[12px]" onClick={() => { setPendingAction(null); setActionNote(""); }}>Cancelar</Button>
+                <Button size="sm" className={cn("h-8 text-[12px] gap-1.5", pm.tone)} onClick={confirmAction}>
+                  <pm.icon className="w-3.5 h-3.5" /> {pm.cta}
+                </Button>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
