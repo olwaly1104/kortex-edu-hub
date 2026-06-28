@@ -179,72 +179,72 @@ export default function AulaControlo() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {/* HEADER — compact, board-readable */}
+    <div className="p-6 space-y-5 animate-fade-in">
+      {/* HEADER */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="flex items-start gap-3 min-w-0">
-          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={() => navigate("/professor")}>
+        <div className="flex items-start gap-2 min-w-0">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => navigate("/professor")}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl font-semibold text-foreground">{aula.titulo}</h1>
+              <h1 className="text-lg font-semibold text-foreground">{aula.titulo}</h1>
               {started ? (
-                <Badge className="bg-primary text-primary-foreground gap-1.5">
+                <Badge className="bg-primary text-primary-foreground gap-1.5 text-[11px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                   A Decorrer
                 </Badge>
               ) : (
-                <Badge variant="outline" className="gap-1.5">
+                <Badge variant="outline" className="gap-1.5 text-[11px]">
                   <AlarmClock className="w-3 h-3" /> Começa em {minutesToStart > 0 ? `${minutesToStart}m` : "breve"}
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1.5 flex-wrap">
+            <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1 flex-wrap">
               <span>{aula.curso} · {aula.ano} · {aula.turma}</span>
-              <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{aula.sala}</span>
-              <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" />{aula.inicio} – {aula.fim}</span>
-              <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" />{aula.alunos.length} alunos</span>
+              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{aula.sala}</span>
+              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{aula.inicio} – {aula.fim}</span>
+              <span className="flex items-center gap-1"><Users className="w-3 h-3" />{aula.alunos.length} alunos</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {!started && (
-            <Button variant="outline" onClick={() => setStarted(true)}>
-              <Play className="w-4 h-4 mr-1.5" /> Iniciar Agora
+            <Button size="sm" variant="outline" onClick={() => setStarted(true)}>
+              <Play className="w-3.5 h-3.5 mr-1.5" /> Iniciar Agora
             </Button>
           )}
-          <Button variant="destructive" onClick={() => setConfirmEnd(true)}>
-            <LogOut className="w-4 h-4 mr-1.5" /> Terminar Aula
+          <Button size="sm" variant="destructive" onClick={() => setConfirmEnd(true)}>
+            <LogOut className="w-3.5 h-3.5 mr-1.5" /> Terminar Aula
           </Button>
         </div>
       </div>
 
       {/* MAIN GRID */}
-      <div className="grid lg:grid-cols-[320px_1fr] gap-6">
-        {/* LEFT RAIL — big timer + steps */}
-        <div className="space-y-4">
-          {/* Timer card — large, board-readable */}
-          <Card className="p-6 bg-gradient-to-br from-primary/5 via-card to-card border-primary/20">
-            <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">
+      <div className="grid lg:grid-cols-[260px_1fr] gap-5">
+        {/* LEFT RAIL */}
+        <div className="space-y-3">
+          {/* Timer */}
+          <Card className="p-4 bg-gradient-to-br from-primary/5 via-card to-card border-primary/20">
+            <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">
               Tempo de Aula
             </p>
-            <p className="text-6xl font-bold text-primary tabular-nums mt-3 leading-none">
+            <p className="text-3xl font-bold text-primary tabular-nums mt-1.5 leading-none">
               {fmtDuration(elapsedSec)}
             </p>
-            <div className="flex items-baseline justify-between mt-4">
-              <p className="text-xs text-muted-foreground tabular-nums">
+            <div className="flex items-baseline justify-between mt-2">
+              <p className="text-[11px] text-muted-foreground tabular-nums">
                 de {fmtDuration(totalDurSec)}
               </p>
-              <p className="text-xs font-medium text-primary tabular-nums">
+              <p className="text-[11px] font-medium text-primary tabular-nums">
                 {Math.round(progressPct)}%
               </p>
             </div>
-            <Progress value={progressPct} className="mt-2 h-2" />
+            <Progress value={progressPct} className="mt-1.5 h-1.5" />
           </Card>
 
           {/* Steps */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {steps.map((s) => {
               const active = passo === s.n;
               const Icon = s.icon;
@@ -254,29 +254,26 @@ export default function AulaControlo() {
                   disabled={s.lock}
                   onClick={() => setPasso(s.n)}
                   className={cn(
-                    "w-full flex items-center gap-3 p-4 rounded-lg border text-left transition-all",
-                    active && "border-primary bg-primary/5 shadow-sm",
+                    "w-full flex items-center gap-2.5 p-2.5 rounded-md border text-left transition-all",
+                    active && "border-primary bg-primary/5",
                     !active && !s.lock && "border-border bg-card hover:border-primary/40 hover:bg-muted/50",
                     s.lock && "border-border bg-muted/30 opacity-60 cursor-not-allowed",
                   )}
                 >
                   <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0",
                     active ? "bg-primary text-primary-foreground" :
                     s.done ? "bg-primary/15 text-primary" :
                     "bg-muted text-muted-foreground",
                   )}>
-                    {s.done ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                    {s.done ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className={cn("text-[10px] uppercase tracking-wider font-semibold", active ? "text-primary" : "text-muted-foreground")}>
-                        Passo {s.n}
-                      </p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-medium text-foreground">{s.label}</p>
                       {s.lock && <Lock className="w-3 h-3 text-muted-foreground" />}
                     </div>
-                    <p className="text-base font-semibold text-foreground">{s.label}</p>
-                    <p className="text-xs text-muted-foreground tabular-nums mt-0.5">{s.hint}</p>
+                    <p className="text-[11px] text-muted-foreground tabular-nums">{s.hint}</p>
                   </div>
                 </button>
               );
@@ -284,57 +281,58 @@ export default function AulaControlo() {
           </div>
         </div>
 
+
         {/* MAIN ZONE */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           {passo === 1 && (
-            <Card className="p-6">
-              <div className="flex items-end justify-between mb-5 flex-wrap gap-3">
+            <Card className="p-5">
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                 <div>
-                  <h2 className="text-xl font-semibold">Chamada</h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Marca a presença para desbloquear o conteúdo da aula.
+                  <h2 className="text-base font-semibold">Chamada</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Toca no nome para alternar presença · atraso · falta.
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CountChip color="bg-primary" label="Presentes" value={counts.presente} />
-                  <CountChip color="bg-amber-500" label="Atraso" value={counts.atraso} />
-                  <CountChip color="bg-destructive" label="Faltas" value={counts.falta} />
+                <div className="flex items-center gap-3 text-xs tabular-nums">
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary" /><span className="font-semibold text-foreground">{counts.presente}</span><span className="text-muted-foreground">presentes</span></span>
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /><span className="font-semibold text-foreground">{counts.atraso}</span><span className="text-muted-foreground">atraso</span></span>
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-destructive" /><span className="font-semibold text-foreground">{counts.falta}</span><span className="text-muted-foreground">faltas</span></span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 mb-4">
-                <Button size="sm" variant="outline" onClick={() => setAll("presente")}>Marcar todos presentes</Button>
-                <Button size="sm" variant="ghost" onClick={() => setAll(null)}>Limpar</Button>
-                <div className="ml-auto text-sm text-muted-foreground tabular-nums">
+              <div className="flex items-center gap-2 mb-3">
+                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setAll("presente")}>Todos presentes</Button>
+                <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setAll(null)}>Limpar</Button>
+                <div className="ml-auto text-xs text-muted-foreground tabular-nums">
                   <span className="font-semibold text-foreground">{presentRate}%</span> presença
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-2 max-h-[440px] overflow-y-auto pr-1">
+              <div className="grid sm:grid-cols-2 gap-1.5 max-h-[400px] overflow-y-auto pr-1">
                 {aula.alunos.map((a, i) => {
                   const v = presencas[a.id];
+                  const dotColor = v === "presente" ? "bg-primary" : v === "atraso" ? "bg-amber-500" : v === "falta" ? "bg-destructive" : "bg-muted-foreground/30";
                   return (
-                    <div key={a.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-card">
-                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground shrink-0">
-                        {String(i + 1).padStart(2, "0")}
-                      </div>
-                      <p className="text-sm font-medium truncate flex-1 min-w-0">{a.nome}</p>
-                      <div className="flex items-center gap-1 shrink-0">
+                    <div key={a.id} className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md border border-border bg-card">
+                      <span className="text-[10px] text-muted-foreground tabular-nums w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
+                      <span className={cn("w-2 h-2 rounded-full shrink-0 transition-colors", dotColor)} />
+                      <p className="text-sm truncate flex-1 min-w-0">{a.nome}</p>
+                      <div className="flex items-center gap-0.5 shrink-0">
                         {([
-                          { k: "presente" as const, Icon: UserCheck, color: "text-primary", bg: "bg-primary/15", ring: "ring-primary/40" },
-                          { k: "atraso" as const, Icon: Clock, color: "text-amber-600", bg: "bg-amber-500/15", ring: "ring-amber-500/40" },
-                          { k: "falta" as const, Icon: UserX, color: "text-destructive", bg: "bg-destructive/15", ring: "ring-destructive/40" },
-                        ]).map(({ k, Icon, color, bg, ring }) => (
+                          { k: "presente" as const, Icon: UserCheck, color: "text-primary", bg: "bg-primary/10" },
+                          { k: "atraso" as const, Icon: Clock, color: "text-amber-600", bg: "bg-amber-500/10" },
+                          { k: "falta" as const, Icon: UserX, color: "text-destructive", bg: "bg-destructive/10" },
+                        ]).map(({ k, Icon, color, bg }) => (
                           <button
                             key={k}
                             onClick={() => setPresencas((p) => ({ ...p, [a.id]: p[a.id] === k ? null : k }))}
                             className={cn(
-                              "w-8 h-8 rounded-md flex items-center justify-center transition-all",
-                              v === k ? `${bg} ${color} ring-2 ${ring}` : "text-muted-foreground hover:bg-muted",
+                              "w-6 h-6 rounded flex items-center justify-center transition-colors",
+                              v === k ? `${bg} ${color}` : "text-muted-foreground/60 hover:bg-muted hover:text-foreground",
                             )}
                             aria-label={k}
                           >
-                            <Icon className="w-4 h-4" />
+                            <Icon className="w-3.5 h-3.5" />
                           </button>
                         ))}
                       </div>
@@ -343,20 +341,21 @@ export default function AulaControlo() {
                 })}
               </div>
 
-              <div className="flex items-center justify-end mt-5">
+              <div className="flex items-center justify-end mt-4">
                 <Button
-                  size="lg"
+                  size="sm"
                   onClick={() => {
                     setChamadaConfirmada(true);
                     setPasso(2);
                     toast.success("Chamada confirmada");
                   }}
                 >
-                  <CheckCircle2 className="w-4 h-4 mr-1.5" /> Confirmar Chamada
+                  <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Confirmar Chamada
                 </Button>
               </div>
             </Card>
           )}
+
 
           {passo === 2 && (
             <>
