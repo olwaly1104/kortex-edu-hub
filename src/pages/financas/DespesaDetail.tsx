@@ -283,13 +283,13 @@ function DocCard({
   icon: Icon,
   tone,
   label,
-  ref,
+  numero,
   date,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   tone: "amber" | "emerald";
   label: string;
-  ref?: string;
+  numero?: string;
   date?: string;
 }) {
   const toneCls =
@@ -304,7 +304,7 @@ function DocCard({
         </div>
         <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">{label}</p>
       </div>
-      <p className="text-[11.5px] font-mono font-semibold text-foreground tabular-nums mt-1.5 truncate">{ref ?? "—"}</p>
+      <p className="text-[11.5px] font-mono font-semibold text-foreground tabular-nums mt-1.5 truncate">{numero ?? "—"}</p>
       <p className="text-[10px] text-muted-foreground tabular-nums mt-0.5">{date ? prettyDate(date) : "Pendente"}</p>
     </div>
   );
