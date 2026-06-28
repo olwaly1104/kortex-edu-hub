@@ -153,31 +153,54 @@ export default function FinancasDespesaDetail() {
           </aside>
 
 
-          {/* RIGHT — Justificação, Anexos, Cronologia */}
+          {/* RIGHT — Descrição (Justificação + Anexos), Cronologia */}
           <div className="p-6 space-y-6 min-w-0">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-2">Justificação</p>
-              <p className="text-xs leading-relaxed text-foreground/85 whitespace-pre-line">{d.justificacao}</p>
-            </div>
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="w-3.5 h-3.5 text-muted-foreground" />
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Descrição da Despesa</h3>
+              </div>
+              <div className="rounded-lg border border-border bg-background overflow-hidden divide-y divide-border">
+                <div className="px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-1.5">Justificação</p>
+                  <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{d.justificacao}</p>
+                </div>
 
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-2">Anexos ({d.anexos.length})</p>
-              <ul className="space-y-1.5">
-                {d.anexos.map((a, i) => {
-                  const ic = anexoIcon(a.tipo);
-                  return (
-                    <li key={i} className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-border bg-muted/30">
-                      <div className={`w-6 h-6 rounded border flex items-center justify-center shrink-0 ${ic.cls}`}>
-                        <ic.Icon className="w-3 h-3" />
-                      </div>
-                      <span className="text-xs font-medium text-foreground truncate flex-1">{a.nome}</span>
-                      {a.size && <span className="text-[10px] text-muted-foreground shrink-0">{a.size}</span>}
-                      <Paperclip className="w-3 h-3 text-muted-foreground shrink-0" />
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+                <div className="px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">
+                    Anexos <span className="text-muted-foreground/70 normal-case tracking-normal tabular-nums">({d.anexos.length})</span>
+                  </p>
+                  {d.anexos.length === 0 ? (
+                    <p className="text-[12px] text-muted-foreground">Anexo 0</p>
+                  ) : (
+                    <ul className="divide-y divide-border/70">
+                      {d.anexos.map((a, i) => {
+                        const ic = anexoIcon(a.tipo);
+                        return (
+                          <li key={i} className="flex items-center gap-3 py-2 first:pt-0 last:pb-0">
+                            <div className={cn("w-8 h-8 rounded-md border flex items-center justify-center shrink-0", ic.cls)}>
+                              <ic.Icon className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[13px] font-medium text-foreground leading-tight truncate">{a.nome}</p>
+                              {a.size && <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{a.size}</p>}
+                            </div>
+                            <div className="flex items-center gap-0.5 shrink-0">
+                              <button type="button" onClick={() => toast({ title: "A abrir anexo", description: a.nome })} className="w-7 h-7 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver">
+                                <Eye className="w-3.5 h-3.5" />
+                              </button>
+                              <button type="button" onClick={() => toast({ title: "Anexo descarregado", description: a.nome })} className="w-7 h-7 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Descarregar">
+                                <Download className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </section>
 
             <section>
               <div className="flex items-center gap-2 mb-3">
