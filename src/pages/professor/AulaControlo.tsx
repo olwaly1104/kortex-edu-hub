@@ -412,21 +412,21 @@ export default function AulaControlo() {
               )}
 
               {aba === "video" && (
-                <Card className="overflow-hidden">
-                  <video
-                    ref={videoRef}
-                    src={aula.video.src}
-                    className="w-full aspect-video bg-black"
-                    onPlay={() => setPlaying(true)}
-                    onPause={() => setPlaying(false)}
-                  />
-                  <div className="flex items-center gap-3 px-5 py-4 border-t border-border">
-                    <Button onClick={togglePlay}>
-                      {playing ? <><Pause className="w-4 h-4 mr-1.5" /> Pausar</> : <><Play className="w-4 h-4 mr-1.5" /> Reproduzir</>}
-                    </Button>
-                    <p className="text-sm font-medium text-foreground">{aula.video.titulo}</p>
-                    <p className="text-xs text-muted-foreground ml-auto">Atalho: P</p>
-                  </div>
+                <Card className="divide-y divide-border">
+                  {aula.videos.map((v) => (
+                    <div key={v.id} className="flex items-center gap-3 p-4 hover:bg-muted/40 transition-colors">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                        <VideoIcon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{v.nome}</p>
+                        <p className="text-xs text-muted-foreground">Vídeo · {v.duracao}</p>
+                      </div>
+                      <Button size="sm" variant="outline" onClick={() => setViewer({ tipo: "video", nome: v.nome, src: v.src })}>
+                        <Play className="w-3.5 h-3.5 mr-1.5" /> Ver
+                      </Button>
+                    </div>
+                  ))}
                 </Card>
               )}
 
@@ -441,11 +441,8 @@ export default function AulaControlo() {
                         <p className="text-sm font-medium truncate">{r.nome}</p>
                         <p className="text-xs text-muted-foreground">{r.tipo}</p>
                       </div>
-                      <Button size="sm" variant="outline" onClick={() => toast.success(`"${r.nome}" partilhado com a turma`)}>
-                        <Share2 className="w-3.5 h-3.5 mr-1.5" /> Partilhar
-                      </Button>
-                      <Button size="icon" variant="ghost" className="h-9 w-9">
-                        <Download className="w-4 h-4" />
+                      <Button size="sm" variant="outline" onClick={() => setViewer({ tipo: "doc", nome: r.nome, src: r.url })}>
+                        <Maximize2 className="w-3.5 h-3.5 mr-1.5" /> Ver
                       </Button>
                     </div>
                   ))}
