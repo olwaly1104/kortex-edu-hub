@@ -222,29 +222,29 @@ export default function AulaControlo() {
 
       {/* MAIN GRID */}
       <div className="grid lg:grid-cols-[260px_1fr] gap-5">
-        {/* LEFT RAIL — big timer + steps */}
-        <div className="space-y-4">
-          {/* Timer card — large, board-readable */}
-          <Card className="p-6 bg-gradient-to-br from-primary/5 via-card to-card border-primary/20">
-            <p className="text-[11px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">
+        {/* LEFT RAIL */}
+        <div className="space-y-3">
+          {/* Timer */}
+          <Card className="p-4 bg-gradient-to-br from-primary/5 via-card to-card border-primary/20">
+            <p className="text-[10px] uppercase tracking-[0.18em] font-semibold text-muted-foreground">
               Tempo de Aula
             </p>
-            <p className="text-6xl font-bold text-primary tabular-nums mt-3 leading-none">
+            <p className="text-3xl font-bold text-primary tabular-nums mt-1.5 leading-none">
               {fmtDuration(elapsedSec)}
             </p>
-            <div className="flex items-baseline justify-between mt-4">
-              <p className="text-xs text-muted-foreground tabular-nums">
+            <div className="flex items-baseline justify-between mt-2">
+              <p className="text-[11px] text-muted-foreground tabular-nums">
                 de {fmtDuration(totalDurSec)}
               </p>
-              <p className="text-xs font-medium text-primary tabular-nums">
+              <p className="text-[11px] font-medium text-primary tabular-nums">
                 {Math.round(progressPct)}%
               </p>
             </div>
-            <Progress value={progressPct} className="mt-2 h-2" />
+            <Progress value={progressPct} className="mt-1.5 h-1.5" />
           </Card>
 
           {/* Steps */}
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {steps.map((s) => {
               const active = passo === s.n;
               const Icon = s.icon;
@@ -254,35 +254,33 @@ export default function AulaControlo() {
                   disabled={s.lock}
                   onClick={() => setPasso(s.n)}
                   className={cn(
-                    "w-full flex items-center gap-3 p-4 rounded-lg border text-left transition-all",
-                    active && "border-primary bg-primary/5 shadow-sm",
+                    "w-full flex items-center gap-2.5 p-2.5 rounded-md border text-left transition-all",
+                    active && "border-primary bg-primary/5",
                     !active && !s.lock && "border-border bg-card hover:border-primary/40 hover:bg-muted/50",
                     s.lock && "border-border bg-muted/30 opacity-60 cursor-not-allowed",
                   )}
                 >
                   <div className={cn(
-                    "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
+                    "w-8 h-8 rounded-md flex items-center justify-center shrink-0",
                     active ? "bg-primary text-primary-foreground" :
                     s.done ? "bg-primary/15 text-primary" :
                     "bg-muted text-muted-foreground",
                   )}>
-                    {s.done ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                    {s.done ? <CheckCircle2 className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className={cn("text-[10px] uppercase tracking-wider font-semibold", active ? "text-primary" : "text-muted-foreground")}>
-                        Passo {s.n}
-                      </p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-medium text-foreground">{s.label}</p>
                       {s.lock && <Lock className="w-3 h-3 text-muted-foreground" />}
                     </div>
-                    <p className="text-base font-semibold text-foreground">{s.label}</p>
-                    <p className="text-xs text-muted-foreground tabular-nums mt-0.5">{s.hint}</p>
+                    <p className="text-[11px] text-muted-foreground tabular-nums">{s.hint}</p>
                   </div>
                 </button>
               );
             })}
           </div>
         </div>
+
 
         {/* MAIN ZONE */}
         <div className="space-y-6">
