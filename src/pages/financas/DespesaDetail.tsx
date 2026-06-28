@@ -141,14 +141,14 @@ export default function FinancasDespesaDetail() {
                   icon={Receipt}
                   tone="amber"
                   label="Factura"
-                  ref={d.facturaNum}
+                  numero={d.facturaNum}
                   date={d.facturaData}
                 />
                 <DocCard
                   icon={BadgeCheck}
                   tone="emerald"
                   label="Comprovativo"
-                  ref={d.comprovativoNum}
+                  numero={d.comprovativoNum}
                   date={d.comprovativoData}
                 />
               </div>
