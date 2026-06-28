@@ -283,56 +283,56 @@ export default function AulaControlo() {
 
 
         {/* MAIN ZONE */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           {passo === 1 && (
-            <Card className="p-6">
-              <div className="flex items-end justify-between mb-5 flex-wrap gap-3">
+            <Card className="p-5">
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                 <div>
-                  <h2 className="text-xl font-semibold">Chamada</h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Marca a presença para desbloquear o conteúdo da aula.
+                  <h2 className="text-base font-semibold">Chamada</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Toca no nome para alternar presença · atraso · falta.
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CountChip color="bg-primary" label="Presentes" value={counts.presente} />
-                  <CountChip color="bg-amber-500" label="Atraso" value={counts.atraso} />
-                  <CountChip color="bg-destructive" label="Faltas" value={counts.falta} />
+                <div className="flex items-center gap-3 text-xs tabular-nums">
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary" /><span className="font-semibold text-foreground">{counts.presente}</span><span className="text-muted-foreground">presentes</span></span>
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /><span className="font-semibold text-foreground">{counts.atraso}</span><span className="text-muted-foreground">atraso</span></span>
+                  <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-destructive" /><span className="font-semibold text-foreground">{counts.falta}</span><span className="text-muted-foreground">faltas</span></span>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 mb-4">
-                <Button size="sm" variant="outline" onClick={() => setAll("presente")}>Marcar todos presentes</Button>
-                <Button size="sm" variant="ghost" onClick={() => setAll(null)}>Limpar</Button>
-                <div className="ml-auto text-sm text-muted-foreground tabular-nums">
+              <div className="flex items-center gap-2 mb-3">
+                <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setAll("presente")}>Todos presentes</Button>
+                <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setAll(null)}>Limpar</Button>
+                <div className="ml-auto text-xs text-muted-foreground tabular-nums">
                   <span className="font-semibold text-foreground">{presentRate}%</span> presença
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-2 max-h-[440px] overflow-y-auto pr-1">
+              <div className="grid sm:grid-cols-2 gap-1.5 max-h-[400px] overflow-y-auto pr-1">
                 {aula.alunos.map((a, i) => {
                   const v = presencas[a.id];
+                  const dotColor = v === "presente" ? "bg-primary" : v === "atraso" ? "bg-amber-500" : v === "falta" ? "bg-destructive" : "bg-muted-foreground/30";
                   return (
-                    <div key={a.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-border bg-card">
-                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground shrink-0">
-                        {String(i + 1).padStart(2, "0")}
-                      </div>
-                      <p className="text-sm font-medium truncate flex-1 min-w-0">{a.nome}</p>
-                      <div className="flex items-center gap-1 shrink-0">
+                    <div key={a.id} className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md border border-border bg-card">
+                      <span className="text-[10px] text-muted-foreground tabular-nums w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
+                      <span className={cn("w-2 h-2 rounded-full shrink-0 transition-colors", dotColor)} />
+                      <p className="text-sm truncate flex-1 min-w-0">{a.nome}</p>
+                      <div className="flex items-center gap-0.5 shrink-0">
                         {([
-                          { k: "presente" as const, Icon: UserCheck, color: "text-primary", bg: "bg-primary/15", ring: "ring-primary/40" },
-                          { k: "atraso" as const, Icon: Clock, color: "text-amber-600", bg: "bg-amber-500/15", ring: "ring-amber-500/40" },
-                          { k: "falta" as const, Icon: UserX, color: "text-destructive", bg: "bg-destructive/15", ring: "ring-destructive/40" },
-                        ]).map(({ k, Icon, color, bg, ring }) => (
+                          { k: "presente" as const, Icon: UserCheck, color: "text-primary", bg: "bg-primary/10" },
+                          { k: "atraso" as const, Icon: Clock, color: "text-amber-600", bg: "bg-amber-500/10" },
+                          { k: "falta" as const, Icon: UserX, color: "text-destructive", bg: "bg-destructive/10" },
+                        ]).map(({ k, Icon, color, bg }) => (
                           <button
                             key={k}
                             onClick={() => setPresencas((p) => ({ ...p, [a.id]: p[a.id] === k ? null : k }))}
                             className={cn(
-                              "w-8 h-8 rounded-md flex items-center justify-center transition-all",
-                              v === k ? `${bg} ${color} ring-2 ${ring}` : "text-muted-foreground hover:bg-muted",
+                              "w-6 h-6 rounded flex items-center justify-center transition-colors",
+                              v === k ? `${bg} ${color}` : "text-muted-foreground/60 hover:bg-muted hover:text-foreground",
                             )}
                             aria-label={k}
                           >
-                            <Icon className="w-4 h-4" />
+                            <Icon className="w-3.5 h-3.5" />
                           </button>
                         ))}
                       </div>
@@ -341,20 +341,21 @@ export default function AulaControlo() {
                 })}
               </div>
 
-              <div className="flex items-center justify-end mt-5">
+              <div className="flex items-center justify-end mt-4">
                 <Button
-                  size="lg"
+                  size="sm"
                   onClick={() => {
                     setChamadaConfirmada(true);
                     setPasso(2);
                     toast.success("Chamada confirmada");
                   }}
                 >
-                  <CheckCircle2 className="w-4 h-4 mr-1.5" /> Confirmar Chamada
+                  <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Confirmar Chamada
                 </Button>
               </div>
             </Card>
           )}
+
 
           {passo === 2 && (
             <>
