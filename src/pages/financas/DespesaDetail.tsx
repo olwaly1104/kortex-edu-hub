@@ -113,49 +113,40 @@ export default function FinancasDespesaDetail() {
             <div className="pt-4 border-t border-border">
               <PersonBlock label="Responsável" name={d.responsavel} role={d.responsavelRole} />
             </div>
-            <div className="pt-4 border-t border-border space-y-4">
-              <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes</p>
+            <div className="pt-4 border-t border-border space-y-5">
+              <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Detalhes</p>
 
-              {/* Fornecedor */}
-              <CleanEntry icon={Building2} label="Fornecedor">
-                <p className="text-[13px] font-semibold text-foreground leading-snug break-words">{d.fornecedor ?? "—"}</p>
+              {/* Fornecedor — featured */}
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/80 mb-1">Fornecedor</p>
+                <p className="text-[13.5px] font-semibold text-foreground leading-snug break-words">{d.fornecedor ?? "—"}</p>
                 {d.nif && (
-                  <p className="text-[10.5px] font-mono text-muted-foreground tabular-nums mt-0.5">NIF {d.nif}</p>
+                  <p className="text-[11px] font-mono text-muted-foreground tabular-nums mt-1">NIF · {d.nif}</p>
                 )}
-              </CleanEntry>
+              </div>
 
-              {/* Método de Pagamento */}
-              <CleanEntry icon={Wallet} label="Método de Pagamento">
-                <p className="text-[13px] font-medium text-foreground leading-snug break-words">{d.metodoPagamento ?? "—"}</p>
-              </CleanEntry>
+              {/* Método de pagamento — single line */}
+              <div className="flex items-baseline justify-between gap-3">
+                <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/80">Método</span>
+                <span className="text-[12.5px] font-medium text-foreground text-right break-words">{d.metodoPagamento ?? "—"}</span>
+              </div>
 
-              {/* Factura */}
-              <CleanEntry
-                icon={Receipt}
-                label="Factura"
-                action={d.facturaNum ? { label: "Ver", onClick: () => setDocOpen(true) } : undefined}
-              >
-                <p className="text-[12.5px] font-mono font-semibold text-foreground tabular-nums break-all leading-snug">
-                  {d.facturaNum ?? "Pendente"}
-                </p>
-                {d.facturaData && (
-                  <p className="text-[10.5px] text-muted-foreground tabular-nums mt-0.5">{prettyDate(d.facturaData)}</p>
-                )}
-              </CleanEntry>
-
-              {/* Comprovativo */}
-              <CleanEntry
-                icon={BadgeCheck}
-                label="Comprovativo"
-                action={d.comprovativoNum ? { label: "Ver", onClick: () => setDocOpen(true) } : undefined}
-              >
-                <p className="text-[12.5px] font-mono font-semibold text-foreground tabular-nums break-all leading-snug">
-                  {d.comprovativoNum ?? "Pendente"}
-                </p>
-                {d.comprovativoData && (
-                  <p className="text-[10.5px] text-muted-foreground tabular-nums mt-0.5">{prettyDate(d.comprovativoData)}</p>
-                )}
-              </CleanEntry>
+              {/* Documentos fiscais */}
+              {(d.facturaNum || d.comprovativoNum) && (
+                <div className="rounded-lg border border-border/70 bg-background overflow-hidden">
+                  <div className="px-3 py-1.5 border-b border-border/70 bg-muted/30">
+                    <p className="text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Documentos Fiscais</p>
+                  </div>
+                  <div className="divide-y divide-border/70">
+                    {d.facturaNum && (
+                      <FiscalLine label="Factura" numero={d.facturaNum} date={d.facturaData} onView={() => setDocOpen(true)} />
+                    )}
+                    {d.comprovativoNum && (
+                      <FiscalLine label="Comprovativo" numero={d.comprovativoNum} date={d.comprovativoData} onView={() => setDocOpen(true)} />
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
           </aside>
