@@ -124,7 +124,7 @@ export default function FinancasDespesaDetail() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Fornecedor</p>
-                    <p className="text-[13px] font-semibold text-foreground leading-tight mt-0.5 truncate">{d.fornecedor ?? "—"}</p>
+                    <p className="text-[13px] font-semibold text-foreground leading-snug mt-0.5 break-words">{d.fornecedor ?? "—"}</p>
                     {d.nif && (
                       <div className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-border bg-muted/40">
                         <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground">NIF</span>
