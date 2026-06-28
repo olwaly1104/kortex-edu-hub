@@ -100,22 +100,22 @@ export default function FinancasDespesaDetail() {
       </Link>
 
       {/* Action bar — outside the card, above the title, linked to cronologia */}
-      {availableActions.length > 0 && (
+      {primaryAction && (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-4 py-2.5 shadow-sm">
           <div className="flex items-center gap-2.5 min-w-0">
-            <Hourglass className={cn("w-4 h-4 shrink-0", d.status === "pendente" ? "text-amber-600" : d.status === "aprovada" ? "text-emerald-600" : "text-blue-600")} />
+            <Hourglass className={cn("w-4 h-4 shrink-0", d.status === "pendente" ? "text-amber-600" : "text-emerald-600")} />
             <span className="text-sm font-semibold text-foreground truncate">
-              {d.status === "pendente" ? "Aguarda decisão" : d.status === "aprovada" ? "Aprovada — aguarda pagamento" : d.status === "paga" ? "Despesa paga" : "Rejeitada"}
+              {d.status === "pendente" ? "Aguarda decisão" : "Aprovada — aguarda pagamento"}
             </span>
-            <span className="text-[11px] text-muted-foreground hidden md:inline">Cada acção fica registada na cronologia</span>
+            <span className="text-[11px] text-muted-foreground hidden md:inline">Esta acção fica registada na cronologia</span>
           </div>
-          <div className="flex items-center gap-1.5 flex-wrap justify-end">
-            {availableActions.map(a => (
-              <Button key={a.key} size="sm" variant={a.cls.includes("bg-") ? "default" : "outline"} className={cn("h-7 text-[11px] gap-1.5 transition-colors", a.cls)} onClick={() => { setPendingAction(a.key); setActionNote(""); }}>
-                <a.icon className="w-3.5 h-3.5" /> {a.label}
-              </Button>
-            ))}
-          </div>
+          <Button
+            size="sm"
+            className={cn("h-8 text-[12px] gap-1.5", primaryAction.cls)}
+            onClick={() => { setPendingAction(primaryAction.key); setActionNote(""); }}
+          >
+            <primaryAction.icon className="w-3.5 h-3.5" /> {primaryAction.label}
+          </Button>
         </div>
       )}
 
