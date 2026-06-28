@@ -192,6 +192,21 @@ export default function AulaControlo() {
   const [confirmEnd, setConfirmEnd] = useState(false);
 
   const [chamadaFullscreen, setChamadaFullscreen] = useState(false);
+  const [apresentacao, setApresentacao] = useState(false);
+  const [quizLancado, setQuizLancado] = useState(false);
+
+  // Modo apresentação: ESC para sair, setas para navegar
+  useEffect(() => {
+    if (!apresentacao) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setApresentacao(false);
+      if (e.key === "ArrowRight" || e.key === " ") setSlideIdx((i) => Math.min(i + 1, aula.slides.length - 1));
+      if (e.key === "ArrowLeft") setSlideIdx((i) => Math.max(i - 1, 0));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [apresentacao, aula.slides.length]);
+
 
   const conteudoHint = `${slideIdx + 1}/${aula.slides.length} slides · ${aula.videos.length} vídeos · ${aula.recursos.length} recursos`;
 
