@@ -340,35 +340,21 @@ function FiscalDocRow({
   );
 }
 
-function CleanEntry({
-  icon: Icon,
-  label,
-  action,
-  children,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  action?: { label: string; onClick: () => void };
-  children: React.ReactNode;
-}) {
+function FiscalLine({ label, numero, date, onView }: { label: string; numero: string; date?: string; onView: () => void }) {
   return (
-    <div>
-      <div className="flex items-center justify-between gap-2 mb-1">
-        <div className="flex items-center gap-1.5">
-          <Icon className="w-3 h-3 text-muted-foreground" />
-          <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">{label}</span>
-        </div>
-        {action && (
-          <button
-            type="button"
-            onClick={action.onClick}
-            className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline shrink-0"
-          >
-            <Eye className="w-3 h-3" /> {action.label}
-          </button>
-        )}
+    <div className="flex items-center gap-3 px-3 py-2">
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-medium">{label}</p>
+        <p className="text-[12px] font-mono font-semibold text-foreground tabular-nums break-all leading-tight mt-0.5">{numero}</p>
+        {date && <p className="text-[10px] text-muted-foreground tabular-nums mt-0.5">{prettyDate(date)}</p>}
       </div>
-      <div className="pl-[18px]">{children}</div>
+      <button
+        type="button"
+        onClick={onView}
+        className="shrink-0 inline-flex items-center gap-1 text-[10.5px] font-semibold text-primary px-2 py-1 rounded hover:bg-primary/5 transition-colors"
+      >
+        <Eye className="w-3 h-3" /> Ver
+      </button>
     </div>
   );
 }
