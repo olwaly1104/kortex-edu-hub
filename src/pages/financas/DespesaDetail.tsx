@@ -217,6 +217,29 @@ function MetaRow({ k, v }: { k: string; v: string }) {
   );
 }
 
+function PersonBlock({ label, name, role }: { label: string; name: string; role?: string }) {
+  const initials = name.split(" ").filter(Boolean).slice(0, 2).map(n => n[0]).join("").toUpperCase();
+  return (
+    <div>
+      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">{label}</p>
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-xs ring-1 ring-primary/15">
+          {initials}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-foreground leading-tight">{name}</p>
+          {role && <p className="text-[11px] text-muted-foreground mt-0.5">{role}</p>}
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-2 mt-3">
+        <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1"><MessageSquare className="w-3 h-3" /> Chat</Button>
+        <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1"><Mail className="w-3 h-3" /> Email</Button>
+        <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1"><Phone className="w-3 h-3" /> Ligar</Button>
+      </div>
+    </div>
+  );
+}
+
 function toneFor(accao: string) {
   const a = accao.toLowerCase();
   if (a.includes("rejeit")) return { icon: X,         cls: "bg-destructive text-destructive-foreground ring-4 ring-destructive/15" };
