@@ -65,26 +65,12 @@ Deno.serve(async (req) => {
     ]);
     const isAdmin = roles.has("admin");
     if (!isAdmin) {
-      const metadataRole = String(userData.user.user_metadata?.modulo ?? "").toLowerCase();
-      const callerEmail = String(userData.user.email ?? "").toLowerCase();
-      const isInstitutionAdmin = metadataRole === "admin" || /^admin@.+\.kor$/.test(callerEmail);
-      if (isInstitutionAdmin) {
-        const { error: backfillErr } = await admin
-          .from("user_roles")
-          .insert({ user_id: callerId, role: "admin" });
-        if (backfillErr && backfillErr.code !== "23505") {
-          console.error("admin role backfill failed:", backfillErr.message);
-          return json({ error: "Falha ao ativar permissões de administrador: " + backfillErr.message }, 500);
-        }
-        roles.add("admin");
-        console.log("admin role backfilled for caller:", callerId);
-      } else {
-        const isStaff = [...roles].some((r) => STAFF_PROVISIONERS.has(r));
-        if (!isStaff) {
-          return json({ error: "Sem permissões para criar utilizadores." }, 403);
-        }
+      const isStaff = [...roles].some((r) => STAFF_PROVISIONERS.has(r));
+      if (!isStaff) {
+        return json({ error: "Sem permissões para criar utilizadores." }, 403);
       }
     }
+
 
     const body = (await req.json().catch(() => ({}))) as Body;
     const email = (body.email || "").trim().toLowerCase();

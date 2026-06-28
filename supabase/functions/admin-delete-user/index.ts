@@ -31,12 +31,9 @@ Deno.serve(async (req) => {
     const { data: roleRow } = await admin
       .from("user_roles").select("role").eq("user_id", callerId).eq("role", "admin").maybeSingle();
     if (!roleRow) {
-      const metadataRole = String(userData.user.user_metadata?.modulo ?? "").toLowerCase();
-      const callerEmail = String(userData.user.email ?? "").toLowerCase();
-      if (!(metadataRole === "admin" || /^admin@.+\.kor$/.test(callerEmail))) {
-        return json({ error: "Apenas administradores podem remover utilizadores." }, 403);
-      }
+      return json({ error: "Apenas administradores podem remover utilizadores." }, 403);
     }
+
 
     const { data: callerProfile } = await admin
       .from("profiles")

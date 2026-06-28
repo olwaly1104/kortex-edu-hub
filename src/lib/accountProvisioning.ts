@@ -15,9 +15,5 @@ export async function provisionKortexUser(input: { name: string; email: string; 
   if (error || serverError) throw new Error(String(serverError || error?.message || "Falha ao criar utilizador."));
   const created = (data as any)?.user as { id: string; email: string; name: string; modulo: string } | undefined;
   if (!created?.id) throw new Error("Resposta inesperada do servidor.");
-  try {
-    const { saveDevCred } = await import("@/lib/devCreds");
-    saveDevCred({ email: created.email, password, modulo: created.modulo, name: created.name });
-  } catch { /* ignore */ }
   return { ...created, password };
 }

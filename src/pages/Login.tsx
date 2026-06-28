@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -6,12 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Eye, EyeOff, Globe, Loader2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import logoUpra from "@/assets/logo-upra.asset.json";
 import { supabase } from "@/integrations/supabase/client";
-
-import { loadDevCreds, removeDevCred, type DevCred } from "@/lib/devCreds";
-import { KeyRound, Copy, Trash2 } from "lucide-react";
 
 const ROLE_ROUTE: Record<string, string> = {
   admin: "/admin",
@@ -37,13 +33,6 @@ export default function Login() {
   const [info, setInfo] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Dev credentials (local browser only)
-  const [credsOpen, setCredsOpen] = useState(false);
-  const [creds, setCreds] = useState<DevCred[]>([]);
-  const [revealed, setRevealed] = useState<Record<string, boolean>>({});
-  useEffect(() => {
-    if (credsOpen) setCreds(loadDevCreds().sort((a, b) => b.createdAt - a.createdAt));
-  }, [credsOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,65 +190,8 @@ export default function Login() {
             <p className="text-xs text-muted-foreground px-2">
               As contas são criadas pela administração da UPRA. Se ainda não tem acesso, contacte os serviços académicos.
             </p>
-
-            {/* Dev-only: ver contas e palavras-passe guardadas neste browser */}
-            <Dialog open={credsOpen} onOpenChange={setCredsOpen}>
-              <DialogTrigger asChild>
-                <Button type="button" variant="outline" size="sm" className="gap-2 w-full">
-                  <KeyRound className="w-4 h-4" /> Ver contas e palavras-passe
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-lg">
-                <DialogHeader>
-                  <DialogTitle>Contas reais (browser local)</DialogTitle>
-                  <DialogDescription>
-                    Lista das contas criadas neste browser, com as palavras-passe usadas. Apenas visível aqui — nunca sai do seu dispositivo.
-                  </DialogDescription>
-                </DialogHeader>
-                {creds.length === 0 ? (
-                  <p className="text-sm text-muted-foreground py-6 text-center">
-                    Sem contas guardadas. Crie utilizadores em Admin → Utilizadores.
-                  </p>
-                ) : (
-                  <div className="space-y-2 max-h-[60vh] overflow-auto">
-                    {creds.map((c) => (
-                      <div key={c.email} className="rounded-md border border-border p-3 text-sm">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="min-w-0">
-                            <p className="font-semibold truncate">{c.name || c.email}</p>
-                            <p className="text-xs text-muted-foreground truncate">{c.email} · {c.modulo}</p>
-                          </div>
-                          <div className="flex items-center gap-1 shrink-0">
-                            <Button type="button" variant="ghost" size="sm" className="h-7 px-2 text-xs"
-                              onClick={() => { setEmail(c.email); setPassword(c.password); setCredsOpen(false); }}>
-                              Usar
-                            </Button>
-                            <Button type="button" variant="ghost" size="icon" className="h-7 w-7"
-                              onClick={() => { navigator.clipboard?.writeText(c.password); }}>
-                              <Copy className="w-3.5 h-3.5" />
-                            </Button>
-                            <Button type="button" variant="ghost" size="icon" className="h-7 w-7 text-destructive"
-                              onClick={() => { removeDevCred(c.email); setCreds(loadDevCreds()); }}>
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="mt-2 flex items-center gap-2">
-                          <code className="flex-1 bg-muted rounded px-2 py-1 text-xs font-mono select-all">
-                            {revealed[c.email] ? c.password : "•".repeat(Math.min(12, c.password.length))}
-                          </code>
-                          <Button type="button" variant="outline" size="sm" className="h-7 px-2 text-xs"
-                            onClick={() => setRevealed((r) => ({ ...r, [c.email]: !r[c.email] }))}>
-                            {revealed[c.email] ? "Ocultar" : "Mostrar"}
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </DialogContent>
-            </Dialog>
           </div>
+
         </div>
       </div>
     </div>
