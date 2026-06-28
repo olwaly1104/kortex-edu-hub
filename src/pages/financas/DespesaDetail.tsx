@@ -135,8 +135,8 @@ export default function FinancasDespesaDetail() {
                 </div>
               </div>
 
-              {/* Documentos fiscais + Detail rows — unified vertical list */}
-              <dl className="rounded-lg border border-border bg-background divide-y divide-border overflow-hidden">
+              {/* Documentos fiscais — em caixa */}
+              <div className="rounded-lg border border-border bg-background divide-y divide-border overflow-hidden mb-3">
                 <FiscalDocRow
                   icon={Receipt}
                   tone="amber"
@@ -153,11 +153,15 @@ export default function FinancasDespesaDetail() {
                   date={d.comprovativoData}
                   onView={() => setDocOpen(true)}
                 />
-                <DetailRow icon={Wallet}       label="Método"   value={d.metodoPagamento ?? "—"} />
+              </div>
+
+              {/* Restantes detalhes — lista limpa */}
+              <dl className="space-y-2.5">
+                <DetailRow icon={Wallet}        label="Método"    value={d.metodoPagamento ?? "—"} />
                 {d.iban && <DetailRow icon={Landmark} label="IBAN" value={d.iban} mono />}
-                <DetailRow icon={Layers}       label="Rubrica"  value={d.rubricaOrcamental ?? "—"} />
-                <DetailRow icon={CalendarDays} label="Submetido" value={prettyDate(d.date)} />
-                <DetailRow icon={CalendarClock} label="Prazo"   value={prettyDate(d.dueDate)} />
+                <DetailRow icon={Layers}        label="Rubrica"   value={d.rubricaOrcamental ?? "—"} />
+                <DetailRow icon={CalendarDays}  label="Submetido" value={prettyDate(d.date)} />
+                <DetailRow icon={CalendarClock} label="Prazo"     value={prettyDate(d.dueDate)} />
               </dl>
             </div>
 
@@ -364,14 +368,12 @@ function DetailRow({
   mono?: boolean;
 }) {
   return (
-    <div className="px-3 py-2.5">
-      <div className="flex items-center gap-2 mb-1">
-        <div className="w-5 h-5 rounded-md bg-muted/60 text-muted-foreground flex items-center justify-center shrink-0">
-          <Icon className="w-3 h-3" />
-        </div>
+    <div>
+      <div className="flex items-center gap-1.5 mb-0.5">
+        <Icon className="w-3 h-3 text-muted-foreground" />
         <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">{label}</span>
       </div>
-      <p className={cn("text-[12px] font-medium text-foreground leading-snug break-words", mono && "font-mono tabular-nums break-all")}>{value}</p>
+      <p className={cn("text-[12px] font-medium text-foreground leading-snug break-words pl-[18px]", mono && "font-mono tabular-nums break-all")}>{value}</p>
     </div>
   );
 }
