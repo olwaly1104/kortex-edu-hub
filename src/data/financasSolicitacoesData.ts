@@ -47,63 +47,7 @@ export interface FinSolicitacao {
   historico: FinHistorico[];
 }
 
-export const finSolicitacoes: FinSolicitacao[] = [
-  {
-    id: "fin-req-0001",
-    ref: "REQ-2025-0412",
-    direction: "recebida",
-    type: "reembolso",
-    title: "Reembolso de deslocação institucional — Luanda → Huambo",
-    description:
-      "Solicito o reembolso das despesas de deslocação efectuadas no âmbito da missão de representação institucional realizada em Huambo, entre 14 e 16 de Maio de 2025. Anexo os comprovativos de combustível, alojamento e refeições, bem como a ordem de missão devidamente assinada.",
-    requester: "Prof. Dr. António Mendes",
-    requesterRole: "Magnífico Reitor",
-    requesterMatricula: "DOC-0001",
-    destinatario: "Direcção Financeira",
-    responsavel: "Sra. Catarina Lopes · Tesouraria",
-    date: "2025-05-19T09:14:00",
-    dueDate: "2025-05-26",
-    status: "em_execucao",
-    anexos: [
-      { nome: "Ordem-de-Missao-HUA-2025.pdf", tamanho: "184 KB", tipo: "pdf" },
-      { nome: "Recibo-Combustivel-Sonangol.pdf", tamanho: "92 KB", tipo: "pdf" },
-      { nome: "Factura-Hotel-Pululukwa.pdf", tamanho: "210 KB", tipo: "pdf" },
-      { nome: "Mapa-Despesas-Maio.xlsx", tamanho: "46 KB", tipo: "sheet" },
-    ],
-    historico: [
-      {
-        data: "2025-05-19T09:14:00",
-        actor: "Prof. Dr. António Mendes",
-        accao: "Solicitação submetida",
-        nota: "Pedido criado e encaminhado para a Direcção Financeira via portal institucional.",
-      },
-      {
-        data: "2025-05-19T11:02:00",
-        actor: "Secretaria Geral",
-        accao: "Pedido protocolado",
-        nota: "Registado sob a referência REQ-2025-0412 e atribuído à Tesouraria.",
-      },
-      {
-        data: "2025-05-20T10:35:00",
-        actor: "Sra. Catarina Lopes · Tesouraria",
-        accao: "Análise documental iniciada",
-        nota: "Verificação dos comprovativos e conferência com a ordem de missão.",
-      },
-      {
-        data: "2025-05-21T15:48:00",
-        actor: "Sra. Catarina Lopes · Tesouraria",
-        accao: "Validação contabilística aprovada",
-        nota: "Documentos conformes. Encaminhado ao Director Financeiro para autorização de pagamento.",
-      },
-      {
-        data: "2025-05-22T09:10:00",
-        actor: "Dr. Hélder Bastos · Director Financeiro",
-        accao: "Autorização de pagamento emitida",
-        nota: "Processamento agendado para a próxima ordem de transferências bancárias.",
-      },
-    ],
-  },
-];
+// Mock data removed. Use the `useFinSolicitacoes` hook to read live data from the backend.
 
 
 export const finTypeMeta: Record<FinType, { label: string; icon: LucideIcon; cls: string; dot: string }> = {
