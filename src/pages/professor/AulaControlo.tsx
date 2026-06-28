@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,21 +18,18 @@ import {
   MapPin,
   Users,
   Play,
-  Pause,
   ChevronLeft,
   ChevronRight,
   Maximize2,
   CheckCircle2,
   FileText,
-  Download,
   Presentation,
   Video as VideoIcon,
   UserCheck,
-  UserX,
   AlarmClock,
   LogOut,
   Lock,
-  Share2,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
