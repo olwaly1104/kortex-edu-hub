@@ -135,8 +135,13 @@ export default function FinancasDespesaDetail() {
                 </div>
               </div>
 
-              {/* Documentos fiscais — em caixa */}
-              <div className="rounded-lg border border-border bg-background divide-y divide-border overflow-hidden mb-3">
+              {/* Método de pagamento — entrada limpa */}
+              <dl className="space-y-3 mb-4">
+                <DetailRow icon={Wallet} label="Método de Pagamento" value={d.metodoPagamento ?? "—"} />
+              </dl>
+
+              {/* Documentos fiscais — em caixa, no fim */}
+              <div className="rounded-lg border border-border bg-background divide-y divide-border overflow-hidden">
                 <FiscalDocRow
                   icon={Receipt}
                   tone="amber"
@@ -154,15 +159,6 @@ export default function FinancasDespesaDetail() {
                   onView={() => setDocOpen(true)}
                 />
               </div>
-
-              {/* Restantes detalhes — lista limpa */}
-              <dl className="space-y-2.5">
-                <DetailRow icon={Wallet}        label="Método"    value={d.metodoPagamento ?? "—"} />
-                {d.iban && <DetailRow icon={Landmark} label="IBAN" value={d.iban} mono />}
-                <DetailRow icon={Layers}        label="Rubrica"   value={d.rubricaOrcamental ?? "—"} />
-                <DetailRow icon={CalendarDays}  label="Submetido" value={prettyDate(d.date)} />
-                <DetailRow icon={CalendarClock} label="Prazo"     value={prettyDate(d.dueDate)} />
-              </dl>
             </div>
 
           </aside>
