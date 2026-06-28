@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,21 +18,18 @@ import {
   MapPin,
   Users,
   Play,
-  Pause,
   ChevronLeft,
   ChevronRight,
   Maximize2,
   CheckCircle2,
   FileText,
-  Download,
   Presentation,
   Video as VideoIcon,
   UserCheck,
-  UserX,
   AlarmClock,
   LogOut,
   Lock,
-  Share2,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -58,13 +55,13 @@ const MOCK_LESSON = {
     { n: 6, titulo: "Discussão & síntese" },
   ],
   recursos: [
-    { id: "r1", nome: "Capítulo 1 — Manual.pdf", tipo: "PDF" },
-    { id: "r2", nome: "Cronologia da arquitectura.pdf", tipo: "PDF" },
+    { id: "r1", nome: "Capítulo 1 — Manual.pdf", tipo: "PDF", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+    { id: "r2", nome: "Cronologia da arquitectura.pdf", tipo: "PDF", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
   ],
-  video: {
-    titulo: "Vídeo introdutório · 4 min",
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
+  videos: [
+    { id: "v1", nome: "Vídeo introdutório", duracao: "4 min", src: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { id: "v2", nome: "Estudo de caso · Vitruvius", duracao: "6 min", src: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  ],
   alunos: Array.from({ length: 24 }).map((_, i) => ({
     id: `est-${i + 1}`,
     nome: [
@@ -148,27 +145,19 @@ export default function AulaControlo() {
   const [slideIdx, setSlideIdx] = useState(0);
   const slide = aula.slides[slideIdx];
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(false);
-  const togglePlay = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (v.paused) { v.play(); setPlaying(true); }
-    else { v.pause(); setPlaying(false); }
-  };
+  const [viewer, setViewer] = useState<{ tipo: "video" | "doc"; nome: string; src: string } | null>(null);
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if (passo !== 2) return;
+      if (passo !== 2 || viewer) return;
       if (aba === "slides") {
         if (e.key === "ArrowRight") setSlideIdx((i) => Math.min(i + 1, aula.slides.length - 1));
         if (e.key === "ArrowLeft") setSlideIdx((i) => Math.max(i - 1, 0));
       }
-      if (aba === "video" && e.key.toLowerCase() === "p") togglePlay();
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [passo, aba, aula.slides.length]);
+  }, [passo, aba, aula.slides.length, viewer]);
 
   const [confirmEnd, setConfirmEnd] = useState(false);
 
@@ -311,28 +300,25 @@ export default function AulaControlo() {
               <div className="grid sm:grid-cols-2 gap-1.5 max-h-[400px] overflow-y-auto pr-1">
                 {aula.alunos.map((a, i) => {
                   const v = presencas[a.id];
-                  const dotColor = v === "presente" ? "bg-primary" : v === "atraso" ? "bg-amber-500" : v === "falta" ? "bg-destructive" : "bg-muted-foreground/30";
                   return (
-                    <div key={a.id} className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md border border-border bg-card">
+                    <div key={a.id} className="flex items-center gap-3 px-3 py-2 rounded-md border border-border bg-card">
                       <span className="text-[10px] text-muted-foreground tabular-nums w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                      <span className={cn("w-2 h-2 rounded-full shrink-0 transition-colors", dotColor)} />
                       <p className="text-sm truncate flex-1 min-w-0">{a.nome}</p>
-                      <div className="flex items-center gap-0.5 shrink-0">
+                      <div className="flex items-center gap-1 shrink-0">
                         {([
-                          { k: "presente" as const, Icon: UserCheck, color: "text-primary", bg: "bg-primary/10" },
-                          { k: "atraso" as const, Icon: Clock, color: "text-amber-600", bg: "bg-amber-500/10" },
-                          { k: "falta" as const, Icon: UserX, color: "text-destructive", bg: "bg-destructive/10" },
-                        ]).map(({ k, Icon, color, bg }) => (
+                          { k: "presente" as const, label: "Presente", activeCls: "bg-primary text-primary-foreground border-primary" },
+                          { k: "atraso" as const, label: "Atraso", activeCls: "bg-amber-500 text-white border-amber-500" },
+                          { k: "falta" as const, label: "Falta", activeCls: "bg-destructive text-destructive-foreground border-destructive" },
+                        ]).map(({ k, label, activeCls }) => (
                           <button
                             key={k}
                             onClick={() => setPresencas((p) => ({ ...p, [a.id]: p[a.id] === k ? null : k }))}
                             className={cn(
-                              "w-6 h-6 rounded flex items-center justify-center transition-colors",
-                              v === k ? `${bg} ${color}` : "text-muted-foreground/60 hover:bg-muted hover:text-foreground",
+                              "px-2.5 h-7 rounded-md border text-[11px] font-medium transition-colors",
+                              v === k ? activeCls : "border-border bg-background text-muted-foreground hover:text-foreground hover:bg-muted",
                             )}
-                            aria-label={k}
                           >
-                            <Icon className="w-3.5 h-3.5" />
+                            {label}
                           </button>
                         ))}
                       </div>
@@ -415,21 +401,21 @@ export default function AulaControlo() {
               )}
 
               {aba === "video" && (
-                <Card className="overflow-hidden">
-                  <video
-                    ref={videoRef}
-                    src={aula.video.src}
-                    className="w-full aspect-video bg-black"
-                    onPlay={() => setPlaying(true)}
-                    onPause={() => setPlaying(false)}
-                  />
-                  <div className="flex items-center gap-3 px-5 py-4 border-t border-border">
-                    <Button onClick={togglePlay}>
-                      {playing ? <><Pause className="w-4 h-4 mr-1.5" /> Pausar</> : <><Play className="w-4 h-4 mr-1.5" /> Reproduzir</>}
-                    </Button>
-                    <p className="text-sm font-medium text-foreground">{aula.video.titulo}</p>
-                    <p className="text-xs text-muted-foreground ml-auto">Atalho: P</p>
-                  </div>
+                <Card className="divide-y divide-border">
+                  {aula.videos.map((v) => (
+                    <div key={v.id} className="flex items-center gap-3 p-4 hover:bg-muted/40 transition-colors">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                        <VideoIcon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{v.nome}</p>
+                        <p className="text-xs text-muted-foreground">Vídeo · {v.duracao}</p>
+                      </div>
+                      <Button size="sm" variant="outline" onClick={() => setViewer({ tipo: "video", nome: v.nome, src: v.src })}>
+                        <Play className="w-3.5 h-3.5 mr-1.5" /> Ver
+                      </Button>
+                    </div>
+                  ))}
                 </Card>
               )}
 
@@ -444,11 +430,8 @@ export default function AulaControlo() {
                         <p className="text-sm font-medium truncate">{r.nome}</p>
                         <p className="text-xs text-muted-foreground">{r.tipo}</p>
                       </div>
-                      <Button size="sm" variant="outline" onClick={() => toast.success(`"${r.nome}" partilhado com a turma`)}>
-                        <Share2 className="w-3.5 h-3.5 mr-1.5" /> Partilhar
-                      </Button>
-                      <Button size="icon" variant="ghost" className="h-9 w-9">
-                        <Download className="w-4 h-4" />
+                      <Button size="sm" variant="outline" onClick={() => setViewer({ tipo: "doc", nome: r.nome, src: r.url })}>
+                        <Maximize2 className="w-3.5 h-3.5 mr-1.5" /> Ver
                       </Button>
                     </div>
                   ))}
@@ -510,6 +493,25 @@ export default function AulaControlo() {
               Confirmar e Sair
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Fullscreen viewer */}
+      <Dialog open={!!viewer} onOpenChange={(o) => !o && setViewer(null)}>
+        <DialogContent className="max-w-[95vw] w-[95vw] h-[92vh] p-0 gap-0 border-0 bg-black/95 [&>button]:hidden flex flex-col">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 shrink-0">
+            <p className="text-sm font-medium text-white truncate">{viewer?.nome}</p>
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-white hover:bg-white/10 hover:text-white" onClick={() => setViewer(null)}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          <div className="flex-1 min-h-0 bg-black">
+            {viewer?.tipo === "video" ? (
+              <video src={viewer.src} controls autoPlay className="w-full h-full object-contain bg-black" />
+            ) : viewer ? (
+              <iframe src={viewer.src} title={viewer.nome} className="w-full h-full bg-white" />
+            ) : null}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
