@@ -197,6 +197,19 @@ export default function AulaControlo() {
   const [apresentacao, setApresentacao] = useState(false);
   const [quizLancado, setQuizLancado] = useState(false);
   const [quizAberto, setQuizAberto] = useState(false);
+  const [quizFullscreen, setQuizFullscreen] = useState(false);
+  const [quizIdx, setQuizIdx] = useState(0);
+
+  useEffect(() => {
+    if (!quizFullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setQuizFullscreen(false);
+      if (e.key === "ArrowRight" || e.key === " ") setQuizIdx((i) => Math.min(i + 1, aula.quiz.questoes.length - 1));
+      if (e.key === "ArrowLeft") setQuizIdx((i) => Math.max(i - 1, 0));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [quizFullscreen, aula.quiz.questoes.length]);
 
   // Modo apresentação: ESC para sair, setas para navegar
   useEffect(() => {
