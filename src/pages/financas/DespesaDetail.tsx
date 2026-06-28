@@ -85,11 +85,58 @@ export default function FinancasDespesaDetail() {
     setActionNote("");
   };
 
+  // Available actions per status (linked to chronologia)
+  const availableActions: { key: NonNullable<typeof pendingAction>; label: string; icon: any; cls: string }[] = [];
+  if (d.status === "pendente") {
+    availableActions.push(
+      { key: "aprovada",  label: "Aprovar",        icon: CheckCircle2,    cls: "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent" },
+      { key: "rejeitada", label: "Rejeitar",       icon: XCircle,         cls: "border-red-200 text-red-600 hover:bg-red-50" },
+      { key: "parecer",   label: "Dar parecer",    icon: MessageSquareText, cls: "" },
+      { key: "upload",    label: "Carregar anexo", icon: Upload,          cls: "" },
+    );
+  } else if (d.status === "aprovada") {
+    availableActions.push(
+      { key: "paga",      label: "Marcar como paga",        icon: Banknote,         cls: "bg-blue-600 hover:bg-blue-700 text-white border-transparent" },
+      { key: "upload",    label: "Carregar comprovativo",   icon: Upload,           cls: "" },
+      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
+    );
+  } else if (d.status === "paga") {
+    availableActions.push(
+      { key: "upload",    label: "Carregar anexo",          icon: Upload,           cls: "" },
+      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
+    );
+  } else if (d.status === "rejeitada") {
+    availableActions.push(
+      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
+    );
+  }
+
   return (
-    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
+    <div className="p-6 lg:p-8 space-y-4 animate-fade-in">
       <Link to="/financas/despesas" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
         <ArrowLeft className="w-4 h-4" /> Voltar a Despesas
       </Link>
+
+      {/* Action bar — outside the card, above the title, linked to cronologia */}
+      {availableActions.length > 0 && (
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-4 py-2.5 shadow-sm">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Hourglass className={cn("w-4 h-4 shrink-0", d.status === "pendente" ? "text-amber-600" : d.status === "aprovada" ? "text-emerald-600" : "text-blue-600")} />
+            <span className="text-sm font-semibold text-foreground truncate">
+              {d.status === "pendente" ? "Aguarda decisão" : d.status === "aprovada" ? "Aprovada — aguarda pagamento" : d.status === "paga" ? "Despesa paga" : "Rejeitada"}
+            </span>
+            <span className="text-[11px] text-muted-foreground hidden md:inline">Cada acção fica registada na cronologia</span>
+          </div>
+          <div className="flex items-center gap-1.5 flex-wrap justify-end">
+            {availableActions.map(a => (
+              <Button key={a.key} size="sm" variant={a.cls.includes("bg-") ? "default" : "outline"} className={cn("h-7 text-[11px] gap-1.5 transition-colors", a.cls)} onClick={() => { setPendingAction(a.key); setActionNote(""); }}>
+                <a.icon className="w-3.5 h-3.5" /> {a.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
 
       <Card className="overflow-hidden p-0 gap-0">
         {/* Breadcrumb */}
