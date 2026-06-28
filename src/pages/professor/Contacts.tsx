@@ -5,6 +5,7 @@ import { Mail, MessageSquare, User, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useMemo } from "react";
 import { useInstitutionContacts } from "@/hooks/useInstitutionContacts";
+import { ModuleTag } from "@/components/chat/ModuleTag";
 
 export default function ProfessorContacts() {
   const navigate = useNavigate();
