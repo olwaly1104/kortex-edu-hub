@@ -40,25 +40,29 @@ export default function ProfessorDashboard() {
             </h2>
           </div>
           <div className="divide-y divide-border">
-            <div className="flex items-center gap-4 px-4 py-3 bg-primary/5 transition-colors">
+            <div className="flex items-center gap-4 px-4 py-3 rounded-md bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/15 transition-colors">
               <div className="text-center shrink-0 w-12">
                 <p className="text-sm font-bold text-primary tabular-nums">10:00</p>
                 <p className="text-[10px] text-muted-foreground tabular-nums">12:00</p>
               </div>
-              <div className="w-0.5 h-10 rounded-full shrink-0 bg-primary" />
+              <div className="w-1 h-12 rounded-full shrink-0 bg-primary" />
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm leading-tight truncate text-primary">Teoria da Arquitectura I</p>
+                <p className="font-semibold text-sm leading-tight truncate text-foreground">Teoria da Arquitectura I</p>
                 <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                   <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />Sala A-204</span>
                   <span>ARQ • 1º Ano • T1</span>
                 </div>
               </div>
-              <Badge variant="outline" className="text-[9px] gap-1 font-medium shrink-0 border-primary/30 text-primary bg-primary/10">
-                <Clock className="w-2.5 h-2.5" /> A Decorrer
+              <Badge className="text-[10px] gap-1.5 font-medium shrink-0 bg-primary/15 text-primary border border-primary/25 hover:bg-primary/15">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" /> A Decorrer
               </Badge>
               <div className="shrink-0">
-                <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium">
-                  <LogIn className="w-3 h-3" /> Entrar na Aula
+                <Button
+                  size="sm"
+                  onClick={() => navigate("/professor/aula/aula-demo")}
+                  className="h-8 px-3 text-[11px] gap-1.5 font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm"
+                >
+                  <LogIn className="w-3.5 h-3.5" /> Entrar na Aula
                 </Button>
               </div>
             </div>
