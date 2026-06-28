@@ -290,9 +290,6 @@ export default function AulaControlo() {
                 <Play className="w-3.5 h-3.5 mr-1.5" /> Iniciar Agora
               </Button>
             )}
-            <Button size="sm" variant="outline" onClick={() => navigate("/professor")}>
-              <ArrowLeft className="w-3.5 h-3.5 mr-1.5" /> Sair da Aula
-            </Button>
             <Button size="sm" variant="destructive" onClick={() => setConfirmEnd(true)}>
               <LogOut className="w-3.5 h-3.5 mr-1.5" /> Terminar Aula
             </Button>
