@@ -113,52 +113,49 @@ export default function FinancasDespesaDetail() {
             <div className="pt-4 border-t border-border">
               <PersonBlock label="Responsável" name={d.responsavel} role={d.responsavelRole} />
             </div>
-            <div className="pt-4 border-t border-border">
-              <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-3">Detalhes</p>
+            <div className="pt-4 border-t border-border space-y-4">
+              <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Detalhes</p>
 
-              {/* Fornecedor card */}
-              <div className="rounded-lg border border-border bg-background p-3 mb-3">
-                <div className="flex items-start gap-2.5">
-                  <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0 ring-1 ring-primary/15">
-                    <Building2 className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Fornecedor</p>
-                    <p className="text-[13px] font-semibold text-foreground leading-snug mt-0.5 break-words">{d.fornecedor ?? "—"}</p>
-                    {d.nif && (
-                      <div className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-border bg-muted/40">
-                        <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground">NIF</span>
-                        <span className="text-[10.5px] font-mono font-semibold text-foreground tabular-nums">{d.nif}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              {/* Fornecedor */}
+              <CleanEntry icon={Building2} label="Fornecedor">
+                <p className="text-[13px] font-semibold text-foreground leading-snug break-words">{d.fornecedor ?? "—"}</p>
+                {d.nif && (
+                  <p className="text-[10.5px] font-mono text-muted-foreground tabular-nums mt-0.5">NIF {d.nif}</p>
+                )}
+              </CleanEntry>
 
-              {/* Método de pagamento — entrada limpa */}
-              <dl className="space-y-3 mb-4">
-                <DetailRow icon={Wallet} label="Método de Pagamento" value={d.metodoPagamento ?? "—"} />
-              </dl>
+              {/* Método de Pagamento */}
+              <CleanEntry icon={Wallet} label="Método de Pagamento">
+                <p className="text-[13px] font-medium text-foreground leading-snug break-words">{d.metodoPagamento ?? "—"}</p>
+              </CleanEntry>
 
-              {/* Documentos fiscais — em caixa, no fim */}
-              <div className="rounded-lg border border-border bg-background divide-y divide-border overflow-hidden">
-                <FiscalDocRow
-                  icon={Receipt}
-                  tone="amber"
-                  label="Factura"
-                  numero={d.facturaNum}
-                  date={d.facturaData}
-                  onView={() => setDocOpen(true)}
-                />
-                <FiscalDocRow
-                  icon={BadgeCheck}
-                  tone="emerald"
-                  label="Comprovativo"
-                  numero={d.comprovativoNum}
-                  date={d.comprovativoData}
-                  onView={() => setDocOpen(true)}
-                />
-              </div>
+              {/* Factura */}
+              <CleanEntry
+                icon={Receipt}
+                label="Factura"
+                action={d.facturaNum ? { label: "Ver", onClick: () => setDocOpen(true) } : undefined}
+              >
+                <p className="text-[12.5px] font-mono font-semibold text-foreground tabular-nums break-all leading-snug">
+                  {d.facturaNum ?? "Pendente"}
+                </p>
+                {d.facturaData && (
+                  <p className="text-[10.5px] text-muted-foreground tabular-nums mt-0.5">{prettyDate(d.facturaData)}</p>
+                )}
+              </CleanEntry>
+
+              {/* Comprovativo */}
+              <CleanEntry
+                icon={BadgeCheck}
+                label="Comprovativo"
+                action={d.comprovativoNum ? { label: "Ver", onClick: () => setDocOpen(true) } : undefined}
+              >
+                <p className="text-[12.5px] font-mono font-semibold text-foreground tabular-nums break-all leading-snug">
+                  {d.comprovativoNum ?? "Pendente"}
+                </p>
+                {d.comprovativoData && (
+                  <p className="text-[10.5px] text-muted-foreground tabular-nums mt-0.5">{prettyDate(d.comprovativoData)}</p>
+                )}
+              </CleanEntry>
             </div>
 
           </aside>
