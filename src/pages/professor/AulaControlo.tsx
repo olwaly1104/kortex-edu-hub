@@ -665,12 +665,14 @@ export default function AulaControlo() {
               <Button
                 size="sm"
                 onClick={() => {
-                  setQuizLancado((v) => !v);
-                  toast.success(quizLancado ? "Quiz encerrado" : "Quiz lançado aos estudantes");
+                  setQuizIdx(0);
+                  setQuizLancado(true);
+                  setQuizAberto(false);
+                  setQuizFullscreen(true);
+                  toast.success("Quiz iniciado");
                 }}
-                variant={quizLancado ? "outline" : "default"}
               >
-                {quizLancado ? <><X className="w-3.5 h-3.5 mr-1.5" /> Encerrar quiz</> : <><Send className="w-3.5 h-3.5 mr-1.5" /> Lançar quiz</>}
+                <Play className="w-3.5 h-3.5 mr-1.5" /> Iniciar quiz
               </Button>
             </div>
           </DialogHeader>
