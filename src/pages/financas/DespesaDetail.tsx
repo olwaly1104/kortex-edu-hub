@@ -14,6 +14,7 @@ import FinancasDespesaDocPreview from "./DespesaDocPreview";
 export default function FinancasDespesaDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [docOpen, setDocOpen] = useState(false);
   const d = findDespesa(id);
 
   if (!d) {
