@@ -287,6 +287,43 @@ export default function FinancasDespesaDetail() {
                   <p className="text-[13.5px] text-foreground/90 leading-[1.65] whitespace-pre-line">{d.justificacao}</p>
                 </div>
 
+                {requiredDocs.length > 0 && (
+                  <div className="px-4 py-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">
+                        Documentos Exigidos <span className="text-muted-foreground/70 normal-case tracking-normal tabular-nums">({d.category})</span>
+                      </p>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-[10px] font-semibold tabular-nums",
+                          docsOk === docsTotal
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : "bg-amber-50 text-amber-700 border-amber-200",
+                        )}
+                      >
+                        {docsOk}/{docsTotal}
+                      </Badge>
+                    </div>
+                    <ul className="space-y-1.5">
+                      {docsStatus.map((r, i) => (
+                        <li key={i} className="flex items-center gap-2 text-[12.5px]">
+                          <span className={cn(
+                            "w-4 h-4 rounded-full inline-flex items-center justify-center shrink-0",
+                            r.ok ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600",
+                          )}>
+                            {r.ok ? <Check className="w-2.5 h-2.5" strokeWidth={3.5} /> : <X className="w-2.5 h-2.5" strokeWidth={3.5} />}
+                          </span>
+                          <span className={cn("flex-1 truncate", r.ok ? "text-foreground" : "text-muted-foreground")}>{r.nome}</span>
+                          <span className={cn("text-[10px] font-semibold uppercase tracking-wider", r.ok ? "text-emerald-600" : "text-red-500")}>
+                            {r.ok ? "Carregado" : "Em falta"}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
                 <div className="px-4 py-3">
                   <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">
                     Anexos <span className="text-muted-foreground/70 normal-case tracking-normal tabular-nums">({d.anexos.length})</span>
