@@ -495,6 +495,25 @@ export default function AulaControlo() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Fullscreen viewer */}
+      <Dialog open={!!viewer} onOpenChange={(o) => !o && setViewer(null)}>
+        <DialogContent className="max-w-[95vw] w-[95vw] h-[92vh] p-0 gap-0 border-0 bg-black/95 [&>button]:hidden flex flex-col">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 shrink-0">
+            <p className="text-sm font-medium text-white truncate">{viewer?.nome}</p>
+            <Button size="icon" variant="ghost" className="h-8 w-8 text-white hover:bg-white/10 hover:text-white" onClick={() => setViewer(null)}>
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          <div className="flex-1 min-h-0 bg-black">
+            {viewer?.tipo === "video" ? (
+              <video src={viewer.src} controls autoPlay className="w-full h-full object-contain bg-black" />
+            ) : viewer ? (
+              <iframe src={viewer.src} title={viewer.nome} className="w-full h-full bg-white" />
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
