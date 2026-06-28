@@ -19,7 +19,37 @@ export default function FinancasDespesaDetail() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [docOpen, setDocOpen] = useState(false);
-  const d = findDespesa(id);
+  const base = findDespesa(id);
+  const [d, setD] = useState(base);
+  const [requiredDocs, setRequiredDocs] = useState<string[]>([]);
+  const [pendingAction, setPendingAction] = useState<null | "aprovada" | "rejeitada" | "paga" | "parecer" | "upload">(null);
+  const [actionNote, setActionNote] = useState("");
+
+  useEffect(() => { setD(base); }, [base]);
+
+  useEffect(() => {
+    if (!d?.category) return;
+    (async () => {
+      const { data } = await supabase
+        .from("fin_despesa_categorias")
+        .select("nome, documentos")
+        .eq("nome", d.category)
+        .maybeSingle();
+      setRequiredDocs(Array.isArray(data?.documentos) ? (data!.documentos as string[]) : []);
+    })();
+  }, [d?.category]);
+
+  const docsStatus = useMemo(() => {
+    const anexoNames = (d?.anexos ?? []).map(a => a.nome.toLowerCase());
+    return requiredDocs.map(req => ({
+      nome: req,
+      ok: anexoNames.some(n => n.includes(req.toLowerCase())) ||
+          (req.toLowerCase().includes("factura") && !!d?.facturaNum) ||
+          (req.toLowerCase().includes("comprov") && !!d?.comprovativoNum),
+    }));
+  }, [requiredDocs, d]);
+  const docsOk = docsStatus.filter(x => x.ok).length;
+  const docsTotal = requiredDocs.length;
 
   if (!d) {
     return (
@@ -32,6 +62,28 @@ export default function FinancasDespesaDetail() {
 
   const st = finStatusMetaDespesa[d.status];
   const dSub = new Date(d.date);
+
+  const appendHistorico = (h: DespesaHistorico, newStatus?: DespesaStatus) => {
+    setD(prev => prev ? { ...prev, historico: [...prev.historico, h], status: newStatus ?? prev.status } : prev);
+  };
+
+  const actionMeta: Record<NonNullable<typeof pendingAction>, { title: string; cta: string; tone: string; icon: any; placeholder: string; accao: string; newStatus?: DespesaStatus }> = {
+    aprovada:  { title: "Aprovar despesa", cta: "Aprovar", tone: "bg-emerald-600 hover:bg-emerald-700 text-white", icon: CheckCircle2, placeholder: "Parecer / Justificação", accao: "Despesa aprovada", newStatus: "aprovada" },
+    rejeitada: { title: "Rejeitar despesa", cta: "Rejeitar", tone: "bg-red-600 hover:bg-red-700 text-white", icon: XCircle, placeholder: "Motivo da rejeição", accao: "Despesa rejeitada", newStatus: "rejeitada" },
+    paga:      { title: "Marcar como paga", cta: "Confirmar pagamento", tone: "bg-blue-600 hover:bg-blue-700 text-white", icon: Banknote, placeholder: "Ref. pagamento, IBAN, observações…", accao: "Pagamento efectuado", newStatus: "paga" },
+    parecer:   { title: "Adicionar parecer", cta: "Registar parecer", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: MessageSquareText, placeholder: "Parecer / Notas internas", accao: "Parecer adicionado" },
+    upload:    { title: "Carregar anexo", cta: "Carregar", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: Upload, placeholder: "Descrição do anexo (ex: Factura definitiva)", accao: "Anexo carregado" },
+  };
+  const pm = pendingAction ? actionMeta[pendingAction] : null;
+
+  const confirmAction = () => {
+    if (!pendingAction || !pm) return;
+    const now = new Date().toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    appendHistorico({ data: now, accao: pm.accao, actor: "Você", nota: actionNote || undefined }, pm.newStatus);
+    toast({ title: pm.accao, description: actionNote || `${d.ref} actualizado.` });
+    setPendingAction(null);
+    setActionNote("");
+  };
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
