@@ -179,49 +179,49 @@ export default function AulaControlo() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      {/* HEADER — compact, board-readable */}
+    <div className="p-6 space-y-5 animate-fade-in">
+      {/* HEADER */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="flex items-start gap-3 min-w-0">
-          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0" onClick={() => navigate("/professor")}>
+        <div className="flex items-start gap-2 min-w-0">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => navigate("/professor")}>
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-2xl font-semibold text-foreground">{aula.titulo}</h1>
+              <h1 className="text-lg font-semibold text-foreground">{aula.titulo}</h1>
               {started ? (
-                <Badge className="bg-primary text-primary-foreground gap-1.5">
+                <Badge className="bg-primary text-primary-foreground gap-1.5 text-[11px]">
                   <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                   A Decorrer
                 </Badge>
               ) : (
-                <Badge variant="outline" className="gap-1.5">
+                <Badge variant="outline" className="gap-1.5 text-[11px]">
                   <AlarmClock className="w-3 h-3" /> Começa em {minutesToStart > 0 ? `${minutesToStart}m` : "breve"}
                 </Badge>
               )}
             </div>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1.5 flex-wrap">
+            <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1 flex-wrap">
               <span>{aula.curso} · {aula.ano} · {aula.turma}</span>
-              <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{aula.sala}</span>
-              <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" />{aula.inicio} – {aula.fim}</span>
-              <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5" />{aula.alunos.length} alunos</span>
+              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{aula.sala}</span>
+              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{aula.inicio} – {aula.fim}</span>
+              <span className="flex items-center gap-1"><Users className="w-3 h-3" />{aula.alunos.length} alunos</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {!started && (
-            <Button variant="outline" onClick={() => setStarted(true)}>
-              <Play className="w-4 h-4 mr-1.5" /> Iniciar Agora
+            <Button size="sm" variant="outline" onClick={() => setStarted(true)}>
+              <Play className="w-3.5 h-3.5 mr-1.5" /> Iniciar Agora
             </Button>
           )}
-          <Button variant="destructive" onClick={() => setConfirmEnd(true)}>
-            <LogOut className="w-4 h-4 mr-1.5" /> Terminar Aula
+          <Button size="sm" variant="destructive" onClick={() => setConfirmEnd(true)}>
+            <LogOut className="w-3.5 h-3.5 mr-1.5" /> Terminar Aula
           </Button>
         </div>
       </div>
 
       {/* MAIN GRID */}
-      <div className="grid lg:grid-cols-[320px_1fr] gap-6">
+      <div className="grid lg:grid-cols-[260px_1fr] gap-5">
         {/* LEFT RAIL — big timer + steps */}
         <div className="space-y-4">
           {/* Timer card — large, board-readable */}
