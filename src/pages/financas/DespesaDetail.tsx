@@ -124,7 +124,7 @@ export default function FinancasDespesaDetail() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Fornecedor</p>
-                    <p className="text-[13px] font-semibold text-foreground leading-tight mt-0.5 truncate">{d.fornecedor ?? "—"}</p>
+                    <p className="text-[13px] font-semibold text-foreground leading-snug mt-0.5 break-words">{d.fornecedor ?? "—"}</p>
                     {d.nif && (
                       <div className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-border bg-muted/40">
                         <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground">NIF</span>
@@ -329,28 +329,25 @@ function FiscalDocRow({
       : "bg-emerald-50 border-emerald-200 text-emerald-700";
   const hasDoc = Boolean(numero);
   return (
-    <div className="flex items-center gap-2.5 px-2.5 py-2">
-      <div className={cn("w-6 h-6 rounded-md border flex items-center justify-center shrink-0", toneCls)}>
-        <Icon className="w-3 h-3" />
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold leading-tight">{label}</p>
-        <div className="flex items-baseline gap-1.5 mt-0.5">
-          <span className="text-[11.5px] font-mono font-semibold text-foreground tabular-nums truncate">{numero ?? "—"}</span>
-          {date && <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">· {prettyDate(date)}</span>}
-          {!hasDoc && <span className="text-[10px] text-muted-foreground shrink-0">Pendente</span>}
+    <div className="px-3 py-2.5">
+      <div className="flex items-center gap-2 mb-1.5">
+        <div className={cn("w-5 h-5 rounded-md border flex items-center justify-center shrink-0", toneCls)}>
+          <Icon className="w-3 h-3" />
         </div>
+        <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold flex-1">{label}</p>
+        {hasDoc && (
+          <button
+            type="button"
+            onClick={onView}
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-border bg-background text-[10px] font-semibold text-foreground hover:bg-muted transition-colors shrink-0"
+            title={`Ver ${label}`}
+          >
+            <Eye className="w-3 h-3" /> Ver
+          </button>
+        )}
       </div>
-      {hasDoc && (
-        <button
-          type="button"
-          onClick={onView}
-          className="inline-flex items-center gap-1 px-1.5 py-1 rounded-md border border-border bg-background text-[10px] font-semibold text-foreground hover:bg-muted transition-colors shrink-0"
-          title={`Ver ${label}`}
-        >
-          <Eye className="w-3 h-3" /> Ver
-        </button>
-      )}
+      <p className="text-[12px] font-mono font-semibold text-foreground tabular-nums break-all leading-snug">{numero ?? "—"}</p>
+      <p className="text-[10px] text-muted-foreground tabular-nums mt-0.5">{date ? prettyDate(date) : "Pendente"}</p>
     </div>
   );
 }
@@ -367,12 +364,14 @@ function DetailRow({
   mono?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-2.5 px-2.5 py-2">
-      <div className="w-6 h-6 rounded-md bg-muted/60 text-muted-foreground flex items-center justify-center shrink-0">
-        <Icon className="w-3 h-3" />
+    <div className="px-3 py-2.5">
+      <div className="flex items-center gap-2 mb-1">
+        <div className="w-5 h-5 rounded-md bg-muted/60 text-muted-foreground flex items-center justify-center shrink-0">
+          <Icon className="w-3 h-3" />
+        </div>
+        <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">{label}</span>
       </div>
-      <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold w-[68px] shrink-0">{label}</span>
-      <span className={cn("text-[11.5px] font-medium text-foreground flex-1 truncate text-right", mono && "font-mono tabular-nums")}>{value}</span>
+      <p className={cn("text-[12px] font-medium text-foreground leading-snug break-words", mono && "font-mono tabular-nums break-all")}>{value}</p>
     </div>
   );
 }
