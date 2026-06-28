@@ -135,26 +135,24 @@ export default function FinancasDespesaDetail() {
                 </div>
               </div>
 
-              {/* Documentos fiscais */}
-              <div className="grid grid-cols-2 gap-2 mb-3">
-                <DocCard
+              {/* Documentos fiscais + Detail rows — unified vertical list */}
+              <dl className="rounded-lg border border-border bg-background divide-y divide-border overflow-hidden">
+                <FiscalDocRow
                   icon={Receipt}
                   tone="amber"
                   label="Factura"
                   numero={d.facturaNum}
                   date={d.facturaData}
+                  onView={() => setDocOpen(true)}
                 />
-                <DocCard
+                <FiscalDocRow
                   icon={BadgeCheck}
                   tone="emerald"
                   label="Comprovativo"
                   numero={d.comprovativoNum}
                   date={d.comprovativoData}
+                  onView={() => setDocOpen(true)}
                 />
-              </div>
-
-              {/* Detail rows */}
-              <dl className="rounded-lg border border-border bg-background divide-y divide-border overflow-hidden">
                 <DetailRow icon={Wallet}       label="Método"   value={d.metodoPagamento ?? "—"} />
                 {d.iban && <DetailRow icon={Landmark} label="IBAN" value={d.iban} mono />}
                 <DetailRow icon={Layers}       label="Rubrica"  value={d.rubricaOrcamental ?? "—"} />
