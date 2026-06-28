@@ -149,14 +149,10 @@ export default function FinancasDespesaDetail() {
               </div>
             </div>
 
-            {/* MIDDLE — Title + valor + badges */}
+            {/* MIDDLE — Title + badges + valor */}
             <div className="min-w-0 flex-1">
               <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">{d.description}</h1>
-              <p className="mt-1 text-[22px] leading-none font-bold text-red-600 tabular-nums tracking-tight">
-                −{formatCurrency(d.amount)}
-                <span className="ml-2 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-semibold align-middle">AOA</span>
-              </p>
-              <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+              <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
                 <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.cls)}>
                   <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />
                   {st.label}
@@ -177,6 +173,10 @@ export default function FinancasDespesaDetail() {
                   </Badge>
                 )}
               </div>
+              <p className="mt-2 text-[22px] leading-none font-bold text-red-600 tabular-nums tracking-tight">
+                −{formatCurrency(d.amount)}
+                <span className="ml-2 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-semibold align-middle">AOA</span>
+              </p>
             </div>
 
             {/* RIGHT — REF + Doc pill */}
