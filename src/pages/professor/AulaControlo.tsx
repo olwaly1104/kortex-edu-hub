@@ -418,6 +418,7 @@ export default function AulaControlo() {
                   { k: "slides" as Aba, label: "Slides", Icon: Presentation },
                   { k: "video" as Aba, label: "Vídeo", Icon: VideoIcon },
                   { k: "recursos" as Aba, label: "Recursos", Icon: FileText },
+                  { k: "quiz" as Aba, label: "Quiz", Icon: HelpCircle },
                 ]).map(({ k, label, Icon }) => (
                   <button
                     key={k}
@@ -440,8 +441,8 @@ export default function AulaControlo() {
                       <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Slide {slide.n} de {aula.slides.length}</p>
                       <p className="text-4xl font-semibold text-foreground mt-4 leading-tight">{slide.titulo}</p>
                     </div>
-                    <Button size="icon" variant="secondary" className="absolute top-4 right-4 h-9 w-9" onClick={() => toast.info("Modo apresentação em breve")}>
-                      <Maximize2 className="w-4 h-4" />
+                    <Button size="sm" variant="secondary" className="absolute top-4 right-4" onClick={() => setApresentacao(true)}>
+                      <Maximize2 className="w-3.5 h-3.5 mr-1.5" /> Modo Apresentação
                     </Button>
                   </div>
                   <div className="flex items-center justify-between px-5 py-4 border-t border-border">
