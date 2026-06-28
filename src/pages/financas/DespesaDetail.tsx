@@ -24,6 +24,7 @@ export default function FinancasDespesaDetail() {
   const [requiredDocs, setRequiredDocs] = useState<string[]>([]);
   const [pendingAction, setPendingAction] = useState<null | "aprovada" | "rejeitada" | "paga" | "parecer" | "upload">(null);
   const [actionNote, setActionNote] = useState("");
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, string>>({});
 
   useEffect(() => { setD(base); }, [base]);
 
