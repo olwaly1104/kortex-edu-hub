@@ -8,6 +8,7 @@ import { FinHeader } from "@/pages/financas/_FinHeader";
 
 export default function ProfessorDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const presencaPill = (
     <div className="inline-flex items-stretch rounded-md border border-border bg-card overflow-hidden text-[11px] uppercase tracking-wider font-medium shadow-sm">
