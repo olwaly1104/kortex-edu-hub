@@ -49,6 +49,7 @@ import ProfessorFinances from "./pages/professor/Finances";
 import ProfessorProfile from "./pages/professor/Profile";
 import ProfessorTurmaDetail from "./pages/professor/TurmaDetail";
 import ProfessorLessonDetailPage from "./pages/professor/LessonDetail";
+import ProfessorAulaControlo from "./pages/professor/AulaControlo";
 import ProfessorStudentProfile from "./pages/professor/StudentProfile";
 import CoordenadorDashboard from "./pages/coordenador/Dashboard";
 import CoordenadorSolicitacoes from "./pages/coordenador/Solicitacoes";
