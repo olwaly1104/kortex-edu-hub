@@ -154,13 +154,19 @@ export default function FinancasDespesaDetail() {
               </ol>
             </div>
           </div>
-
-          {/* Right — Doc preview */}
-          <div className="min-h-[680px]">
-            <FinancasDespesaDocPreview despesa={d} />
-          </div>
         </div>
       </Card>
+
+      <Dialog open={docOpen} onOpenChange={setDocOpen}>
+        <DialogContent className="max-w-5xl p-0 overflow-hidden max-h-[90vh]">
+          <DialogHeader className="px-4 py-3 border-b border-border">
+            <DialogTitle className="text-sm font-semibold">Documento · Despesa-{d.ref}</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[calc(90vh-3rem)] overflow-auto">
+            <FinancasDespesaDocPreview despesa={d} />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
