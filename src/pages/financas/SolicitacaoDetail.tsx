@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
@@ -17,15 +17,17 @@ import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose,
 } from "@/components/ui/dialog";
 import {
-  finSolicitacoes, finStatusMeta, finTypeMeta,
+  finStatusMeta, finTypeMeta, type FinSolicitacao,
 } from "@/data/financasSolicitacoesData";
+import { fetchFinSolicitacao } from "@/hooks/useFinSolicitacoes";
 import FinancasSolicitacaoDocPreview from "./SolicitacaoDocPreview";
 
 export default function FinancasSolicitacaoDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const baseSelected = finSolicitacoes.find(s => s.id === id);
+  const [baseSelected, setBaseSelected] = useState<FinSolicitacao | null>(null);
+  const [loading, setLoading] = useState(true);
   const [statusOverride, setStatusOverride] = useState<null | "em_execucao" | "executada" | "rejeitado">(null);
   const [pendingAction, setPendingAction] = useState<null | "em_execucao" | "executada" | "rejeitado">(null);
   const [actionNotes, setActionNotes] = useState("");
@@ -34,8 +36,15 @@ export default function FinancasSolicitacaoDetail() {
   const [maxStep, setMaxStep] = useState<0 | 1 | 2>(0);
   const [declarationChecked, setDeclarationChecked] = useState(false);
 
+  useEffect(() => {
+    if (!id) return;
+    setLoading(true);
+    fetchFinSolicitacao(id).then(r => { setBaseSelected(r); setLoading(false); });
+  }, [id]);
 
-
+  if (loading) {
+    return <div className="p-8 text-center text-sm text-muted-foreground">A carregar…</div>;
+  }
 
   if (!baseSelected) {
     return (

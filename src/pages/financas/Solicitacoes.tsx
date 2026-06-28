@@ -26,15 +26,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import {
-  finSolicitacoes, finTypeMeta, finStatusMeta,
-  type FinType, type FinStatus,
+  finTypeMeta, finStatusMeta,
+  type FinType, type FinStatus, type FinSolicitacao,
 } from "@/data/financasSolicitacoesData";
+import { useFinSolicitacoes, createFinSolicitacao } from "@/hooks/useFinSolicitacoes";
 
 type EstadoFilter = "todos" | "pendentes" | "atrasadas" | "em_execucao" | "executadas" | "rejeitadas";
 
 export default function FinancasSolicitacoes() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { items: finSolicitacoes, refresh } = useFinSolicitacoes();
   const [tab, setTab] = useState<"recebidas" | "enviadas">("recebidas");
   const [estado, setEstado] = useState<EstadoFilter>("todos");
   const [search, setSearch] = useState("");
@@ -160,10 +162,26 @@ export default function FinancasSolicitacoes() {
   const todayLabel = now.toLocaleDateString("pt-PT", { weekday: "long", day: "2-digit", month: "long", year: "numeric" });
   const ANO_LETIVO = "2024 / 2025";
 
-  const handleNewSubmit = () => {
+  const handleNewSubmit = async () => {
     if (!newType || !newTitle.trim() || !newDesc.trim()) return;
-    toast({ title: "Solicitação submetida", description: `${previewRef} · enviada para ${ROUTING[newType].destinatario}.` });
-    setShowNewDialog(false);
+    try {
+      const created = await createFinSolicitacao({
+        type: newType,
+        title: newTitle.trim(),
+        description: newDesc.trim(),
+        destinatario: ROUTING[newType].destinatario,
+        responsavel: ROUTING[newType].responsavel,
+        valor: newValor ? Number(newValor) : null,
+        prazoDe: newPrazoDe ? newPrazoDe.toISOString().slice(0, 10) : null,
+        prazoAte: newPrazoAte ? newPrazoAte.toISOString().slice(0, 10) : null,
+        anexos: newFiles.map(f => ({ nome: f.name, tamanho: f.size, tipo: "pdf" })),
+      });
+      toast({ title: "Solicitação submetida", description: `${created.ref} · enviada para ${ROUTING[newType].destinatario}.` });
+      setShowNewDialog(false);
+      await refresh();
+    } catch (e: any) {
+      toast({ title: "Erro ao submeter", description: e?.message ?? "Tente novamente.", variant: "destructive" });
+    }
   };
 
   const StatCell = ({ icon: Icon, label, value, tone }:{
