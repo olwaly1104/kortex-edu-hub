@@ -58,13 +58,13 @@ const MOCK_LESSON = {
     { n: 6, titulo: "Discussão & síntese" },
   ],
   recursos: [
-    { id: "r1", nome: "Capítulo 1 — Manual.pdf", tipo: "PDF" },
-    { id: "r2", nome: "Cronologia da arquitectura.pdf", tipo: "PDF" },
+    { id: "r1", nome: "Capítulo 1 — Manual.pdf", tipo: "PDF", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+    { id: "r2", nome: "Cronologia da arquitectura.pdf", tipo: "PDF", url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
   ],
-  video: {
-    titulo: "Vídeo introdutório · 4 min",
-    src: "https://www.w3schools.com/html/mov_bbb.mp4",
-  },
+  videos: [
+    { id: "v1", nome: "Vídeo introdutório", duracao: "4 min", src: "https://www.w3schools.com/html/mov_bbb.mp4" },
+    { id: "v2", nome: "Estudo de caso · Vitruvius", duracao: "6 min", src: "https://www.w3schools.com/html/mov_bbb.mp4" },
+  ],
   alunos: Array.from({ length: 24 }).map((_, i) => ({
     id: `est-${i + 1}`,
     nome: [
