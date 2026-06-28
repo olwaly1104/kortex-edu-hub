@@ -26,9 +26,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 import {
-  finSolicitacoes, finTypeMeta, finStatusMeta,
-  type FinType, type FinStatus,
+  finTypeMeta, finStatusMeta,
+  type FinType, type FinStatus, type FinSolicitacao,
 } from "@/data/financasSolicitacoesData";
+import { useFinSolicitacoes, createFinSolicitacao } from "@/hooks/useFinSolicitacoes";
 
 type EstadoFilter = "todos" | "pendentes" | "atrasadas" | "em_execucao" | "executadas" | "rejeitadas";
 
