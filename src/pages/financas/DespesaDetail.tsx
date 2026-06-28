@@ -136,11 +136,9 @@ export default function FinancasDespesaDetail() {
 
               {/* Documentos */}
               {(d.facturaNum || d.comprovativoNum) && (
-                <div className="rounded-lg border border-border/70 bg-background overflow-hidden">
-                  <div className="px-3 py-1.5 border-b border-border/70 bg-muted/30">
-                    <p className="text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Documentos</p>
-                  </div>
-                  <div className="divide-y divide-border/70">
+                <div className="space-y-1.5">
+                  <p className="text-[9.5px] uppercase tracking-[0.16em] text-muted-foreground/70 font-semibold">Documentos</p>
+                  <div className="rounded-lg border border-border/70 bg-background overflow-hidden divide-y divide-border/70">
                     {d.facturaNum && (
                       <FiscalLine label="Factura" numero={d.facturaNum} date={d.facturaData} onView={() => setDocOpen(true)} />
                     )}
