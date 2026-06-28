@@ -33,7 +33,12 @@ export interface FinDespesa {
   fornecedor?: string;
   nif?: string;
   metodoPagamento?: string;
+  iban?: string;
   rubricaOrcamental?: string;
+  facturaNum?: string;
+  facturaData?: string;
+  comprovativoNum?: string;
+  comprovativoData?: string;
   anexos: DespesaAnexo[];
   historico: DespesaHistorico[];
 }
@@ -66,7 +71,12 @@ export const finDespesas: FinDespesa[] = [
     fornecedor: "Papelaria Académica Lda.",
     nif: "5417889003",
     metodoPagamento: "Transferência bancária",
+    iban: "AO06 0040 0000 5417 8890 0399 5",
     rubricaOrcamental: "02.01 — Material Pedagógico",
+    facturaNum: "FT 2025/00184",
+    facturaData: "2025-06-17",
+    comprovativoNum: "TRX-44821",
+    comprovativoData: "2025-06-19",
     justificacao:
       "Reposição de material para as aulas práticas do 2.º semestre — papel cavalinho A2, escalímetros, esquadros e tinta acrílica para maquetes. Pedido validado pelo Coordenador de Curso conforme orçamento aprovado para o ano lectivo 2024/2025.",
     anexos: [

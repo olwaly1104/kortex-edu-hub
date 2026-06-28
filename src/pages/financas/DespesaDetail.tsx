@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, FileText, Clock, Paperclip, FileImage, FileSpreadsheet, Eye, Download, Check, X, Hourglass, MessageSquare, Mail, Phone } from "lucide-react";
+import { ArrowLeft, FileText, Clock, Paperclip, FileImage, FileSpreadsheet, Eye, Download, Check, X, Hourglass, MessageSquare, Mail, Phone, Building2, Receipt, BadgeCheck, Wallet, Landmark, Layers, CalendarDays, CalendarClock } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -114,16 +114,55 @@ export default function FinancasDespesaDetail() {
               <PersonBlock label="Responsável" name={d.responsavel} role={d.responsavelRole} />
             </div>
             <div className="pt-4 border-t border-border">
-              <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Detalhes</p>
-              <dl className="space-y-1.5 text-xs">
-                <MetaRow k="Fornecedor"       v={d.fornecedor ?? "—"} />
-                <MetaRow k="NIF"              v={d.nif ?? "—"} />
-                <MetaRow k="Método pagamento" v={d.metodoPagamento ?? "—"} />
-                <MetaRow k="Rubrica"          v={d.rubricaOrcamental ?? "—"} />
-                <MetaRow k="Submetido em"     v={prettyDate(d.date)} />
-                <MetaRow k="Prazo"            v={prettyDate(d.dueDate)} />
+              <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-3">Detalhes</p>
+
+              {/* Fornecedor card */}
+              <div className="rounded-lg border border-border bg-background p-3 mb-3">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center shrink-0 ring-1 ring-primary/15">
+                    <Building2 className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Fornecedor</p>
+                    <p className="text-[13px] font-semibold text-foreground leading-tight mt-0.5 truncate">{d.fornecedor ?? "—"}</p>
+                    {d.nif && (
+                      <div className="mt-1.5 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-border bg-muted/40">
+                        <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground">NIF</span>
+                        <span className="text-[10.5px] font-mono font-semibold text-foreground tabular-nums">{d.nif}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Documentos fiscais */}
+              <div className="grid grid-cols-2 gap-2 mb-3">
+                <DocCard
+                  icon={Receipt}
+                  tone="amber"
+                  label="Factura"
+                  ref={d.facturaNum}
+                  date={d.facturaData}
+                />
+                <DocCard
+                  icon={BadgeCheck}
+                  tone="emerald"
+                  label="Comprovativo"
+                  ref={d.comprovativoNum}
+                  date={d.comprovativoData}
+                />
+              </div>
+
+              {/* Detail rows */}
+              <dl className="rounded-lg border border-border bg-background divide-y divide-border overflow-hidden">
+                <DetailRow icon={Wallet}       label="Método"   value={d.metodoPagamento ?? "—"} />
+                {d.iban && <DetailRow icon={Landmark} label="IBAN" value={d.iban} mono />}
+                <DetailRow icon={Layers}       label="Rubrica"  value={d.rubricaOrcamental ?? "—"} />
+                <DetailRow icon={CalendarDays} label="Submetido" value={prettyDate(d.date)} />
+                <DetailRow icon={CalendarClock} label="Prazo"   value={prettyDate(d.dueDate)} />
               </dl>
             </div>
+
           </aside>
 
 
@@ -236,6 +275,59 @@ function PersonBlock({ label, name, role }: { label: string; name: string; role?
         <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1"><Mail className="w-3 h-3" /> Email</Button>
         <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1"><Phone className="w-3 h-3" /> Ligar</Button>
       </div>
+    </div>
+  );
+}
+
+function DocCard({
+  icon: Icon,
+  tone,
+  label,
+  ref,
+  date,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  tone: "amber" | "emerald";
+  label: string;
+  ref?: string;
+  date?: string;
+}) {
+  const toneCls =
+    tone === "amber"
+      ? "bg-amber-50 border-amber-200 text-amber-700"
+      : "bg-emerald-50 border-emerald-200 text-emerald-700";
+  return (
+    <div className="rounded-lg border border-border bg-background p-2.5">
+      <div className="flex items-center gap-2">
+        <div className={cn("w-7 h-7 rounded-md border flex items-center justify-center shrink-0", toneCls)}>
+          <Icon className="w-3.5 h-3.5" />
+        </div>
+        <p className="text-[9px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">{label}</p>
+      </div>
+      <p className="text-[11.5px] font-mono font-semibold text-foreground tabular-nums mt-1.5 truncate">{ref ?? "—"}</p>
+      <p className="text-[10px] text-muted-foreground tabular-nums mt-0.5">{date ? prettyDate(date) : "Pendente"}</p>
+    </div>
+  );
+}
+
+function DetailRow({
+  icon: Icon,
+  label,
+  value,
+  mono,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-2.5 px-2.5 py-2">
+      <div className="w-6 h-6 rounded-md bg-muted/60 text-muted-foreground flex items-center justify-center shrink-0">
+        <Icon className="w-3 h-3" />
+      </div>
+      <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold w-[68px] shrink-0">{label}</span>
+      <span className={cn("text-[11.5px] font-medium text-foreground flex-1 truncate text-right", mono && "font-mono tabular-nums")}>{value}</span>
     </div>
   );
 }
