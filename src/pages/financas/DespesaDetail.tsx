@@ -169,20 +169,39 @@ export default function FinancasDespesaDetail() {
 
             <div className="min-w-0 flex-1">
               <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">{d.description}</h1>
-              <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+              <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
                 <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.cls)}>
                   <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />
                   {st.label}
                 </Badge>
                 <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">{d.category}</Badge>
-              </div>
-              <div className="mt-2 text-2xl font-bold text-red-600 tabular-nums tracking-tight">
-                -{formatCurrency(d.amount)}
+                {docsTotal > 0 && (
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1",
+                      docsOk === docsTotal
+                        ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                        : "bg-amber-50 text-amber-700 border-amber-200",
+                    )}
+                  >
+                    <Paperclip className="w-2.5 h-2.5" />
+                    {docsOk}/{docsTotal} documentos
+                  </Badge>
+                )}
               </div>
             </div>
 
-            {/* Right — REF + Doc pill */}
-            <div className="shrink-0 flex flex-col items-end gap-1.5">
+            {/* Right — Valor + REF + Doc pill */}
+            <div className="shrink-0 flex flex-col items-end gap-2">
+              <div className="rounded-lg border border-border bg-gradient-to-br from-red-50 to-background px-3.5 py-2 text-right shadow-sm">
+                <p className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-semibold">Valor da Despesa</p>
+                <p className="text-[26px] leading-none font-bold text-red-600 tabular-nums tracking-tight mt-1">
+                  −{formatCurrency(d.amount)}
+                </p>
+                <p className="text-[10px] text-muted-foreground tabular-nums mt-1">AOA · {d.metodoPagamento ?? "—"}</p>
+              </div>
+
               <div className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background text-[11px] font-mono font-semibold text-foreground">
                 {d.ref}
               </div>
@@ -205,6 +224,7 @@ export default function FinancasDespesaDetail() {
             </div>
           </div>
         </div>
+
 
         {/* 2-column body: Identificação left · resto right */}
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
