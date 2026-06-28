@@ -62,6 +62,36 @@ const MOCK_LESSON = {
     { id: "v1", nome: "Vídeo introdutório", duracao: "4 min", src: "https://www.w3schools.com/html/mov_bbb.mp4" },
     { id: "v2", nome: "Estudo de caso · Vitruvius", duracao: "6 min", src: "https://www.w3schools.com/html/mov_bbb.mp4" },
   ],
+  quiz: {
+    id: "qz-aula-demo",
+    titulo: "Quiz · Fundamentos de Vitruvius",
+    duracao: 8,
+    questoes: [
+      {
+        id: "q1",
+        enunciado: "Quais são os três princípios de Vitruvius?",
+        opcoes: [
+          "Forma, Função, Ornamento",
+          "Firmitas, Utilitas, Venustas",
+          "Estrutura, Espaço, Luz",
+          "Cidade, Edifício, Detalhe",
+        ],
+        correta: 1,
+      },
+      {
+        id: "q2",
+        enunciado: "Em que tratado Vitruvius desenvolve esses princípios?",
+        opcoes: ["De Architectura", "Os Quatro Livros", "Vers une Architecture", "Complexidade e Contradição"],
+        correta: 0,
+      },
+      {
+        id: "q3",
+        enunciado: "Venustas corresponde a:",
+        opcoes: ["Solidez", "Utilidade", "Beleza", "Proporção"],
+        correta: 2,
+      },
+    ],
+  },
   alunos: Array.from({ length: 24 }).map((_, i) => ({
     id: `est-${i + 1}`,
     nome: [
@@ -76,7 +106,7 @@ const MOCK_LESSON = {
 
 type Presenca = "presente" | "atraso" | "falta" | null;
 type Passo = 1 | 2 | 3;
-type Aba = "slides" | "video" | "recursos";
+type Aba = "slides" | "video" | "recursos" | "quiz";
 
 function toMinutes(hhmm: string) {
   const [h, m] = hhmm.split(":").map(Number);
