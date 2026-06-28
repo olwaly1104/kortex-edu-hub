@@ -161,9 +161,13 @@ export default function AulaControlo() {
 
   const [confirmEnd, setConfirmEnd] = useState(false);
 
+  const [chamadaFullscreen, setChamadaFullscreen] = useState(false);
+
+  const conteudoHint = `${slideIdx + 1}/${aula.slides.length} slides · ${aula.videos.length} vídeos · ${aula.recursos.length} recursos`;
+
   const steps = [
     { n: 1 as Passo, label: "Chamada", icon: UserCheck, hint: `${counts.presente + counts.atraso}/${aula.alunos.length} presentes`, done: chamadaConfirmada, lock: false },
-    { n: 2 as Passo, label: "Conteúdo", icon: Presentation, hint: `Slide ${slideIdx + 1}/${aula.slides.length}`, done: false, lock: !chamadaConfirmada },
+    { n: 2 as Passo, label: "Conteúdo", icon: Presentation, hint: conteudoHint, done: false, lock: !chamadaConfirmada },
     { n: 3 as Passo, label: "Encerramento", icon: CheckCircle2, hint: "Resumo & sair", done: false, lock: !chamadaConfirmada },
   ];
 
