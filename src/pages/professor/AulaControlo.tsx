@@ -527,6 +527,7 @@ export default function AulaControlo() {
           </div>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }
