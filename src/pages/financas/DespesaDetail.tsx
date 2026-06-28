@@ -72,7 +72,7 @@ export default function FinancasDespesaDetail() {
     rejeitada: { title: "Confirmar rejeição", cta: "Confirmar rejeição", tone: "bg-red-600 hover:bg-red-700 text-white", icon: XCircle, placeholder: "Motivo da rejeição", accao: "Despesa rejeitada", newStatus: "rejeitada" },
     paga:      { title: "Confirmar pagamento", cta: "Confirmar pagamento", tone: "bg-blue-600 hover:bg-blue-700 text-white", icon: Banknote, placeholder: "Ref. pagamento, IBAN, observações…", accao: "Pagamento efectuado", newStatus: "paga" },
     parecer:   { title: "Adicionar parecer", cta: "Registar parecer", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: MessageSquareText, placeholder: "Parecer / Notas internas", accao: "Parecer adicionado" },
-    upload:    { title: "Carregar anexo", cta: "Adicionar anexo", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: FileUp, placeholder: "Descrição do anexo", accao: "Anexo carregado" },
+    upload:    { title: "Carregar anexo", cta: "Adicionar anexo", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: Upload, placeholder: "Descrição do anexo", accao: "Anexo carregado" },
   };
 
   const pm = pendingAction ? actionMeta[pendingAction] : null;
