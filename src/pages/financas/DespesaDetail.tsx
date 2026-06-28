@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, FileText, Clock, Paperclip, FileImage, FileSpreadsheet, Eye, Download, Check, X, Hourglass } from "lucide-react";
+import { ArrowLeft, FileText, Clock, Paperclip, FileImage, FileSpreadsheet, Eye, Download, Check, X, Hourglass, MessageSquare, Mail, Phone } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -107,26 +107,14 @@ export default function FinancasDespesaDetail() {
 
         {/* 2-column body: Identificação left · resto right */}
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
-          {/* LEFT — Identificação */}
-          <aside className="p-5 bg-muted/15 space-y-5">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Requerente</p>
-              <dl className="space-y-1.5 text-xs">
-                <MetaRow k="Nome"   v={d.requestedBy} />
-                <MetaRow k="Função" v={d.requesterRole ?? "—"} />
-              </dl>
+          {/* LEFT — Requerente · Responsável · Detalhes */}
+          <aside className="p-5 space-y-5 bg-muted/15">
+            <PersonBlock label="Requerente" name={d.requestedBy} role={d.requesterRole} />
+            <div className="pt-4 border-t border-border">
+              <PersonBlock label="Responsável" name={d.responsavel} role={d.responsavelRole} />
             </div>
-            <div className="border-t border-border" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Responsável</p>
-              <dl className="space-y-1.5 text-xs">
-                <MetaRow k="Nome"   v={d.responsavel} />
-                <MetaRow k="Função" v={d.responsavelRole ?? "—"} />
-              </dl>
-            </div>
-            <div className="border-t border-border" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Detalhes</p>
+            <div className="pt-4 border-t border-border">
+              <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Detalhes</p>
               <dl className="space-y-1.5 text-xs">
                 <MetaRow k="Fornecedor"       v={d.fornecedor ?? "—"} />
                 <MetaRow k="NIF"              v={d.nif ?? "—"} />
@@ -137,6 +125,7 @@ export default function FinancasDespesaDetail() {
               </dl>
             </div>
           </aside>
+
 
           {/* RIGHT — Justificação, Anexos, Cronologia */}
           <div className="p-6 space-y-6 min-w-0">
@@ -224,6 +213,29 @@ function MetaRow({ k, v }: { k: string; v: string }) {
     <div className="flex items-baseline gap-2">
       <dt className="text-muted-foreground w-[120px] shrink-0">{k}</dt>
       <dd className="font-medium text-foreground flex-1 truncate">{v}</dd>
+    </div>
+  );
+}
+
+function PersonBlock({ label, name, role }: { label: string; name: string; role?: string }) {
+  const initials = name.split(" ").filter(Boolean).slice(0, 2).map(n => n[0]).join("").toUpperCase();
+  return (
+    <div>
+      <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">{label}</p>
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-semibold text-xs ring-1 ring-primary/15">
+          {initials}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-foreground leading-tight">{name}</p>
+          {role && <p className="text-[11px] text-muted-foreground mt-0.5">{role}</p>}
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-2 mt-3">
+        <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1"><MessageSquare className="w-3 h-3" /> Chat</Button>
+        <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1"><Mail className="w-3 h-3" /> Email</Button>
+        <Button variant="outline" size="sm" className="h-7 px-1 text-[11px] gap-1"><Phone className="w-3 h-3" /> Ligar</Button>
+      </div>
     </div>
   );
 }
