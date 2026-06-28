@@ -132,28 +132,36 @@ export default function FinancasDespesaDetail() {
 
         <div className="px-6 pt-4 pb-4">
           <div className="flex items-start gap-4 rounded-lg border border-border bg-background p-3">
-            {/* LEFT — Valor da Despesa */}
-            <div className="shrink-0 rounded-lg border border-red-200/70 bg-gradient-to-br from-red-50 to-background px-4 py-2.5 shadow-sm min-w-[180px]">
-              <p className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-semibold">Valor da Despesa</p>
-              <p className="text-[28px] leading-none font-bold text-red-600 tabular-nums tracking-tight mt-1.5">
-                −{formatCurrency(d.amount)}
-              </p>
-              <p className="text-[10px] text-muted-foreground tabular-nums mt-1.5">AOA · {d.metodoPagamento ?? "—"}</p>
+            {/* LEFT — Date block */}
+            <div className="shrink-0 w-[60px] rounded-md border border-border overflow-hidden bg-background text-center">
+              <div className="bg-primary/90 py-0.5">
+                <p className="text-[9px] uppercase tracking-[0.15em] text-primary-foreground font-bold">
+                  {dSub.toLocaleDateString("pt-PT", { month: "short" }).replace(".", "")}
+                </p>
+              </div>
+              <div className="py-1">
+                <p className="text-[24px] leading-none font-bold text-foreground tabular-nums tracking-tight">
+                  {String(dSub.getDate()).padStart(2, "0")}
+                </p>
+                <p className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-semibold mt-0.5">
+                  {dSub.getFullYear()}
+                </p>
+              </div>
             </div>
 
-            {/* MIDDLE — Title + badges */}
+            {/* MIDDLE — Title + valor + badges */}
             <div className="min-w-0 flex-1">
               <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">{d.description}</h1>
-              <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+              <p className="mt-1 text-[22px] leading-none font-bold text-red-600 tabular-nums tracking-tight">
+                −{formatCurrency(d.amount)}
+                <span className="ml-2 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-semibold align-middle">AOA</span>
+              </p>
+              <div className="mt-2 flex items-center gap-1.5 flex-wrap">
                 <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", st.cls)}>
                   <span className={cn("w-1.5 h-1.5 rounded-full", st.dot)} />
                   {st.label}
                 </Badge>
                 <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">{d.category}</Badge>
-                <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1">
-                  <CalendarDays className="w-2.5 h-2.5" />
-                  {prettyDate(d.date)}
-                </Badge>
                 {docsTotal > 0 && (
                   <Badge
                     variant="outline"
