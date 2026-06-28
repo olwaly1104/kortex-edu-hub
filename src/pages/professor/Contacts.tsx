@@ -5,6 +5,7 @@ import { Mail, MessageSquare, User, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useMemo } from "react";
 import { useInstitutionContacts } from "@/hooks/useInstitutionContacts";
+import { ModuleTag } from "@/components/chat/ModuleTag";
 
 export default function ProfessorContacts() {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ export default function ProfessorContacts() {
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-foreground text-sm truncate">{c.display_name}</p>
                 <p className="text-xs text-muted-foreground truncate">{c.email ?? "—"}</p>
-                {c.modulo && <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">{c.modulo}</p>}
+                {c.modulo && <div className="mt-1"><ModuleTag modulo={c.modulo} /></div>}
               </div>
               <div className="flex gap-1.5 shrink-0">
                 {c.email && (
