@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, FileText, CheckCircle2, Clock, XCircle, Paperclip, FileImage, FileSpreadsheet } from "lucide-react";
+import { ArrowLeft, FileText, CheckCircle2, Clock, XCircle, Paperclip, FileImage, FileSpreadsheet, Eye } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import EmptyState from "@/components/EmptyState";
 import { findDespesa, finStatusMetaDespesa, prettyDate, type DespesaAnexo } from "@/data/financasDespesasData";
