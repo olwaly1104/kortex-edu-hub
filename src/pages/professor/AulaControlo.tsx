@@ -148,27 +148,19 @@ export default function AulaControlo() {
   const [slideIdx, setSlideIdx] = useState(0);
   const slide = aula.slides[slideIdx];
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [playing, setPlaying] = useState(false);
-  const togglePlay = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (v.paused) { v.play(); setPlaying(true); }
-    else { v.pause(); setPlaying(false); }
-  };
+  const [viewer, setViewer] = useState<{ tipo: "video" | "doc"; nome: string; src: string } | null>(null);
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if (passo !== 2) return;
+      if (passo !== 2 || viewer) return;
       if (aba === "slides") {
         if (e.key === "ArrowRight") setSlideIdx((i) => Math.min(i + 1, aula.slides.length - 1));
         if (e.key === "ArrowLeft") setSlideIdx((i) => Math.max(i - 1, 0));
       }
-      if (aba === "video" && e.key.toLowerCase() === "p") togglePlay();
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [passo, aba, aula.slides.length]);
+  }, [passo, aba, aula.slides.length, viewer]);
 
   const [confirmEnd, setConfirmEnd] = useState(false);
 
