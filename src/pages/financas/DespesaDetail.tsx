@@ -349,24 +349,35 @@ function FiscalDocRow({
   );
 }
 
-function DetailRow({
+function CleanEntry({
   icon: Icon,
   label,
-  value,
-  mono,
+  action,
+  children,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
-  value: string;
-  mono?: boolean;
+  action?: { label: string; onClick: () => void };
+  children: React.ReactNode;
 }) {
   return (
     <div>
-      <div className="flex items-center gap-1.5 mb-0.5">
-        <Icon className="w-3 h-3 text-muted-foreground" />
-        <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">{label}</span>
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <div className="flex items-center gap-1.5">
+          <Icon className="w-3 h-3 text-muted-foreground" />
+          <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">{label}</span>
+        </div>
+        {action && (
+          <button
+            type="button"
+            onClick={action.onClick}
+            className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary hover:underline shrink-0"
+          >
+            <Eye className="w-3 h-3" /> {action.label}
+          </button>
+        )}
       </div>
-      <p className={cn("text-[12px] font-medium text-foreground leading-snug break-words pl-[18px]", mono && "font-mono tabular-nums break-all")}>{value}</p>
+      <div className="pl-[18px]">{children}</div>
     </div>
   );
 }
