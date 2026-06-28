@@ -85,31 +85,13 @@ export default function FinancasDespesaDetail() {
     setActionNote("");
   };
 
-  // Available actions per status (linked to chronologia)
-  const availableActions: { key: NonNullable<typeof pendingAction>; label: string; icon: any; cls: string }[] = [];
-  if (d.status === "pendente") {
-    availableActions.push(
-      { key: "aprovada",  label: "Aprovar",        icon: CheckCircle2,    cls: "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent" },
-      { key: "rejeitada", label: "Rejeitar",       icon: XCircle,         cls: "border-red-200 text-red-600 hover:bg-red-50" },
-      { key: "parecer",   label: "Dar parecer",    icon: MessageSquareText, cls: "" },
-      { key: "upload",    label: "Carregar anexo", icon: Upload,          cls: "" },
-    );
-  } else if (d.status === "aprovada") {
-    availableActions.push(
-      { key: "paga",      label: "Marcar como paga",        icon: Banknote,         cls: "bg-blue-600 hover:bg-blue-700 text-white border-transparent" },
-      { key: "upload",    label: "Carregar comprovativo",   icon: Upload,           cls: "" },
-      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
-    );
-  } else if (d.status === "paga") {
-    availableActions.push(
-      { key: "upload",    label: "Carregar anexo",          icon: Upload,           cls: "" },
-      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
-    );
-  } else if (d.status === "rejeitada") {
-    availableActions.push(
-      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
-    );
-  }
+  // Single contextual action per status (linked to cronologia)
+  const primaryAction: { key: NonNullable<typeof pendingAction>; label: string; icon: any; cls: string } | null =
+    d.status === "pendente"
+      ? { key: "aprovada", label: "Aprovar despesa", icon: CheckCircle2, cls: "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent" }
+      : d.status === "aprovada"
+      ? { key: "paga", label: "Marcar como paga", icon: Banknote, cls: "bg-blue-600 hover:bg-blue-700 text-white border-transparent" }
+      : null;
 
   return (
     <div className="p-6 lg:p-8 space-y-4 animate-fade-in">
@@ -118,22 +100,22 @@ export default function FinancasDespesaDetail() {
       </Link>
 
       {/* Action bar — outside the card, above the title, linked to cronologia */}
-      {availableActions.length > 0 && (
+      {primaryAction && (
         <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background px-4 py-2.5 shadow-sm">
           <div className="flex items-center gap-2.5 min-w-0">
-            <Hourglass className={cn("w-4 h-4 shrink-0", d.status === "pendente" ? "text-amber-600" : d.status === "aprovada" ? "text-emerald-600" : "text-blue-600")} />
+            <Hourglass className={cn("w-4 h-4 shrink-0", d.status === "pendente" ? "text-amber-600" : "text-emerald-600")} />
             <span className="text-sm font-semibold text-foreground truncate">
-              {d.status === "pendente" ? "Aguarda decisão" : d.status === "aprovada" ? "Aprovada — aguarda pagamento" : d.status === "paga" ? "Despesa paga" : "Rejeitada"}
+              {d.status === "pendente" ? "Aguarda decisão" : "Aprovada — aguarda pagamento"}
             </span>
-            <span className="text-[11px] text-muted-foreground hidden md:inline">Cada acção fica registada na cronologia</span>
+            <span className="text-[11px] text-muted-foreground hidden md:inline">Esta acção fica registada na cronologia</span>
           </div>
-          <div className="flex items-center gap-1.5 flex-wrap justify-end">
-            {availableActions.map(a => (
-              <Button key={a.key} size="sm" variant={a.cls.includes("bg-") ? "default" : "outline"} className={cn("h-7 text-[11px] gap-1.5 transition-colors", a.cls)} onClick={() => { setPendingAction(a.key); setActionNote(""); }}>
-                <a.icon className="w-3.5 h-3.5" /> {a.label}
-              </Button>
-            ))}
-          </div>
+          <Button
+            size="sm"
+            className={cn("h-8 text-[12px] gap-1.5", primaryAction.cls)}
+            onClick={() => { setPendingAction(primaryAction.key); setActionNote(""); }}
+          >
+            <primaryAction.icon className="w-3.5 h-3.5" /> {primaryAction.label}
+          </Button>
         </div>
       )}
 
@@ -148,25 +130,18 @@ export default function FinancasDespesaDetail() {
           <span className="font-mono text-foreground normal-case tracking-normal">{d.ref}</span>
         </div>
 
-        {/* Title block */}
         <div className="px-6 pt-4 pb-4">
-          <div className="flex items-start gap-3 rounded-lg border border-border bg-background p-3">
-            <div className="shrink-0 w-[60px] rounded-md border border-border overflow-hidden bg-background text-center">
-              <div className="bg-primary/90 py-0.5">
-                <p className="text-[9px] uppercase tracking-[0.15em] text-primary-foreground font-bold">
-                  {dSub.toLocaleDateString("pt-PT", { month: "short" }).replace(".", "")}
-                </p>
-              </div>
-              <div className="py-1">
-                <p className="text-[24px] leading-none font-bold text-foreground tabular-nums tracking-tight">
-                  {String(dSub.getDate()).padStart(2, "0")}
-                </p>
-                <p className="text-[8.5px] uppercase tracking-wider text-muted-foreground font-semibold mt-0.5">
-                  {dSub.getFullYear()}
-                </p>
-              </div>
+          <div className="flex items-start gap-4 rounded-lg border border-border bg-background p-3">
+            {/* LEFT — Valor da Despesa */}
+            <div className="shrink-0 rounded-lg border border-red-200/70 bg-gradient-to-br from-red-50 to-background px-4 py-2.5 shadow-sm min-w-[180px]">
+              <p className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-semibold">Valor da Despesa</p>
+              <p className="text-[28px] leading-none font-bold text-red-600 tabular-nums tracking-tight mt-1.5">
+                −{formatCurrency(d.amount)}
+              </p>
+              <p className="text-[10px] text-muted-foreground tabular-nums mt-1.5">AOA · {d.metodoPagamento ?? "—"}</p>
             </div>
 
+            {/* MIDDLE — Title + badges */}
             <div className="min-w-0 flex-1">
               <h1 className="text-xl font-semibold leading-tight tracking-tight text-foreground">{d.description}</h1>
               <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
@@ -175,6 +150,10 @@ export default function FinancasDespesaDetail() {
                   {st.label}
                 </Badge>
                 <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">{d.category}</Badge>
+                <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1">
+                  <CalendarDays className="w-2.5 h-2.5" />
+                  {prettyDate(d.date)}
+                </Badge>
                 {docsTotal > 0 && (
                   <Badge
                     variant="outline"
@@ -192,16 +171,8 @@ export default function FinancasDespesaDetail() {
               </div>
             </div>
 
-            {/* Right — Valor + REF + Doc pill */}
+            {/* RIGHT — REF + Doc pill */}
             <div className="shrink-0 flex flex-col items-end gap-2">
-              <div className="rounded-lg border border-border bg-gradient-to-br from-red-50 to-background px-3.5 py-2 text-right shadow-sm">
-                <p className="text-[9px] uppercase tracking-[0.15em] text-muted-foreground font-semibold">Valor da Despesa</p>
-                <p className="text-[26px] leading-none font-bold text-red-600 tabular-nums tracking-tight mt-1">
-                  −{formatCurrency(d.amount)}
-                </p>
-                <p className="text-[10px] text-muted-foreground tabular-nums mt-1">AOA · {d.metodoPagamento ?? "—"}</p>
-              </div>
-
               <div className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background text-[11px] font-mono font-semibold text-foreground">
                 {d.ref}
               </div>
@@ -224,6 +195,7 @@ export default function FinancasDespesaDetail() {
             </div>
           </div>
         </div>
+
 
 
         {/* 2-column body: Identificação left · resto right */}
