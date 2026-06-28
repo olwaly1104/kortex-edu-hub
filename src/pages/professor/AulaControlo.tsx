@@ -30,6 +30,8 @@ import {
   LogOut,
   Lock,
   X,
+  HelpCircle,
+  Send,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -62,6 +64,36 @@ const MOCK_LESSON = {
     { id: "v1", nome: "Vídeo introdutório", duracao: "4 min", src: "https://www.w3schools.com/html/mov_bbb.mp4" },
     { id: "v2", nome: "Estudo de caso · Vitruvius", duracao: "6 min", src: "https://www.w3schools.com/html/mov_bbb.mp4" },
   ],
+  quiz: {
+    id: "qz-aula-demo",
+    titulo: "Quiz · Fundamentos de Vitruvius",
+    duracao: 8,
+    questoes: [
+      {
+        id: "q1",
+        enunciado: "Quais são os três princípios de Vitruvius?",
+        opcoes: [
+          "Forma, Função, Ornamento",
+          "Firmitas, Utilitas, Venustas",
+          "Estrutura, Espaço, Luz",
+          "Cidade, Edifício, Detalhe",
+        ],
+        correta: 1,
+      },
+      {
+        id: "q2",
+        enunciado: "Em que tratado Vitruvius desenvolve esses princípios?",
+        opcoes: ["De Architectura", "Os Quatro Livros", "Vers une Architecture", "Complexidade e Contradição"],
+        correta: 0,
+      },
+      {
+        id: "q3",
+        enunciado: "Venustas corresponde a:",
+        opcoes: ["Solidez", "Utilidade", "Beleza", "Proporção"],
+        correta: 2,
+      },
+    ],
+  },
   alunos: Array.from({ length: 24 }).map((_, i) => ({
     id: `est-${i + 1}`,
     nome: [
@@ -76,7 +108,7 @@ const MOCK_LESSON = {
 
 type Presenca = "presente" | "atraso" | "falta" | null;
 type Passo = 1 | 2 | 3;
-type Aba = "slides" | "video" | "recursos";
+type Aba = "slides" | "video" | "recursos" | "quiz";
 
 function toMinutes(hhmm: string) {
   const [h, m] = hhmm.split(":").map(Number);
@@ -162,6 +194,21 @@ export default function AulaControlo() {
   const [confirmEnd, setConfirmEnd] = useState(false);
 
   const [chamadaFullscreen, setChamadaFullscreen] = useState(false);
+  const [apresentacao, setApresentacao] = useState(false);
+  const [quizLancado, setQuizLancado] = useState(false);
+
+  // Modo apresentação: ESC para sair, setas para navegar
+  useEffect(() => {
+    if (!apresentacao) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setApresentacao(false);
+      if (e.key === "ArrowRight" || e.key === " ") setSlideIdx((i) => Math.min(i + 1, aula.slides.length - 1));
+      if (e.key === "ArrowLeft") setSlideIdx((i) => Math.max(i - 1, 0));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [apresentacao, aula.slides.length]);
+
 
   const conteudoHint = `${slideIdx + 1}/${aula.slides.length} slides · ${aula.videos.length} vídeos · ${aula.recursos.length} recursos`;
 
@@ -371,6 +418,7 @@ export default function AulaControlo() {
                   { k: "slides" as Aba, label: "Slides", Icon: Presentation },
                   { k: "video" as Aba, label: "Vídeo", Icon: VideoIcon },
                   { k: "recursos" as Aba, label: "Recursos", Icon: FileText },
+                  { k: "quiz" as Aba, label: "Quiz", Icon: HelpCircle },
                 ]).map(({ k, label, Icon }) => (
                   <button
                     key={k}
@@ -393,8 +441,8 @@ export default function AulaControlo() {
                       <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Slide {slide.n} de {aula.slides.length}</p>
                       <p className="text-4xl font-semibold text-foreground mt-4 leading-tight">{slide.titulo}</p>
                     </div>
-                    <Button size="icon" variant="secondary" className="absolute top-4 right-4 h-9 w-9" onClick={() => toast.info("Modo apresentação em breve")}>
-                      <Maximize2 className="w-4 h-4" />
+                    <Button size="sm" variant="secondary" className="absolute top-4 right-4" onClick={() => setApresentacao(true)}>
+                      <Maximize2 className="w-3.5 h-3.5 mr-1.5" /> Modo Apresentação
                     </Button>
                   </div>
                   <div className="flex items-center justify-between px-5 py-4 border-t border-border">
@@ -458,6 +506,68 @@ export default function AulaControlo() {
                 </Card>
               )}
 
+              {aba === "quiz" && (
+                <Card className="p-5">
+                  <div className="flex items-start justify-between gap-3 flex-wrap mb-4">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-base font-semibold">{aula.quiz.titulo}</h3>
+                        <Badge variant="outline" className="text-[11px]">{aula.quiz.questoes.length} questões</Badge>
+                        <Badge variant="outline" className="text-[11px]"><Clock className="w-3 h-3 mr-1" />{aula.quiz.duracao} min</Badge>
+                        {quizLancado && (
+                          <Badge className="bg-primary text-primary-foreground text-[11px] gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> Lançado
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">Lança o quiz para que os estudantes respondam em tempo real.</p>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setQuizLancado((v) => !v);
+                        toast.success(quizLancado ? "Quiz encerrado" : "Quiz lançado aos estudantes");
+                      }}
+                      variant={quizLancado ? "outline" : "default"}
+                    >
+                      {quizLancado ? <><X className="w-3.5 h-3.5 mr-1.5" /> Encerrar quiz</> : <><Send className="w-3.5 h-3.5 mr-1.5" /> Lançar quiz</>}
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {aula.quiz.questoes.map((q, qi) => (
+                      <div key={q.id} className="rounded-lg border border-border p-4">
+                        <div className="flex items-start gap-3">
+                          <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">{qi + 1}</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-foreground">{q.enunciado}</p>
+                            <div className="grid sm:grid-cols-2 gap-2 mt-3">
+                              {q.opcoes.map((o, oi) => (
+                                <div
+                                  key={oi}
+                                  className={cn(
+                                    "flex items-center gap-2 px-3 py-2 rounded-md border text-xs",
+                                    oi === q.correta
+                                      ? "border-primary/40 bg-primary/5 text-foreground"
+                                      : "border-border bg-card text-muted-foreground",
+                                  )}
+                                >
+                                  <span className="font-semibold tabular-nums">{String.fromCharCode(65 + oi)}.</span>
+                                  <span className="flex-1 min-w-0">{o}</span>
+                                  {oi === q.correta && <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              )}
+
+
+
               <div className="flex items-center justify-end">
                 <Button variant="outline" onClick={() => setPasso(3)}>
                   Avançar para encerramento <ChevronRight className="w-4 h-4 ml-1" />
@@ -491,6 +601,45 @@ export default function AulaControlo() {
           )}
         </div>
       </div>
+
+      {/* Modo Apresentação — fullscreen overlay */}
+      {apresentacao && (
+        <div className="fixed inset-0 z-[60] bg-black text-white flex flex-col">
+          <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+            <Badge variant="outline" className="text-white border-white/30 bg-white/5 text-[11px] tabular-nums">
+              {slideIdx + 1} / {aula.slides.length}
+            </Badge>
+            <Button size="sm" variant="ghost" className="text-white hover:bg-white/10 hover:text-white" onClick={() => setApresentacao(false)}>
+              <X className="w-4 h-4 mr-1.5" /> Sair (Esc)
+            </Button>
+          </div>
+          <div className="flex-1 flex items-center justify-center px-16">
+            <div className="text-center max-w-5xl">
+              <p className="text-sm uppercase tracking-[0.3em] text-white/50">
+                Slide {slide.n} · {aula.titulo}
+              </p>
+              <p className="text-6xl md:text-7xl font-semibold leading-tight mt-6">{slide.titulo}</p>
+            </div>
+          </div>
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3">
+            <Button size="icon" variant="ghost" className="text-white hover:bg-white/10 hover:text-white" disabled={slideIdx === 0} onClick={() => setSlideIdx((i) => i - 1)}>
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex items-center gap-1.5">
+              {aula.slides.map((s, i) => (
+                <button
+                  key={s.n}
+                  onClick={() => setSlideIdx(i)}
+                  className={cn("h-1.5 rounded-full transition-all", i === slideIdx ? "w-8 bg-white" : "w-1.5 bg-white/30")}
+                />
+              ))}
+            </div>
+            <Button size="icon" variant="ghost" className="text-white hover:bg-white/10 hover:text-white" disabled={slideIdx === aula.slides.length - 1} onClick={() => setSlideIdx((i) => i + 1)}>
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       <Dialog open={confirmEnd} onOpenChange={setConfirmEnd}>
         <DialogContent>
