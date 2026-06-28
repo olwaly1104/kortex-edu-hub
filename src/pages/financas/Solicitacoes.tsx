@@ -36,6 +36,7 @@ type EstadoFilter = "todos" | "pendentes" | "atrasadas" | "em_execucao" | "execu
 export default function FinancasSolicitacoes() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { items: finSolicitacoes, refresh } = useFinSolicitacoes();
   const [tab, setTab] = useState<"recebidas" | "enviadas">("recebidas");
   const [estado, setEstado] = useState<EstadoFilter>("todos");
   const [search, setSearch] = useState("");
