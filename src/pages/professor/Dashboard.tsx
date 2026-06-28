@@ -1,6 +1,8 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
-import { Calendar as CalendarIcon, Megaphone, ClipboardCheck, GraduationCap, Clock, MapPin, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar as CalendarIcon, Megaphone, ClipboardCheck, GraduationCap, MapPin, LogIn, Clock } from "lucide-react";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 
 export default function ProfessorDashboard() {
