@@ -722,6 +722,84 @@ export type Database = {
         }
         Relationships: []
       }
+      fin_solicitacoes: {
+        Row: {
+          anexos: Json
+          created_at: string
+          description: string | null
+          destinatario: string | null
+          destinatario_user_id: string | null
+          direction: string
+          due_date: string | null
+          historico: Json
+          id: string
+          institution_id: string
+          prazo_ate: string | null
+          prazo_de: string | null
+          ref: string
+          requester_matricula: string | null
+          requester_name: string | null
+          requester_role: string | null
+          requester_user_id: string
+          responsavel: string | null
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          valor: number | null
+        }
+        Insert: {
+          anexos?: Json
+          created_at?: string
+          description?: string | null
+          destinatario?: string | null
+          destinatario_user_id?: string | null
+          direction: string
+          due_date?: string | null
+          historico?: Json
+          id?: string
+          institution_id: string
+          prazo_ate?: string | null
+          prazo_de?: string | null
+          ref: string
+          requester_matricula?: string | null
+          requester_name?: string | null
+          requester_role?: string | null
+          requester_user_id: string
+          responsavel?: string | null
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Update: {
+          anexos?: Json
+          created_at?: string
+          description?: string | null
+          destinatario?: string | null
+          destinatario_user_id?: string | null
+          direction?: string
+          due_date?: string | null
+          historico?: Json
+          id?: string
+          institution_id?: string
+          prazo_ate?: string | null
+          prazo_de?: string | null
+          ref?: string
+          requester_matricula?: string | null
+          requester_name?: string | null
+          requester_role?: string | null
+          requester_user_id?: string
+          responsavel?: string | null
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          valor?: number | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
