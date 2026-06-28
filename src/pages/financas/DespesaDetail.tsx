@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, FileText, CheckCircle2, Clock, XCircle, Paperclip, FileImage, FileSpreadsheet, Eye } from "lucide-react";
+import { ArrowLeft, FileText, CheckCircle2, Clock, XCircle, Paperclip, FileImage, FileSpreadsheet, Eye, Download } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import EmptyState from "@/components/EmptyState";
 import { findDespesa, finStatusMetaDespesa, prettyDate, type DespesaAnexo } from "@/data/financasDespesasData";
@@ -14,6 +15,7 @@ import FinancasDespesaDocPreview from "./DespesaDocPreview";
 export default function FinancasDespesaDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [docOpen, setDocOpen] = useState(false);
   const d = findDespesa(id);
 
@@ -72,57 +74,61 @@ export default function FinancasDespesaDetail() {
                   {st.label}
                 </Badge>
                 <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider">{d.category}</Badge>
-                <Badge variant="outline" className="text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1 bg-red-50 text-red-700 border-red-200">
-                  -{formatCurrency(d.amount)}
-                </Badge>
+              </div>
+              <div className="mt-2 text-2xl font-bold text-red-600 tabular-nums tracking-tight">
+                -{formatCurrency(d.amount)}
               </div>
             </div>
 
+            {/* Right — REF + Doc pill */}
             <div className="shrink-0 flex flex-col items-end gap-1.5">
               <div className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background text-[11px] font-mono font-semibold text-foreground">
                 {d.ref}
               </div>
-              <button
-                onClick={() => setDocOpen(true)}
-                className="inline-flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-md border border-border bg-background shadow-sm hover:bg-muted/40 transition-colors"
-              >
+              <div className="inline-flex items-center gap-2 pl-1.5 pr-1 py-1 rounded-md border border-border bg-background shadow-sm">
                 <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
                   <FileText className="w-3 h-3 text-red-600" />
                 </div>
-                <div className="flex flex-col leading-tight text-left">
+                <div className="flex flex-col min-w-0 leading-tight">
                   <span className="text-[11px] font-semibold text-foreground tabular-nums">Despesa-{d.ref}</span>
-                  <span className="text-[9px] text-muted-foreground font-medium">Clique para abrir</span>
+                  <span className="text-[9px] tracking-[0.02em] text-muted-foreground font-medium">Gerado automaticamente</span>
                 </div>
-              </button>
+                <span className="self-stretch w-px bg-border mx-0.5" />
+                <button type="button" onClick={() => setDocOpen(true)} className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Ver documento">
+                  <Eye className="w-3 h-3" />
+                </button>
+                <button type="button" onClick={() => toast({ title: "Documento exportado", description: `Despesa-${d.ref}.pdf` })} className="w-5 h-5 rounded inline-flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" title="Descarregar">
+                  <Download className="w-3 h-3" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Body — single column */}
-        <div className="border-t border-border">
-          <div className="p-6 space-y-6">
-            {/* Metadata */}
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-2">Identificação</p>
-              <dl className="space-y-1.5 text-xs">
-                <MetaRow k="Solicitado por"   v={`${d.requestedBy} · ${d.requesterRole ?? "—"}`} />
-                <MetaRow k="Responsável"      v={`${d.responsavel} · ${d.responsavelRole ?? "—"}`} />
-                <MetaRow k="Fornecedor"       v={d.fornecedor ?? "—"} />
-                <MetaRow k="NIF"              v={d.nif ?? "—"} />
-                <MetaRow k="Método pagamento" v={d.metodoPagamento ?? "—"} />
-                <MetaRow k="Rubrica"          v={d.rubricaOrcamental ?? "—"} />
-                <MetaRow k="Submetido em"     v={prettyDate(d.date)} />
-                <MetaRow k="Prazo"            v={prettyDate(d.dueDate)} />
-              </dl>
-            </div>
+        {/* 2-column body: Identificação left · resto right */}
+        <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
+          {/* LEFT — Identificação */}
+          <aside className="p-5 bg-muted/15">
+            <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Identificação</p>
+            <dl className="space-y-1.5 text-xs">
+              <MetaRow k="Solicitado por"   v={`${d.requestedBy} · ${d.requesterRole ?? "—"}`} />
+              <MetaRow k="Responsável"      v={`${d.responsavel} · ${d.responsavelRole ?? "—"}`} />
+              <MetaRow k="Fornecedor"       v={d.fornecedor ?? "—"} />
+              <MetaRow k="NIF"              v={d.nif ?? "—"} />
+              <MetaRow k="Método pagamento" v={d.metodoPagamento ?? "—"} />
+              <MetaRow k="Rubrica"          v={d.rubricaOrcamental ?? "—"} />
+              <MetaRow k="Submetido em"     v={prettyDate(d.date)} />
+              <MetaRow k="Prazo"            v={prettyDate(d.dueDate)} />
+            </dl>
+          </aside>
 
-            {/* Justificação */}
+          {/* RIGHT — Justificação, Anexos, Cronologia */}
+          <div className="p-6 space-y-6 min-w-0">
             <div>
               <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-2">Justificação</p>
               <p className="text-xs leading-relaxed text-foreground/85 whitespace-pre-line">{d.justificacao}</p>
             </div>
 
-            {/* Anexos */}
             <div>
               <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-2">Anexos ({d.anexos.length})</p>
               <ul className="space-y-1.5">
@@ -142,7 +148,6 @@ export default function FinancasDespesaDetail() {
               </ul>
             </div>
 
-            {/* Cronologia */}
             <div>
               <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Cronologia</p>
               <ol className="relative border-l-2 border-border pl-5 space-y-4">
