@@ -135,26 +135,24 @@ export default function FinancasDespesaDetail() {
                 </div>
               </div>
 
-              {/* Documentos fiscais */}
-              <div className="grid grid-cols-2 gap-2 mb-3">
-                <DocCard
+              {/* Documentos fiscais + Detail rows — unified vertical list */}
+              <dl className="rounded-lg border border-border bg-background divide-y divide-border overflow-hidden">
+                <FiscalDocRow
                   icon={Receipt}
                   tone="amber"
                   label="Factura"
                   numero={d.facturaNum}
                   date={d.facturaData}
+                  onView={() => setDocOpen(true)}
                 />
-                <DocCard
+                <FiscalDocRow
                   icon={BadgeCheck}
                   tone="emerald"
                   label="Comprovativo"
                   numero={d.comprovativoNum}
                   date={d.comprovativoData}
+                  onView={() => setDocOpen(true)}
                 />
-              </div>
-
-              {/* Detail rows */}
-              <dl className="rounded-lg border border-border bg-background divide-y divide-border overflow-hidden">
                 <DetailRow icon={Wallet}       label="Método"   value={d.metodoPagamento ?? "—"} />
                 {d.iban && <DetailRow icon={Landmark} label="IBAN" value={d.iban} mono />}
                 <DetailRow icon={Layers}       label="Rubrica"  value={d.rubricaOrcamental ?? "—"} />
@@ -306,6 +304,53 @@ function DocCard({
       </div>
       <p className="text-[11.5px] font-mono font-semibold text-foreground tabular-nums mt-1.5 truncate">{numero ?? "—"}</p>
       <p className="text-[10px] text-muted-foreground tabular-nums mt-0.5">{date ? prettyDate(date) : "Pendente"}</p>
+    </div>
+  );
+}
+
+function FiscalDocRow({
+  icon: Icon,
+  tone,
+  label,
+  numero,
+  date,
+  onView,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  tone: "amber" | "emerald";
+  label: string;
+  numero?: string;
+  date?: string;
+  onView?: () => void;
+}) {
+  const toneCls =
+    tone === "amber"
+      ? "bg-amber-50 border-amber-200 text-amber-700"
+      : "bg-emerald-50 border-emerald-200 text-emerald-700";
+  const hasDoc = Boolean(numero);
+  return (
+    <div className="flex items-center gap-2.5 px-2.5 py-2">
+      <div className={cn("w-6 h-6 rounded-md border flex items-center justify-center shrink-0", toneCls)}>
+        <Icon className="w-3 h-3" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold leading-tight">{label}</p>
+        <div className="flex items-baseline gap-1.5 mt-0.5">
+          <span className="text-[11.5px] font-mono font-semibold text-foreground tabular-nums truncate">{numero ?? "—"}</span>
+          {date && <span className="text-[10px] text-muted-foreground tabular-nums shrink-0">· {prettyDate(date)}</span>}
+          {!hasDoc && <span className="text-[10px] text-muted-foreground shrink-0">Pendente</span>}
+        </div>
+      </div>
+      {hasDoc && (
+        <button
+          type="button"
+          onClick={onView}
+          className="inline-flex items-center gap-1 px-1.5 py-1 rounded-md border border-border bg-background text-[10px] font-semibold text-foreground hover:bg-muted transition-colors shrink-0"
+          title={`Ver ${label}`}
+        >
+          <Eye className="w-3 h-3" /> Ver
+        </button>
+      )}
     </div>
   );
 }
