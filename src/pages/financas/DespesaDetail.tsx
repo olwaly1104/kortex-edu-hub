@@ -230,11 +230,11 @@ function MetaRow({ k, v }: { k: string; v: string }) {
 
 function toneFor(accao: string) {
   const a = accao.toLowerCase();
-  if (a.includes("aprov"))  return { icon: CheckCircle2, cls: "bg-emerald-500 text-white ring-emerald-500/15" };
-  if (a.includes("rejeit")) return { icon: XCircle,      cls: "bg-red-500 text-white ring-red-500/15" };
-  if (a.includes("pag"))    return { icon: CheckCircle2, cls: "bg-blue-500 text-white ring-blue-500/15" };
-  if (a.includes("submet")) return { icon: FileText,     cls: "bg-primary text-primary-foreground ring-primary/15" };
-  return { icon: Clock, cls: "bg-amber-500 text-white ring-amber-500/15" };
+  if (a.includes("rejeit")) return { icon: X,         cls: "bg-destructive text-destructive-foreground ring-4 ring-destructive/15" };
+  if (a.includes("aprov"))  return { icon: Check,     cls: "bg-emerald-500 text-white ring-4 ring-emerald-500/15" };
+  if (a.includes("pag"))    return { icon: Check,     cls: "bg-emerald-500 text-white ring-4 ring-emerald-500/15" };
+  if (a.includes("submet")) return { icon: Check,     cls: "bg-emerald-500 text-white ring-4 ring-emerald-500/15" };
+  return { icon: Hourglass, cls: "bg-amber-400 text-white ring-4 ring-amber-400/40" };
 }
 
 function anexoIcon(t: DespesaAnexo["tipo"]) {
