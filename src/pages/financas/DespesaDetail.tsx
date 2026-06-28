@@ -85,31 +85,13 @@ export default function FinancasDespesaDetail() {
     setActionNote("");
   };
 
-  // Available actions per status (linked to chronologia)
-  const availableActions: { key: NonNullable<typeof pendingAction>; label: string; icon: any; cls: string }[] = [];
-  if (d.status === "pendente") {
-    availableActions.push(
-      { key: "aprovada",  label: "Aprovar",        icon: CheckCircle2,    cls: "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent" },
-      { key: "rejeitada", label: "Rejeitar",       icon: XCircle,         cls: "border-red-200 text-red-600 hover:bg-red-50" },
-      { key: "parecer",   label: "Dar parecer",    icon: MessageSquareText, cls: "" },
-      { key: "upload",    label: "Carregar anexo", icon: Upload,          cls: "" },
-    );
-  } else if (d.status === "aprovada") {
-    availableActions.push(
-      { key: "paga",      label: "Marcar como paga",        icon: Banknote,         cls: "bg-blue-600 hover:bg-blue-700 text-white border-transparent" },
-      { key: "upload",    label: "Carregar comprovativo",   icon: Upload,           cls: "" },
-      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
-    );
-  } else if (d.status === "paga") {
-    availableActions.push(
-      { key: "upload",    label: "Carregar anexo",          icon: Upload,           cls: "" },
-      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
-    );
-  } else if (d.status === "rejeitada") {
-    availableActions.push(
-      { key: "parecer",   label: "Dar parecer",             icon: MessageSquareText,cls: "" },
-    );
-  }
+  // Single contextual action per status (linked to cronologia)
+  const primaryAction: { key: NonNullable<typeof pendingAction>; label: string; icon: any; cls: string } | null =
+    d.status === "pendente"
+      ? { key: "aprovada", label: "Aprovar despesa", icon: CheckCircle2, cls: "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent" }
+      : d.status === "aprovada"
+      ? { key: "paga", label: "Marcar como paga", icon: Banknote, cls: "bg-blue-600 hover:bg-blue-700 text-white border-transparent" }
+      : null;
 
   return (
     <div className="p-6 lg:p-8 space-y-4 animate-fade-in">
