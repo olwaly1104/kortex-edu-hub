@@ -68,23 +68,33 @@ export default function FinancasDespesaDetail() {
     setD(prev => prev ? { ...prev, historico: [...prev.historico, h], status: newStatus ?? prev.status } : prev);
   };
 
-  const actionMeta: Record<NonNullable<typeof pendingAction>, { title: string; cta: string; tone: string; icon: any; placeholder: string; accao: string; newStatus?: DespesaStatus }> = {
-    aprovada:  { title: "Confirmar aprovação", cta: "Confirmar aprovação", tone: "bg-emerald-600 hover:bg-emerald-700 text-white", icon: CheckCircle2, placeholder: "Parecer / Justificação", accao: "Despesa aprovada", newStatus: "aprovada" },
-    rejeitada: { title: "Confirmar rejeição", cta: "Confirmar rejeição", tone: "bg-red-600 hover:bg-red-700 text-white", icon: XCircle, placeholder: "Motivo da rejeição", accao: "Despesa rejeitada", newStatus: "rejeitada" },
-    paga:      { title: "Confirmar pagamento", cta: "Confirmar pagamento", tone: "bg-blue-600 hover:bg-blue-700 text-white", icon: Banknote, placeholder: "Ref. pagamento, IBAN, observações…", accao: "Pagamento efectuado", newStatus: "paga" },
-    parecer:   { title: "Adicionar parecer", cta: "Registar parecer", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: MessageSquareText, placeholder: "Parecer / Notas internas", accao: "Parecer adicionado" },
-    upload:    { title: "Carregar anexo", cta: "Adicionar anexo", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: Upload, placeholder: "Descrição do anexo", accao: "Anexo carregado" },
+  const actionMeta: Record<NonNullable<typeof pendingAction>, {
+    title: string; cta: string; tone: string; icon: any; placeholder: string; accao: string;
+    newStatus?: DespesaStatus;
+    fromStatus?: DespesaStatus;
+    requiredUploads?: string[];
+  }> = {
+    aprovada:  { title: "Confirmar aprovação", cta: "Confirmar aprovação", tone: "bg-emerald-600 hover:bg-emerald-700 text-white", icon: CheckCircle2, placeholder: "Parecer / Justificação", accao: "Despesa aprovada", newStatus: "aprovada", fromStatus: "pendente", requiredUploads: [] },
+    rejeitada: { title: "Confirmar rejeição", cta: "Confirmar rejeição", tone: "bg-red-600 hover:bg-red-700 text-white", icon: XCircle, placeholder: "Motivo da rejeição (obrigatório)", accao: "Despesa rejeitada", newStatus: "rejeitada", fromStatus: "pendente", requiredUploads: [] },
+    paga:      { title: "Confirmar pagamento", cta: "Confirmar pagamento", tone: "bg-blue-600 hover:bg-blue-700 text-white", icon: Banknote, placeholder: "Ref. pagamento, IBAN, observações…", accao: "Pagamento efectuado", newStatus: "paga", fromStatus: "aprovada", requiredUploads: ["Factura", "Comprovativo"] },
+    parecer:   { title: "Adicionar parecer", cta: "Registar parecer", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: MessageSquareText, placeholder: "Parecer / Notas internas", accao: "Parecer adicionado", requiredUploads: [] },
+    upload:    { title: "Carregar anexo", cta: "Adicionar anexo", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: Upload, placeholder: "Descrição do anexo", accao: "Anexo carregado", requiredUploads: ["Anexo"] },
   };
 
   const pm = pendingAction ? actionMeta[pendingAction] : null;
+  const missingUploads = pm?.requiredUploads?.filter(u => !uploadedFiles[u]) ?? [];
+  const canConfirm = missingUploads.length === 0 && (pendingAction !== "rejeitada" || actionNote.trim().length > 0);
 
   const confirmAction = () => {
-    if (!pm) return;
+    if (!pm || !canConfirm) return;
     const now = new Date().toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
-    appendHistorico({ data: now, accao: pm.accao, actor: "Você", nota: actionNote || undefined }, pm.newStatus);
-    toast({ title: pm.accao, description: actionNote || `${d.ref} actualizado.` });
+    const uploadSummary = Object.entries(uploadedFiles).map(([k, v]) => `${k}: ${v}`).join(" · ");
+    const fullNote = [actionNote, uploadSummary].filter(Boolean).join(" — ");
+    appendHistorico({ data: now, accao: pm.accao, actor: "Você", nota: fullNote || undefined }, pm.newStatus);
+    toast({ title: pm.accao, description: fullNote || `${d.ref} actualizado.` });
     setPendingAction(null);
     setActionNote("");
+    setUploadedFiles({});
   };
 
   // Single contextual action per status (linked to cronologia)
