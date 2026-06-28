@@ -197,6 +197,19 @@ export default function AulaControlo() {
   const [apresentacao, setApresentacao] = useState(false);
   const [quizLancado, setQuizLancado] = useState(false);
   const [quizAberto, setQuizAberto] = useState(false);
+  const [quizFullscreen, setQuizFullscreen] = useState(false);
+  const [quizIdx, setQuizIdx] = useState(0);
+
+  useEffect(() => {
+    if (!quizFullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setQuizFullscreen(false);
+      if (e.key === "ArrowRight" || e.key === " ") setQuizIdx((i) => Math.min(i + 1, aula.quiz.questoes.length - 1));
+      if (e.key === "ArrowLeft") setQuizIdx((i) => Math.max(i - 1, 0));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [quizFullscreen, aula.quiz.questoes.length]);
 
   // Modo apresentação: ESC para sair, setas para navegar
   useEffect(() => {
@@ -652,12 +665,14 @@ export default function AulaControlo() {
               <Button
                 size="sm"
                 onClick={() => {
-                  setQuizLancado((v) => !v);
-                  toast.success(quizLancado ? "Quiz encerrado" : "Quiz lançado aos estudantes");
+                  setQuizIdx(0);
+                  setQuizLancado(true);
+                  setQuizAberto(false);
+                  setQuizFullscreen(true);
+                  toast.success("Quiz iniciado");
                 }}
-                variant={quizLancado ? "outline" : "default"}
               >
-                {quizLancado ? <><X className="w-3.5 h-3.5 mr-1.5" /> Encerrar quiz</> : <><Send className="w-3.5 h-3.5 mr-1.5" /> Lançar quiz</>}
+                <Play className="w-3.5 h-3.5 mr-1.5" /> Iniciar quiz
               </Button>
             </div>
           </DialogHeader>
@@ -693,6 +708,63 @@ export default function AulaControlo() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Quiz fullscreen mode */}
+      {quizFullscreen && (() => {
+        const q = aula.quiz.questoes[quizIdx];
+        return (
+          <div className="fixed inset-0 z-[60] bg-black text-white flex flex-col">
+            <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 z-10">
+              <Badge className="bg-primary text-primary-foreground gap-1.5 text-[11px]">
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" /> Quiz A Decorrer
+              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-white border-white/30 bg-white/5 text-[11px] tabular-nums">
+                  {quizIdx + 1} / {aula.quiz.questoes.length}
+                </Badge>
+                <Button size="sm" variant="ghost" className="text-white hover:bg-white/10 hover:text-white" onClick={() => { setQuizFullscreen(false); setQuizLancado(false); }}>
+                  <X className="w-4 h-4 mr-1.5" /> Encerrar (Esc)
+                </Button>
+              </div>
+            </div>
+            <div className="flex-1 flex items-center justify-center px-16">
+              <div className="max-w-5xl w-full">
+                <p className="text-sm uppercase tracking-[0.3em] text-white/50 text-center">
+                  Pergunta {quizIdx + 1} · {aula.quiz.titulo}
+                </p>
+                <p className="text-4xl md:text-5xl font-semibold leading-tight mt-6 text-center">{q.enunciado}</p>
+                <div className="grid sm:grid-cols-2 gap-4 mt-12">
+                  {q.opcoes.map((o, oi) => (
+                    <div key={oi} className="flex items-center gap-4 px-6 py-5 rounded-xl border border-white/15 bg-white/5">
+                      <span className="w-10 h-10 rounded-lg bg-white/10 text-white text-lg font-semibold flex items-center justify-center shrink-0">
+                        {String.fromCharCode(65 + oi)}
+                      </span>
+                      <span className="text-xl md:text-2xl font-medium">{o}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3">
+              <Button size="icon" variant="ghost" className="text-white hover:bg-white/10 hover:text-white" disabled={quizIdx === 0} onClick={() => setQuizIdx((i) => i - 1)}>
+                <ChevronLeft className="w-5 h-5" />
+              </Button>
+              <div className="flex items-center gap-1.5">
+                {aula.quiz.questoes.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setQuizIdx(i)}
+                    className={cn("h-1.5 rounded-full transition-all", i === quizIdx ? "w-8 bg-white" : "w-1.5 bg-white/30")}
+                  />
+                ))}
+              </div>
+              <Button size="icon" variant="ghost" className="text-white hover:bg-white/10 hover:text-white" disabled={quizIdx === aula.quiz.questoes.length - 1} onClick={() => setQuizIdx((i) => i + 1)}>
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Fullscreen viewer */}
       <Dialog open={!!viewer} onOpenChange={(o) => !o && setViewer(null)}>
