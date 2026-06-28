@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, FileText, CheckCircle2, Clock, XCircle, Paperclip, FileImage, FileSpreadsheet, Eye, Download } from "lucide-react";
+import { ArrowLeft, FileText, Clock, Paperclip, FileImage, FileSpreadsheet, Eye, Download, Check, X, Hourglass } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -108,18 +108,34 @@ export default function FinancasDespesaDetail() {
         {/* 2-column body: Identificação left · resto right */}
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
           {/* LEFT — Identificação */}
-          <aside className="p-5 bg-muted/15">
-            <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Identificação</p>
-            <dl className="space-y-1.5 text-xs">
-              <MetaRow k="Solicitado por"   v={`${d.requestedBy} · ${d.requesterRole ?? "—"}`} />
-              <MetaRow k="Responsável"      v={`${d.responsavel} · ${d.responsavelRole ?? "—"}`} />
-              <MetaRow k="Fornecedor"       v={d.fornecedor ?? "—"} />
-              <MetaRow k="NIF"              v={d.nif ?? "—"} />
-              <MetaRow k="Método pagamento" v={d.metodoPagamento ?? "—"} />
-              <MetaRow k="Rubrica"          v={d.rubricaOrcamental ?? "—"} />
-              <MetaRow k="Submetido em"     v={prettyDate(d.date)} />
-              <MetaRow k="Prazo"            v={prettyDate(d.dueDate)} />
-            </dl>
+          <aside className="p-5 bg-muted/15 space-y-5">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Requerente</p>
+              <dl className="space-y-1.5 text-xs">
+                <MetaRow k="Nome"   v={d.requestedBy} />
+                <MetaRow k="Função" v={d.requesterRole ?? "—"} />
+              </dl>
+            </div>
+            <div className="border-t border-border" />
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Responsável</p>
+              <dl className="space-y-1.5 text-xs">
+                <MetaRow k="Nome"   v={d.responsavel} />
+                <MetaRow k="Função" v={d.responsavelRole ?? "—"} />
+              </dl>
+            </div>
+            <div className="border-t border-border" />
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Detalhes</p>
+              <dl className="space-y-1.5 text-xs">
+                <MetaRow k="Fornecedor"       v={d.fornecedor ?? "—"} />
+                <MetaRow k="NIF"              v={d.nif ?? "—"} />
+                <MetaRow k="Método pagamento" v={d.metodoPagamento ?? "—"} />
+                <MetaRow k="Rubrica"          v={d.rubricaOrcamental ?? "—"} />
+                <MetaRow k="Submetido em"     v={prettyDate(d.date)} />
+                <MetaRow k="Prazo"            v={prettyDate(d.dueDate)} />
+              </dl>
+            </div>
           </aside>
 
           {/* RIGHT — Justificação, Anexos, Cronologia */}
@@ -148,26 +164,44 @@ export default function FinancasDespesaDetail() {
               </ul>
             </div>
 
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Cronologia</p>
-              <ol className="relative border-l-2 border-border pl-5 space-y-4">
+            <section>
+              <div className="flex items-center gap-2 mb-3">
+                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                <h3 className="text-[11px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">Cronologia</h3>
+              </div>
+              <ol className="space-y-0">
                 {d.historico.map((h, i) => {
+                  const isLast = i === d.historico.length - 1;
                   const tone = toneFor(h.accao);
                   const Icon = tone.icon;
                   return (
-                    <li key={i} className="relative">
-                      <span className={cn("absolute -left-[28px] top-0 w-5 h-5 rounded-full flex items-center justify-center ring-4", tone.cls)}>
-                        <Icon className="w-3 h-3" />
-                      </span>
-                      <div className="text-xs font-semibold text-foreground">{h.accao}</div>
-                      <div className="text-[10px] text-muted-foreground tabular-nums mt-0.5">{h.data} · {h.actor ?? "—"}</div>
-                      {h.nota && <p className="text-[11px] text-foreground/75 mt-1 leading-relaxed">{h.nota}</p>}
+                    <li key={i} className="flex gap-3 relative">
+                      <div className="flex flex-col items-center shrink-0 w-5">
+                        <div className={cn("w-5 h-5 rounded-full flex items-center justify-center mt-0.5 z-10", tone.cls)}>
+                          {Icon && <Icon className="w-3 h-3" strokeWidth={3} />}
+                        </div>
+                        {!isLast && <div className="w-px flex-1 bg-border mt-1" />}
+                      </div>
+                      <div className={cn("flex-1 min-w-0", !isLast && "pb-5")}>
+                        <div className="flex items-baseline justify-between gap-2 flex-wrap">
+                          <p className="text-sm font-medium text-foreground">{h.accao}</p>
+                          <span className="text-[10px] text-muted-foreground tabular-nums whitespace-nowrap">{h.data}</span>
+                        </div>
+                        {h.actor && <p className="text-[11px] text-muted-foreground mt-0.5">{h.actor}</p>}
+                        {h.nota && (
+                          <div className="mt-2 pl-3 border-l-2 border-border">
+                            <p className="text-[10px] uppercase tracking-[0.08em] text-muted-foreground font-semibold mb-0.5">Parecer / Notas</p>
+                            <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-wrap">{h.nota}</p>
+                          </div>
+                        )}
+                      </div>
                     </li>
                   );
                 })}
               </ol>
-            </div>
+            </section>
           </div>
+
         </div>
       </Card>
 
@@ -196,11 +230,11 @@ function MetaRow({ k, v }: { k: string; v: string }) {
 
 function toneFor(accao: string) {
   const a = accao.toLowerCase();
-  if (a.includes("aprov"))  return { icon: CheckCircle2, cls: "bg-emerald-500 text-white ring-emerald-500/15" };
-  if (a.includes("rejeit")) return { icon: XCircle,      cls: "bg-red-500 text-white ring-red-500/15" };
-  if (a.includes("pag"))    return { icon: CheckCircle2, cls: "bg-blue-500 text-white ring-blue-500/15" };
-  if (a.includes("submet")) return { icon: FileText,     cls: "bg-primary text-primary-foreground ring-primary/15" };
-  return { icon: Clock, cls: "bg-amber-500 text-white ring-amber-500/15" };
+  if (a.includes("rejeit")) return { icon: X,         cls: "bg-destructive text-destructive-foreground ring-4 ring-destructive/15" };
+  if (a.includes("aprov"))  return { icon: Check,     cls: "bg-emerald-500 text-white ring-4 ring-emerald-500/15" };
+  if (a.includes("pag"))    return { icon: Check,     cls: "bg-emerald-500 text-white ring-4 ring-emerald-500/15" };
+  if (a.includes("submet")) return { icon: Check,     cls: "bg-emerald-500 text-white ring-4 ring-emerald-500/15" };
+  return { icon: Hourglass, cls: "bg-amber-400 text-white ring-4 ring-amber-400/40" };
 }
 
 function anexoIcon(t: DespesaAnexo["tipo"]) {
