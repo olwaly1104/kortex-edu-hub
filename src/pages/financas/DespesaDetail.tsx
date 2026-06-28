@@ -107,26 +107,14 @@ export default function FinancasDespesaDetail() {
 
         {/* 2-column body: Identificação left · resto right */}
         <div className="grid md:grid-cols-[280px_1fr] divide-x divide-border border-t border-border">
-          {/* LEFT — Identificação */}
-          <aside className="p-5 bg-muted/15 space-y-5">
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Requerente</p>
-              <dl className="space-y-1.5 text-xs">
-                <MetaRow k="Nome"   v={d.requestedBy} />
-                <MetaRow k="Função" v={d.requesterRole ?? "—"} />
-              </dl>
+          {/* LEFT — Requerente · Responsável · Detalhes */}
+          <aside className="p-5 space-y-5 bg-muted/15">
+            <PersonBlock label="Requerente" name={d.requestedBy} role={d.requesterRole} />
+            <div className="pt-4 border-t border-border">
+              <PersonBlock label="Responsável" name={d.responsavel} role={d.responsavelRole} />
             </div>
-            <div className="border-t border-border" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Responsável</p>
-              <dl className="space-y-1.5 text-xs">
-                <MetaRow k="Nome"   v={d.responsavel} />
-                <MetaRow k="Função" v={d.responsavelRole ?? "—"} />
-              </dl>
-            </div>
-            <div className="border-t border-border" />
-            <div>
-              <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-3">Detalhes</p>
+            <div className="pt-4 border-t border-border">
+              <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold mb-2">Detalhes</p>
               <dl className="space-y-1.5 text-xs">
                 <MetaRow k="Fornecedor"       v={d.fornecedor ?? "—"} />
                 <MetaRow k="NIF"              v={d.nif ?? "—"} />
@@ -137,6 +125,7 @@ export default function FinancasDespesaDetail() {
               </dl>
             </div>
           </aside>
+
 
           {/* RIGHT — Justificação, Anexos, Cronologia */}
           <div className="p-6 space-y-6 min-w-0">
