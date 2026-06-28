@@ -405,7 +405,7 @@ export default function FinancasDespesaDetail() {
       </Dialog>
 
       {/* Action dialog — Aprovar / Rejeitar / Pagar / Parecer / Upload */}
-      <Dialog open={!!pendingAction} onOpenChange={(o) => { if (!o) { setPendingAction(null); setActionNote(""); } }}>
+      <Dialog open={!!pendingAction} onOpenChange={(o) => { if (!o) { setPendingAction(null); setActionNote(""); setUploadedFiles({}); } }}>
         <DialogContent className="max-w-md">
           {pm && (
             <>
@@ -417,24 +417,74 @@ export default function FinancasDespesaDetail() {
                   Esta acção será registada na cronologia de <span className="font-mono font-semibold text-foreground">{d.ref}</span>.
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-3 mt-2">
-                <Textarea
-                  value={actionNote}
-                  onChange={(e) => setActionNote(e.target.value)}
-                  placeholder={pm.placeholder}
-                  rows={4}
-                  className="text-[13px]"
-                />
-                {pendingAction === "upload" && (
-                  <div className="rounded-md border border-dashed border-border bg-muted/30 px-3 py-4 text-center text-[11px] text-muted-foreground">
-                    <Upload className="w-4 h-4 mx-auto mb-1.5 text-muted-foreground/70" />
-                    Arraste o ficheiro ou clique para seleccionar
+
+              {/* State transition */}
+              {pm.fromStatus && pm.newStatus && (
+                <div className="flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 py-2">
+                  <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Estado</span>
+                  <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", finStatusMetaDespesa[pm.fromStatus].cls)}>
+                    <span className={cn("w-1.5 h-1.5 rounded-full", finStatusMetaDespesa[pm.fromStatus].dot)} />
+                    {finStatusMetaDespesa[pm.fromStatus].label}
+                  </Badge>
+                  <span className="text-muted-foreground">→</span>
+                  <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", finStatusMetaDespesa[pm.newStatus].cls)}>
+                    <span className={cn("w-1.5 h-1.5 rounded-full", finStatusMetaDespesa[pm.newStatus].dot)} />
+                    {finStatusMetaDespesa[pm.newStatus].label}
+                  </Badge>
+                </div>
+              )}
+
+              <div className="space-y-3 mt-1">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Notas {pendingAction === "rejeitada" && <span className="text-red-600 normal-case tracking-normal">(obrigatório)</span>}</label>
+                  <Textarea
+                    value={actionNote}
+                    onChange={(e) => setActionNote(e.target.value)}
+                    placeholder={pm.placeholder}
+                    rows={3}
+                    className="text-[13px]"
+                  />
+                </div>
+
+                {(pm.requiredUploads ?? []).length > 0 && (
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">
+                      Evidência <span className="normal-case tracking-normal text-muted-foreground/80">(obrigatório)</span>
+                    </label>
+                    <div className="space-y-2">
+                      {pm.requiredUploads!.map((u) => {
+                        const file = uploadedFiles[u];
+                        return (
+                          <label key={u} className={cn("flex items-center gap-2 rounded-md border border-dashed px-3 py-2 cursor-pointer transition-colors", file ? "border-emerald-300 bg-emerald-50/40" : "border-border bg-muted/20 hover:bg-muted/40")}>
+                            <div className={cn("w-7 h-7 rounded-md border flex items-center justify-center shrink-0", file ? "bg-emerald-100 border-emerald-200 text-emerald-700" : "bg-background border-border text-muted-foreground")}>
+                              {file ? <Check className="w-3.5 h-3.5" strokeWidth={3} /> : <Upload className="w-3.5 h-3.5" />}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[12px] font-semibold text-foreground leading-tight">{u}</p>
+                              <p className="text-[10.5px] text-muted-foreground truncate">{file ?? "Clique para seleccionar ficheiro"}</p>
+                            </div>
+                            <input
+                              type="file"
+                              className="hidden"
+                              onChange={(e) => {
+                                const f = e.target.files?.[0];
+                                if (f) setUploadedFiles(prev => ({ ...prev, [u]: f.name }));
+                              }}
+                            />
+                          </label>
+                        );
+                      })}
+                    </div>
+                    {missingUploads.length > 0 && (
+                      <p className="text-[10.5px] text-amber-600 font-medium">Em falta: {missingUploads.join(", ")}</p>
+                    )}
                   </div>
                 )}
               </div>
+
               <div className="flex items-center justify-end gap-2 mt-4">
-                <Button variant="outline" size="sm" className="h-8 text-[12px]" onClick={() => { setPendingAction(null); setActionNote(""); }}>Cancelar</Button>
-                <Button size="sm" className={cn("h-8 text-[12px] gap-1.5", pm.tone)} onClick={confirmAction}>
+                <Button variant="outline" size="sm" className="h-8 text-[12px]" onClick={() => { setPendingAction(null); setActionNote(""); setUploadedFiles({}); }}>Cancelar</Button>
+                <Button size="sm" disabled={!canConfirm} className={cn("h-8 text-[12px] gap-1.5", pm.tone)} onClick={confirmAction}>
                   <pm.icon className="w-3.5 h-3.5" /> {pm.cta}
                 </Button>
               </div>
