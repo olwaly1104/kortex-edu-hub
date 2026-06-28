@@ -355,7 +355,7 @@ function AppRoutes() {
         <Route path="/professor/disciplines/:id" element={<ProfessorDisciplineDetail />} />
         <Route path="/professor/turma/:turmaId" element={<ProfessorTurmaDetail />} />
         <Route path="/professor/lessons/:lessonId" element={<ProfessorLessonDetailPage />} />
-        <Route path="/professor/aula/:lessonId" element={<ProfessorAulaControlo />} />
+        
         <Route path="/professor/students" element={<ProfessorStudents />} />
         <Route path="/professor/lessons" element={<ProfessorLessons />} />
         <Route path="/professor/grades" element={<ProfessorGrades />} />
@@ -537,6 +537,7 @@ function AppRoutes() {
         <Route path="/inscricoes/candidato/:ref" element={<InscricoesCandidatoDetail />} />
         <Route path="/inscricoes/candidato/:ref/documento" element={<InscricoesDoc />} />
       </Route>
+      <Route path="/professor/aula/:lessonId" element={<ProfessorAulaControlo />} />
       <Route path="/site" element={<Website />} />
       <Route path="/candidatar" element={<Candidatar />} />
       <Route path="/login" element={<Navigate to={homeRedirect} replace />} />

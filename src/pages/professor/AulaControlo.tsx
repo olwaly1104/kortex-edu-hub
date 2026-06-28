@@ -161,53 +161,66 @@ export default function AulaControlo() {
 
   const [confirmEnd, setConfirmEnd] = useState(false);
 
+  const [chamadaFullscreen, setChamadaFullscreen] = useState(false);
+
+  const conteudoHint = `${slideIdx + 1}/${aula.slides.length} slides · ${aula.videos.length} vídeos · ${aula.recursos.length} recursos`;
+
   const steps = [
     { n: 1 as Passo, label: "Chamada", icon: UserCheck, hint: `${counts.presente + counts.atraso}/${aula.alunos.length} presentes`, done: chamadaConfirmada, lock: false },
-    { n: 2 as Passo, label: "Conteúdo", icon: Presentation, hint: `Slide ${slideIdx + 1}/${aula.slides.length}`, done: false, lock: !chamadaConfirmada },
+    { n: 2 as Passo, label: "Conteúdo", icon: Presentation, hint: conteudoHint, done: false, lock: !chamadaConfirmada },
     { n: 3 as Passo, label: "Encerramento", icon: CheckCircle2, hint: "Resumo & sair", done: false, lock: !chamadaConfirmada },
   ];
 
   return (
-    <div className="p-6 space-y-5 animate-fade-in">
-      {/* HEADER */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div className="flex items-start gap-2 min-w-0">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => navigate("/professor")}>
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-lg font-semibold text-foreground">{aula.titulo}</h1>
-              {started ? (
-                <Badge className="bg-primary text-primary-foreground gap-1.5 text-[11px]">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                  A Decorrer
-                </Badge>
-              ) : (
-                <Badge variant="outline" className="gap-1.5 text-[11px]">
-                  <AlarmClock className="w-3 h-3" /> Começa em {minutesToStart > 0 ? `${minutesToStart}m` : "breve"}
-                </Badge>
-              )}
+    <div className="min-h-screen bg-background">
+      {/* HEADER (sticky, no sidebar — modo aula) */}
+      <header className="sticky top-0 z-30 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+        <div className="px-6 py-3 flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <Presentation className="w-5 h-5" />
             </div>
-            <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1 flex-wrap">
-              <span>{aula.curso} · {aula.ano} · {aula.turma}</span>
-              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{aula.sala}</span>
-              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{aula.inicio} – {aula.fim}</span>
-              <span className="flex items-center gap-1"><Users className="w-3 h-3" />{aula.alunos.length} alunos</span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl font-semibold text-foreground leading-tight truncate">{aula.titulo}</h1>
+                {started ? (
+                  <Badge className="bg-primary text-primary-foreground gap-1.5 text-[11px]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    Aula A Decorrer
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="gap-1.5 text-[11px]">
+                    <AlarmClock className="w-3 h-3" /> Começa em {minutesToStart > 0 ? `${minutesToStart}m` : "breve"}
+                  </Badge>
+                )}
+                <Badge variant="outline" className="gap-1 text-[11px]"><Lock className="w-3 h-3" /> Modo Aula</Badge>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5 flex-wrap">
+                <span>{aula.curso} · {aula.ano} · {aula.turma}</span>
+                <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{aula.sala}</span>
+                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{aula.inicio} – {aula.fim}</span>
+                <span className="flex items-center gap-1"><Users className="w-3 h-3" />{aula.alunos.length} alunos</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {!started && (
-            <Button size="sm" variant="outline" onClick={() => setStarted(true)}>
-              <Play className="w-3.5 h-3.5 mr-1.5" /> Iniciar Agora
+          <div className="flex items-center gap-2">
+            {!started && (
+              <Button size="sm" variant="outline" onClick={() => setStarted(true)}>
+                <Play className="w-3.5 h-3.5 mr-1.5" /> Iniciar Agora
+              </Button>
+            )}
+            <Button size="sm" variant="outline" onClick={() => navigate("/professor")}>
+              <ArrowLeft className="w-3.5 h-3.5 mr-1.5" /> Sair da Aula
             </Button>
-          )}
-          <Button size="sm" variant="destructive" onClick={() => setConfirmEnd(true)}>
-            <LogOut className="w-3.5 h-3.5 mr-1.5" /> Terminar Aula
-          </Button>
+            <Button size="sm" variant="destructive" onClick={() => setConfirmEnd(true)}>
+              <LogOut className="w-3.5 h-3.5 mr-1.5" /> Terminar Aula
+            </Button>
+          </div>
         </div>
-      </div>
+      </header>
+
+      <div className="p-6 space-y-5 animate-fade-in">
+
 
       {/* MAIN GRID */}
       <div className="grid lg:grid-cols-[260px_1fr] gap-5">
@@ -274,7 +287,7 @@ export default function AulaControlo() {
         {/* MAIN ZONE */}
         <div className="space-y-5">
           {passo === 1 && (
-            <Card className="p-5">
+            <Card className={cn("p-5", chamadaFullscreen && "fixed inset-0 z-40 rounded-none overflow-auto p-8")}>
               <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                 <div>
                   <h2 className="text-base font-semibold">Chamada</h2>
@@ -286,6 +299,9 @@ export default function AulaControlo() {
                   <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary" /><span className="font-semibold text-foreground">{counts.presente}</span><span className="text-muted-foreground">presentes</span></span>
                   <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /><span className="font-semibold text-foreground">{counts.atraso}</span><span className="text-muted-foreground">atraso</span></span>
                   <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-destructive" /><span className="font-semibold text-foreground">{counts.falta}</span><span className="text-muted-foreground">faltas</span></span>
+                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setChamadaFullscreen((v) => !v)} title={chamadaFullscreen ? "Sair do ecrã inteiro" : "Ecrã inteiro"}>
+                    {chamadaFullscreen ? <X className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                  </Button>
                 </div>
               </div>
 
@@ -297,13 +313,16 @@ export default function AulaControlo() {
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-1.5 max-h-[400px] overflow-y-auto pr-1">
+              <div className={cn(
+                "grid gap-1.5 overflow-y-auto pr-1",
+                chamadaFullscreen ? "sm:grid-cols-2 lg:grid-cols-3 max-h-[calc(100vh-220px)]" : "sm:grid-cols-2 max-h-[400px]",
+              )}>
                 {aula.alunos.map((a, i) => {
                   const v = presencas[a.id];
                   return (
                     <div key={a.id} className="flex items-center gap-3 px-3 py-2 rounded-md border border-border bg-card">
                       <span className="text-[10px] text-muted-foreground tabular-nums w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                      <p className="text-sm truncate flex-1 min-w-0">{a.nome}</p>
+                      <p className="text-sm flex-1 min-w-0 break-words font-medium text-foreground">{a.nome}</p>
                       <div className="flex items-center gap-1 shrink-0">
                         {([
                           { k: "presente" as const, label: "Presente", activeCls: "bg-primary text-primary-foreground border-primary" },
@@ -332,6 +351,7 @@ export default function AulaControlo() {
                   size="sm"
                   onClick={() => {
                     setChamadaConfirmada(true);
+                    setChamadaFullscreen(false);
                     setPasso(2);
                     toast.success("Chamada confirmada");
                   }}
@@ -514,6 +534,7 @@ export default function AulaControlo() {
           </div>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   );
 }
