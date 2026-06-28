@@ -196,6 +196,7 @@ export default function AulaControlo() {
   const [chamadaFullscreen, setChamadaFullscreen] = useState(false);
   const [apresentacao, setApresentacao] = useState(false);
   const [quizLancado, setQuizLancado] = useState(false);
+  const [quizAberto, setQuizAberto] = useState(false);
 
   // Modo apresentação: ESC para sair, setas para navegar
   useEffect(() => {
