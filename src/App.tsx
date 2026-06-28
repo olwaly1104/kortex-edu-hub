@@ -355,6 +355,7 @@ function AppRoutes() {
         <Route path="/professor/disciplines/:id" element={<ProfessorDisciplineDetail />} />
         <Route path="/professor/turma/:turmaId" element={<ProfessorTurmaDetail />} />
         <Route path="/professor/lessons/:lessonId" element={<ProfessorLessonDetailPage />} />
+        <Route path="/professor/aula/:lessonId" element={<ProfessorAulaControlo />} />
         <Route path="/professor/students" element={<ProfessorStudents />} />
         <Route path="/professor/lessons" element={<ProfessorLessons />} />
         <Route path="/professor/grades" element={<ProfessorGrades />} />
