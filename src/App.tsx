@@ -49,6 +49,7 @@ import ProfessorFinances from "./pages/professor/Finances";
 import ProfessorProfile from "./pages/professor/Profile";
 import ProfessorTurmaDetail from "./pages/professor/TurmaDetail";
 import ProfessorLessonDetailPage from "./pages/professor/LessonDetail";
+import ProfessorAulaControlo from "./pages/professor/AulaControlo";
 import ProfessorStudentProfile from "./pages/professor/StudentProfile";
 import CoordenadorDashboard from "./pages/coordenador/Dashboard";
 import CoordenadorSolicitacoes from "./pages/coordenador/Solicitacoes";
@@ -354,6 +355,7 @@ function AppRoutes() {
         <Route path="/professor/disciplines/:id" element={<ProfessorDisciplineDetail />} />
         <Route path="/professor/turma/:turmaId" element={<ProfessorTurmaDetail />} />
         <Route path="/professor/lessons/:lessonId" element={<ProfessorLessonDetailPage />} />
+        <Route path="/professor/aula/:lessonId" element={<ProfessorAulaControlo />} />
         <Route path="/professor/students" element={<ProfessorStudents />} />
         <Route path="/professor/lessons" element={<ProfessorLessons />} />
         <Route path="/professor/grades" element={<ProfessorGrades />} />
