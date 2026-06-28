@@ -113,29 +113,32 @@ export default function FinancasDespesaDetail() {
             <div className="pt-4 border-t border-border">
               <PersonBlock label="Responsável" name={d.responsavel} role={d.responsavelRole} />
             </div>
-            <div className="pt-4 border-t border-border space-y-5">
+            <div className="pt-4 border-t border-border space-y-4">
               <p className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Detalhes</p>
 
-              {/* Fornecedor — featured */}
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/80 mb-1">Fornecedor</p>
-                <p className="text-[13.5px] font-semibold text-foreground leading-snug break-words">{d.fornecedor ?? "—"}</p>
+              {/* Fornecedor */}
+              <div className="space-y-1">
+                <p className="text-[9.5px] uppercase tracking-[0.16em] text-muted-foreground/70 font-semibold">Fornecedor</p>
+                <p className="text-[13.5px] font-semibold text-foreground leading-tight break-words">{d.fornecedor ?? "—"}</p>
                 {d.nif && (
-                  <p className="text-[11px] font-mono text-muted-foreground tabular-nums mt-1">NIF · {d.nif}</p>
+                  <div className="inline-flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-md bg-muted/60 border border-border/60">
+                    <span className="text-[9px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">NIF</span>
+                    <span className="text-[11px] font-mono font-semibold text-foreground tabular-nums">{d.nif}</span>
+                  </div>
                 )}
               </div>
 
-              {/* Método de pagamento — single line */}
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground/80">Método</span>
-                <span className="text-[12.5px] font-medium text-foreground text-right break-words">{d.metodoPagamento ?? "—"}</span>
+              {/* Método de pagamento */}
+              <div className="space-y-1">
+                <p className="text-[9.5px] uppercase tracking-[0.16em] text-muted-foreground/70 font-semibold">Método de Pagamento</p>
+                <p className="text-[13px] font-medium text-foreground leading-tight break-words">{d.metodoPagamento ?? "—"}</p>
               </div>
 
-              {/* Documentos fiscais */}
+              {/* Documentos */}
               {(d.facturaNum || d.comprovativoNum) && (
                 <div className="rounded-lg border border-border/70 bg-background overflow-hidden">
                   <div className="px-3 py-1.5 border-b border-border/70 bg-muted/30">
-                    <p className="text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Documentos Fiscais</p>
+                    <p className="text-[9.5px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Documentos</p>
                   </div>
                   <div className="divide-y divide-border/70">
                     {d.facturaNum && (
