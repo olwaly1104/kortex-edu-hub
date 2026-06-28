@@ -368,14 +368,12 @@ function DetailRow({
   mono?: boolean;
 }) {
   return (
-    <div className="px-3 py-2.5">
-      <div className="flex items-center gap-2 mb-1">
-        <div className="w-5 h-5 rounded-md bg-muted/60 text-muted-foreground flex items-center justify-center shrink-0">
-          <Icon className="w-3 h-3" />
-        </div>
+    <div>
+      <div className="flex items-center gap-1.5 mb-0.5">
+        <Icon className="w-3 h-3 text-muted-foreground" />
         <span className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-semibold">{label}</span>
       </div>
-      <p className={cn("text-[12px] font-medium text-foreground leading-snug break-words", mono && "font-mono tabular-nums break-all")}>{value}</p>
+      <p className={cn("text-[12px] font-medium text-foreground leading-snug break-words pl-[18px]", mono && "font-mono tabular-nums break-all")}>{value}</p>
     </div>
   );
 }
