@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Card } from "@/components/ui/card";
-import { Calendar as CalendarIcon, Megaphone, ClipboardCheck, GraduationCap } from "lucide-react";
+import { Calendar as CalendarIcon, Megaphone, ClipboardCheck, GraduationCap, Clock, MapPin, Users } from "lucide-react";
 import { FinHeader } from "@/pages/financas/_FinHeader";
 
 export default function ProfessorDashboard() {
@@ -35,12 +35,21 @@ export default function ProfessorDashboard() {
               <CalendarIcon className="w-5 h-5 text-primary" /> Agenda Hoje
             </h2>
           </div>
-          <div className="flex flex-col items-center justify-center py-10 text-center">
-            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-2">
-              <CalendarIcon className="w-5 h-5 text-muted-foreground" />
+          <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
+            <div className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors">
+              <div className="flex flex-col items-center justify-center w-16 shrink-0 rounded-md bg-primary/10 text-primary py-2">
+                <span className="text-[10px] uppercase tracking-wider font-medium">Hoje</span>
+                <span className="text-sm font-bold tabular-nums">10:00</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-foreground truncate">Teoria da Arquitectura I</p>
+                <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground flex-wrap">
+                  <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> 10:00 – 12:00</span>
+                  <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> Sala A-204</span>
+                  <span className="inline-flex items-center gap-1"><Users className="w-3 h-3" /> ARQ • 1º Ano • T1</span>
+                </div>
+              </div>
             </div>
-            <p className="text-sm font-medium text-foreground">Sem aulas hoje</p>
-            <p className="text-xs text-muted-foreground mt-1">A sua agenda está livre.</p>
           </div>
         </Card>
 
