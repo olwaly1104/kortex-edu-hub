@@ -24,6 +24,7 @@ export default function FinancasDespesaDetail() {
   const [requiredDocs, setRequiredDocs] = useState<string[]>([]);
   const [pendingAction, setPendingAction] = useState<null | "aprovada" | "rejeitada" | "paga" | "parecer" | "upload">(null);
   const [actionNote, setActionNote] = useState("");
+  const [uploadedFiles, setUploadedFiles] = useState<Record<string, string>>({});
 
   useEffect(() => { setD(base); }, [base]);
 
@@ -67,23 +68,33 @@ export default function FinancasDespesaDetail() {
     setD(prev => prev ? { ...prev, historico: [...prev.historico, h], status: newStatus ?? prev.status } : prev);
   };
 
-  const actionMeta: Record<NonNullable<typeof pendingAction>, { title: string; cta: string; tone: string; icon: any; placeholder: string; accao: string; newStatus?: DespesaStatus }> = {
-    aprovada:  { title: "Confirmar aprovação", cta: "Confirmar aprovação", tone: "bg-emerald-600 hover:bg-emerald-700 text-white", icon: CheckCircle2, placeholder: "Parecer / Justificação", accao: "Despesa aprovada", newStatus: "aprovada" },
-    rejeitada: { title: "Confirmar rejeição", cta: "Confirmar rejeição", tone: "bg-red-600 hover:bg-red-700 text-white", icon: XCircle, placeholder: "Motivo da rejeição", accao: "Despesa rejeitada", newStatus: "rejeitada" },
-    paga:      { title: "Confirmar pagamento", cta: "Confirmar pagamento", tone: "bg-blue-600 hover:bg-blue-700 text-white", icon: Banknote, placeholder: "Ref. pagamento, IBAN, observações…", accao: "Pagamento efectuado", newStatus: "paga" },
-    parecer:   { title: "Adicionar parecer", cta: "Registar parecer", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: MessageSquareText, placeholder: "Parecer / Notas internas", accao: "Parecer adicionado" },
-    upload:    { title: "Carregar anexo", cta: "Adicionar anexo", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: Upload, placeholder: "Descrição do anexo", accao: "Anexo carregado" },
+  const actionMeta: Record<NonNullable<typeof pendingAction>, {
+    title: string; cta: string; tone: string; icon: any; placeholder: string; accao: string;
+    newStatus?: DespesaStatus;
+    fromStatus?: DespesaStatus;
+    requiredUploads?: string[];
+  }> = {
+    aprovada:  { title: "Confirmar aprovação", cta: "Confirmar aprovação", tone: "bg-emerald-600 hover:bg-emerald-700 text-white", icon: CheckCircle2, placeholder: "Parecer / Justificação", accao: "Despesa aprovada", newStatus: "aprovada", fromStatus: "pendente", requiredUploads: [] },
+    rejeitada: { title: "Confirmar rejeição", cta: "Confirmar rejeição", tone: "bg-red-600 hover:bg-red-700 text-white", icon: XCircle, placeholder: "Motivo da rejeição (obrigatório)", accao: "Despesa rejeitada", newStatus: "rejeitada", fromStatus: "pendente", requiredUploads: [] },
+    paga:      { title: "Confirmar pagamento", cta: "Confirmar pagamento", tone: "bg-blue-600 hover:bg-blue-700 text-white", icon: Banknote, placeholder: "Ref. pagamento, IBAN, observações…", accao: "Pagamento efectuado", newStatus: "paga", fromStatus: "aprovada", requiredUploads: ["Factura", "Comprovativo"] },
+    parecer:   { title: "Adicionar parecer", cta: "Registar parecer", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: MessageSquareText, placeholder: "Parecer / Notas internas", accao: "Parecer adicionado", requiredUploads: [] },
+    upload:    { title: "Carregar anexo", cta: "Adicionar anexo", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: Upload, placeholder: "Descrição do anexo", accao: "Anexo carregado", requiredUploads: ["Anexo"] },
   };
 
   const pm = pendingAction ? actionMeta[pendingAction] : null;
+  const missingUploads = pm?.requiredUploads?.filter(u => !uploadedFiles[u]) ?? [];
+  const canConfirm = missingUploads.length === 0 && (pendingAction !== "rejeitada" || actionNote.trim().length > 0);
 
   const confirmAction = () => {
-    if (!pm) return;
+    if (!pm || !canConfirm) return;
     const now = new Date().toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
-    appendHistorico({ data: now, accao: pm.accao, actor: "Você", nota: actionNote || undefined }, pm.newStatus);
-    toast({ title: pm.accao, description: actionNote || `${d.ref} actualizado.` });
+    const uploadSummary = Object.entries(uploadedFiles).map(([k, v]) => `${k}: ${v}`).join(" · ");
+    const fullNote = [actionNote, uploadSummary].filter(Boolean).join(" — ");
+    appendHistorico({ data: now, accao: pm.accao, actor: "Você", nota: fullNote || undefined }, pm.newStatus);
+    toast({ title: pm.accao, description: fullNote || `${d.ref} actualizado.` });
     setPendingAction(null);
     setActionNote("");
+    setUploadedFiles({});
   };
 
   // Single contextual action per status (linked to cronologia)
@@ -394,7 +405,7 @@ export default function FinancasDespesaDetail() {
       </Dialog>
 
       {/* Action dialog — Aprovar / Rejeitar / Pagar / Parecer / Upload */}
-      <Dialog open={!!pendingAction} onOpenChange={(o) => { if (!o) { setPendingAction(null); setActionNote(""); } }}>
+      <Dialog open={!!pendingAction} onOpenChange={(o) => { if (!o) { setPendingAction(null); setActionNote(""); setUploadedFiles({}); } }}>
         <DialogContent className="max-w-md">
           {pm && (
             <>
@@ -406,24 +417,74 @@ export default function FinancasDespesaDetail() {
                   Esta acção será registada na cronologia de <span className="font-mono font-semibold text-foreground">{d.ref}</span>.
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-3 mt-2">
-                <Textarea
-                  value={actionNote}
-                  onChange={(e) => setActionNote(e.target.value)}
-                  placeholder={pm.placeholder}
-                  rows={4}
-                  className="text-[13px]"
-                />
-                {pendingAction === "upload" && (
-                  <div className="rounded-md border border-dashed border-border bg-muted/30 px-3 py-4 text-center text-[11px] text-muted-foreground">
-                    <Upload className="w-4 h-4 mx-auto mb-1.5 text-muted-foreground/70" />
-                    Arraste o ficheiro ou clique para seleccionar
+
+              {/* State transition */}
+              {pm.fromStatus && pm.newStatus && (
+                <div className="flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 py-2">
+                  <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Estado</span>
+                  <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", finStatusMetaDespesa[pm.fromStatus].cls)}>
+                    <span className={cn("w-1.5 h-1.5 rounded-full", finStatusMetaDespesa[pm.fromStatus].dot)} />
+                    {finStatusMetaDespesa[pm.fromStatus].label}
+                  </Badge>
+                  <span className="text-muted-foreground">→</span>
+                  <Badge variant="outline" className={cn("text-[10px] font-semibold px-2 py-0.5 uppercase tracking-wider gap-1", finStatusMetaDespesa[pm.newStatus].cls)}>
+                    <span className={cn("w-1.5 h-1.5 rounded-full", finStatusMetaDespesa[pm.newStatus].dot)} />
+                    {finStatusMetaDespesa[pm.newStatus].label}
+                  </Badge>
+                </div>
+              )}
+
+              <div className="space-y-3 mt-1">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">Notas {pendingAction === "rejeitada" && <span className="text-red-600 normal-case tracking-normal">(obrigatório)</span>}</label>
+                  <Textarea
+                    value={actionNote}
+                    onChange={(e) => setActionNote(e.target.value)}
+                    placeholder={pm.placeholder}
+                    rows={3}
+                    className="text-[13px]"
+                  />
+                </div>
+
+                {(pm.requiredUploads ?? []).length > 0 && (
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">
+                      Evidência <span className="normal-case tracking-normal text-muted-foreground/80">(obrigatório)</span>
+                    </label>
+                    <div className="space-y-2">
+                      {pm.requiredUploads!.map((u) => {
+                        const file = uploadedFiles[u];
+                        return (
+                          <label key={u} className={cn("flex items-center gap-2 rounded-md border border-dashed px-3 py-2 cursor-pointer transition-colors", file ? "border-emerald-300 bg-emerald-50/40" : "border-border bg-muted/20 hover:bg-muted/40")}>
+                            <div className={cn("w-7 h-7 rounded-md border flex items-center justify-center shrink-0", file ? "bg-emerald-100 border-emerald-200 text-emerald-700" : "bg-background border-border text-muted-foreground")}>
+                              {file ? <Check className="w-3.5 h-3.5" strokeWidth={3} /> : <Upload className="w-3.5 h-3.5" />}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[12px] font-semibold text-foreground leading-tight">{u}</p>
+                              <p className="text-[10.5px] text-muted-foreground truncate">{file ?? "Clique para seleccionar ficheiro"}</p>
+                            </div>
+                            <input
+                              type="file"
+                              className="hidden"
+                              onChange={(e) => {
+                                const f = e.target.files?.[0];
+                                if (f) setUploadedFiles(prev => ({ ...prev, [u]: f.name }));
+                              }}
+                            />
+                          </label>
+                        );
+                      })}
+                    </div>
+                    {missingUploads.length > 0 && (
+                      <p className="text-[10.5px] text-amber-600 font-medium">Em falta: {missingUploads.join(", ")}</p>
+                    )}
                   </div>
                 )}
               </div>
+
               <div className="flex items-center justify-end gap-2 mt-4">
-                <Button variant="outline" size="sm" className="h-8 text-[12px]" onClick={() => { setPendingAction(null); setActionNote(""); }}>Cancelar</Button>
-                <Button size="sm" className={cn("h-8 text-[12px] gap-1.5", pm.tone)} onClick={confirmAction}>
+                <Button variant="outline" size="sm" className="h-8 text-[12px]" onClick={() => { setPendingAction(null); setActionNote(""); setUploadedFiles({}); }}>Cancelar</Button>
+                <Button size="sm" disabled={!canConfirm} className={cn("h-8 text-[12px] gap-1.5", pm.tone)} onClick={confirmAction}>
                   <pm.icon className="w-3.5 h-3.5" /> {pm.cta}
                 </Button>
               </div>
