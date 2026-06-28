@@ -287,7 +287,7 @@ export default function AulaControlo() {
         {/* MAIN ZONE */}
         <div className="space-y-5">
           {passo === 1 && (
-            <Card className="p-5">
+            <Card className={cn("p-5", chamadaFullscreen && "fixed inset-0 z-40 rounded-none overflow-auto p-8")}>
               <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                 <div>
                   <h2 className="text-base font-semibold">Chamada</h2>
@@ -299,6 +299,9 @@ export default function AulaControlo() {
                   <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-primary" /><span className="font-semibold text-foreground">{counts.presente}</span><span className="text-muted-foreground">presentes</span></span>
                   <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /><span className="font-semibold text-foreground">{counts.atraso}</span><span className="text-muted-foreground">atraso</span></span>
                   <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-destructive" /><span className="font-semibold text-foreground">{counts.falta}</span><span className="text-muted-foreground">faltas</span></span>
+                  <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setChamadaFullscreen((v) => !v)} title={chamadaFullscreen ? "Sair do ecrã inteiro" : "Ecrã inteiro"}>
+                    {chamadaFullscreen ? <X className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                  </Button>
                 </div>
               </div>
 
@@ -310,13 +313,16 @@ export default function AulaControlo() {
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-1.5 max-h-[400px] overflow-y-auto pr-1">
+              <div className={cn(
+                "grid gap-1.5 overflow-y-auto pr-1",
+                chamadaFullscreen ? "sm:grid-cols-2 lg:grid-cols-3 max-h-[calc(100vh-220px)]" : "sm:grid-cols-2 max-h-[400px]",
+              )}>
                 {aula.alunos.map((a, i) => {
                   const v = presencas[a.id];
                   return (
                     <div key={a.id} className="flex items-center gap-3 px-3 py-2 rounded-md border border-border bg-card">
                       <span className="text-[10px] text-muted-foreground tabular-nums w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                      <p className="text-sm truncate flex-1 min-w-0">{a.nome}</p>
+                      <p className="text-sm flex-1 min-w-0 break-words font-medium text-foreground">{a.nome}</p>
                       <div className="flex items-center gap-1 shrink-0">
                         {([
                           { k: "presente" as const, label: "Presente", activeCls: "bg-primary text-primary-foreground border-primary" },
@@ -345,6 +351,7 @@ export default function AulaControlo() {
                   size="sm"
                   onClick={() => {
                     setChamadaConfirmada(true);
+                    setChamadaFullscreen(false);
                     setPasso(2);
                     toast.success("Chamada confirmada");
                   }}
