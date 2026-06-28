@@ -82,23 +82,16 @@ export default function FinancasDespesaDetail() {
               <div className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-background text-[11px] font-mono font-semibold text-foreground">
                 {d.ref}
               </div>
-              <div className="inline-flex items-center gap-2 pl-1.5 pr-2 py-1 rounded-md border border-border bg-background shadow-sm">
-                <div className="w-6 h-6 rounded bg-red-50 border border-red-200 flex items-center justify-center shrink-0">
-                  <FileText className="w-3 h-3 text-red-600" />
-                </div>
-                <div className="flex flex-col leading-tight">
-                  <span className="text-[11px] font-semibold text-foreground tabular-nums">Despesa-{d.ref}</span>
-                  <span className="text-[9px] text-muted-foreground font-medium">Gerado automaticamente</span>
-                </div>
-              </div>
+              <Button variant="outline" size="sm" className="h-8 gap-1.5 text-[11px]" onClick={() => setDocOpen(true)}>
+                <Eye className="w-3.5 h-3.5" /> Ver documento
+              </Button>
             </div>
           </div>
         </div>
 
-        {/* Body grid: Cronologia + Doc preview */}
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] gap-0 border-t border-border">
-          {/* Left — Cronologia + Metadata */}
-          <div className="p-6 space-y-6 border-r border-border">
+        {/* Body — single column */}
+        <div className="border-t border-border">
+          <div className="p-6 space-y-6">
             {/* Metadata */}
             <div>
               <p className="text-[10px] uppercase tracking-[0.18em] font-bold text-muted-foreground mb-2">Identificação</p>
