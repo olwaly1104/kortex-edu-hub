@@ -173,11 +173,8 @@ export default function AdminUtilizadores() {
         return;
       }
       setRows((prev) => prev.filter((r) => r.id !== id && r.email.toLowerCase() !== email.toLowerCase()));
-      try {
-        const { removeDevCred } = await import("@/lib/devCreds");
-        removeDevCred(email);
-      } catch { /* ignore */ }
       refetchServer();
+
     } finally {
       setDeletingId(null);
     }
