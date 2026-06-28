@@ -72,7 +72,23 @@ export default function FinancasDespesaDetail() {
     rejeitada: { title: "Confirmar rejeição", cta: "Confirmar rejeição", tone: "bg-red-600 hover:bg-red-700 text-white", icon: XCircle, placeholder: "Motivo da rejeição", accao: "Despesa rejeitada", newStatus: "rejeitada" },
     paga:      { title: "Confirmar pagamento", cta: "Confirmar pagamento", tone: "bg-blue-600 hover:bg-blue-700 text-white", icon: Banknote, placeholder: "Ref. pagamento, IBAN, observações…", accao: "Pagamento efectuado", newStatus: "paga" },
     parecer:   { title: "Adicionar parecer", cta: "Registar parecer", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: MessageSquareText, placeholder: "Parecer / Notas internas", accao: "Parecer adicionado" },
-...
+    upload:    { title: "Carregar anexo", cta: "Adicionar anexo", tone: "bg-primary hover:bg-primary/90 text-primary-foreground", icon: FileUp, placeholder: "Descrição do anexo", accao: "Anexo carregado" },
+  };
+
+  const pm = pendingAction ? actionMeta[pendingAction] : null;
+
+  const confirmAction = () => {
+    if (!pm) return;
+    const now = new Date().toLocaleString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+    appendHistorico({ data: now, accao: pm.accao, actor: "Você", nota: actionNote || undefined }, pm.newStatus);
+    toast({ title: pm.accao, description: actionNote || `${d.ref} actualizado.` });
+    setPendingAction(null);
+    setActionNote("");
+  };
+
+  // Single contextual action per status (linked to cronologia)
+  const primaryAction: { key: NonNullable<typeof pendingAction>; label: string; icon: any; cls: string } | null =
+    d.status === "pendente"
       ? { key: "aprovada", label: "Confirmar aprovação", icon: CheckCircle2, cls: "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent" }
       : d.status === "aprovada"
       ? { key: "paga", label: "Confirmar pagamento", icon: Banknote, cls: "bg-blue-600 hover:bg-blue-700 text-white border-transparent" }
