@@ -37,19 +37,27 @@ export default function ProfessorDashboard() {
               <CalendarIcon className="w-5 h-5 text-primary" /> Agenda Hoje
             </h2>
           </div>
-          <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
-            <div className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors">
-              <div className="flex flex-col items-center justify-center w-16 shrink-0 rounded-md bg-primary/10 text-primary py-2">
-                <span className="text-[10px] uppercase tracking-wider font-medium">Hoje</span>
-                <span className="text-sm font-bold tabular-nums">10:00</span>
+          <div className="divide-y divide-border">
+            <div className="flex items-center gap-4 px-4 py-3 bg-primary/5 transition-colors">
+              <div className="text-center shrink-0 w-12">
+                <p className="text-sm font-bold text-primary tabular-nums">10:00</p>
+                <p className="text-[10px] text-muted-foreground tabular-nums">12:00</p>
               </div>
+              <div className="w-0.5 h-10 rounded-full shrink-0 bg-primary" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">Teoria da Arquitectura I</p>
-                <div className="flex items-center gap-3 mt-1 text-[11px] text-muted-foreground flex-wrap">
-                  <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" /> 10:00 – 12:00</span>
-                  <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> Sala A-204</span>
-                  <span className="inline-flex items-center gap-1"><Users className="w-3 h-3" /> ARQ • 1º Ano • T1</span>
+                <p className="font-medium text-sm leading-tight truncate text-primary">Teoria da Arquitectura I</p>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                  <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />Sala A-204</span>
+                  <span>ARQ • 1º Ano • T1</span>
                 </div>
+              </div>
+              <Badge variant="outline" className="text-[9px] gap-1 font-medium shrink-0 border-primary/30 text-primary bg-primary/10">
+                <Clock className="w-2.5 h-2.5" /> A Decorrer
+              </Badge>
+              <div className="shrink-0">
+                <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] gap-1.5 font-medium">
+                  <LogIn className="w-3 h-3" /> Entrar na Aula
+                </Button>
               </div>
             </div>
           </div>
