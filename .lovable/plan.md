@@ -1,59 +1,66 @@
-## 1. Remove "Módulo Kortex" field
+# Aula em Directo — Painel de Controlo do Professor
 
-Drop the field that sits below "Documentação Anexa" in:
-- `src/components/admin/DocenteFormDialog.tsx`
-- `src/components/admin/StaffFormDialog.tsx`
-- `src/pages/admin/Discentes.tsx` (inline add form)
+## 1. Refinar o botão "Entrar na Aula" (Dashboard)
 
-Also strip it from the `requiredOk` validation and from save payloads (keep the column in DB untouched — just stop sending/reading it from these forms).
+No card **Agenda Hoje** do `/professor`:
+- Substituir o botão `variant="outline"` (fundo branco e cinza neutro) por um chip sólido na cor primária quando a aula está **A Decorrer** (CTA principal), e versão suave para aulas futuras.
+- Estados visuais:
+  - **A Decorrer** → fundo verde primário, texto branco, ícone `LogIn`, hover mais escuro, ring suave verde a pulsar (`animate-pulse` discreto no ponto de status).
+  - **Agendada** → outline verde primário, texto verde, sem fundo branco puro (usa `bg-primary/5`).
+  - **Concluída** → ghost cinza com `Video` + "Rever".
+- Linha lateral colorida (`bg-primary`) já existente fica mais espessa (`w-1`) e ganha cantos arredondados.
 
-## 2. Bloqueado badge (visual only)
+## 2. Nova página — Painel da Aula
 
-Reuse the existing badge style from `src/pages/admin/FaculdadesCursos.tsx` (the same pattern already in `ConfigurarReceitas.tsx`).
+Rota: `/professor/aula/:lessonId` (placeholder com dados mock por enquanto, pronto para ligar ao backend depois).
 
-Add the badge to each row when `row.bloqueado === true` in:
-- Onboarding RH → Departamentos, Docentes table, Staff table
-- Onboarding Espaços, Geopontos, Salários, Estudantes, Regras Presença
-- Faculdades & Cursos (already present — verify both tables)
-- Finanças → Configurar Receitas (Propinas por Curso, Taxas e Serviços)
+Layout (1 ecrã, sem scroll lateral):
 
-Tables whose source has no `bloqueado` column today: read it as `row.bloqueado ?? false` so the badge simply never shows until the column exists. No migration in this pass.
+```text
+┌─────────────────────────────────────────────────────────────┐
+│ HEADER     Teoria da Arquitectura I · ARQ · 1º Ano · T1     │
+│            Sala A-204 · 10:00 – 12:00     [Terminar Aula]   │
+├──────────────┬──────────────────────────────────────────────┤
+│ CRONÓMETRO   │  PASSO ACTUAL                                │
+│ 00:23:41     │  ──────────────────                          │
+│ Decorrida    │  ① Chamada (a fazer)                         │
+│ ─── / 02:00  │  ② Conteúdo da aula                          │
+│ Barra verde  │  ③ Encerramento                              │
+├──────────────┴──────────────────────────────────────────────┤
+│ ZONA PRINCIPAL — muda conforme o passo                      │
+│                                                             │
+│  • Passo 1: grelha de chamada (alunos com botões            │
+│    Presente / Atraso / Falta, marcação em massa, %)         │
+│  • Passo 2: controlo de conteúdos                           │
+│      ‑ Slides (anterior / seguinte, miniatura, fullscreen)  │
+│      ‑ Vídeos (play/pause, scrub, ecrã cheio)               │
+│      ‑ Recursos (PDFs, links partilhados em 1 clique)       │
+│  • Passo 3: resumo + botão "Encerrar Aula"                  │
+└─────────────────────────────────────────────────────────────┘
+```
 
-## 3. Edit button on every row
+### Comportamento
 
-Pattern (already used in RH Departamentos):
-- Default row = read-only text
-- Pencil icon toggles edit mode → inputs/selects appear
-- Save icon commits
+- **Auto-start**: ao abrir, se a hora actual ≥ hora de início, o cronómetro inicia automaticamente. Caso contrário mostra "Começa em 04:12" e o botão "Iniciar Agora".
+- **Chamada obrigatória primeiro**: passo 2 fica bloqueado até a chamada ser confirmada (mesmo que com 0 presenças explicitamente marcadas — exige carregar em "Confirmar Chamada"). Mostra contagem ao vivo (`18 / 24 presentes`).
+- **Controlo de conteúdo**:
+  - Slides: navegação com `←` / `→` no teclado, indicador `3 / 24`, botão fullscreen.
+  - Vídeos: player simples (HTML5) com play/pause e barra de progresso.
+  - Lista de recursos com acção "Partilhar com a turma" (placeholder).
+- **Terminar aula**: dialog de confirmação, mostra sumário (duração, % presença, conteúdos cobertos) e fecha sessão.
 
-Apply to all tables listed in section 2. Where rows are already always-editable inputs (Pessoas, Espaços, Geopontos, Salários, Estudantes, Regras Presença, ConfigurarReceitas), wrap each row with the same `editing[id]` toggle and swap inputs ↔ read-only text.
+## 3. Ligações
 
-## 4. Confirm dialogs
+- Botão **Entrar na Aula** no Dashboard navega para `/professor/aula/aula-demo` (id mock).
+- Página acessível também a partir de `Aulas` futuramente (não tocar agora).
+- Atalhos de teclado: `P` toggle play/pause vídeo, `←/→` slides, `Esc` sair de fullscreen.
 
-Add an `AlertDialog` for two actions on every row:
-- **Delete** → "Tem a certeza que pretende eliminar este registo? Esta acção é irreversível." → Confirmar / Cancelar
-- **Confirm Edit (Save)** → "Confirmar as alterações a este registo?" → Confirmar / Cancelar
+## Detalhes técnicos
 
-Implementation: a small shared helper `useConfirm()` in `src/components/ui/confirm-dialog.tsx` that renders one `AlertDialog` driven by state, returns `confirm(opts) => Promise<boolean>`. Each table imports it and wraps its existing `remove()` / save handlers.
-
-## Files touched
-
-- New: `src/components/ui/confirm-dialog.tsx`
-- Edited:
-  - `src/components/admin/DocenteFormDialog.tsx`
-  - `src/components/admin/StaffFormDialog.tsx`
-  - `src/pages/admin/Discentes.tsx`
-  - `src/pages/admin/onboarding/RH.tsx`
-  - `src/pages/admin/onboarding/Pessoas.tsx`
-  - `src/pages/admin/onboarding/Espacos.tsx`
-  - `src/pages/admin/onboarding/Geopontos.tsx`
-  - `src/pages/admin/onboarding/Salarios.tsx`
-  - `src/pages/admin/onboarding/Estudantes.tsx`
-  - `src/pages/admin/onboarding/RegrasPresenca.tsx`
-  - `src/pages/admin/FaculdadesCursos.tsx`
-  - `src/pages/financas/ConfigurarReceitas.tsx`
-
-## Out of scope (ask later if needed)
-
-- Adding a UI to actually toggle `bloqueado` on/off (you said "just a visual badge").
-- Adding a `bloqueado` column to tables that don't have one yet (no DB migration).
+- Novo ficheiro `src/pages/professor/AulaControlo.tsx`.
+- Registar rota em `src/App.tsx` sob `/professor/aula/:lessonId`.
+- Estado local (`useState` / `useReducer`) — sem backend nesta iteração; dados mock (1 turma, ~24 alunos, 3 slides, 1 vídeo). Marcado claramente como mock para substituir depois pelo `lessons` real.
+- Reutilizar tokens semânticos (`bg-primary`, `text-primary`, `border-border`) — sem cores hard-coded.
+- Componentes shadcn: `Card`, `Button`, `Badge`, `Progress`, `Dialog`, `Tabs` (para os 3 passos no header lateral).
+- Cronómetro com `setInterval` em `useEffect` + cleanup.
+- Sem nova dependência.
