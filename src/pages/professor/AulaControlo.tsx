@@ -311,28 +311,25 @@ export default function AulaControlo() {
               <div className="grid sm:grid-cols-2 gap-1.5 max-h-[400px] overflow-y-auto pr-1">
                 {aula.alunos.map((a, i) => {
                   const v = presencas[a.id];
-                  const dotColor = v === "presente" ? "bg-primary" : v === "atraso" ? "bg-amber-500" : v === "falta" ? "bg-destructive" : "bg-muted-foreground/30";
                   return (
-                    <div key={a.id} className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-md border border-border bg-card">
+                    <div key={a.id} className="flex items-center gap-3 px-3 py-2 rounded-md border border-border bg-card">
                       <span className="text-[10px] text-muted-foreground tabular-nums w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                      <span className={cn("w-2 h-2 rounded-full shrink-0 transition-colors", dotColor)} />
                       <p className="text-sm truncate flex-1 min-w-0">{a.nome}</p>
-                      <div className="flex items-center gap-0.5 shrink-0">
+                      <div className="flex items-center gap-1 shrink-0">
                         {([
-                          { k: "presente" as const, Icon: UserCheck, color: "text-primary", bg: "bg-primary/10" },
-                          { k: "atraso" as const, Icon: Clock, color: "text-amber-600", bg: "bg-amber-500/10" },
-                          { k: "falta" as const, Icon: UserX, color: "text-destructive", bg: "bg-destructive/10" },
-                        ]).map(({ k, Icon, color, bg }) => (
+                          { k: "presente" as const, label: "Presente", activeCls: "bg-primary text-primary-foreground border-primary" },
+                          { k: "atraso" as const, label: "Atraso", activeCls: "bg-amber-500 text-white border-amber-500" },
+                          { k: "falta" as const, label: "Falta", activeCls: "bg-destructive text-destructive-foreground border-destructive" },
+                        ]).map(({ k, label, activeCls }) => (
                           <button
                             key={k}
                             onClick={() => setPresencas((p) => ({ ...p, [a.id]: p[a.id] === k ? null : k }))}
                             className={cn(
-                              "w-6 h-6 rounded flex items-center justify-center transition-colors",
-                              v === k ? `${bg} ${color}` : "text-muted-foreground/60 hover:bg-muted hover:text-foreground",
+                              "px-2.5 h-7 rounded-md border text-[11px] font-medium transition-colors",
+                              v === k ? activeCls : "border-border bg-background text-muted-foreground hover:text-foreground hover:bg-muted",
                             )}
-                            aria-label={k}
                           >
-                            <Icon className="w-3.5 h-3.5" />
+                            {label}
                           </button>
                         ))}
                       </div>
