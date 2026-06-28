@@ -33,7 +33,12 @@ export interface FinDespesa {
   fornecedor?: string;
   nif?: string;
   metodoPagamento?: string;
+  iban?: string;
   rubricaOrcamental?: string;
+  facturaNum?: string;
+  facturaData?: string;
+  comprovativoNum?: string;
+  comprovativoData?: string;
   anexos: DespesaAnexo[];
   historico: DespesaHistorico[];
 }
