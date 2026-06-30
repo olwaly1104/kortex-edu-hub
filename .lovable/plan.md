@@ -1,66 +1,72 @@
-# Aula em Directo — Painel de Controlo do Professor
+## 1. Sistema page — GB utilizados bar
 
-## 1. Refinar o botão "Entrar na Aula" (Dashboard)
+`src/pages/admin/Sistema.tsx`
+- Replace **Faculdades** and **Cursos** KPI cards with a single full-width **Armazenamento** card containing a thin progress bar (`Progress` component), showing `X.X MB / 50 GB`.
+- Source: list `discentes` storage bucket via `supabase.storage.from("discentes").list("", { limit: 1000 })` (recursive walk on subfolders) and sum `metadata.size`. Cap visualised total at 50 GB.
+- Keep Perfis + Acessos cards. New grid becomes 2 KPIs + 1 wider storage card.
 
-No card **Agenda Hoje** do `/professor`:
-- Substituir o botão `variant="outline"` (fundo branco e cinza neutro) por um chip sólido na cor primária quando a aula está **A Decorrer** (CTA principal), e versão suave para aulas futuras.
-- Estados visuais:
-  - **A Decorrer** → fundo verde primário, texto branco, ícone `LogIn`, hover mais escuro, ring suave verde a pulsar (`animate-pulse` discreto no ponto de status).
-  - **Agendada** → outline verde primário, texto verde, sem fundo branco puro (usa `bg-primary/5`).
-  - **Concluída** → ghost cinza com `Video` + "Rever".
-- Linha lateral colorida (`bg-primary`) já existente fica mais espessa (`w-1`) e ganha cantos arredondados.
+## 2. Docente form — remove categoria, merge morada into Identificação
 
-## 2. Nova página — Painel da Aula
+`src/components/admin/DocenteFormDialog.tsx`
+- Drop **Categoria** field entirely; on save set `categoria = moduloKortex` label (so existing data shape unchanged).
+- Remove "Morada de Residência" section; move Província / Município / Endereço into the Identificação Pessoal grid (extend to 4 cols).
 
-Rota: `/professor/aula/:lessonId` (placeholder com dados mock por enquanto, pronto para ligar ao backend depois).
+`src/pages/admin/Docentes.tsx` (legacy dialog) — same removals.
 
-Layout (1 ecrã, sem scroll lateral):
+`src/lib/peopleStorage.ts` — keep `categoria` field optional (no migration).
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│ HEADER     Teoria da Arquitectura I · ARQ · 1º Ano · T1     │
-│            Sala A-204 · 10:00 – 12:00     [Terminar Aula]   │
-├──────────────┬──────────────────────────────────────────────┤
-│ CRONÓMETRO   │  PASSO ACTUAL                                │
-│ 00:23:41     │  ──────────────────                          │
-│ Decorrida    │  ① Chamada (a fazer)                         │
-│ ─── / 02:00  │  ② Conteúdo da aula                          │
-│ Barra verde  │  ③ Encerramento                              │
-├──────────────┴──────────────────────────────────────────────┤
-│ ZONA PRINCIPAL — muda conforme o passo                      │
-│                                                             │
-│  • Passo 1: grelha de chamada (alunos com botões            │
-│    Presente / Atraso / Falta, marcação em massa, %)         │
-│  • Passo 2: controlo de conteúdos                           │
-│      ‑ Slides (anterior / seguinte, miniatura, fullscreen)  │
-│      ‑ Vídeos (play/pause, scrub, ecrã cheio)               │
-│      ‑ Recursos (PDFs, links partilhados em 1 clique)       │
-│  • Passo 3: resumo + botão "Encerrar Aula"                  │
-└─────────────────────────────────────────────────────────────┘
-```
+## 3. Docente profile cleanup + Ver/Descarregar
 
-### Comportamento
+`src/pages/admin/DocenteProfile.tsx`
+- Remove Categoria badge in header and Categoria InfoRow in "Afiliação Institucional".
+- Delete the standalone "Localização" and "Contacto" SectionCards (already covered in Informações Pessoais).
+- Replace the moduloLabel badge + hand-rolled Docente pill with `<ModuleTag modulo={docente.moduloKortex} />` (single source of truth from chat).
+- Add a header action row "Ver documento" / "Descarregar" that opens a `Dialog` containing a new `DocenteDocPreview` component (A4 layout cloned from `DiscenteDocPreview` with docente fields).
 
-- **Auto-start**: ao abrir, se a hora actual ≥ hora de início, o cronómetro inicia automaticamente. Caso contrário mostra "Começa em 04:12" e o botão "Iniciar Agora".
-- **Chamada obrigatória primeiro**: passo 2 fica bloqueado até a chamada ser confirmada (mesmo que com 0 presenças explicitamente marcadas — exige carregar em "Confirmar Chamada"). Mostra contagem ao vivo (`18 / 24 presentes`).
-- **Controlo de conteúdo**:
-  - Slides: navegação com `←` / `→` no teclado, indicador `3 / 24`, botão fullscreen.
-  - Vídeos: player simples (HTML5) com play/pause e barra de progresso.
-  - Lista de recursos com acção "Partilhar com a turma" (placeholder).
-- **Terminar aula**: dialog de confirmação, mostra sumário (duração, % presença, conteúdos cobertos) e fecha sessão.
+New file: `src/pages/admin/DocenteDocPreview.tsx` (~250 lines, structurally identical to DiscenteDocPreview, with sections: Identificação Pessoal, Afiliação Institucional, Contacto & Morada, Formação Académica; documentos checklist: BI, CV, Diploma, Foto).
 
-## 3. Ligações
+## 4. Staff profile page + auto-doc
 
-- Botão **Entrar na Aula** no Dashboard navega para `/professor/aula/aula-demo` (id mock).
-- Página acessível também a partir de `Aulas` futuramente (não tocar agora).
-- Atalhos de teclado: `P` toggle play/pause vídeo, `←/→` slides, `Esc` sair de fullscreen.
+New file: `src/pages/admin/StaffProfile.tsx` — mirror of DocenteProfile structure but for `StaffRow` fields (no Faculdade/Grau; uses Departamento + Função). Header uses `<ModuleTag modulo={staff.moduloKortex} />`.
 
-## Detalhes técnicos
+New file: `src/pages/admin/StaffDocPreview.tsx` — mirror of DocenteDocPreview tuned to staff fields (Identificação Pessoal, Afiliação Institucional [Departamento/Função/Módulo], Contacto & Morada). Documentos: BI, CV, Foto.
 
-- Novo ficheiro `src/pages/professor/AulaControlo.tsx`.
-- Registar rota em `src/App.tsx` sob `/professor/aula/:lessonId`.
-- Estado local (`useState` / `useReducer`) — sem backend nesta iteração; dados mock (1 turma, ~24 alunos, 3 slides, 1 vídeo). Marcado claramente como mock para substituir depois pelo `lessons` real.
-- Reutilizar tokens semânticos (`bg-primary`, `text-primary`, `border-border`) — sem cores hard-coded.
-- Componentes shadcn: `Card`, `Button`, `Badge`, `Progress`, `Dialog`, `Tabs` (para os 3 passos no header lateral).
-- Cronómetro com `setInterval` em `useEffect` + cleanup.
-- Sem nova dependência.
+`src/App.tsx` — register `/admin/staff/:staffId` → `AdminStaffProfile`.
+
+Make staff rows clickable across: `src/pages/admin/Staff.tsx`, `src/pages/admin/onboarding/Pessoas.tsx` (staff panel) — navigate to `/admin/staff/:id`.
+
+## 5. ModuleTag everywhere on profile pages and admin tables
+
+Replace ad-hoc pills with `<ModuleTag>`:
+- `src/pages/admin/Docentes.tsx` table — Cargo column.
+- `src/pages/admin/Staff.tsx` table — Módulo column.
+- `src/pages/admin/onboarding/Pessoas.tsx` — both Docente and Staff tables.
+- `src/pages/admin/DocenteProfile.tsx` — Cargo badge.
+- New `StaffProfile.tsx` — Módulo badge.
+
+## 6. Smart CSV import
+
+New shared component: `src/components/admin/CsvImportDialog.tsx`
+- Opens from "Importar CSV" button (added next to "Adicionar X" in Docentes, Staff, Discentes config screens).
+- Drag-drop or file picker (`.csv`).
+- Parses with native `FileReader` + simple CSV splitter (handles quoted values, `,` separator).
+- Props: `template: { header: string; required: boolean; key: string }[]`, `validators: Record<key, (val, ctx) => string|null>`, `referenceData: { faculdades, cursos, departamentos }`, `onConfirm(rows)`.
+- Preview table: each row gets a status pill `Pronto` / `Aviso` / `Erro`. Columns show parsed value plus inline messages, e.g. "Faculdade 'CIE' não encontrada (sugestão: Ciências Exatas)". Fuzzy match by lowercase normalized contains/startsWith.
+- Footer KPIs: `X prontos · Y avisos · Z erros`. "Importar X registos" button only imports `Pronto + Aviso` (skips errors).
+- Download template button generates a CSV with headers + 1 sample row.
+
+Wire-up:
+- `src/pages/admin/onboarding/Pessoas.tsx` (Docentes panel) — add "Importar CSV" next to "Adicionar docente"; template: prefixo, primeiro_nome, ultimo_nome, telemovel, faculdade, departamento, grau, cargo, modulo_kortex. Fuzzy-match faculdade against `faculdades` table; departamento against `departamentos`. On confirm, batch insert via `saveDocentes([...existing, ...newRows])`.
+- `src/pages/admin/onboarding/Pessoas.tsx` (Staff panel) — template: prefixo, primeiro_nome, ultimo_nome, telemovel, departamento, funcao, modulo_kortex.
+- `src/pages/admin/Discentes.tsx` — template: primeiro_nome, ultimo_nome, telemovel, bilhete, faculdade, curso, ano, turma, regime, encarregado_nome, encarregado_telefone, encarregado_parentesco. Match curso by sigla or designacao within selected faculdade.
+
+## 7. Out of scope (will NOT touch)
+
+- Backend RLS / storage bucket policies (already configured).
+- Existing onboarding wizard step ordering.
+- Other modules' profile pages (decano/coordenador/reitor) — request was explicitly about admin/finanças staff click-through.
+
+## Risks
+- The discentes bucket size may be empty → show `0 B / 50 GB`. That's expected.
+- CSV fuzzy match is heuristic; flagged warnings let the user proceed knowingly.
+- DocenteDocPreview adds ~250 LOC; mirrors DiscenteDocPreview to keep visual consistency.

@@ -4,32 +4,55 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Progress } from "@/components/ui/progress";
 import { isFullOnboardingComplete } from "@/components/admin/OnboardingStepBanner";
-import { Building2, Database, ShieldCheck, Users, Layers, CheckCircle2, Clock } from "lucide-react";
+import { Building2, Database, ShieldCheck, Users, HardDrive, CheckCircle2, Clock } from "lucide-react";
+
+const TOTAL_BYTES = 50 * 1024 * 1024 * 1024; // 50 GB cap
+
+const fmtBytes = (n: number) => {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  if (n < 1024 * 1024 * 1024) return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(n / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+};
+
+async function walkBucket(bucket: string, prefix = ""): Promise<number> {
+  const { data, error } = await supabase.storage.from(bucket).list(prefix, { limit: 1000 });
+  if (error || !data) return 0;
+  let total = 0;
+  for (const item of data) {
+    if (item.id === null || item.metadata == null) {
+      // folder
+      total += await walkBucket(bucket, prefix ? `${prefix}/${item.name}` : item.name);
+    } else {
+      total += (item.metadata as any)?.size || 0;
+    }
+  }
+  return total;
+}
 
 export default function AdminSistema() {
   const { user } = useAuth();
-  const [counts, setCounts] = useState({ profiles: 0, roles: 0, cursos: 0, faculdades: 0 });
+  const [counts, setCounts] = useState({ profiles: 0, roles: 0 });
   const [loaded, setLoaded] = useState(false);
+  const [usedBytes, setUsedBytes] = useState<number | null>(null);
   const onboardingDone = isFullOnboardingComplete(user?.email);
 
   useEffect(() => {
     (async () => {
-      const [p, r, c, f] = await Promise.all([
+      const [p, r] = await Promise.all([
         (supabase as any).from("profiles").select("id", { count: "exact", head: true }),
         (supabase as any).from("user_roles").select("id", { count: "exact", head: true }),
-        (supabase as any).from("cursos").select("id", { count: "exact", head: true }),
-        (supabase as any).from("faculdades").select("id", { count: "exact", head: true }),
       ]);
-      setCounts({
-        profiles: p.count ?? 0,
-        roles: r.count ?? 0,
-        cursos: c.count ?? 0,
-        faculdades: f.count ?? 0,
-      });
+      setCounts({ profiles: p.count ?? 0, roles: r.count ?? 0 });
       setLoaded(true);
+      const bytes = await walkBucket("discentes").catch(() => 0);
+      setUsedBytes(bytes);
     })();
   }, []);
+
+  const pct = usedBytes == null ? 0 : Math.min(100, (usedBytes / TOTAL_BYTES) * 100);
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
@@ -43,8 +66,19 @@ export default function AdminSistema() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPI icon={<Users className="w-4 h-4" />} label="Perfis" value={counts.profiles} loaded={loaded} />
         <KPI icon={<ShieldCheck className="w-4 h-4" />} label="Acessos atribuídos" value={counts.roles} loaded={loaded} />
-        <KPI icon={<Building2 className="w-4 h-4" />} label="Faculdades" value={counts.faculdades} loaded={loaded} />
-        <KPI icon={<Layers className="w-4 h-4" />} label="Cursos" value={counts.cursos} loaded={loaded} />
+        <Card className="p-4 lg:col-span-2">
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <HardDrive className="w-4 h-4" />
+              <span>Armazenamento</span>
+            </div>
+            <span className="font-semibold tabular-nums text-foreground">
+              {usedBytes == null ? "—" : `${fmtBytes(usedBytes)} / 50 GB`}
+            </span>
+          </div>
+          <Progress value={pct} className="h-1.5 mt-3" />
+          <p className="text-[10px] text-muted-foreground mt-1.5 tabular-nums">{pct.toFixed(2)}% utilizado</p>
+        </Card>
       </div>
 
       <Card className="p-5">
