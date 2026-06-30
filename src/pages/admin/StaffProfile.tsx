@@ -1,37 +1,49 @@
 import { useMemo, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
-  ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar,
-  GraduationCap, FileText, Building2, IdCard, Award, BookOpen, Briefcase, Eye, Download,
+  ArrowLeft, Mail, MessageCircle, Phone, MapPin, UserCheck, Calendar,
+  FileText, Building2, IdCard, Briefcase, Eye, Download,
 } from "lucide-react";
-import { loadDocentes } from "@/lib/peopleStorage";
+import { loadStaff, type StaffRow } from "@/lib/peopleStorage";
 import { ModuleTag } from "@/components/chat/ModuleTag";
-import DocenteDocPreview from "./DocenteDocPreview";
+import StaffDocPreview from "./StaffDocPreview";
 
-export default function AdminDocenteProfile() {
-  const { docenteId } = useParams();
+type StaffRowExtra = StaffRow & {
+  nascimento?: string;
+  genero?: "M" | "F" | "Outro";
+  bilhete?: string;
+  bilheteFileName?: string;
+  fotoDataUrl?: string;
+  provincia?: string;
+  municipio?: string;
+  endereco?: string;
+  cvFileName?: string;
+};
+
+export default function AdminStaffProfile() {
+  const { staffId } = useParams();
   const navigate = useNavigate();
-  const rows = useMemo(() => loadDocentes(), []);
-  const docente = useMemo(() => rows.find((r) => r.id === docenteId), [rows, docenteId]);
+  const rows = useMemo(() => loadStaff() as StaffRowExtra[], []);
+  const staff = useMemo(() => rows.find((r) => r.id === staffId), [rows, staffId]);
   const [docOpen, setDocOpen] = useState(false);
 
-  if (!docente) {
+  if (!staff) {
     return (
       <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2"><ArrowLeft className="w-4 h-4" /> Voltar</Button>
-        <p className="text-muted-foreground text-center py-12">Docente não encontrado.</p>
+        <p className="text-muted-foreground text-center py-12">Staff não encontrado.</p>
       </div>
     );
   }
 
-  const fullName = `${docente.prefixo || ""} ${docente.primeiroNome} ${docente.ultimoNome}`.trim();
-  const initials = `${docente.primeiroNome?.[0] || ""}${docente.ultimoNome?.[0] || ""}`.toUpperCase();
-  const displayId = `DOC-${(docente.id || "00000000").slice(0, 8).toUpperCase()}`;
-  const genero = docente.genero === "M" ? "Masculino" : docente.genero === "F" ? "Feminino" : (docente.genero || "—");
+  const fullName = `${staff.prefixo || ""} ${staff.primeiroNome} ${staff.ultimoNome}`.trim();
+  const initials = `${staff.primeiroNome?.[0] || ""}${staff.ultimoNome?.[0] || ""}`.toUpperCase();
+  const displayId = `STF-${(staff.id || "00000000").slice(0, 8).toUpperCase()}`;
+  const genero = staff.genero === "M" ? "Masculino" : staff.genero === "F" ? "Feminino" : (staff.genero || "—");
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -49,7 +61,6 @@ export default function AdminDocenteProfile() {
         </div>
       </div>
 
-      {/* Identity header */}
       <Card className="overflow-hidden p-0">
         <div className="grid lg:grid-cols-[1.6fr_1fr] divide-y lg:divide-y-0 lg:divide-x divide-border">
           <div className="p-6 relative">
@@ -65,34 +76,30 @@ export default function AdminDocenteProfile() {
 
             <div className="flex items-start gap-5">
               <div className="w-20 h-20 rounded-full bg-muted overflow-hidden shrink-0 ring-2 ring-border flex items-center justify-center text-xl font-semibold text-muted-foreground">
-                {docente.fotoDataUrl ? <img src={docente.fotoDataUrl} alt={fullName} className="w-full h-full object-cover" /> : initials || <UserCheck className="w-6 h-6" />}
+                {staff.fotoDataUrl ? <img src={staff.fotoDataUrl} alt={fullName} className="w-full h-full object-cover" /> : initials || <UserCheck className="w-6 h-6" />}
               </div>
               <div className="flex-1 min-w-0">
-                <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Perfil do Docente</span>
+                <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Perfil do Staff</span>
                 <div className="flex items-center gap-2 mt-1">
-                  <ModuleTag modulo={docente.moduloKortex} />
+                  <ModuleTag modulo={staff.moduloKortex} />
                 </div>
                 <h1 className="text-2xl font-bold text-foreground leading-tight mt-1.5">{fullName}</h1>
                 <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
-                  {docente.faculdade && (
-                    <Link to="/admin/faculdades-cursos" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-semibold border border-primary/20 hover:bg-primary/15 transition-colors">
-                      <Building2 className="w-3 h-3" /> {docente.faculdade}
-                    </Link>
-                  )}
-                  {docente.departamento && (
+                  {staff.departamento && (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[11px] font-semibold border border-blue-200">
-                      <Briefcase className="w-3 h-3" /> {docente.departamento}
+                      <Briefcase className="w-3 h-3" /> {staff.departamento}
+                    </span>
+                  )}
+                  {staff.funcao && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-foreground text-[11px] font-semibold border border-border">
+                      {staff.funcao}
                     </span>
                   )}
                 </div>
 
                 <div className="flex items-center gap-2 mt-4 flex-wrap">
-                  <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
-                    <MessageCircle className="w-3.5 h-3.5" /> Chat
-                  </Button>
-                  <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
-                    <Mail className="w-3.5 h-3.5" /> Email
-                  </Button>
+                  <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7"><MessageCircle className="w-3.5 h-3.5" /> Chat</Button>
+                  <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7"><Mail className="w-3.5 h-3.5" /> Email</Button>
                 </div>
               </div>
             </div>
@@ -101,21 +108,19 @@ export default function AdminDocenteProfile() {
           <div className="bg-muted/30 p-6 grid grid-cols-2 gap-4 content-center">
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Módulo Kortex</p>
-              <div className="mt-1.5"><ModuleTag modulo={docente.moduloKortex} /></div>
+              <div className="mt-1.5"><ModuleTag modulo={staff.moduloKortex} /></div>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Contrato</p>
-              <p className="text-sm font-semibold mt-1.5">{docente.contrato || "—"}</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Função</p>
+              <p className="text-sm font-semibold mt-1.5">{staff.funcao || "—"}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Grau Académico</p>
-              <p className="text-sm font-semibold mt-1.5">{docente.grau || "—"}</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Departamento</p>
+              <p className="text-sm font-semibold mt-1.5">{staff.departamento || "—"}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Experiência</p>
-              <p className="text-sm font-semibold tabular-nums mt-1.5">
-                {docente.anosExperiencia ? `${docente.anosExperiencia} anos` : "—"}
-              </p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">ID</p>
+              <p className="text-xs font-mono mt-1.5 truncate">{displayId}</p>
             </div>
           </div>
         </div>
@@ -124,40 +129,28 @@ export default function AdminDocenteProfile() {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="bg-muted/40">
           <TabsTrigger value="overview" className="text-xs">Visão Geral</TabsTrigger>
-          <TabsTrigger value="academica" className="text-xs">Formação</TabsTrigger>
           <TabsTrigger value="documentos" className="text-xs">Documentos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid lg:grid-cols-2 gap-4">
             <SectionCard title="Informações Pessoais" icon={<UserCheck className="w-4 h-4" />}>
-              <InfoRow label="Email institucional" value={docente.email || "—"} icon={<Mail className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Telemóvel" value={docente.contacto || "—"} icon={<Phone className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Data de Nascimento" value={docente.nascimento || "—"} icon={<Calendar className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Email institucional" value={staff.email || "—"} icon={<Mail className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Telemóvel" value={staff.contacto || "—"} icon={<Phone className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Data de Nascimento" value={staff.nascimento || "—"} icon={<Calendar className="w-4 h-4 text-primary" />} />
               <InfoRow label="Género" value={genero} icon={<UserCheck className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Nº Bilhete de Identidade" value={docente.bilhete || "—"} icon={<IdCard className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Província" value={docente.provincia || "—"} icon={<MapPin className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Município" value={docente.municipio || "—"} icon={<MapPin className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Endereço" value={docente.endereco || "—"} icon={<Building2 className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Nº Bilhete de Identidade" value={staff.bilhete || "—"} icon={<IdCard className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Província" value={staff.provincia || "—"} icon={<MapPin className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Município" value={staff.municipio || "—"} icon={<MapPin className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Endereço" value={staff.endereco || "—"} icon={<Building2 className="w-4 h-4 text-primary" />} />
             </SectionCard>
 
-            <SectionCard title="Afiliação Institucional" icon={<GraduationCap className="w-4 h-4" />}>
-              <InfoRow label="Faculdade" value={docente.faculdade || "—"} icon={<Building2 className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Departamento" value={docente.departamento || "—"} icon={<Briefcase className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Cargo" value={docente.cargo || "—"} icon={<Users className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Contrato" value={docente.contrato || "—"} icon={<FileText className="w-4 h-4 text-primary" />} />
-              <InfoRow label="ID do Docente" value={docente.id} icon={<IdCard className="w-4 h-4 text-primary" />} />
+            <SectionCard title="Afiliação Institucional" icon={<Building2 className="w-4 h-4" />}>
+              <InfoRow label="Departamento" value={staff.departamento || "—"} icon={<Briefcase className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Função" value={staff.funcao || "—"} icon={<UserCheck className="w-4 h-4 text-primary" />} />
+              <InfoRow label="ID do Staff" value={staff.id} icon={<IdCard className="w-4 h-4 text-primary" />} />
             </SectionCard>
           </div>
-        </TabsContent>
-
-        <TabsContent value="academica" className="space-y-4">
-          <SectionCard title="Formação Académica" icon={<BookOpen className="w-4 h-4" />}>
-            <InfoRow label="Grau máximo" value={docente.grau || "—"} icon={<Award className="w-4 h-4 text-primary" />} />
-            <InfoRow label="Curso" value={docente.especialidade || "—"} icon={<BookOpen className="w-4 h-4 text-primary" />} />
-            <InfoRow label="Instituição de formação" value={docente.instituicaoFormacao || "—"} icon={<Building2 className="w-4 h-4 text-primary" />} />
-            <InfoRow label="Anos de docência" value={docente.anosExperiencia ? `${docente.anosExperiencia} anos` : "—"} icon={<Calendar className="w-4 h-4 text-primary" />} />
-          </SectionCard>
         </TabsContent>
 
         <TabsContent value="documentos" className="space-y-4">
@@ -168,10 +161,9 @@ export default function AdminDocenteProfile() {
               </h3>
             </div>
             <div className="divide-y divide-border">
-              <DocFileRow label="Bilhete de Identidade" fileName={docente.bilheteFileName} icon={<IdCard className="w-4 h-4 text-primary" />} />
-              <DocFileRow label="Curriculum Vitae (CV)" fileName={docente.cvFileName} icon={<FileText className="w-4 h-4 text-primary" />} />
-              <DocFileRow label={docente.grau ? `Diploma de ${docente.grau}` : "Diploma académico"} fileName={docente.diplomaFileName} icon={<Award className="w-4 h-4 text-primary" />} />
-              <DocFileRow label="Fotografia" fileName={docente.fotoDataUrl ? "foto.jpg" : ""} icon={<UserCheck className="w-4 h-4 text-primary" />} />
+              <DocFileRow label="Bilhete de Identidade" fileName={staff.bilheteFileName} icon={<IdCard className="w-4 h-4 text-primary" />} />
+              <DocFileRow label="Curriculum Vitae (CV)" fileName={staff.cvFileName} icon={<FileText className="w-4 h-4 text-primary" />} />
+              <DocFileRow label="Fotografia" fileName={staff.fotoDataUrl ? "foto.jpg" : ""} icon={<UserCheck className="w-4 h-4 text-primary" />} />
             </div>
           </Card>
         </TabsContent>
@@ -179,8 +171,8 @@ export default function AdminDocenteProfile() {
 
       <Dialog open={docOpen} onOpenChange={setDocOpen}>
         <DialogContent className="max-w-5xl p-0 h-[92vh] overflow-hidden">
-          <DialogTitle className="sr-only">Perfil do Docente — {fullName}</DialogTitle>
-          <DocenteDocPreview docente={docente} displayId={displayId} />
+          <DialogTitle className="sr-only">Perfil do Staff — {fullName}</DialogTitle>
+          <StaffDocPreview staff={staff} displayId={displayId} />
         </DialogContent>
       </Dialog>
     </div>

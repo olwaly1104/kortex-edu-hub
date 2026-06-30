@@ -189,6 +189,7 @@ import AdminSalas from "./pages/admin/Salas";
 import AdminStaff from "./pages/admin/Staff";
 import AdminDocentes from "./pages/admin/Docentes";
 import AdminDocenteProfile from "./pages/admin/DocenteProfile";
+import AdminStaffProfile from "./pages/admin/StaffProfile";
 import AdminFinancasDiscentes from "./pages/admin/FinancasDiscentes";
 import AdminUtilizadores from "./pages/admin/Utilizadores";
 import AdminSistema from "./pages/admin/Sistema";
@@ -303,6 +304,7 @@ function AppRoutes() {
         <Route path="/admin/discentes/:discenteId" element={<AdminDiscenteProfile />} />
         <Route path="/admin/salas" element={<AdminSalas />} />
         <Route path="/admin/staff" element={<AdminStaff />} />
+        <Route path="/admin/staff/:staffId" element={<AdminStaffProfile />} />
         <Route path="/admin/docentes" element={<AdminDocentes />} />
         <Route path="/admin/docentes/:docenteId" element={<AdminDocenteProfile />} />
         <Route path="/admin/utilizadores" element={<AdminUtilizadores />} />
@@ -474,6 +476,8 @@ function AppRoutes() {
         <Route path="/financas/configurador" element={<FinancasConfigurarReceitas />} />
         <Route path="/financas/salarios" element={<FinancasSalarios />} />
         <Route path="/financas/docentes/:docenteId" element={<AdminDocenteProfile />} />
+        <Route path="/financas/staff/:staffId" element={<AdminStaffProfile />} />
+        <Route path="/gap/staff/:staffId" element={<AdminStaffProfile />} />
         <Route path="/financas/orcamentos" element={<FinancasOrcamentos />} />
         <Route path="/financas/discentes" element={<FinancasDiscentes />} />
         <Route path="/financas/discentes/:discenteId" element={<GapEstudanteProfile />} />

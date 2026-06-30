@@ -28,9 +28,19 @@ export const buildDocenteEmail = (p: string, u: string) => {
 };
 const diplomaLabel = (g?: Grau) => (g ? `Diploma de ${g}` : "Diploma académico");
 
+const moduloLabel = (v: string) => {
+  switch ((v || "").toLowerCase()) {
+    case "professor": return "Professor";
+    case "coordenador": return "Coordenador de Curso";
+    case "decano": return "Decano";
+    case "reitor": return "Reitor";
+    default: return v || "Professor";
+  }
+};
+
 export const emptyDocente = (): DocenteRow => ({
   id: "", prefixo: "Dr.", primeiroNome: "", ultimoNome: "", email: "", contacto: "",
-  faculdade: "", departamento: "", categoria: "Assistente", cargo: "Docente",
+  faculdade: "", departamento: "", categoria: "Professor", cargo: "Docente",
   nascimento: "", genero: "M", bilhete: "", bilheteFileName: "", fotoDataUrl: "",
   provincia: "", municipio: "", endereco: "",
   grau: "Licenciatura", especialidade: "", instituicaoFormacao: "", anosExperiencia: "",
@@ -69,7 +79,6 @@ export function DocenteFormDialog({
     !!draft.bilhete.trim() &&
     !!draft.faculdade &&
     !!draft.departamento &&
-    !!draft.categoria &&
     !!draft.cargo &&
     !!draft.contrato &&
     !!draft.contacto.trim() &&
@@ -95,7 +104,7 @@ export function DocenteFormDialog({
       return;
     }
     if (!window.confirm("Tem a certeza que pretende criar este docente?")) return;
-    onSave({ ...draft, email: previewEmail, id: draft.id || `${Date.now()}` });
+    onSave({ ...draft, email: previewEmail, categoria: moduloLabel(draft.moduloKortex || "professor"), id: draft.id || `${Date.now()}` });
     setDraft(emptyDocente());
   };
 
@@ -185,7 +194,7 @@ export function DocenteFormDialog({
             </p>
 
             <section>
-              <SectionTitle index={1} icon={<User className="w-3.5 h-3.5" />} title="Identificação Pessoal" hint="Foto, data de nascimento, género e documento" />
+              <SectionTitle index={1} icon={<User className="w-3.5 h-3.5" />} title="Identificação Pessoal" hint="Foto, dados pessoais e morada" />
               <div className="flex items-start gap-4">
                 <button
                   type="button"
@@ -202,7 +211,7 @@ export function DocenteFormDialog({
                   )}
                   <input ref={fotoInput} type="file" accept="image/*" className="hidden" onChange={(e) => onFoto(e.target.files?.[0] || null)} />
                 </button>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-1">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 flex-1">
                   <Field label="Prefixo">
                     <Select value={draft.prefixo} onValueChange={(v) => setF("prefixo", v)}>
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
@@ -240,6 +249,20 @@ export function DocenteFormDialog({
                   <Field label="Nº Bilhete de Identidade">
                     <Input className="h-8 text-xs" value={draft.bilhete || ""} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" />
                   </Field>
+                  <Field label="Província">
+                    <Select value={draft.provincia || ""} onValueChange={(v) => setDraft((d) => ({ ...d, provincia: v, municipio: "" }))}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                      <SelectContent>{PROVINCIAS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </Field>
+                  <Field label="Município">
+                    <Input className="h-8 text-xs" value={draft.municipio || ""} onChange={(e) => setF("municipio", e.target.value)} placeholder="—" />
+                  </Field>
+                  <div className="md:col-span-3">
+                    <Field label="Endereço">
+                      <Input className="h-8 text-xs" value={draft.endereco || ""} onChange={(e) => setF("endereco", e.target.value)} placeholder="Rua, bairro, nº" />
+                    </Field>
+                  </div>
                 </div>
               </div>
             </section>
@@ -259,28 +282,9 @@ export function DocenteFormDialog({
               </div>
             </section>
 
-            <section>
-              <SectionTitle index={3} icon={<MapPin className="w-3.5 h-3.5" />} title="Morada de Residência" hint="Localização atual do docente" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                <Field label="Província">
-                  <Select value={draft.provincia || ""} onValueChange={(v) => setDraft((d) => ({ ...d, provincia: v, municipio: "" }))}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-                    <SelectContent>{PROVINCIAS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Município">
-                  <Input className="h-8 text-xs" value={draft.municipio || ""} onChange={(e) => setF("municipio", e.target.value)} placeholder="—" />
-                </Field>
-                <div className="md:col-span-2">
-                  <Field label="Endereço">
-                    <Input className="h-8 text-xs" value={draft.endereco || ""} onChange={(e) => setF("endereco", e.target.value)} placeholder="Rua, bairro, nº" />
-                  </Field>
-                </div>
-              </div>
-            </section>
 
             <section>
-              <SectionTitle index={4} icon={<BookOpen className="w-3.5 h-3.5" />} title="Formação Académica" hint="Grau máximo concluído e área de especialidade" />
+              <SectionTitle index={3} icon={<BookOpen className="w-3.5 h-3.5" />} title="Formação Académica" hint="Grau máximo concluído e área de especialidade" />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Field label="Grau académico">
                   <Select value={draft.grau || "Licenciatura"} onValueChange={(v) => setF("grau", v as Grau)}>
@@ -301,7 +305,7 @@ export function DocenteFormDialog({
             </section>
 
             <section>
-              <SectionTitle index={5} icon={<Award className="w-3.5 h-3.5" />} title="Documentação Anexa" hint="CV e diploma" />
+              <SectionTitle index={4} icon={<Award className="w-3.5 h-3.5" />} title="Documentação Anexa" hint="CV e diploma" />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <Field label="Curriculum Vitae (CV)">
                   <FileButton fileName={draft.cvFileName} onPick={(f) => setF("cvFileName", f?.name || "")} inputRef={cvInput} accept="application/pdf,.doc,.docx" Icon={FileText} />
