@@ -28,9 +28,19 @@ export const buildDocenteEmail = (p: string, u: string) => {
 };
 const diplomaLabel = (g?: Grau) => (g ? `Diploma de ${g}` : "Diploma académico");
 
+const moduloLabel = (v: string) => {
+  switch ((v || "").toLowerCase()) {
+    case "professor": return "Professor";
+    case "coordenador": return "Coordenador de Curso";
+    case "decano": return "Decano";
+    case "reitor": return "Reitor";
+    default: return v || "Professor";
+  }
+};
+
 export const emptyDocente = (): DocenteRow => ({
   id: "", prefixo: "Dr.", primeiroNome: "", ultimoNome: "", email: "", contacto: "",
-  faculdade: "", departamento: "", categoria: "Assistente", cargo: "Docente",
+  faculdade: "", departamento: "", categoria: "Professor", cargo: "Docente",
   nascimento: "", genero: "M", bilhete: "", bilheteFileName: "", fotoDataUrl: "",
   provincia: "", municipio: "", endereco: "",
   grau: "Licenciatura", especialidade: "", instituicaoFormacao: "", anosExperiencia: "",
@@ -69,7 +79,6 @@ export function DocenteFormDialog({
     !!draft.bilhete.trim() &&
     !!draft.faculdade &&
     !!draft.departamento &&
-    !!draft.categoria &&
     !!draft.cargo &&
     !!draft.contrato &&
     !!draft.contacto.trim() &&
@@ -95,7 +104,7 @@ export function DocenteFormDialog({
       return;
     }
     if (!window.confirm("Tem a certeza que pretende criar este docente?")) return;
-    onSave({ ...draft, email: previewEmail, id: draft.id || `${Date.now()}` });
+    onSave({ ...draft, email: previewEmail, categoria: moduloLabel(draft.moduloKortex || "professor"), id: draft.id || `${Date.now()}` });
     setDraft(emptyDocente());
   };
 
