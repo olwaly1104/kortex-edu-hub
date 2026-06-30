@@ -1,31 +1,23 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar,
-  GraduationCap, FileText, Building2, IdCard, Award, BookOpen, Briefcase,
+  GraduationCap, FileText, Building2, IdCard, Award, BookOpen, Briefcase, Eye, Download,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { loadDocentes, type DocenteRow } from "@/lib/peopleStorage";
-
-const moduloLabel = (v?: string) => {
-  switch ((v || "").toLowerCase()) {
-    case "professor": return "Professor";
-    case "coordenador": return "Coordenador de Curso";
-    case "decano": return "Decano";
-    case "reitor": return "Reitor";
-    default: return v || "—";
-  }
-};
+import { loadDocentes } from "@/lib/peopleStorage";
+import { ModuleTag } from "@/components/chat/ModuleTag";
+import DocenteDocPreview from "./DocenteDocPreview";
 
 export default function AdminDocenteProfile() {
   const { docenteId } = useParams();
   const navigate = useNavigate();
   const rows = useMemo(() => loadDocentes(), []);
   const docente = useMemo(() => rows.find((r) => r.id === docenteId), [rows, docenteId]);
+  const [docOpen, setDocOpen] = useState(false);
 
   if (!docente) {
     return (
@@ -43,10 +35,18 @@ export default function AdminDocenteProfile() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 -ml-2">
           <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => setDocOpen(true)}>
+            <Eye className="w-3.5 h-3.5" /> Ver documento
+          </Button>
+          <Button size="sm" className="gap-1.5 h-8 text-xs" onClick={() => setDocOpen(true)}>
+            <Download className="w-3.5 h-3.5" /> Descarregar
+          </Button>
+        </div>
       </div>
 
       {/* Identity header */}
@@ -70,9 +70,7 @@ export default function AdminDocenteProfile() {
               <div className="flex-1 min-w-0">
                 <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Perfil do Docente</span>
                 <div className="flex items-center gap-2 mt-1">
-                  <Badge className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/10 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
-                    <GraduationCap className="w-3 h-3 mr-1" /> Docente
-                  </Badge>
+                  <ModuleTag modulo={docente.moduloKortex} />
                 </div>
                 <h1 className="text-2xl font-bold text-foreground leading-tight mt-1.5">{fullName}</h1>
                 <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
@@ -86,12 +84,6 @@ export default function AdminDocenteProfile() {
                       <Briefcase className="w-3 h-3" /> {docente.departamento}
                     </span>
                   )}
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-foreground text-[11px] font-semibold border border-border">
-                    <Award className="w-3 h-3" /> {docente.categoria}
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-foreground text-[11px] font-semibold border border-border">
-                    <Users className="w-3 h-3" /> {docente.cargo}
-                  </span>
                 </div>
 
                 <div className="flex items-center gap-2 mt-4 flex-wrap">
@@ -109,28 +101,15 @@ export default function AdminDocenteProfile() {
           <div className="bg-muted/30 p-6 grid grid-cols-2 gap-4 content-center">
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Módulo Kortex</p>
-              <div className="mt-1.5">
-                <Badge variant="outline" className="text-xs px-2 py-0.5 bg-primary/10 text-primary border-primary/20">
-                  {moduloLabel(docente.moduloKortex)}
-                </Badge>
-              </div>
+              <div className="mt-1.5"><ModuleTag modulo={docente.moduloKortex} /></div>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Contrato</p>
-              <div className="mt-1.5">
-                <Badge variant="outline" className={cn("text-xs px-2 py-0.5",
-                  docente.contrato === "Permanente" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-700 border-amber-200")}>
-                  {docente.contrato || "—"}
-                </Badge>
-              </div>
+              <p className="text-sm font-semibold mt-1.5">{docente.contrato || "—"}</p>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Grau Académico</p>
-              <div className="mt-1.5">
-                <Badge variant="outline" className="text-xs px-2 py-0.5 bg-muted text-foreground border-border">
-                  {docente.grau || "—"}
-                </Badge>
-              </div>
+              <p className="text-sm font-semibold mt-1.5">{docente.grau || "—"}</p>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Experiência</p>
@@ -157,30 +136,17 @@ export default function AdminDocenteProfile() {
               <InfoRow label="Data de Nascimento" value={docente.nascimento || "—"} icon={<Calendar className="w-4 h-4 text-primary" />} />
               <InfoRow label="Género" value={genero} icon={<UserCheck className="w-4 h-4 text-primary" />} />
               <InfoRow label="Nº Bilhete de Identidade" value={docente.bilhete || "—"} icon={<IdCard className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Morada" value={[docente.endereco, docente.municipio, docente.provincia].filter(Boolean).join(", ") || "—"} icon={<MapPin className="w-4 h-4 text-primary" />} />
-            </SectionCard>
-
-            <SectionCard title="Afiliação Institucional" icon={<GraduationCap className="w-4 h-4" />}>
-              <InfoRow label="Faculdade" value={docente.faculdade || "—"} icon={<Building2 className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Departamento" value={docente.departamento || "—"} icon={<Briefcase className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Categoria" value={docente.categoria || "—"} icon={<Award className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Cargo" value={docente.cargo || "—"} icon={<Users className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Módulo Kortex" value={moduloLabel(docente.moduloKortex)} icon={<UserCheck className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Contrato" value={docente.contrato || "—"} icon={<FileText className="w-4 h-4 text-primary" />} />
-              <InfoRow label="ID do Docente" value={docente.id} icon={<IdCard className="w-4 h-4 text-primary" />} />
-            </SectionCard>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-4">
-            <SectionCard title="Localização" icon={<MapPin className="w-4 h-4" />}>
               <InfoRow label="Província" value={docente.provincia || "—"} icon={<MapPin className="w-4 h-4 text-primary" />} />
               <InfoRow label="Município" value={docente.municipio || "—"} icon={<MapPin className="w-4 h-4 text-primary" />} />
               <InfoRow label="Endereço" value={docente.endereco || "—"} icon={<Building2 className="w-4 h-4 text-primary" />} />
             </SectionCard>
 
-            <SectionCard title="Contacto" icon={<Phone className="w-4 h-4" />}>
-              <InfoRow label="Email" value={docente.email || "—"} icon={<Mail className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Telemóvel" value={docente.contacto || "—"} icon={<Phone className="w-4 h-4 text-primary" />} />
+            <SectionCard title="Afiliação Institucional" icon={<GraduationCap className="w-4 h-4" />}>
+              <InfoRow label="Faculdade" value={docente.faculdade || "—"} icon={<Building2 className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Departamento" value={docente.departamento || "—"} icon={<Briefcase className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Cargo" value={docente.cargo || "—"} icon={<Users className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Contrato" value={docente.contrato || "—"} icon={<FileText className="w-4 h-4 text-primary" />} />
+              <InfoRow label="ID do Docente" value={docente.id} icon={<IdCard className="w-4 h-4 text-primary" />} />
             </SectionCard>
           </div>
         </TabsContent>
@@ -188,7 +154,7 @@ export default function AdminDocenteProfile() {
         <TabsContent value="academica" className="space-y-4">
           <SectionCard title="Formação Académica" icon={<BookOpen className="w-4 h-4" />}>
             <InfoRow label="Grau máximo" value={docente.grau || "—"} icon={<Award className="w-4 h-4 text-primary" />} />
-            <InfoRow label="Especialidade" value={docente.especialidade || "—"} icon={<BookOpen className="w-4 h-4 text-primary" />} />
+            <InfoRow label="Curso" value={docente.especialidade || "—"} icon={<BookOpen className="w-4 h-4 text-primary" />} />
             <InfoRow label="Instituição de formação" value={docente.instituicaoFormacao || "—"} icon={<Building2 className="w-4 h-4 text-primary" />} />
             <InfoRow label="Anos de docência" value={docente.anosExperiencia ? `${docente.anosExperiencia} anos` : "—"} icon={<Calendar className="w-4 h-4 text-primary" />} />
           </SectionCard>
@@ -210,6 +176,13 @@ export default function AdminDocenteProfile() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={docOpen} onOpenChange={setDocOpen}>
+        <DialogContent className="max-w-5xl p-0 h-[92vh] overflow-hidden">
+          <DialogTitle className="sr-only">Perfil do Docente — {fullName}</DialogTitle>
+          <DocenteDocPreview docente={docente} displayId={displayId} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
