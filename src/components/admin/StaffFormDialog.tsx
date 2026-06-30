@@ -288,7 +288,7 @@ export function StaffFormDialog({
 
 
           <section>
-            <SectionTitle index={4} icon={<Building2 className="w-3.5 h-3.5" />} title="Afiliação Institucional" hint="Departamento e função do funcionário" />
+            <SectionTitle index={3} icon={<Building2 className="w-3.5 h-3.5" />} title="Afiliação Institucional" hint="Departamento e função do funcionário" />
             <div className="grid grid-cols-2 md:grid-cols-2 gap-2">
               <Field label="Departamento">
                 <Select value={draft.departamento} onValueChange={(v) => setF("departamento", v)}>
@@ -307,7 +307,7 @@ export function StaffFormDialog({
           </section>
 
           <section>
-            <SectionTitle index={5} icon={<FileText className="w-3.5 h-3.5" />} title="Documentação Anexa" hint="Bilhete de identidade e CV" />
+            <SectionTitle index={4} icon={<FileText className="w-3.5 h-3.5" />} title="Documentação Anexa" hint="Bilhete de identidade e CV" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               <Field label="Bilhete de Identidade">
                 <FileButton fileName={draft.bilheteFileName} onPick={(f) => setF("bilheteFileName", f?.name || "")} inputRef={biInput} accept="image/*,application/pdf" Icon={IdCard} />
