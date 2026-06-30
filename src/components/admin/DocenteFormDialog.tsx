@@ -194,7 +194,7 @@ export function DocenteFormDialog({
             </p>
 
             <section>
-              <SectionTitle index={1} icon={<User className="w-3.5 h-3.5" />} title="Identificação Pessoal" hint="Foto, data de nascimento, género e documento" />
+              <SectionTitle index={1} icon={<User className="w-3.5 h-3.5" />} title="Identificação Pessoal" hint="Foto, dados pessoais e morada" />
               <div className="flex items-start gap-4">
                 <button
                   type="button"
@@ -211,7 +211,7 @@ export function DocenteFormDialog({
                   )}
                   <input ref={fotoInput} type="file" accept="image/*" className="hidden" onChange={(e) => onFoto(e.target.files?.[0] || null)} />
                 </button>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-1">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 flex-1">
                   <Field label="Prefixo">
                     <Select value={draft.prefixo} onValueChange={(v) => setF("prefixo", v)}>
                       <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
@@ -249,6 +249,20 @@ export function DocenteFormDialog({
                   <Field label="Nº Bilhete de Identidade">
                     <Input className="h-8 text-xs" value={draft.bilhete || ""} onChange={(e) => setF("bilhete", e.target.value)} placeholder="00000000XX000" />
                   </Field>
+                  <Field label="Província">
+                    <Select value={draft.provincia || ""} onValueChange={(v) => setDraft((d) => ({ ...d, provincia: v, municipio: "" }))}>
+                      <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                      <SelectContent>{PROVINCIAS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </Field>
+                  <Field label="Município">
+                    <Input className="h-8 text-xs" value={draft.municipio || ""} onChange={(e) => setF("municipio", e.target.value)} placeholder="—" />
+                  </Field>
+                  <div className="md:col-span-3">
+                    <Field label="Endereço">
+                      <Input className="h-8 text-xs" value={draft.endereco || ""} onChange={(e) => setF("endereco", e.target.value)} placeholder="Rua, bairro, nº" />
+                    </Field>
+                  </div>
                 </div>
               </div>
             </section>
@@ -268,25 +282,6 @@ export function DocenteFormDialog({
               </div>
             </section>
 
-            <section>
-              <SectionTitle index={3} icon={<MapPin className="w-3.5 h-3.5" />} title="Morada de Residência" hint="Localização atual do docente" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                <Field label="Província">
-                  <Select value={draft.provincia || ""} onValueChange={(v) => setDraft((d) => ({ ...d, provincia: v, municipio: "" }))}>
-                    <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
-                    <SelectContent>{PROVINCIAS.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
-                  </Select>
-                </Field>
-                <Field label="Município">
-                  <Input className="h-8 text-xs" value={draft.municipio || ""} onChange={(e) => setF("municipio", e.target.value)} placeholder="—" />
-                </Field>
-                <div className="md:col-span-2">
-                  <Field label="Endereço">
-                    <Input className="h-8 text-xs" value={draft.endereco || ""} onChange={(e) => setF("endereco", e.target.value)} placeholder="Rua, bairro, nº" />
-                  </Field>
-                </div>
-              </div>
-            </section>
 
             <section>
               <SectionTitle index={4} icon={<BookOpen className="w-3.5 h-3.5" />} title="Formação Académica" hint="Grau máximo concluído e área de especialidade" />
