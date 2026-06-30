@@ -284,7 +284,7 @@ export function DocenteFormDialog({
 
 
             <section>
-              <SectionTitle index={4} icon={<BookOpen className="w-3.5 h-3.5" />} title="Formação Académica" hint="Grau máximo concluído e área de especialidade" />
+              <SectionTitle index={3} icon={<BookOpen className="w-3.5 h-3.5" />} title="Formação Académica" hint="Grau máximo concluído e área de especialidade" />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Field label="Grau académico">
                   <Select value={draft.grau || "Licenciatura"} onValueChange={(v) => setF("grau", v as Grau)}>
@@ -305,7 +305,7 @@ export function DocenteFormDialog({
             </section>
 
             <section>
-              <SectionTitle index={5} icon={<Award className="w-3.5 h-3.5" />} title="Documentação Anexa" hint="CV e diploma" />
+              <SectionTitle index={4} icon={<Award className="w-3.5 h-3.5" />} title="Documentação Anexa" hint="CV e diploma" />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <Field label="Curriculum Vitae (CV)">
                   <FileButton fileName={draft.cvFileName} onPick={(f) => setF("cvFileName", f?.name || "")} inputRef={cvInput} accept="application/pdf,.doc,.docx" Icon={FileText} />
