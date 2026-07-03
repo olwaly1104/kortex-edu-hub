@@ -96,12 +96,9 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
   const [loading, setLoading] = useState(true);
   const [docentes, setDocentes] = useState<DocenteRow[]>(() => loadDocentes());
-  const [customEstados, setCustomEstados] = useState<EstadoDef[]>(() => loadCustomEstados());
-  const [categorias, setCategorias] = useState<CategoriaDef[]>(() => loadCategorias());
+  const [estadosAll, setEstadosAll] = useState<EstadoDef[]>(() => loadEstados());
   const [newEstado, setNewEstado] = useState("");
-  const [newCategoria, setNewCategoria] = useState("");
 
-  const estadosAll = useMemo<EstadoDef[]>(() => [...DEFAULT_ESTADOS, ...customEstados], [customEstados]);
   const estadoMeta = (k: string): EstadoDef =>
     estadosAll.find(e => e.key === k) ?? { key: k, label: k, color: "bg-muted text-foreground border-border" };
 
