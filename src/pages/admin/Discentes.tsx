@@ -148,6 +148,7 @@ export default function AdminDiscentes() {
   const [justCreated, setJustCreated] = useState<string | null>(null);
   const [showMore, setShowMore] = useState(false);
   const [previewId, setPreviewId] = useState<string>("");
+  const [csvOpen, setCsvOpen] = useState(false);
 
   useEffect(() => {
     if (open) {
