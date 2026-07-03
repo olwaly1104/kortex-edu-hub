@@ -374,6 +374,7 @@ export type Database = {
           datas: string[]
           etapa_id: string
           hora: string | null
+          horas: string[]
           id: string
           institution_id: string | null
           local: string | null
@@ -389,6 +390,7 @@ export type Database = {
           datas?: string[]
           etapa_id: string
           hora?: string | null
+          horas?: string[]
           id?: string
           institution_id?: string | null
           local?: string | null
@@ -404,6 +406,7 @@ export type Database = {
           datas?: string[]
           etapa_id?: string
           hora?: string | null
+          horas?: string[]
           id?: string
           institution_id?: string | null
           local?: string | null

@@ -1,0 +1,1 @@
+ALTER TABLE public.candidaturas_sessoes ADD COLUMN IF NOT EXISTS horas time[] NOT NULL DEFAULT '{}';

@@ -30,6 +30,7 @@ type Sessao = {
   datas: string[];
   data_fim: string | null;
   hora: string | null;
+  horas: string[];
   local: string | null;
   responsavel_id: string | null;
   capacidade: number | null;
@@ -130,7 +131,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     }
     setEtapas(etapasRows);
 
-    if (!s.error) setSessoes(((s.data ?? []) as any[]).map(r => ({ ...r, mode: r.mode ?? "" })) as Sessao[]);
+    if (!s.error) setSessoes(((s.data ?? []) as any[]).map(r => ({ ...r, mode: r.mode ?? "", horas: Array.isArray(r.horas) ? r.horas : [] })) as Sessao[]);
     setLoading(false);
   };
   useEffect(() => { load(); }, [authUserId]);
@@ -455,33 +456,55 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                           </PopoverContent>
                         </Popover>
                       ) : sessao.mode === "dias" ? (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
-                              {sessao.datas.length > 0 ? `${sessao.datas.length} data${sessao.datas.length === 1 ? "" : "s"}` : <span className="text-muted-foreground">Escolher datas</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar mode="multiple" selected={sessao.datas.map(d => new Date(d))}
-                              onSelect={(ds) => updSessao(sessao.id, { datas: (ds || []).map(d => d.toISOString().slice(0, 10)).sort() })} />
-                            {sessao.datas.length > 0 && (
-                              <div className="p-2 border-t flex flex-wrap gap-1 max-w-[280px]">
-                                {sessao.datas.map(d => (
-                                  <Badge key={d} variant="outline" className="text-[10px] gap-1">
-                                    {d}
-                                    <button onClick={() => toggleSessaoData(sessao, d)} className="hover:text-destructive"><Trash2 className="w-2.5 h-2.5" /></button>
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-                          </PopoverContent>
-                        </Popover>
+                        <div className="space-y-1.5">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
+                                {sessao.datas.length > 0 ? `${sessao.datas.length} data${sessao.datas.length === 1 ? "" : "s"}` : <span className="text-muted-foreground">Escolher datas</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <Calendar mode="multiple" selected={sessao.datas.map(d => new Date(d))}
+                                onSelect={(ds) => {
+                                  const newDatas = (ds || []).map(d => d.toISOString().slice(0, 10)).sort();
+                                  const oldMap = new Map(sessao.datas.map((d, i) => [d, sessao.horas[i] || ""]));
+                                  const newHoras = newDatas.map(d => oldMap.get(d) || "");
+                                  updSessao(sessao.id, { datas: newDatas, horas: newHoras });
+                                }} />
+                            </PopoverContent>
+                          </Popover>
+                          {sessao.datas.length > 0 && (
+                            <div className="space-y-1">
+                              {sessao.datas.map((d, i) => (
+                                <div key={d} className="flex items-center gap-1.5">
+                                  <Badge variant="outline" className="text-[10px] shrink-0">{d}</Badge>
+                                  <Input type="time" className="h-7 text-xs flex-1" value={sessao.horas[i] || ""}
+                                    onChange={e => {
+                                      const next = [...sessao.horas];
+                                      while (next.length < sessao.datas.length) next.push("");
+                                      next[i] = e.target.value;
+                                      updSessao(sessao.id, { horas: next });
+                                    }} />
+                                  <button onClick={() => {
+                                    const newDatas = sessao.datas.filter(x => x !== d);
+                                    const newHoras = sessao.horas.filter((_, j) => j !== i);
+                                    updSessao(sessao.id, { datas: newDatas, horas: newHoras });
+                                  }} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-3 h-3" /></button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-muted-foreground italic text-[11px]">Escolha uma opção</span>
                       )}
                     </td>
                     <td className="px-2 py-2">
-                      <Input type="time" className="h-8 text-xs" value={sessao.hora || ""} onChange={e => updSessao(sessao.id, { hora: e.target.value })} />
+                      {sessao.mode === "dias" ? (
+                        <span className="text-[10px] text-muted-foreground italic">por data</span>
+                      ) : (
+                        <Input type="time" className="h-8 text-xs" value={sessao.hora || ""} onChange={e => updSessao(sessao.id, { hora: e.target.value })} />
+                      )}
                     </td>
                     <td className="px-2 py-2">
                       <Input className="h-8 text-xs" value={sessao.local || ""} onChange={e => updSessao(sessao.id, { local: e.target.value })} placeholder="Ex: Anfiteatro A" />
