@@ -252,41 +252,55 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const removeInvalid = () => setRows((rs) => rs.filter((r) => validate(r).length === 0));
   const toggleAll = (v: boolean) => setRows((rs) => rs.map((r) => ({ ...r, _selected: v })));
 
-  /* bulk apply */
+  /* bulk apply — auto-applies on every change */
   const [bulkFac, setBulkFac] = useState("");
   const [bulkCurso, setBulkCurso] = useState("");
   const [bulkAno, setBulkAno] = useState("");
   const bulkCursos = useMemo(
-    () => (bulkFac ? cursos.filter((c: any) => c.faculdade_id === bulkFac) : []),
+    () => (bulkFac ? cursos.filter((c: any) => c.faculdade_id === bulkFac) : cursos),
     [cursos, bulkFac],
   );
   const bulkAnos = useMemo(() => {
     const c = cursos.find((x: any) => x.id === bulkCurso) as any;
-    const n = Math.max(1, Math.min(10, Number(c?.years) || 0));
-    return n > 0 ? Array.from({ length: n }, (_, i) => String(i + 1)) : [];
+    const n = Math.max(1, Math.min(10, Number(c?.years) || 6));
+    return Array.from({ length: n }, (_, i) => String(i + 1));
   }, [cursos, bulkCurso]);
 
-  const applyBulk = () => {
-    if (!bulkFac && !bulkCurso && !bulkAno) {
-      toast.info("Preencha pelo menos um campo para aplicar");
-      return;
-    }
+  const applyBulkFaculdade = (id: string) => {
+    setBulkFac(id);
+    setBulkCurso("");
+    setBulkAno("");
     setRows((rs) => rs.map((r) => {
       if (!r._selected) return r;
-      const next = { ...r };
-      if (bulkFac) {
-        next.faculdade_id = bulkFac;
-        if (bulkCurso) next.curso_id = bulkCurso;
-        else if (r.curso_id) {
-          const stillOk = cursos.find((c: any) => c.id === r.curso_id && c.faculdade_id === bulkFac);
-          if (!stillOk) next.curso_id = "";
-        }
+      const next = { ...r, faculdade_id: id };
+      if (r.curso_id) {
+        const stillOk = cursos.find((c: any) => c.id === r.curso_id && c.faculdade_id === id);
+        if (!stillOk) { next.curso_id = ""; next.ano = ""; }
       }
-      if (bulkCurso && !bulkFac) next.curso_id = bulkCurso;
-      if (bulkAno) next.ano = bulkAno;
       return next;
     }));
-    toast.success("Alterações aplicadas às linhas selecionadas");
+  };
+  const applyBulkCurso = (id: string) => {
+    setBulkCurso(id);
+    setBulkAno("");
+    const curso = cursos.find((c: any) => c.id === id) as any;
+    setRows((rs) => rs.map((r) => {
+      if (!r._selected) return r;
+      const next = { ...r, curso_id: id };
+      if (curso?.faculdade_id) next.faculdade_id = curso.faculdade_id;
+      // reset ano if it's out of range for the new curso
+      const maxYears = Math.max(1, Math.min(10, Number(curso?.years) || 0));
+      if (r.ano && maxYears && Number(r.ano) > maxYears) next.ano = "";
+      return next;
+    }));
+  };
+  const applyBulkAno = (v: string) => {
+    setBulkAno(v);
+    setRows((rs) => rs.map((r) => (r._selected ? { ...r, ano: v } : r)));
+  };
+  const confirmBulk = () => {
+    setBulkFac(""); setBulkCurso(""); setBulkAno("");
+    toast.success("Alterações confirmadas");
   };
 
   const doImport = async () => {
