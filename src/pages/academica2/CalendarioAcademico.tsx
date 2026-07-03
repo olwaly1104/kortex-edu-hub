@@ -247,16 +247,16 @@ export default function CalendarioAcademico() {
         </div>
       )}
 
-      {/* Ano Letivo + Turnos */}
+      {/* Ano Letivo + Turnos + Candidaturas */}
       <Card className="p-4 space-y-5">
         <div className="flex items-center gap-2">
           <CalendarDays className="w-4 h-4 text-primary" />
-          <p className="text-sm font-semibold">Ano Letivo</p>
-          <span className="text-[11px] text-muted-foreground">Período académico e turnos diários</span>
+          <p className="text-sm font-semibold">Configuração do Ano Letivo</p>
+          <span className="text-[11px] text-muted-foreground">Período, turnos e candidaturas</span>
         </div>
 
         <div>
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Período</p>
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Período académico</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <p className="text-[11px] text-muted-foreground mb-1">Ano Letivo</p>
@@ -278,8 +278,8 @@ export default function CalendarioAcademico() {
           </div>
         </div>
 
-        <div className="pt-1 border-t">
-          <div className="flex items-center justify-between gap-2 flex-wrap mt-4 mb-2">
+        <div className="pt-4 border-t">
+          <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
             <div className="flex items-center gap-2">
               <Sun className="w-3.5 h-3.5 text-primary" />
               <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Turnos ({turnos.length})</p>
@@ -310,18 +310,12 @@ export default function CalendarioAcademico() {
             ))}
           </div>
         </div>
-      </Card>
 
-      {/* Candidaturas */}
-      <Card className="p-4 space-y-5">
-        <div className="flex items-center gap-2">
-          <FileSignature className="w-4 h-4 text-primary" />
-          <p className="text-sm font-semibold">Candidaturas — {anoLetivo}</p>
-          <span className="text-[11px] text-muted-foreground">Janela de inscrições e vagas totais</span>
-        </div>
-
-        <div>
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Período de inscrição</p>
+        <div className="pt-4 border-t">
+          <div className="flex items-center gap-2 mb-2">
+            <FileSignature className="w-3.5 h-3.5 text-primary" />
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Candidaturas</p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <p className="text-[11px] text-muted-foreground mb-1">Abertura</p>
@@ -338,6 +332,7 @@ export default function CalendarioAcademico() {
           </div>
         </div>
       </Card>
+
 
 
 
