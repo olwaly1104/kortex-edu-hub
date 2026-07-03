@@ -120,10 +120,13 @@ export default function AdminDocenteProfile() {
               <p className="text-sm font-semibold mt-1.5">{docente.grau || "—"}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Experiência</p>
-              <p className="text-sm font-semibold tabular-nums mt-1.5">
-                {docente.anosExperiencia ? `${docente.anosExperiencia} anos` : "—"}
-              </p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Minha Presença</p>
+              <div className="mt-1.5 flex items-center gap-2">
+                <div className="flex-1 max-w-[120px] h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full bg-emerald-500" style={{ width: "94%" }} />
+                </div>
+                <span className="text-xs font-semibold tabular-nums text-emerald-700">94%</span>
+              </div>
             </div>
           </div>
         </div>
