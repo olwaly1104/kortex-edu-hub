@@ -176,7 +176,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   };
 
   const rmEtapa = async (id: string, nome: string) => {
-    if (isProtected(nome)) { toast.error("Etapa predefinida — não pode ser removida."); return; }
+    
     if (!confirm(`Remover etapa "${nome}"?`)) return;
     const { error } = await supabase.from("candidaturas_etapas").delete().eq("id", id);
     if (error) { toast.error(error.message); return; }
@@ -327,7 +327,6 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
               ) : etapas.length === 0 ? (
                 <tr><td colSpan={5} className="px-3 py-6 text-center text-muted-foreground italic">Sem etapas configuradas.</td></tr>
               ) : etapas.map(et => {
-                const locked = isProtected(et.nome);
                 return (
                 <tr key={et.id} className="border-t align-top">
                   <td className="px-3 py-2">
@@ -336,9 +335,8 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                         placeholder="Nome da etapa"
                         onChange={e => setEtapas(p => p.map(x => x.id === et.id ? { ...x, nome: e.target.value } : x))}
                         onBlur={e => updEtapa(et.id, { nome: e.target.value })}
-                        disabled={readOnly || locked} readOnly={readOnly || locked}
+                        disabled={readOnly} readOnly={readOnly}
                         className="h-8 text-xs" />
-                      {locked && <Badge variant="outline" className="text-[9px] uppercase tracking-wide shrink-0">Predefinida</Badge>}
                     </div>
                   </td>
                   <td className="px-3 py-2 text-center">
@@ -371,7 +369,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                     </Popover>
                   </td>
                   <td className="px-2 py-2">
-                    {!readOnly && !locked && (
+                    {!readOnly && (
                       <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
                         onClick={() => rmEtapa(et.id, et.nome)}>
                         <Trash2 className="w-3.5 h-3.5" />
