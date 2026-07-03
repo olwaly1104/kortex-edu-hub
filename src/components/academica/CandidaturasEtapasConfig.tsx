@@ -37,27 +37,25 @@ type Sessao = {
 
 type EstadoDef = { key: string; label: string; color: string; descricao?: string };
 
+const COR_OPCOES: { label: string; value: string }[] = [
+  { label: "Verde",    value: "bg-green-100 text-green-700 border-green-200" },
+  { label: "Âmbar",    value: "bg-amber-100 text-amber-700 border-amber-200" },
+  { label: "Vermelho", value: "bg-red-100 text-red-700 border-red-200" },
+  { label: "Azul",     value: "bg-blue-100 text-blue-700 border-blue-200" },
+  { label: "Cinza",    value: "bg-slate-100 text-slate-700 border-slate-200" },
+  { label: "Violeta",  value: "bg-violet-100 text-violet-700 border-violet-200" },
+];
+
 const DEFAULT_ESTADOS: EstadoDef[] = [
-  { key: "agendado",  label: "Agendado",  color: "bg-blue-50 text-blue-700 border-blue-200",       descricao: "Sessão marcada, aguarda realização." },
-  { key: "completo",  label: "Completo",  color: "bg-green-50 text-green-700 border-green-200",    descricao: "Etapa concluída pelo candidato." },
-  { key: "remarcado", label: "Remarcado", color: "bg-amber-50 text-amber-700 border-amber-200",    descricao: "Data alterada para nova sessão." },
-  { key: "aprovado",  label: "Aprovado",  color: "bg-emerald-50 text-emerald-700 border-emerald-200", descricao: "Candidato aprovado nesta etapa." },
-  { key: "reprovado", label: "Reprovado", color: "bg-red-50 text-red-700 border-red-200",          descricao: "Candidato reprovado nesta etapa." },
+  { key: "agendado",  label: "Agendado",  color: "bg-blue-100 text-blue-700 border-blue-200",       descricao: "Sessão marcada, aguarda realização." },
+  { key: "completo",  label: "Completo",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Etapa concluída pelo candidato." },
+  { key: "remarcado", label: "Remarcado", color: "bg-amber-100 text-amber-700 border-amber-200",    descricao: "Data alterada para nova sessão." },
+  { key: "aprovado",  label: "Aprovado",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Candidato aprovado nesta etapa." },
+  { key: "reprovado", label: "Reprovado", color: "bg-red-100 text-red-700 border-red-200",          descricao: "Candidato reprovado nesta etapa." },
 ];
 const DEFAULT_ESTADO_KEYS = new Set(DEFAULT_ESTADOS.map(e => e.key));
 
-const PALETTE: { name: string; color: string }[] = [
-  { name: "Azul",    color: "bg-blue-50 text-blue-700 border-blue-200" },
-  { name: "Verde",   color: "bg-green-50 text-green-700 border-green-200" },
-  { name: "Âmbar",   color: "bg-amber-50 text-amber-700 border-amber-200" },
-  { name: "Esmeralda", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  { name: "Vermelho", color: "bg-red-50 text-red-700 border-red-200" },
-  { name: "Violeta", color: "bg-violet-50 text-violet-700 border-violet-200" },
-  { name: "Céu",     color: "bg-sky-50 text-sky-700 border-sky-200" },
-  { name: "Rosa",    color: "bg-rose-50 text-rose-700 border-rose-200" },
-  { name: "Cinza",   color: "bg-slate-100 text-slate-700 border-slate-200" },
-];
-const nextColor = (i: number) => PALETTE[i % PALETTE.length].color;
+const nextColor = (i: number) => COR_OPCOES[i % COR_OPCOES.length].value;
 
 const ESTADOS_KEY = "upra:cand-estados-v2";
 
@@ -237,91 +235,64 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     <fieldset disabled={readOnly} className="space-y-4 disabled:opacity-100">
       <div className="space-y-4">
 
-      {/* ESTADOS POSSÍVEIS (editável, com pré-visualização e cor) */}
-      <div>
-        <div className="mb-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estados possíveis</p>
-          <p className="text-[11px] text-muted-foreground">Vocabulário de estados que cada etapa pode assumir. Edite nome e cor.</p>
+      {/* ESTADOS POSSÍVEIS (padrão GAP: designação, descrição, cor, pré-visualização) */}
+      <Card className="overflow-hidden">
+        <div className="px-5 py-3 border-b bg-muted/30 flex items-center gap-2">
+          <div className="min-w-0">
+            <h2 className="text-sm font-bold text-foreground">Estados de candidatura</h2>
+            <p className="text-[11px] text-muted-foreground">Fases do ciclo de vida de uma candidatura (ex: Agendado, Completo, Aprovado).</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground ml-auto tabular-nums shrink-0">
+            {estadosAll.length} estado{estadosAll.length === 1 ? "" : "s"}
+          </span>
         </div>
-        <div className="rounded-lg border overflow-hidden">
-          <table className="w-full text-xs">
-            <thead className="bg-muted/40 text-[10px] uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th className="px-3 py-2 text-left w-40">Designação</th>
-                <th className="px-3 py-2 text-left">Descrição</th>
-                <th className="px-3 py-2 text-left w-40">Cor</th>
-                <th className="px-3 py-2 text-left w-32">Pré-visualização</th>
-                <th className="w-10"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {estadosAll.map(e => {
-                const isDefault = DEFAULT_ESTADO_KEYS.has(e.key);
-                return (
-                  <tr key={e.key} className="border-t align-middle">
-                    <td className="px-3 py-2">
-                      <Input value={e.label} disabled={readOnly} readOnly={readOnly}
-                        onChange={ev => updEstado(e.key, { label: ev.target.value })}
-                        placeholder="Designação"
-                        className="h-8 text-xs" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <Input value={e.descricao ?? ""} disabled={readOnly} readOnly={readOnly}
-                        onChange={ev => updEstado(e.key, { descricao: ev.target.value })}
-                        placeholder="Breve explicação"
-                        className="h-8 text-xs" />
-                    </td>
-                    <td className="px-3 py-2">
-                      <Popover>
-                        <PopoverTrigger asChild disabled={readOnly}>
-                          <button className="flex items-center gap-2 h-8 w-full rounded-md border px-2 hover:bg-muted/30 disabled:cursor-default">
-                            <span className={cn("inline-block w-4 h-4 rounded border", e.color)} />
-                            <span className="text-[11px] text-muted-foreground">
-                              {PALETTE.find(p => p.color === e.color)?.name ?? "Personalizada"}
-                            </span>
-                            {!readOnly && <ChevronDown className="w-3 h-3 ml-auto text-muted-foreground" />}
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent align="start" className="w-56 p-2 grid grid-cols-3 gap-1.5">
-                          {PALETTE.map(p => (
-                            <button key={p.color}
-                              onClick={() => updEstado(e.key, { color: p.color })}
-                              className={cn("flex flex-col items-center gap-1 rounded-md border p-1.5 hover:bg-muted/40", e.color === p.color && "ring-2 ring-primary")}>
-                              <span className={cn("inline-block w-full h-5 rounded", p.color)} />
-                              <span className="text-[10px] text-muted-foreground">{p.name}</span>
-                            </button>
-                          ))}
-                        </PopoverContent>
-                      </Popover>
-                    </td>
-                    <td className="px-3 py-2">
-                      <Badge variant="outline" className={cn("text-[11px]", e.color)}>{e.label || "—"}</Badge>
-                    </td>
-                    <td className="px-2 py-2">
-                      {!readOnly && !isDefault && (
-                        <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                          onClick={() => rmEstado(e.key)}>
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-          {!readOnly && (
-            <div className="flex items-center gap-2 p-2 border-t bg-muted/20">
-              <Input value={newEstado} onChange={e => setNewEstado(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addEstado(); } }}
-                placeholder="Novo estado (ex: Em revisão)" className="h-8 text-xs max-w-[240px]" />
-              <Button size="sm" variant="outline" className="h-8 gap-1 text-xs" onClick={addEstado}>
-                <Plus className="w-3 h-3" /> Adicionar Estado
-              </Button>
-            </div>
-          )}
+        <div className="divide-y">
+          <div className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted/10">
+            <div>Designação</div>
+            <div>Descrição</div>
+            <div>Cor</div>
+            <div>Pré-visualização</div>
+            <div className="text-right">Ação</div>
+          </div>
+          {estadosAll.map(es => {
+            const isDefault = DEFAULT_ESTADO_KEYS.has(es.key);
+            return (
+              <div key={es.key} className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
+                <Input className="h-9" placeholder="Ex: Agendado" value={es.label}
+                  disabled={readOnly} readOnly={readOnly}
+                  onChange={e => updEstado(es.key, { label: e.target.value })} />
+                <Input className="h-9" placeholder="Descrição curta do estado" value={es.descricao ?? ""}
+                  disabled={readOnly} readOnly={readOnly}
+                  onChange={e => updEstado(es.key, { descricao: e.target.value })} />
+                <select className="h-9 rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50"
+                  value={es.color} disabled={readOnly}
+                  onChange={e => updEstado(es.key, { color: e.target.value })}>
+                  {COR_OPCOES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </select>
+                <span className={cn("inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium", es.color)}>
+                  {es.label || "—"}
+                </span>
+                <div className="flex justify-end">
+                  {!readOnly && !isDefault && (
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                      onClick={() => rmEstado(es.key)}>
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
-      </div>
+        {!readOnly && (
+          <div className="px-5 py-3 border-t bg-muted/10">
+            <Button size="sm" variant="outline" className="gap-1.5" onClick={addEstado}>
+              <Plus className="w-3.5 h-3.5" /> Adicionar estado
+            </Button>
+          </div>
+        )}
+      </Card>
+
 
       <div>
         <div className="flex items-center justify-between mb-2">
