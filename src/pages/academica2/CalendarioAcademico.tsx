@@ -328,11 +328,13 @@ export default function CalendarioAcademico() {
         </div>
       )}
 
-      <Tabs defaultValue="config" className="w-full">
-        <TabsList className="grid grid-cols-2 w-full max-w-lg">
+      <Tabs defaultValue="candidaturas" className="w-full">
+        <TabsList className="grid grid-cols-3 w-full max-w-2xl">
+          <TabsTrigger value="candidaturas" className="gap-1.5"><FileSignature className="w-3.5 h-3.5" /> Candidaturas</TabsTrigger>
           <TabsTrigger value="config" className="gap-1.5"><Settings2 className="w-3.5 h-3.5" /> Configuração do Ano Letivo</TabsTrigger>
           <TabsTrigger value="calendario" className="gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Calendário do Ano Letivo</TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="config" className="space-y-6 mt-4">
       {/* Ano Letivo + Turnos + Semestres + Candidaturas */}
