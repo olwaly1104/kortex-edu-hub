@@ -184,6 +184,44 @@ Deno.serve(async (req) => {
         modulo_kortex: modulo,
       }, { onConflict: "id" });
       if (stErr) console.error("staff upsert failed:", stErr.message);
+    } else if (modulo === "estudante" && body.estudante && typeof body.estudante === "object") {
+      // Atomically create the estudante row using service_role so RLS can't
+      // leave an orphaned auth user if the client-side insert would have failed.
+      const est = body.estudante as Record<string, unknown>;
+      if (est.curso_id) {
+        const { error: eErr } = await admin.from("estudantes").upsert({
+          id: newUserId,
+          owner_user_id: institutionId,
+          nome: name,
+          email,
+          ano: (est.ano as string) || "1",
+          turma: (est.turma as string) || "A",
+          origem: (est.origem as string) || "novo",
+          primeiro_nome: est.primeiro_nome ?? primeiro,
+          ultimo_nome: est.ultimo_nome ?? ultimo,
+          curso_id: est.curso_id,
+          nascimento: est.nascimento ?? null,
+          genero: est.genero ?? null,
+          nacionalidade: est.nacionalidade ?? null,
+          bilhete: est.bilhete ?? null,
+          telemovel: est.telemovel ?? null,
+          provincia: est.provincia ?? null,
+          municipio: est.municipio ?? null,
+          endereco: est.endereco ?? null,
+          enc_nome: est.enc_nome ?? null,
+          enc_parentesco: est.enc_parentesco ?? null,
+          enc_telefone: est.enc_telefone ?? null,
+          regime: (est.regime as string) || "normal",
+          foto_url: est.foto_url ?? null,
+          bilhete_url: est.bilhete_url ?? null,
+          certificado_url: est.certificado_url ?? null,
+          enc_bilhete_url: est.enc_bilhete_url ?? null,
+        }, { onConflict: "id" });
+        if (eErr) {
+          console.error("estudante upsert failed:", eErr.message);
+          return json({ error: "Conta criada mas falhou ao criar discente: " + eErr.message }, 500);
+        }
+      }
     }
 
     return json({
