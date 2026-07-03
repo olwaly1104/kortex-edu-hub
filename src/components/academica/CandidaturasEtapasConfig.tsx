@@ -36,7 +36,7 @@ type Sessao = {
   capacidade: number | null;
 };
 
-type EstadoDef = { key: string; label: string; color: string; descricao?: string };
+type EstadoDef = { id?: string; key: string; label: string; color: string; descricao?: string | null; is_default?: boolean; ordem?: number };
 
 const COR_OPCOES: { label: string; value: string }[] = [
   { label: "Verde",    value: "bg-green-100 text-green-700 border-green-200" },
@@ -47,54 +47,16 @@ const COR_OPCOES: { label: string; value: string }[] = [
   { label: "Violeta",  value: "bg-violet-100 text-violet-700 border-violet-200" },
 ];
 
-const DEFAULT_ESTADOS: EstadoDef[] = [
-  { key: "agendado",  label: "Agendado",  color: "bg-blue-100 text-blue-700 border-blue-200",       descricao: "Sessão marcada, aguarda realização." },
-  { key: "completo",  label: "Completo",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Etapa concluída pelo candidato." },
-  { key: "remarcado", label: "Remarcado", color: "bg-amber-100 text-amber-700 border-amber-200",    descricao: "Data alterada para nova sessão." },
-  { key: "aprovado",  label: "Aprovado",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Candidato aprovado nesta etapa." },
-  { key: "reprovado", label: "Reprovado", color: "bg-red-100 text-red-700 border-red-200",          descricao: "Candidato reprovado nesta etapa." },
+const DEFAULT_ESTADOS: Omit<EstadoDef, "id">[] = [
+  { key: "agendado",  label: "Agendado",  color: "bg-blue-100 text-blue-700 border-blue-200",       descricao: "Sessão marcada, aguarda realização.", is_default: true, ordem: 0 },
+  { key: "completo",  label: "Completo",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Etapa concluída pelo candidato.",     is_default: true, ordem: 1 },
+  { key: "remarcado", label: "Remarcado", color: "bg-amber-100 text-amber-700 border-amber-200",    descricao: "Data alterada para nova sessão.",     is_default: true, ordem: 2 },
+  { key: "aprovado",  label: "Aprovado",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Candidato aprovado nesta etapa.",     is_default: true, ordem: 3 },
+  { key: "reprovado", label: "Reprovado", color: "bg-red-100 text-red-700 border-red-200",          descricao: "Candidato reprovado nesta etapa.",    is_default: true, ordem: 4 },
 ];
-const DEFAULT_ESTADO_KEYS = new Set(DEFAULT_ESTADOS.map(e => e.key));
 
 const nextColor = (i: number) => COR_OPCOES[i % COR_OPCOES.length].value;
 
-const ESTADOS_KEY = "upra:cand-estados-v2";
-
-const parseIsoLocal = (value?: string | null): Date | undefined => {
-  if (!value) return undefined;
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) return undefined;
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = Number(match[3]);
-  const date = new Date(year, month - 1, day);
-  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return undefined;
-  return date;
-};
-
-const formatIsoLocal = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-function loadEstados(): EstadoDef[] {
-  if (typeof window === "undefined") return DEFAULT_ESTADOS;
-  try {
-    const raw = localStorage.getItem(ESTADOS_KEY);
-    if (!raw) return DEFAULT_ESTADOS;
-    const arr = JSON.parse(raw);
-    if (!Array.isArray(arr) || arr.length === 0) return DEFAULT_ESTADOS;
-    // ensure all default keys still exist
-    const keys = new Set(arr.map((e: EstadoDef) => e.key));
-    const missing = DEFAULT_ESTADOS.filter(d => !keys.has(d.key));
-    return [...arr, ...missing];
-  } catch { return DEFAULT_ESTADOS; }
-}
-function saveEstados(v: EstadoDef[]) {
-  try { localStorage.setItem(ESTADOS_KEY, JSON.stringify(v)); } catch {}
-}
 
 
 
