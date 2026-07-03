@@ -350,10 +350,10 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   if (stage === "upload") {
     return (
       <Dialog open={open} onOpenChange={(v) => { if (!v) close(); else onOpenChange(true); }}>
-        <DialogContent className="max-w-2xl p-0 overflow-hidden">
-          <DialogHeader className="px-6 pt-5 pb-3 border-b bg-gradient-to-br from-primary/5 via-background to-background">
+        <DialogContent className="max-w-2xl p-0 overflow-hidden max-h-[92vh] flex flex-col">
+          <DialogHeader className="px-5 pt-4 pb-3 border-b bg-gradient-to-br from-primary/5 via-background to-background shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
                 <FileSpreadsheet className="w-4 h-4" />
               </div>
               <div className="min-w-0 flex-1">
@@ -364,16 +364,16 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
               </div>
             </div>
             {onSwitchToManual && (
-              <div className="pt-3">
+              <div className="pt-2.5">
                 <ModeToggle mode="csv" onSwitchToManual={onSwitchToManual} />
               </div>
             )}
           </DialogHeader>
 
-          <div className="px-6 py-5">
+          <div className="px-5 py-4 overflow-y-auto flex-1">
             {rows.length > 0 && !parsing && (
-              <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50/50 p-3 flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+              <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50/50 p-2.5 flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                   <Check className="w-4 h-4" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -400,7 +400,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                 onFile(e.dataTransfer.files?.[0] || null);
               }}
               onClick={() => { if (!parsing) fileRef.current?.click(); }}
-              className={`relative border-2 border-dashed rounded-xl px-6 py-12 text-center transition-colors ${
+              className={`relative border-2 border-dashed rounded-xl px-4 py-6 text-center transition-colors ${
                 parsing ? "border-primary bg-primary/5 cursor-wait" :
                 dragOver ? "border-primary bg-primary/5 cursor-pointer" :
                 "border-input hover:border-primary/60 hover:bg-muted/30 cursor-pointer"
@@ -408,21 +408,21 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
             >
               {parsing ? (
                 <>
-                  <div className="w-14 h-14 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
-                    <Loader2 className="w-6 h-6 animate-spin" />
+                  <div className="w-11 h-11 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
                   </div>
                   <p className="text-sm font-semibold">A processar CSV…</p>
-                  <p className="text-xs text-muted-foreground mt-1">A extrair nomes, faculdades, cursos e anos</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">A extrair nomes, faculdades, cursos e anos</p>
                 </>
               ) : (
                 <>
-                  <div className="w-14 h-14 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
-                    <Upload className="w-6 h-6" />
+                  <div className="w-11 h-11 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
+                    <Upload className="w-5 h-5" />
                   </div>
                   <p className="text-sm font-semibold">
-                    {rows.length > 0 ? "Substituir CSV — arraste ou clique" : "Arraste o CSV para aqui, ou clique para escolher"}
+                    {rows.length > 0 ? "Substituir CSV — arraste ou clique" : "Arraste o CSV ou clique para escolher"}
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">Suporta vírgula ou ponto-e-vírgula · UTF-8</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Vírgula ou ponto-e-vírgula · UTF-8</p>
                 </>
               )}
               <input
@@ -432,19 +432,17 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
               />
             </div>
 
-            <div className="mt-5 rounded-lg border bg-muted/30 p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-4 h-4 text-primary" />
-                <p className="text-xs font-semibold">Colunas reconhecidas — extracção inteligente</p>
+            <div className="mt-3 rounded-lg border bg-muted/30 p-3">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-primary" />
+                <p className="text-[11px] font-semibold">Colunas reconhecidas — extracção inteligente</p>
               </div>
-              <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
-                Não precisa de nomes exactos. O sistema detecta variações comuns e faz a extracção automática:
-                <br />
-                <strong className="text-foreground">Nome</strong> → separa automaticamente primeiro e último nome ·{" "}
-                <strong className="text-foreground">Faculdade</strong> → aceita sigla ou nome completo ·{" "}
-                <strong className="text-foreground">Curso</strong> → reconhece código ou nome, mesmo parcial ·{" "}
+              <p className="text-[10.5px] text-muted-foreground leading-relaxed mb-2">
+                <strong className="text-foreground">Nome</strong> → primeiro/último ·{" "}
+                <strong className="text-foreground">Faculdade</strong> → nome ou sigla ·{" "}
+                <strong className="text-foreground">Curso</strong> → nome ou código ·{" "}
                 <strong className="text-foreground">Ano</strong> → 1, 2, 3… ·{" "}
-                <strong className="text-foreground">Género/Regime</strong> → normaliza valores (M/F, bolseiro/normal).
+                <strong className="text-foreground">Género/Regime</strong> → M/F, bolseiro/normal.
               </p>
               <div className="flex flex-wrap gap-1">
                 {RECOGNIZED_COLS.map((h) => (
@@ -453,8 +451,8 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                   </span>
                 ))}
               </div>
-              <p className="text-[10.5px] text-muted-foreground mt-3 leading-relaxed">
-                Obrigatórios: <strong>nome, faculdade, curso, ano</strong>. A turma é atribuída depois na plataforma.
+              <p className="text-[10px] text-muted-foreground mt-2 leading-relaxed">
+                Obrigatórios: <strong>nome, faculdade, curso, ano</strong>. A turma é atribuída depois.
               </p>
             </div>
           </div>
