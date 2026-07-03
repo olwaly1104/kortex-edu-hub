@@ -243,7 +243,6 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const [bulkFac, setBulkFac] = useState("");
   const [bulkCurso, setBulkCurso] = useState("");
   const [bulkAno, setBulkAno] = useState("");
-  const [bulkTurma, setBulkTurma] = useState("");
   const bulkCursos = useMemo(
     () => (bulkFac ? cursos.filter((c: any) => c.faculdade_id === bulkFac) : []),
     [cursos, bulkFac],
@@ -255,7 +254,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   }, [cursos, bulkCurso]);
 
   const applyBulk = () => {
-    if (!bulkFac && !bulkCurso && !bulkAno && !bulkTurma) {
+    if (!bulkFac && !bulkCurso && !bulkAno) {
       toast.info("Preencha pelo menos um campo para aplicar");
       return;
     }
@@ -272,7 +271,6 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       }
       if (bulkCurso && !bulkFac) next.curso_id = bulkCurso;
       if (bulkAno) next.ano = bulkAno;
-      if (bulkTurma) next.turma = bulkTurma;
       return next;
     }));
     toast.success("Alterações aplicadas às linhas selecionadas");
