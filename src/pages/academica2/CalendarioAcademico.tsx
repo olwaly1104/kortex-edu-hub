@@ -311,10 +311,10 @@ export default function CalendarioAcademico() {
 
 
   const counts = useMemo(() => {
-    const c: Record<EventoTipo, number> = { exames: 0, ferias: 0, feriado: 0, especial: 0 };
-    eventos.forEach(e => { c[e.tipo]++; });
+    const c: Record<EventoTipo, number> = { exames: 0, ferias: 0, feriado: 0, especial: 0, semestre: 0, candidaturas: 0 };
+    displayEventos.forEach(e => { c[e.tipo]++; });
     return c;
-  }, [eventos]);
+  }, [displayEventos]);
 
   // Group events by month for the new timeline
   const months = useMemo(() => {
