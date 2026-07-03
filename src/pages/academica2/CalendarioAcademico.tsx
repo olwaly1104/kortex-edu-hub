@@ -329,6 +329,21 @@ export default function CalendarioAcademico() {
     return out;
   }, [inicio, fim]);
 
+  const sessaoEvents = useMemo<Evento[]>(() => {
+    const out: Evento[] = [];
+    sessoesAgendadas.forEach(s => {
+      const nome = etapasMap[s.etapa_id] || "Sessão";
+      if (s.mode === "periodo" && s.datas[0] && s.data_fim) {
+        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.data_fim });
+      } else if (s.mode === "dia" && s.datas[0]) {
+        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.datas[0] });
+      } else if (s.mode === "dias") {
+        s.datas.forEach((d, i) => out.push({ id: `__ses_${s.id}_${i}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: d, fim: d }));
+      }
+    });
+    return out;
+  }, [sessoesAgendadas, etapasMap]);
+
   const displayEventos = useMemo<Evento[]>(() => [
     { id: "__inicio_ano", tipo: "especial", titulo: "Início do Ano Letivo", inicio, fim: inicio },
     { id: "__fim_ano",    tipo: "especial", titulo: "Fim do Ano Letivo",    inicio: fim, fim },
@@ -336,10 +351,11 @@ export default function CalendarioAcademico() {
       { id: `__sem_${s.id}_ini`, tipo: "semestre" as EventoTipo, titulo: `Início do ${s.nome}`, inicio: s.inicio, fim: s.inicio },
       { id: `__sem_${s.id}_fim`, tipo: "semestre" as EventoTipo, titulo: `Fim do ${s.nome}`, inicio: s.fim, fim: s.fim },
     ]),
-    { id: "__cand", tipo: "especial", titulo: "Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.fim },
-
+    { id: "__cand_ini", tipo: "especial", titulo: "Início das Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.inicio },
+    { id: "__cand_fim", tipo: "especial", titulo: "Fim das Candidaturas",    inicio: candidaturas.fim,    fim: candidaturas.fim },
+    ...sessaoEvents,
     ...eventos,
-  ], [eventos, inicio, fim, semestres, candidaturas]);
+  ], [eventos, inicio, fim, semestres, candidaturas, sessaoEvents]);
 
   const eventsByMonth = useMemo(() => {
     const map: Record<string, Evento[]> = {};
