@@ -55,6 +55,8 @@ export default function CriarTurmas() {
   const isOnboarding = useIsOnboardingStep();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const salasOpts = useSalasDisponiveis();
+
 
   const { data: faculdades = [] } = useQuery({
     queryKey: ["faculdades-all"],
