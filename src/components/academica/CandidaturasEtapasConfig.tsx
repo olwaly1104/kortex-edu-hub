@@ -206,6 +206,12 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     setEstadosAll(next); saveEstados(next);
   };
 
+  const toggleEstado = (et: Etapa, key: string) => {
+    const has = et.estados_possiveis.includes(key);
+    const next = has ? et.estados_possiveis.filter(k => k !== key) : [...et.estados_possiveis, key];
+    updEtapa(et.id, { estados_possiveis: next });
+  };
+
 
 
   const updSessao = async (id: string, patch: Partial<Sessao>) => {
