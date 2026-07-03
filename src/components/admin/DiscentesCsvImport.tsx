@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
   Upload, FileSpreadsheet, X, Check, AlertCircle,
   Trash2, Loader2, Sparkles, ArrowRight, UserPlus,
@@ -321,44 +322,31 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
 
   if (!open) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col animate-fade-in">
-      {/* Top bar */}
-      <div className="px-6 py-3 border-b bg-gradient-to-br from-primary/5 via-background to-background flex items-center gap-4">
-        <button
-          type="button"
-          onClick={close}
-          className="h-8 px-2.5 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
-        >
-          <X className="w-3.5 h-3.5" /> Sair
-        </button>
-        <div className="w-px h-6 bg-border" />
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-            <FileSpreadsheet className="w-4 h-4" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-sm font-bold leading-tight">Importar Discentes via CSV</p>
-            <p className="text-[11px] text-muted-foreground leading-tight">
-              {stage === "upload" ? "Carregue um ficheiro CSV para começar" : "Reveja e edite antes de confirmar"}
-            </p>
-          </div>
-        </div>
-        {stage === "preview" && (
-          <div className="flex items-center gap-2">
-            <StatChip color="emerald" label="Válidas" value={stats.valid} />
-            <StatChip color="amber" label="Com erro" value={stats.invalid} />
-            <StatChip color="muted" label="Total" value={stats.total} />
-          </div>
-        )}
-        <div className="ml-auto">
-          {onSwitchToManual && <ModeToggle mode="csv" onSwitchToManual={onSwitchToManual} />}
-        </div>
-      </div>
+  // Upload stage → dialog. Preview stage → fullscreen.
+  if (stage === "upload") {
+    return (
+      <Dialog open={open} onOpenChange={(v) => { if (!v) close(); else onOpenChange(true); }}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden">
+          <DialogHeader className="px-6 pt-5 pb-3 border-b bg-gradient-to-br from-primary/5 via-background to-background">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <FileSpreadsheet className="w-4 h-4" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-sm font-bold leading-tight">Importar Discentes via CSV</DialogTitle>
+                <DialogDescription className="text-[11px] leading-tight">
+                  Carregue um ficheiro CSV para começar
+                </DialogDescription>
+              </div>
+            </div>
+            {onSwitchToManual && (
+              <div className="pt-3">
+                <ModeToggle mode="csv" onSwitchToManual={onSwitchToManual} />
+              </div>
+            )}
+          </DialogHeader>
 
-      {stage === "upload" && (
-        <div className="flex-1 overflow-y-auto">
-          <div className="max-w-2xl mx-auto px-6 py-10">
+          <div className="px-6 py-5">
             <div
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
@@ -367,12 +355,12 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                 onFile(e.dataTransfer.files?.[0] || null);
               }}
               onClick={() => fileRef.current?.click()}
-              className={`border-2 border-dashed rounded-xl px-6 py-16 text-center cursor-pointer transition-colors ${
+              className={`border-2 border-dashed rounded-xl px-6 py-12 text-center cursor-pointer transition-colors ${
                 dragOver ? "border-primary bg-primary/5" : "border-input hover:border-primary/60 hover:bg-muted/30"
               }`}
             >
-              <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
-                <Upload className="w-7 h-7" />
+              <div className="w-14 h-14 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
+                <Upload className="w-6 h-6" />
               </div>
               <p className="text-sm font-semibold">Arraste o CSV para aqui, ou clique para escolher</p>
               <p className="text-xs text-muted-foreground mt-1">Suporta vírgula ou ponto-e-vírgula · UTF-8</p>
@@ -383,7 +371,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
               />
             </div>
 
-            <div className="mt-6 rounded-lg border bg-muted/30 p-4">
+            <div className="mt-5 rounded-lg border bg-muted/30 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkles className="w-4 h-4 text-primary" />
                 <p className="text-xs font-semibold">Colunas reconhecidas — extracção inteligente</p>
@@ -408,8 +396,39 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
               </p>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-background flex flex-col animate-fade-in">
+      {/* Top bar */}
+      <div className="px-6 py-3 border-b bg-gradient-to-br from-primary/5 via-background to-background flex items-center gap-4">
+        <button
+          type="button"
+          onClick={close}
+          className="h-8 px-2.5 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+        >
+          <X className="w-3.5 h-3.5" /> Sair
+        </button>
+        <div className="w-px h-6 bg-border" />
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <FileSpreadsheet className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-bold leading-tight">Importar Discentes via CSV</p>
+            <p className="text-[11px] text-muted-foreground leading-tight">Reveja e edite antes de confirmar</p>
+          </div>
         </div>
-      )}
+        <div className="flex items-center gap-2">
+          <StatChip color="emerald" label="Válidas" value={stats.valid} />
+          <StatChip color="amber" label="Com erro" value={stats.invalid} />
+          <StatChip color="muted" label="Total" value={stats.total} />
+        </div>
+      </div>
+
 
 
 
