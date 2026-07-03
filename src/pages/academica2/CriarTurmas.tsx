@@ -23,7 +23,23 @@ type TurmaRow = {
   capacidade: number;
 };
 
-const turnos = ["Manhã", "Tarde", "Noite"] as const;
+type TurnoOpt = { nome: string; inicio: string; fim: string };
+function useTurnosConfig(): TurnoOpt[] {
+  const [opts, setOpts] = useState<TurnoOpt[]>([]);
+  useEffect(() => {
+    const load = () => {
+      try {
+        const raw = JSON.parse(localStorage.getItem("upra:turnos-cfg") || "[]");
+        if (Array.isArray(raw)) setOpts(raw.filter((t: any) => t?.nome).map((t: any) => ({ nome: t.nome, inicio: t.inicio, fim: t.fim })));
+      } catch {}
+    };
+    load();
+    const onStorage = (e: StorageEvent) => { if (e.key === "upra:turnos-cfg") load(); };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+  return opts;
+}
 const LETRAS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
 type SalaOpt = { value: string; label: string };
@@ -56,6 +72,7 @@ export default function CriarTurmas() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const salasOpts = useSalasDisponiveis();
+  const turnosOpts = useTurnosConfig();
 
 
   const { data: faculdades = [] } = useQuery({
@@ -99,11 +116,14 @@ export default function CriarTurmas() {
       const { data: authData } = await supabase.auth.getUser();
       const authId = authData?.user?.id;
       if (!authId) throw new Error("Sessão expirada. Volte a iniciar sessão.");
+      const firstTurno = (() => {
+        try { const a = JSON.parse(localStorage.getItem("upra:turnos-cfg") || "[]"); return a?.[0]?.nome ?? null; } catch { return null; }
+      })();
       const { error } = await supabase.from("turmas").insert({
         ...row,
         owner_user_id: authId,
         capacidade: 32,
-        turno: "Manhã",
+        turno: firstTurno,
       });
       if (error) throw error;
     },
@@ -324,9 +344,15 @@ export default function CriarTurmas() {
                                 ))}
                               </SelectContent>
                             </Select>
-                            <Select value={t.turno ?? "Manhã"} onValueChange={(v) => updateMut.mutate({ id: t.id, patch: { turno: v } })}>
-                              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                              <SelectContent>{turnos.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                            <Select value={t.turno ?? ""} onValueChange={(v) => updateMut.mutate({ id: t.id, patch: { turno: v } })}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={turnosOpts.length ? "Turno" : "Sem turnos"} /></SelectTrigger>
+                              <SelectContent>
+                                {turnosOpts.length === 0 ? (
+                                  <div className="px-2 py-1.5 text-xs text-muted-foreground">Configure turnos no Calendário Académico</div>
+                                ) : turnosOpts.map((s) => (
+                                  <SelectItem key={s.nome} value={s.nome}>{s.nome} <span className="text-muted-foreground">({s.inicio}–{s.fim})</span></SelectItem>
+                                ))}
+                              </SelectContent>
                             </Select>
                             <Input type="number" value={t.capacidade}
                               onChange={(e) => updateMut.mutate({ id: t.id, patch: { capacidade: +e.target.value || 0 } })}
