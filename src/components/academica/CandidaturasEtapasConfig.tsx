@@ -591,9 +591,13 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                       )}
                     </td>
                     <td className="px-2 py-2">
-                      <Select value={sessao.local || undefined} onValueChange={v => updSessao(sessao.id, { local: v })}>
+                      <Select value={sessao.local || "none"} onValueChange={v => {
+                        if (v === "none") return;
+                        updSessao(sessao.id, { local: v });
+                      }}>
                         <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={geopontos.length ? "Geoponto" : "Sem geopontos"} /></SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="none" disabled>{geopontos.length ? "Geoponto" : "Sem geopontos"}</SelectItem>
                           {geopontos.length === 0 ? (
                             <div className="px-2 py-1.5 text-xs text-muted-foreground">Sem geopontos</div>
                           ) : geopontos.map(g => (
@@ -603,9 +607,13 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                       </Select>
                     </td>
                     <td className="px-2 py-2">
-                      <Select value={sessao.responsavel_id || undefined} onValueChange={v => updSessao(sessao.id, { responsavel_id: v })}>
+                      <Select value={sessao.responsavel_id || "none"} onValueChange={v => {
+                        if (v === "none") return;
+                        updSessao(sessao.id, { responsavel_id: v });
+                      }}>
                         <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={docentes.length ? "Docente" : "Sem docentes"} /></SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="none" disabled>{docentes.length ? "Docente" : "Sem docentes"}</SelectItem>
                           {docentes.length === 0 ? (
                             <div className="px-2 py-1.5 text-xs text-muted-foreground">Sem docentes</div>
                           ) : docentes.map(d => (
