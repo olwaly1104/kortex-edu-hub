@@ -295,13 +295,12 @@ export default function AdminDiscentes() {
     draft.ultimoNome.trim() &&
     draft.faculdade_id &&
     draft.curso_id &&
-    draft.ano &&
-    draft.turma
+    draft.ano
   );
 
   const addRow = async () => {
     if (!requiredOk) {
-      toast.error("Preencha todos os campos obrigatórios (exceto Documentação Anexa)");
+      toast.error("Preencha nome, faculdade, curso e ano");
       return;
     }
     if (!draft.curso_id) {
@@ -309,8 +308,8 @@ export default function AdminDiscentes() {
       setConfirmOpen(false);
       return;
     }
-    if (!draft.ano || !draft.turma) {
-      toast.error("Selecione ano e turma antes de confirmar.");
+    if (!draft.ano) {
+      toast.error("Selecione o ano antes de confirmar.");
       setConfirmOpen(false);
       return;
     }
@@ -335,7 +334,7 @@ export default function AdminDiscentes() {
         nome,
         email: previewEmail,
         ano: draft.ano,
-        turma: draft.turma,
+        turma: draft.turma || "A",
         primeiro_nome: draft.primeiroNome.trim(),
         ultimo_nome: draft.ultimoNome.trim() || null,
         nascimento: draft.nascimento || null,
@@ -876,10 +875,6 @@ export default function AdminDiscentes() {
                 }
                 if (!draft.ano) {
                   toast.error("Selecione o ano.");
-                  return;
-                }
-                if (!draft.turma) {
-                  toast.error("Selecione a turma.");
                   return;
                 }
                 setConfirmOpen(true);
