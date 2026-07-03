@@ -314,9 +314,16 @@ export default function CriarTurmas() {
                             <div className="flex items-center gap-1.5 font-bold text-primary text-sm pl-2">
                               <span>{codigo}</span>
                             </div>
-                            <Input value={t.sala ?? ""} placeholder="Sala"
-                              onChange={(e) => updateMut.mutate({ id: t.id, patch: { sala: e.target.value } })}
-                              className="h-8 text-xs" />
+                            <Select value={t.sala ?? ""} onValueChange={(v) => updateMut.mutate({ id: t.id, patch: { sala: v } })}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={salasOpts.length ? "Sala" : "Sem salas"} /></SelectTrigger>
+                              <SelectContent>
+                                {salasOpts.length === 0 ? (
+                                  <div className="px-2 py-1.5 text-xs text-muted-foreground">Registe salas em Geopontos</div>
+                                ) : salasOpts.map((s) => (
+                                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <Select value={t.turno ?? "Manhã"} onValueChange={(v) => updateMut.mutate({ id: t.id, patch: { turno: v } })}>
                               <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                               <SelectContent>{turnos.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
