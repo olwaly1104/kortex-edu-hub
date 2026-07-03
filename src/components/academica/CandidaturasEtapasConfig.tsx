@@ -114,12 +114,12 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
 
   const load = async () => {
     setLoading(true);
-    const [e, s] = await Promise.all([
+    const [e, s, es] = await Promise.all([
       supabase.from("candidaturas_etapas").select("*").order("ordem"),
       supabase.from("candidaturas_sessoes").select("*"),
+      (supabase.from as any)("candidaturas_estados").select("*").order("ordem"),
     ]);
     let etapasRows = (e.error ? [] : (e.data ?? [])) as Etapa[];
-    // Ensure all protected defaults exist (seed missing ones)
     if (!e.error && authUserId) {
       const existing = new Set(etapasRows.map(r => (r.nome || "").trim().toLowerCase()));
       const missing = DEFAULT_ETAPAS.filter(d => !existing.has(d.nome.toLowerCase()))
@@ -132,6 +132,19 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     setEtapas(etapasRows);
 
     if (!s.error) setSessoes(((s.data ?? []) as any[]).map(r => ({ ...r, mode: r.mode ?? "", horas: Array.isArray(r.horas) ? r.horas : [] })) as Sessao[]);
+
+    let estadosRows = (es.error ? [] : (es.data ?? [])) as EstadoDef[];
+    if (!es.error && authUserId) {
+      const existingKeys = new Set(estadosRows.map(r => r.key));
+      const missing = DEFAULT_ESTADOS.filter(d => !existingKeys.has(d.key))
+        .map(d => ({ ...d, owner_user_id: authUserId }));
+      if (missing.length) {
+        const ins = await (supabase.from as any)("candidaturas_estados").insert(missing).select("*");
+        if (!ins.error) estadosRows = [...estadosRows, ...((ins.data ?? []) as EstadoDef[])]
+          .sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0));
+      }
+    }
+    setEstadosAll(estadosRows);
     setLoading(false);
   };
   useEffect(() => { load(); }, [authUserId]);
