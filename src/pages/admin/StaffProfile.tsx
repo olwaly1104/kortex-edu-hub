@@ -48,18 +48,10 @@ export default function AdminStaffProfile() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 -ml-2">
           <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => setDocOpen(true)}>
-            <Eye className="w-3.5 h-3.5" /> Ver documento
-          </Button>
-          <Button size="sm" className="gap-1.5 h-8 text-xs" onClick={() => setDocOpen(true)}>
-            <Download className="w-3.5 h-3.5" /> Descarregar
-          </Button>
-        </div>
       </div>
 
       <Card className="overflow-hidden p-0">
@@ -71,7 +63,15 @@ export default function AdminStaffProfile() {
               </div>
               <div className="leading-tight">
                 <p className="text-[10px] font-semibold text-foreground tabular-nums">{displayId}</p>
-                <p className="text-[9px] text-muted-foreground">Identificador interno</p>
+                <p className="text-[9px] text-muted-foreground">Gerado automaticamente</p>
+              </div>
+              <div className="flex items-center gap-1 ml-1">
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDocOpen(true)} title="Pré-visualizar">
+                  <Eye className="w-3.5 h-3.5" />
+                </Button>
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDocOpen(true)} title="Descarregar">
+                  <Download className="w-3.5 h-3.5" />
+                </Button>
               </div>
             </div>
 
@@ -82,7 +82,9 @@ export default function AdminStaffProfile() {
               <div className="flex-1 min-w-0">
                 <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Perfil do Staff</span>
                 <div className="flex items-center gap-2 mt-1">
-                  <ModuleTag modulo={staff.moduloKortex} />
+                  <Badge className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/10 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
+                    <Users className="w-3 h-3 mr-1" /> Staff
+                  </Badge>
                 </div>
                 <h1 className="text-2xl font-bold text-foreground leading-tight mt-1.5">{fullName}</h1>
                 <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
