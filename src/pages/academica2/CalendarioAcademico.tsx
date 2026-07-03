@@ -248,90 +248,100 @@ export default function CalendarioAcademico() {
       )}
 
       {/* Ano Letivo + Turnos + Candidaturas */}
-      <Card className="p-4 space-y-5">
-        <div className="flex items-center gap-2">
-          <CalendarDays className="w-4 h-4 text-primary" />
-          <p className="text-sm font-semibold">Configuração do Ano Letivo</p>
-          <span className="text-[11px] text-muted-foreground">Período, turnos e candidaturas</span>
+      <Card className="overflow-hidden">
+        <div className="px-5 py-4 border-b bg-muted/30">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="w-4 h-4 text-primary" />
+            <p className="text-sm font-semibold">Configuração do Ano Letivo</p>
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Período académico, turnos diários e janela de candidaturas</p>
         </div>
 
-        <div>
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Período académico</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="divide-y">
+          {/* Período académico */}
+          <section className="px-5 py-4 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 items-start">
             <div>
-              <p className="text-[11px] text-muted-foreground mb-1">Ano Letivo</p>
-              <Select value={anoLetivo} onValueChange={changeAno}>
-                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {ANOS_LETIVOS.map(a => <SelectItem key={a} value={a}>{a}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <p className="text-xs font-medium">Período académico</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Ano e datas de início/fim</p>
             </div>
-            <div>
-              <p className="text-[11px] text-muted-foreground mb-1">Início</p>
-              <Input type="date" value={inicio} onChange={e => setInicio(e.target.value)} className="h-9" />
-            </div>
-            <div>
-              <p className="text-[11px] text-muted-foreground mb-1">Fim</p>
-              <Input type="date" value={fim} onChange={e => setFim(e.target.value)} className="h-9" />
-            </div>
-          </div>
-        </div>
-
-        <div className="pt-4 border-t">
-          <div className="flex items-center justify-between gap-2 flex-wrap mb-2">
-            <div className="flex items-center gap-2">
-              <Sun className="w-3.5 h-3.5 text-primary" />
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Turnos ({turnos.length})</p>
-            </div>
-            <Button size="sm" variant="outline" className="h-8 gap-1" onClick={addTurno}>
-              <Plus className="w-3.5 h-3.5" /> Adicionar Turno
-            </Button>
-          </div>
-          <div className="space-y-2">
-            {turnos.length === 0 && (
-              <p className="text-xs text-muted-foreground italic">Sem turnos configurados.</p>
-            )}
-            {turnos.length > 0 && (
-              <div className="grid grid-cols-[1fr_110px_110px_36px] gap-2 items-center text-[10px] uppercase tracking-wide text-muted-foreground px-1">
-                <span>Nome</span><span>Início</span><span>Fim</span><span />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <p className="text-[11px] text-muted-foreground mb-1">Ano Letivo</p>
+                <Select value={anoLetivo} onValueChange={changeAno}>
+                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {ANOS_LETIVOS.map(a => <SelectItem key={a} value={a}>{a}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
-            )}
-            {turnos.map(t => (
-              <div key={t.id} className="grid grid-cols-[1fr_110px_110px_36px] gap-2 items-center">
-                <Input value={t.nome} onChange={e => updTurno(t.id, { nome: e.target.value })} placeholder="Nome do turno" className="h-8 text-xs" />
-                <Input type="time" value={t.inicio} onChange={e => updTurno(t.id, { inicio: e.target.value })} className="h-8 text-xs" />
-                <Input type="time" value={t.fim} onChange={e => updTurno(t.id, { fim: e.target.value })} className="h-8 text-xs" />
-                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                  onClick={() => { if (confirm(`Remover turno "${t.nome}"?`)) rmTurno(t.id); }}>
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
+              <div>
+                <p className="text-[11px] text-muted-foreground mb-1">Início</p>
+                <Input type="date" value={inicio} onChange={e => setInicio(e.target.value)} className="h-9" />
               </div>
-            ))}
-          </div>
-        </div>
+              <div>
+                <p className="text-[11px] text-muted-foreground mb-1">Fim</p>
+                <Input type="date" value={fim} onChange={e => setFim(e.target.value)} className="h-9" />
+              </div>
+            </div>
+          </section>
 
-        <div className="pt-4 border-t">
-          <div className="flex items-center gap-2 mb-2">
-            <FileSignature className="w-3.5 h-3.5 text-primary" />
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Candidaturas</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {/* Turnos */}
+          <section className="px-5 py-4 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 items-start">
             <div>
-              <p className="text-[11px] text-muted-foreground mb-1">Abertura</p>
-              <Input type="date" value={candidaturas.inicio} onChange={e => setCandidaturas(c => ({ ...c, inicio: e.target.value }))} className="h-9" />
+              <p className="text-xs font-medium flex items-center gap-1.5"><Sun className="w-3.5 h-3.5 text-primary" /> Turnos</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{turnos.length} configurado{turnos.length === 1 ? "" : "s"}</p>
             </div>
+            <div className="space-y-2">
+              {turnos.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">Sem turnos configurados.</p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-[1fr_110px_110px_36px] gap-2 items-center text-[10px] uppercase tracking-wide text-muted-foreground px-1">
+                    <span>Nome</span><span>Início</span><span>Fim</span><span />
+                  </div>
+                  {turnos.map(t => (
+                    <div key={t.id} className="grid grid-cols-[1fr_110px_110px_36px] gap-2 items-center">
+                      <Input value={t.nome} onChange={e => updTurno(t.id, { nome: e.target.value })} placeholder="Nome do turno" className="h-8 text-xs" />
+                      <Input type="time" value={t.inicio} onChange={e => updTurno(t.id, { inicio: e.target.value })} className="h-8 text-xs" />
+                      <Input type="time" value={t.fim} onChange={e => updTurno(t.id, { fim: e.target.value })} className="h-8 text-xs" />
+                      <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        onClick={() => { if (confirm(`Remover turno "${t.nome}"?`)) rmTurno(t.id); }}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  ))}
+                </>
+              )}
+              <Button size="sm" variant="outline" className="h-8 gap-1 mt-1" onClick={addTurno}>
+                <Plus className="w-3.5 h-3.5" /> Adicionar Turno
+              </Button>
+            </div>
+          </section>
+
+          {/* Candidaturas */}
+          <section className="px-5 py-4 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 items-start">
             <div>
-              <p className="text-[11px] text-muted-foreground mb-1">Encerramento</p>
-              <Input type="date" value={candidaturas.fim} onChange={e => setCandidaturas(c => ({ ...c, fim: e.target.value }))} className="h-9" />
+              <p className="text-xs font-medium flex items-center gap-1.5"><FileSignature className="w-3.5 h-3.5 text-primary" /> Candidaturas</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Janela de inscrições e vagas</p>
             </div>
-            <div>
-              <p className="text-[11px] text-muted-foreground mb-1">Vagas totais</p>
-              <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} className="h-9" />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <p className="text-[11px] text-muted-foreground mb-1">Abertura</p>
+                <Input type="date" value={candidaturas.inicio} onChange={e => setCandidaturas(c => ({ ...c, inicio: e.target.value }))} className="h-9" />
+              </div>
+              <div>
+                <p className="text-[11px] text-muted-foreground mb-1">Encerramento</p>
+                <Input type="date" value={candidaturas.fim} onChange={e => setCandidaturas(c => ({ ...c, fim: e.target.value }))} className="h-9" />
+              </div>
+              <div>
+                <p className="text-[11px] text-muted-foreground mb-1">Vagas totais</p>
+                <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} className="h-9" />
+              </div>
             </div>
-          </div>
+          </section>
         </div>
       </Card>
+
 
 
 
