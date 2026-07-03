@@ -18,24 +18,15 @@ import DocenteDocPreview from "./DocenteDocPreview";
 export default function AdminDocenteProfile() {
   const { docenteId } = useParams();
   const navigate = useNavigate();
-  const rows = useMemo(() => loadDocentes(), []);
+  const { user } = useAuth();
+  const [rowsVersion, setRowsVersion] = useState(0);
+  const rows = useMemo(() => loadDocentes(), [rowsVersion]);
   const docente = useMemo(() => rows.find((r) => r.id === docenteId), [rows, docenteId]);
   const [docOpen, setDocOpen] = useState(false);
-  const [cadeiras, setCadeiras] = useState<string[]>([]);
+  const [editOpen, setEditOpen] = useState(false);
 
-  const fullNameLookup = docente ? `${docente.primeiroNome} ${docente.ultimoNome}`.trim() : "";
-  useEffect(() => {
-    if (!docente) return;
-    (async () => {
-      const { data } = await (supabase.from("cadeiras" as any) as any)
-        .select("name, docente")
-        .order("ano", { ascending: true });
-      const mine = (data ?? []).filter((c: any) =>
-        (c.docente || "").trim().toLowerCase() === fullNameLookup.toLowerCase()
-      );
-      setCadeiras(mine.map((c: any) => c.name));
-    })();
-  }, [docente?.id, fullNameLookup]);
+  const canEdit = user?.role === "admin" || user?.email?.toLowerCase() === docente?.email?.toLowerCase();
+
 
 
   if (!docente) {
