@@ -26,10 +26,37 @@ type TurmaRow = {
 const turnos = ["Manhã", "Tarde", "Noite"] as const;
 const LETRAS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
+type SalaOpt = { value: string; label: string };
+function useSalasDisponiveis(): SalaOpt[] {
+  const [opts, setOpts] = useState<SalaOpt[]>([]);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const { data: eds } = await supabase.from("edificios").select("id, sigla, nome");
+      const edMap = new Map<string, string>((eds ?? []).map((e: any) => [e.id, e.sigla || e.nome || "—"]));
+      let espacos: any[] = [];
+      try { espacos = JSON.parse(localStorage.getItem("upra:espacos") || "[]"); } catch {}
+      const salas = espacos
+        .filter((s) => s.tipo === "Sala" && (s.nome || "").trim())
+        .map((s) => {
+          const ed = edMap.get(s.edificioId) || "";
+          const label = ed ? `${ed} · ${s.nome}` : s.nome;
+          return { value: label, label };
+        });
+      if (alive) setOpts(salas);
+    })();
+    return () => { alive = false; };
+  }, []);
+  return opts;
+}
+
+
 export default function CriarTurmas() {
   const isOnboarding = useIsOnboardingStep();
   const { user } = useAuth();
   const qc = useQueryClient();
+  const salasOpts = useSalasDisponiveis();
+
 
   const { data: faculdades = [] } = useQuery({
     queryKey: ["faculdades-all"],
@@ -287,9 +314,16 @@ export default function CriarTurmas() {
                             <div className="flex items-center gap-1.5 font-bold text-primary text-sm pl-2">
                               <span>{codigo}</span>
                             </div>
-                            <Input value={t.sala ?? ""} placeholder="Sala"
-                              onChange={(e) => updateMut.mutate({ id: t.id, patch: { sala: e.target.value } })}
-                              className="h-8 text-xs" />
+                            <Select value={t.sala ?? ""} onValueChange={(v) => updateMut.mutate({ id: t.id, patch: { sala: v } })}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={salasOpts.length ? "Sala" : "Sem salas"} /></SelectTrigger>
+                              <SelectContent>
+                                {salasOpts.length === 0 ? (
+                                  <div className="px-2 py-1.5 text-xs text-muted-foreground">Registe salas em Geopontos</div>
+                                ) : salasOpts.map((s) => (
+                                  <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <Select value={t.turno ?? "Manhã"} onValueChange={(v) => updateMut.mutate({ id: t.id, patch: { turno: v } })}>
                               <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
                               <SelectContent>{turnos.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
