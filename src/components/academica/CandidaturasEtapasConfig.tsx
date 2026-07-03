@@ -464,25 +464,45 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                     </td>
                     <td className="px-2 py-2">
                       {sessao.mode === "periodo" ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 min-w-[260px]">
-                          <label className="space-y-1">
+                        <div className="grid grid-cols-2 gap-1.5 min-w-[260px]">
+                          <div className="space-y-1">
                             <span className="text-[10px] font-medium text-muted-foreground">De</span>
-                            <Input
-                              type="date"
-                              className="h-8 text-xs"
-                              value={sessao.datas[0] || ""}
-                              onChange={e => updSessao(sessao.id, { datas: e.target.value ? [e.target.value] : [] })}
-                            />
-                          </label>
-                          <label className="space-y-1">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
+                                  {sessao.datas[0] || <span className="text-muted-foreground">Escolher</span>}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={parseIsoLocal(sessao.datas[0])}
+                                  defaultMonth={parseIsoLocal(sessao.datas[0]) ?? parseIsoLocal(sessao.data_fim ?? undefined) ?? new Date()}
+                                  onSelect={d => updSessao(sessao.id, { datas: d ? [formatIsoLocal(d)] : [] })}
+                                  className={cn("p-3 pointer-events-auto")}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
+                          <div className="space-y-1">
                             <span className="text-[10px] font-medium text-muted-foreground">Até</span>
-                            <Input
-                              type="date"
-                              className="h-8 text-xs"
-                              value={sessao.data_fim || ""}
-                              onChange={e => updSessao(sessao.id, { data_fim: e.target.value || null })}
-                            />
-                          </label>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
+                                  {sessao.data_fim || <span className="text-muted-foreground">Escolher</span>}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={parseIsoLocal(sessao.data_fim ?? undefined)}
+                                  defaultMonth={parseIsoLocal(sessao.data_fim ?? undefined) ?? parseIsoLocal(sessao.datas[0]) ?? new Date()}
+                                  onSelect={d => updSessao(sessao.id, { data_fim: d ? formatIsoLocal(d) : null })}
+                                  className={cn("p-3 pointer-events-auto")}
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
                         </div>
                       ) : sessao.mode === "dia" ? (
                         <Popover>
