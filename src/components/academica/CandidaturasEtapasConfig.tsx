@@ -37,27 +37,25 @@ type Sessao = {
 
 type EstadoDef = { key: string; label: string; color: string; descricao?: string };
 
+const COR_OPCOES: { label: string; value: string }[] = [
+  { label: "Verde",    value: "bg-green-100 text-green-700 border-green-200" },
+  { label: "Âmbar",    value: "bg-amber-100 text-amber-700 border-amber-200" },
+  { label: "Vermelho", value: "bg-red-100 text-red-700 border-red-200" },
+  { label: "Azul",     value: "bg-blue-100 text-blue-700 border-blue-200" },
+  { label: "Cinza",    value: "bg-slate-100 text-slate-700 border-slate-200" },
+  { label: "Violeta",  value: "bg-violet-100 text-violet-700 border-violet-200" },
+];
+
 const DEFAULT_ESTADOS: EstadoDef[] = [
-  { key: "agendado",  label: "Agendado",  color: "bg-blue-50 text-blue-700 border-blue-200",       descricao: "Sessão marcada, aguarda realização." },
-  { key: "completo",  label: "Completo",  color: "bg-green-50 text-green-700 border-green-200",    descricao: "Etapa concluída pelo candidato." },
-  { key: "remarcado", label: "Remarcado", color: "bg-amber-50 text-amber-700 border-amber-200",    descricao: "Data alterada para nova sessão." },
-  { key: "aprovado",  label: "Aprovado",  color: "bg-emerald-50 text-emerald-700 border-emerald-200", descricao: "Candidato aprovado nesta etapa." },
-  { key: "reprovado", label: "Reprovado", color: "bg-red-50 text-red-700 border-red-200",          descricao: "Candidato reprovado nesta etapa." },
+  { key: "agendado",  label: "Agendado",  color: "bg-blue-100 text-blue-700 border-blue-200",       descricao: "Sessão marcada, aguarda realização." },
+  { key: "completo",  label: "Completo",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Etapa concluída pelo candidato." },
+  { key: "remarcado", label: "Remarcado", color: "bg-amber-100 text-amber-700 border-amber-200",    descricao: "Data alterada para nova sessão." },
+  { key: "aprovado",  label: "Aprovado",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Candidato aprovado nesta etapa." },
+  { key: "reprovado", label: "Reprovado", color: "bg-red-100 text-red-700 border-red-200",          descricao: "Candidato reprovado nesta etapa." },
 ];
 const DEFAULT_ESTADO_KEYS = new Set(DEFAULT_ESTADOS.map(e => e.key));
 
-const PALETTE: { name: string; color: string }[] = [
-  { name: "Azul",    color: "bg-blue-50 text-blue-700 border-blue-200" },
-  { name: "Verde",   color: "bg-green-50 text-green-700 border-green-200" },
-  { name: "Âmbar",   color: "bg-amber-50 text-amber-700 border-amber-200" },
-  { name: "Esmeralda", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  { name: "Vermelho", color: "bg-red-50 text-red-700 border-red-200" },
-  { name: "Violeta", color: "bg-violet-50 text-violet-700 border-violet-200" },
-  { name: "Céu",     color: "bg-sky-50 text-sky-700 border-sky-200" },
-  { name: "Rosa",    color: "bg-rose-50 text-rose-700 border-rose-200" },
-  { name: "Cinza",   color: "bg-slate-100 text-slate-700 border-slate-200" },
-];
-const nextColor = (i: number) => PALETTE[i % PALETTE.length].color;
+const nextColor = (i: number) => COR_OPCOES[i % COR_OPCOES.length].value;
 
 const ESTADOS_KEY = "upra:cand-estados-v2";
 
