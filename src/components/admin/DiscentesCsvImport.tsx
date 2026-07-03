@@ -43,10 +43,11 @@ const norm = (s: string) =>
   (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
 
 const HEADER_MAP: Record<string, string> = {
-  primeironome: "primeiro_nome", primeiro: "primeiro_nome", nome: "primeiro_nome", firstname: "primeiro_nome",
+  nome: "nome_completo", nomecompleto: "nome_completo", fullname: "nome_completo", name: "nome_completo",
+  primeironome: "primeiro_nome", primeiro: "primeiro_nome", firstname: "primeiro_nome",
   ultimonome: "ultimo_nome", apelido: "ultimo_nome", ultimo: "ultimo_nome", lastname: "ultimo_nome", sobrenome: "ultimo_nome",
   faculdade: "faculdade", faculty: "faculdade", sigla: "faculdade",
-  curso: "curso", codigo: "curso", codigocurso: "curso", coursecode: "curso",
+  curso: "curso", nomedocurso: "curso", nomecurso: "curso", codigo: "curso", codigocurso: "curso", coursecode: "curso", coursename: "curso",
   ano: "ano", year: "ano",
   turma: "turma", class: "turma",
   nascimento: "nascimento", datanascimento: "nascimento", birthdate: "nascimento",
@@ -59,8 +60,15 @@ const HEADER_MAP: Record<string, string> = {
   endereco: "endereco", morada: "endereco", address: "endereco",
 };
 
-const FIELDS = ["primeiro_nome","ultimo_nome","faculdade","curso","ano","turma","nascimento","genero","regime","telemovel","bilhete","provincia","municipio","endereco"] as const;
+const FIELDS = ["nome_completo","primeiro_nome","ultimo_nome","faculdade","curso","ano","turma","nascimento","genero","regime","telemovel","bilhete","provincia","municipio","endereco"] as const;
 type Field = typeof FIELDS[number];
+
+const splitName = (full: string): [string, string] => {
+  const parts = (full || "").trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return ["", ""];
+  if (parts.length === 1) return [parts[0], ""];
+  return [parts[0], parts.slice(1).join(" ")];
+};
 
 type Row = {
   _key: string;
@@ -89,11 +97,7 @@ const emptyRow = (): Row => ({
   telemovel: "", bilhete: "", provincia: "", municipio: "", endereco: "",
 });
 
-const TEMPLATE_HEADERS = ["primeiro_nome","ultimo_nome","faculdade","curso","ano","turma","genero","regime","telemovel","bilhete"];
-const TEMPLATE_EXAMPLE = [
-  ["Ana","Silva","ARQ","ARQ-BAC","1","A","F","normal","+244 923 000 001","000000000LA000"],
-  ["Bruno","Costa","ARQ","ARQ-BAC","1","A","M","bolseiro","","000000000LA001"],
-];
+const RECOGNIZED_COLS = ["nome","faculdade","curso","ano","turma","genero","regime","telemovel","bilhete","nascimento","provincia","municipio","endereco"];
 
 /* ---------------- component ---------------- */
 
