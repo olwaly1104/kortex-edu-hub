@@ -878,8 +878,6 @@ export default function AdminDiscentes() {
                   return;
                 }
                 setConfirmOpen(true);
-                return;
-                setConfirmOpen(true);
               }}
               disabled={uploading || createMut.isPending}
               className="gap-1.5"
