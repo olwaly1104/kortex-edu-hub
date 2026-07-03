@@ -90,6 +90,10 @@ const isProtected = (nome: string) => PROTECTED_NAMES.has((nome || "").trim().to
 
 export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnly?: boolean }) {
   const { user } = useAuth();
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setAuthUserId(data.user?.id ?? null));
+  }, []);
   const [etapas, setEtapas] = useState<Etapa[]>([]);
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
   const [loading, setLoading] = useState(true);
@@ -115,10 +119,10 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     ]);
     let etapasRows = (e.error ? [] : (e.data ?? [])) as Etapa[];
     // Ensure all protected defaults exist (seed missing ones)
-    if (!e.error && user?.id) {
+    if (!e.error && authUserId) {
       const existing = new Set(etapasRows.map(r => (r.nome || "").trim().toLowerCase()));
       const missing = DEFAULT_ETAPAS.filter(d => !existing.has(d.nome.toLowerCase()))
-        .map(d => ({ ...d, owner_user_id: user.id }));
+        .map(d => ({ ...d, owner_user_id: authUserId }));
       if (missing.length) {
         const ins = await supabase.from("candidaturas_etapas").insert(missing).select("*");
         if (!ins.error) etapasRows = [...etapasRows, ...((ins.data ?? []) as Etapa[])].sort((a, b) => a.ordem - b.ordem);
@@ -129,7 +133,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     if (!s.error) setSessoes(((s.data ?? []) as any[]).map(r => ({ ...r, mode: r.mode ?? "" })) as Sessao[]);
     setLoading(false);
   };
-  useEffect(() => { load(); }, [user?.id]);
+  useEffect(() => { load(); }, [authUserId]);
 
 
   // Auto-create sessão row for every etapa with agenda=true
@@ -141,18 +145,18 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
       for (const et of need) {
         await supabase.from("candidaturas_sessoes").insert({
           etapa_id: et.id,
-          owner_user_id: user?.id,
+          owner_user_id: authUserId,
           mode: "",
           datas: [],
         });
       }
       load();
     })();
-  }, [etapas, sessoes, loading, user?.id]);
+  }, [etapas, sessoes, loading, authUserId]);
 
   const addEtapa = async () => {
     const { data, error } = await supabase.from("candidaturas_etapas").insert({
-      nome: "", ordem: etapas.length, owner_user_id: user?.id,
+      nome: "", ordem: etapas.length, owner_user_id: authUserId,
       agenda: false, obrigatoria: false, estados_possiveis: [],
     }).select("*").single();
     if (error) { toast.error(error.message); return; }
