@@ -4,9 +4,10 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Mail, MessageCircle, Phone, MapPin, UserCheck, Calendar,
-  FileText, Building2, IdCard, Briefcase, Eye, Download,
+  FileText, Building2, IdCard, Briefcase, Eye, Download, Users,
 } from "lucide-react";
 import { loadStaff, type StaffRow } from "@/lib/peopleStorage";
 import { ModuleTag } from "@/components/chat/ModuleTag";
