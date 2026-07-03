@@ -26,6 +26,31 @@ type TurmaRow = {
 const turnos = ["Manhã", "Tarde", "Noite"] as const;
 const LETRAS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
+type SalaOpt = { value: string; label: string };
+function useSalasDisponiveis(): SalaOpt[] {
+  const [opts, setOpts] = useState<SalaOpt[]>([]);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const { data: eds } = await supabase.from("edificios").select("id, sigla, nome");
+      const edMap = new Map<string, string>((eds ?? []).map((e: any) => [e.id, e.sigla || e.nome || "—"]));
+      let espacos: any[] = [];
+      try { espacos = JSON.parse(localStorage.getItem("upra:espacos") || "[]"); } catch {}
+      const salas = espacos
+        .filter((s) => s.tipo === "Sala" && (s.nome || "").trim())
+        .map((s) => {
+          const ed = edMap.get(s.edificioId) || "";
+          const label = ed ? `${ed} · ${s.nome}` : s.nome;
+          return { value: label, label };
+        });
+      if (alive) setOpts(salas);
+    })();
+    return () => { alive = false; };
+  }, []);
+  return opts;
+}
+
+
 export default function CriarTurmas() {
   const isOnboarding = useIsOnboardingStep();
   const { user } = useAuth();
