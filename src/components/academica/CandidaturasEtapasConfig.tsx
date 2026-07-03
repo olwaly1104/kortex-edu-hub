@@ -45,6 +45,16 @@ const ESTADOS_DISPONIVEIS = [
 
 const estadoMeta = (k: string) => ESTADOS_DISPONIVEIS.find(e => e.key === k) ?? { key: k, label: k, color: "bg-muted text-foreground border-border" };
 
+const DEFAULT_ETAPAS = [
+  { nome: "Submissão da candidatura", ordem: 0, agenda: false, obrigatoria: true, estados_possiveis: ["completo"] },
+  { nome: "Entrevista",               ordem: 1, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "completo", "remarcado"] },
+  { nome: "Curso Preparatório",       ordem: 2, agenda: true,  obrigatoria: false, estados_possiveis: ["agendado", "completo", "remarcado"] },
+  { nome: "Exame de Acesso",          ordem: 3, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
+];
+const PROTECTED_NAMES = new Set(DEFAULT_ETAPAS.map(d => d.nome.toLowerCase()));
+const isProtected = (nome: string) => PROTECTED_NAMES.has((nome || "").trim().toLowerCase());
+
+
 export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnly?: boolean }) {
   const { user } = useAuth();
   const [etapas, setEtapas] = useState<Etapa[]>([]);
@@ -66,18 +76,18 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
       supabase.from("candidaturas_sessoes").select("*"),
     ]);
     let etapasRows = (e.error ? [] : (e.data ?? [])) as Etapa[];
-    // Seed defaults (same as GAP) if empty
-    if (!e.error && etapasRows.length === 0 && user?.id) {
-      const defaults = [
-        { nome: "Submissão da candidatura", ordem: 0, agenda: false, obrigatoria: true, estados_possiveis: ["completo"] },
-        { nome: "Entrevista",               ordem: 1, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "completo", "remarcado"] },
-        { nome: "Curso Preparatório",       ordem: 2, agenda: true,  obrigatoria: false, estados_possiveis: ["agendado", "completo", "remarcado"] },
-        { nome: "Exame de Acesso",          ordem: 3, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
-      ].map(d => ({ ...d, owner_user_id: user.id }));
-      const ins = await supabase.from("candidaturas_etapas").insert(defaults).select("*");
-      if (!ins.error) etapasRows = (ins.data ?? []) as Etapa[];
+    // Ensure all protected defaults exist (seed missing ones)
+    if (!e.error && user?.id) {
+      const existing = new Set(etapasRows.map(r => (r.nome || "").trim().toLowerCase()));
+      const missing = DEFAULT_ETAPAS.filter(d => !existing.has(d.nome.toLowerCase()))
+        .map(d => ({ ...d, owner_user_id: user.id }));
+      if (missing.length) {
+        const ins = await supabase.from("candidaturas_etapas").insert(missing).select("*");
+        if (!ins.error) etapasRows = [...etapasRows, ...((ins.data ?? []) as Etapa[])].sort((a, b) => a.ordem - b.ordem);
+      }
     }
     setEtapas(etapasRows);
+
     if (!s.error) setSessoes(((s.data ?? []) as any[]).map(r => ({ ...r, mode: r.mode ?? "" })) as Sessao[]);
     setLoading(false);
   };
@@ -124,11 +134,13 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   };
 
   const rmEtapa = async (id: string, nome: string) => {
+    if (isProtected(nome)) { toast.error("Etapa predefinida — não pode ser removida."); return; }
     if (!confirm(`Remover etapa "${nome}"?`)) return;
     const { error } = await supabase.from("candidaturas_etapas").delete().eq("id", id);
     if (error) { toast.error(error.message); return; }
     load();
   };
+
 
   const toggleEstado = (et: Etapa, key: string) => {
     const has = et.estados_possiveis.includes(key);
@@ -188,16 +200,20 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                 <tr><td colSpan={5} className="px-3 py-6 text-center text-muted-foreground">A carregar…</td></tr>
               ) : etapas.length === 0 ? (
                 <tr><td colSpan={5} className="px-3 py-6 text-center text-muted-foreground italic">Sem etapas configuradas.</td></tr>
-              ) : etapas.map(et => (
+              ) : etapas.map(et => {
+                const locked = isProtected(et.nome);
+                return (
                 <tr key={et.id} className="border-t align-top">
                   <td className="px-3 py-2">
-                    <Input value={et.nome} data-etapa-id={et.id}
-                      placeholder="Nome da etapa"
-                      onChange={e => setEtapas(p => p.map(x => x.id === et.id ? { ...x, nome: e.target.value } : x))}
-                      onBlur={e => updEtapa(et.id, { nome: e.target.value })}
-                      disabled={readOnly} readOnly={readOnly}
-                      className="h-8 text-xs" />
-
+                    <div className="flex items-center gap-2">
+                      <Input value={et.nome} data-etapa-id={et.id}
+                        placeholder="Nome da etapa"
+                        onChange={e => setEtapas(p => p.map(x => x.id === et.id ? { ...x, nome: e.target.value } : x))}
+                        onBlur={e => updEtapa(et.id, { nome: e.target.value })}
+                        disabled={readOnly || locked} readOnly={readOnly || locked}
+                        className="h-8 text-xs" />
+                      {locked && <Badge variant="outline" className="text-[9px] uppercase tracking-wide shrink-0">Predefinida</Badge>}
+                    </div>
                   </td>
                   <td className="px-3 py-2 text-center">
                     <Checkbox checked={et.obrigatoria} disabled={readOnly} onCheckedChange={v => updEtapa(et.id, { obrigatoria: !!v })} />
@@ -229,15 +245,18 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                     </Popover>
                   </td>
                   <td className="px-2 py-2">
-                    {!readOnly && (
+                    {!readOnly && !locked && (
                       <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
                         onClick={() => rmEtapa(et.id, et.nome)}>
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     )}
                   </td>
+
                 </tr>
-              ))}
+                );
+              })}
+
             </tbody>
           </table>
         </div>
