@@ -85,6 +85,21 @@ const buildAuto = (startISO: string, endISO: string): Evento[] => {
   ];
 };
 
+type Turno = { id: string; nome: string; inicio: string; fim: string };
+
+const DEFAULT_TURNOS: Turno[] = [
+  { id: "t-m", nome: "Manhã", inicio: "08:00", fim: "12:00" },
+  { id: "t-t", nome: "Tarde", inicio: "13:00", fim: "17:00" },
+  { id: "t-n", nome: "Noite", inicio: "18:00", fim: "22:00" },
+];
+
+const TURNOS_KEY = "upra:turnos-cfg";
+const CAND_KEY = "upra:candidaturas-cfg";
+
+function loadJSON<T>(key: string, fallback: T): T {
+  try { const r = localStorage.getItem(key); return r ? (JSON.parse(r) as T) : fallback; } catch { return fallback; }
+}
+
 export default function CalendarioAcademico() {
   const isOnboarding = useIsOnboardingStep();
   const { user } = useAuth();
@@ -97,6 +112,19 @@ export default function CalendarioAcademico() {
   const [planView, setPlanView] = useState<"cards" | "mensal">("cards");
   const [monthCursor, setMonthCursor] = useState(() => { const d = new Date(initial.inicio); return new Date(d.getFullYear(), d.getMonth(), 1); });
 
+  // Candidaturas configuration (application windows)
+  const [candidaturas, setCandidaturas] = useState<{ inicio: string; fim: string; vagas: number; taxa: number }>(
+    () => loadJSON(CAND_KEY, { inicio: `${initial.inicio.slice(0,4)}-05-01`, fim: `${initial.inicio.slice(0,4)}-08-15`, vagas: 200, taxa: 15000 })
+  );
+  useEffect(() => { try { localStorage.setItem(CAND_KEY, JSON.stringify(candidaturas)); } catch {} }, [candidaturas]);
+
+  // Turnos configuration
+  const [turnos, setTurnos] = useState<Turno[]>(() => loadJSON(TURNOS_KEY, DEFAULT_TURNOS));
+  useEffect(() => { try { localStorage.setItem(TURNOS_KEY, JSON.stringify(turnos)); } catch {} }, [turnos]);
+  const addTurno = () => setTurnos(p => [...p, { id: `t-${Date.now()}`, nome: `Turno ${p.length + 1}`, inicio: "08:00", fim: "12:00" }]);
+  const updTurno = (id: string, patch: Partial<Turno>) => setTurnos(p => p.map(t => t.id === id ? { ...t, ...patch } : t));
+  const rmTurno = (id: string) => setTurnos(p => p.filter(t => t.id !== id));
+
   const changeAno = (v: string) => {
     setAnoLetivo(v);
     const r = rangeFromAno(v);
@@ -106,6 +134,7 @@ export default function CalendarioAcademico() {
     const d = new Date(r.inicio);
     setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
   };
+
 
   const regenerate = () => {
     setEventos(buildAuto(inicio, fim));
