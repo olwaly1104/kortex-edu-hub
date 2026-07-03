@@ -53,7 +53,15 @@ export default function AdminDocenteProfile() {
               </div>
               <div className="leading-tight">
                 <p className="text-[10px] font-semibold text-foreground tabular-nums">{displayId}</p>
-                <p className="text-[9px] text-muted-foreground">Identificador interno</p>
+                <p className="text-[9px] text-muted-foreground">Gerado automaticamente</p>
+              </div>
+              <div className="flex items-center gap-1 ml-1">
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDocOpen(true)} title="Pré-visualizar">
+                  <Eye className="w-3.5 h-3.5" />
+                </Button>
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDocOpen(true)} title="Descarregar">
+                  <Download className="w-3.5 h-3.5" />
+                </Button>
               </div>
             </div>
 
