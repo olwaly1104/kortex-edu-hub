@@ -39,21 +39,20 @@ export default function DocenteDocPreview({ docente: d, displayId }: Props) {
       title: "Identificação Pessoal",
       rows: [
         ["Nome completo", fullName],
-        ["Primeiro nome", d.primeiroNome || "—"],
-        ["Último nome", d.ultimoNome || "—"],
         ["Data de nascimento", fmtDataShort(d.nascimento)],
         ["Género", generoLabel(d.genero)],
         ["Nº Bilhete de Identidade", d.bilhete || "—"],
+        ["Módulo Kortex", moduloLabel(d.moduloKortex)],
       ],
     },
     {
       title: "Afiliação Institucional",
       rows: [
         ["Faculdade", d.faculdade || "—"],
+        ["Curso", d.curso || "—"],
         ["Departamento", d.departamento || "—"],
         ["Cargo", d.cargo || "—"],
         ["Contrato", d.contrato || "—"],
-        ["Módulo Kortex", moduloLabel(d.moduloKortex)],
         ["Email institucional", d.email || "—"],
       ],
     },
