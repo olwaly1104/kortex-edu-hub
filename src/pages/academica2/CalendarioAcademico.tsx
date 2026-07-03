@@ -161,8 +161,8 @@ export default function CalendarioAcademico() {
 
 
   const regenerate = () => {
-    setEventos(buildAuto(inicio, fim));
-    toast.success("Calendário regenerado automaticamente");
+    setEventos([]);
+    toast.success("Calendário limpo");
   };
 
   const confirmCalendar = () => {
