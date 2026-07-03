@@ -31,6 +31,7 @@ import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import CandidaturasEtapasConfig from "@/components/academica/CandidaturasEtapasConfig";
+import CandidaturasPage from "@/pages/academica2/CandidaturasPage";
 
 type EstadoItem = { key: string; label: string; color: string; descricao?: string };
 type CategoriaItem = { key: string; label: string; color: string; descricao?: string };
