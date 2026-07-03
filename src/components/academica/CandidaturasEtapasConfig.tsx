@@ -57,6 +57,21 @@ const DEFAULT_ESTADOS: Omit<EstadoDef, "id">[] = [
 
 const nextColor = (i: number) => COR_OPCOES[i % COR_OPCOES.length].value;
 
+const parseIsoLocal = (value?: string | null): Date | undefined => {
+  if (!value) return undefined;
+  const m = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return undefined;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return isNaN(d.getTime()) ? undefined : d;
+};
+const formatIsoLocal = (date: Date): string => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+
 
 
 
