@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { loadDocentes } from "@/lib/peopleStorage";
 import { ModuleTag } from "@/components/chat/ModuleTag";
+import { supabase } from "@/integrations/supabase/client";
 import DocenteDocPreview from "./DocenteDocPreview";
 
 export default function AdminDocenteProfile() {
