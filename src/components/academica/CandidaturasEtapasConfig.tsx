@@ -131,7 +131,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     }
     setEtapas(etapasRows);
 
-    if (!s.error) setSessoes(((s.data ?? []) as any[]).map(r => ({ ...r, mode: r.mode ?? "" })) as Sessao[]);
+    if (!s.error) setSessoes(((s.data ?? []) as any[]).map(r => ({ ...r, mode: r.mode ?? "", horas: Array.isArray(r.horas) ? r.horas : [] })) as Sessao[]);
     setLoading(false);
   };
   useEffect(() => { load(); }, [authUserId]);
