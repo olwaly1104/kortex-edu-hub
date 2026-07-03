@@ -384,9 +384,6 @@ export default function CalendarioAcademico() {
       } />
       {!isOnboarding && (
         <div>
-          <Link to="/areaacademica/criador" className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1 mb-2">
-            <ArrowLeft className="w-3 h-3" /> Voltar ao Criador
-          </Link>
           <div className="rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 flex items-center justify-between flex-wrap gap-3">
             <div>
               <Badge className="mb-2 gap-1"><CalendarDays className="w-3 h-3" /> Passo 5 de 6</Badge>
@@ -813,10 +810,6 @@ export default function CalendarioAcademico() {
 
 
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button variant="outline" asChild><Link to="/areaacademica/criador/turmas">Voltar</Link></Button>
-        <Button asChild className="gap-2"><Link to="/areaacademica/criador">Concluir e voltar ao Criador <Check className="w-4 h-4" /></Link></Button>
-      </div>
     </div>
   );
 }
