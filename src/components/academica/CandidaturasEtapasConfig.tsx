@@ -160,9 +160,11 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Etapas do Processo</p>
             <p className="text-[11px] text-muted-foreground">{etapas.length} etapa{etapas.length === 1 ? "" : "s"} · dados reais partilhados com GAP</p>
           </div>
-          <Button size="sm" variant="outline" className="h-7 gap-1 text-xs" onClick={addEtapa}>
-            <Plus className="w-3 h-3" /> Adicionar Etapa
-          </Button>
+          {!readOnly && (
+            <Button size="sm" variant="outline" className="h-7 gap-1 text-xs" onClick={addEtapa}>
+              <Plus className="w-3 h-3" /> Adicionar Etapa
+            </Button>
+          )}
         </div>
         <div className="rounded-lg border overflow-hidden">
           <table className="w-full text-xs">
