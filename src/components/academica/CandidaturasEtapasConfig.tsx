@@ -237,14 +237,6 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     <fieldset disabled={readOnly} className="space-y-4 disabled:opacity-100">
       <div className="space-y-4">
 
-      {/* ESTADOS POSSÍVEIS (editável) */}
-      <div>
-        <div className="mb-2 flex items-end justify-between gap-2">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estados possíveis</p>
-            <p className="text-[11px] text-muted-foreground">Vocabulário de estados que cada etapa pode assumir.</p>
-          </div>
-        </div>
       {/* ESTADOS POSSÍVEIS (editável, com pré-visualização e cor) */}
       <div>
         <div className="mb-2">
