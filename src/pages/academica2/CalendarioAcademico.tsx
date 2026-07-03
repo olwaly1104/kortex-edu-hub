@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import CandidaturasEtapasConfig from "@/components/academica/CandidaturasEtapasConfig";
 
 
-type EventoTipo = "semestre" | "exames" | "ferias" | "feriado" | "especial";
+type EventoTipo = "exames" | "ferias" | "feriado" | "especial";
 type Epoca = "1" | "2" | "especial";
 type Semestre = "1" | "2";
 type Evento = {
@@ -30,7 +30,7 @@ type Evento = {
 };
 
 const TIPO_META: Record<EventoTipo, { label: string; color: string; dot: string; ring: string; icon: typeof BookOpen }> = {
-  semestre: { label: "Semestre", color: "bg-primary text-primary-foreground",  dot: "bg-primary",     ring: "border-l-primary",     icon: BookOpen },
+  
   exames:   { label: "Exames",   color: "bg-amber-500 text-white",             dot: "bg-amber-500",   ring: "border-l-amber-500",   icon: FileSignature },
   ferias:   { label: "Férias",   color: "bg-sky-500 text-white",               dot: "bg-sky-500",     ring: "border-l-sky-500",     icon: Sun },
   feriado:  { label: "Feriado",  color: "bg-rose-500 text-white",              dot: "bg-rose-500",    ring: "border-l-rose-500",    icon: Star },
@@ -73,11 +73,12 @@ const buildAuto = (startISO: string, endISO: string): Evento[] => {
   const year = start.getFullYear();
   const nextYear = end.getFullYear();
   return [
-    { id: "s1",  tipo: "semestre", titulo: "1º Semestre — Aulas",        inicio: fmt(addDays(start, 14)), fim: fmt(addDays(start, 14 + 16 * 7)) },
+    { id: "s1",  tipo: "especial", titulo: "1º Semestre — Aulas",        inicio: fmt(addDays(start, 14)), fim: fmt(addDays(start, 14 + 16 * 7)) },
     { id: "e1",  tipo: "exames",   titulo: "Exames — 1ª Época (1º Semestre)", inicio: fmt(addDays(start, 14 + 16 * 7 + 7)), fim: fmt(addDays(start, 14 + 16 * 7 + 21)), epoca: "1", semestre: "1" },
     { id: "e1b", tipo: "exames",   titulo: "Exames — 2ª Época (1º Semestre)", inicio: fmt(addDays(start, 14 + 16 * 7 + 28)), fim: fmt(addDays(start, 14 + 16 * 7 + 42)), epoca: "2", semestre: "1" },
     { id: "h1",  tipo: "ferias",   titulo: "Férias de Inverno",          inicio: `${year}-12-22`,         fim: `${nextYear}-01-05` },
-    { id: "s2",  tipo: "semestre", titulo: "2º Semestre — Aulas",        inicio: fmt(half),               fim: fmt(addDays(half, 16 * 7)) },
+    { id: "s2",  tipo: "especial", titulo: "2º Semestre — Aulas",        inicio: fmt(half),               fim: fmt(addDays(half, 16 * 7)) },
+
     { id: "e2",  tipo: "exames",   titulo: "Exames — 1ª Época (2º Semestre)", inicio: fmt(addDays(half, 16 * 7 + 7)),  fim: fmt(addDays(half, 16 * 7 + 21)), epoca: "1", semestre: "2" },
     { id: "e2b", tipo: "exames",   titulo: "Exames — 2ª Época (2º Semestre)", inicio: fmt(addDays(half, 16 * 7 + 28)), fim: fmt(addDays(half, 16 * 7 + 42)), epoca: "2", semestre: "2" },
     { id: "esp", tipo: "exames",   titulo: "Exames — Época Especial",    inicio: `${nextYear}-09-15`,     fim: `${nextYear}-09-26`, epoca: "especial", semestre: null },
@@ -305,7 +306,7 @@ export default function CalendarioAcademico() {
 
 
   const counts = useMemo(() => {
-    const c: Record<EventoTipo, number> = { semestre: 0, exames: 0, ferias: 0, feriado: 0, especial: 0 };
+    const c: Record<EventoTipo, number> = { exames: 0, ferias: 0, feriado: 0, especial: 0 };
     eventos.forEach(e => { c[e.tipo]++; });
     return c;
   }, [eventos]);
@@ -352,8 +353,9 @@ export default function CalendarioAcademico() {
     { id: "__inicio_ano", tipo: "especial", titulo: "Início do Ano Letivo", inicio, fim: inicio },
     { id: "__fim_ano",    tipo: "especial", titulo: "Fim do Ano Letivo",    inicio: fim, fim },
     ...semestres.flatMap(s => [
-      { id: `__sem_${s.id}_ini`, tipo: "semestre" as EventoTipo, titulo: `Início do ${s.nome}`, inicio: s.inicio, fim: s.inicio },
-      { id: `__sem_${s.id}_fim`, tipo: "semestre" as EventoTipo, titulo: `Fim do ${s.nome}`, inicio: s.fim, fim: s.fim },
+      { id: `__sem_${s.id}_ini`, tipo: "especial" as EventoTipo, titulo: `Início do ${s.nome}`, inicio: s.inicio, fim: s.inicio },
+      { id: `__sem_${s.id}_fim`, tipo: "especial" as EventoTipo, titulo: `Fim do ${s.nome}`, inicio: s.fim, fim: s.fim },
+
     ]),
     { id: "__cand_ini", tipo: "especial", titulo: "Início das Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.inicio },
     { id: "__cand_fim", tipo: "especial", titulo: "Fim das Candidaturas",    inicio: candidaturas.fim,    fim: candidaturas.fim },
