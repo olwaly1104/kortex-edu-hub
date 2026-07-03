@@ -284,14 +284,15 @@ export default function CalendarioAcademico() {
     if (error) toast.error("Erro ao remover");
   };
   const add = async (tipo: EventoTipo) => {
-    if (!user?.id) { toast.error("Sessão inválida"); return; }
+    if (!authUserId) { toast.error("Sessão inválida"); return; }
     const base = { tipo, titulo: `Novo ${TIPO_META[tipo].label}`, inicio, fim: inicio } as Evento;
     if (tipo === "exames") {
       base.epoca = "1"; base.semestre = "1";
       base.titulo = buildExameTitulo(base.epoca, base.semestre);
     }
     const { data, error } = await supabase.from("ano_letivo_eventos").insert({
-      owner_user_id: user.id,
+      owner_user_id: authUserId,
+
       ano_letivo: anoLetivo,
       tipo: base.tipo, titulo: base.titulo, inicio: base.inicio, fim: base.fim,
       epoca: base.epoca ?? null, semestre: base.semestre ?? null,
