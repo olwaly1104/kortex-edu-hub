@@ -341,9 +341,15 @@ export default function CriarTurmas() {
                                 ))}
                               </SelectContent>
                             </Select>
-                            <Select value={t.turno ?? "Manhã"} onValueChange={(v) => updateMut.mutate({ id: t.id, patch: { turno: v } })}>
-                              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                              <SelectContent>{turnos.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                            <Select value={t.turno ?? ""} onValueChange={(v) => updateMut.mutate({ id: t.id, patch: { turno: v } })}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={turnosOpts.length ? "Turno" : "Sem turnos"} /></SelectTrigger>
+                              <SelectContent>
+                                {turnosOpts.length === 0 ? (
+                                  <div className="px-2 py-1.5 text-xs text-muted-foreground">Configure turnos no Calendário Académico</div>
+                                ) : turnosOpts.map((s) => (
+                                  <SelectItem key={s.nome} value={s.nome}>{s.nome} <span className="text-muted-foreground">({s.inicio}–{s.fim})</span></SelectItem>
+                                ))}
+                              </SelectContent>
                             </Select>
                             <Input type="number" value={t.capacidade}
                               onChange={(e) => updateMut.mutate({ id: t.id, patch: { capacidade: +e.target.value || 0 } })}
