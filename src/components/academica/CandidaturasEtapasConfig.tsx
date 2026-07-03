@@ -358,5 +358,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
         </div>
       </div>
     </div>
+    </fieldset>
   );
+}
 }
