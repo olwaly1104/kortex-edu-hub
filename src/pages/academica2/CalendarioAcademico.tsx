@@ -16,7 +16,9 @@ import { supabase } from "@/integrations/supabase/client";
 import CandidaturasEtapasConfig from "@/components/academica/CandidaturasEtapasConfig";
 
 
-type EventoTipo = "exames" | "ferias" | "feriado" | "especial";
+type EventoTipo = "exames" | "ferias" | "feriado" | "especial" | "semestre" | "candidaturas";
+type EventoTipoAddable = "exames" | "ferias" | "feriado" | "especial";
+const ADDABLE_TIPOS: EventoTipoAddable[] = ["exames", "ferias", "feriado", "especial"];
 type Epoca = "1" | "2" | "especial";
 type Semestre = "1" | "2";
 type Evento = {
@@ -31,10 +33,12 @@ type Evento = {
 
 const TIPO_META: Record<EventoTipo, { label: string; color: string; dot: string; ring: string; icon: typeof BookOpen }> = {
   
-  exames:   { label: "Exames",   color: "bg-amber-500 text-white",             dot: "bg-amber-500",   ring: "border-l-amber-500",   icon: FileSignature },
-  ferias:   { label: "Férias",   color: "bg-sky-500 text-white",               dot: "bg-sky-500",     ring: "border-l-sky-500",     icon: Sun },
-  feriado:  { label: "Feriado",  color: "bg-rose-500 text-white",              dot: "bg-rose-500",    ring: "border-l-rose-500",    icon: Star },
-  especial: { label: "Especial", color: "bg-violet-500 text-white",            dot: "bg-violet-500",  ring: "border-l-violet-500",  icon: Sparkles },
+  exames:       { label: "Exames",       color: "bg-amber-500 text-white",  dot: "bg-amber-500",   ring: "border-l-amber-500",   icon: FileSignature },
+  ferias:       { label: "Férias",       color: "bg-sky-500 text-white",    dot: "bg-sky-500",     ring: "border-l-sky-500",     icon: Sun },
+  feriado:      { label: "Feriado",      color: "bg-rose-500 text-white",   dot: "bg-rose-500",    ring: "border-l-rose-500",    icon: Star },
+  especial:     { label: "Especial",     color: "bg-violet-500 text-white", dot: "bg-violet-500",  ring: "border-l-violet-500",  icon: Sparkles },
+  semestre:     { label: "Semestre",     color: "bg-emerald-600 text-white",dot: "bg-emerald-600", ring: "border-l-emerald-600", icon: BookOpen },
+  candidaturas: { label: "Candidaturas", color: "bg-indigo-500 text-white", dot: "bg-indigo-500",  ring: "border-l-indigo-500",  icon: CalendarRange },
 };
 
 const EPOCA_LABEL: Record<Epoca, string> = {
@@ -306,11 +310,6 @@ export default function CalendarioAcademico() {
 
 
 
-  const counts = useMemo(() => {
-    const c: Record<EventoTipo, number> = { exames: 0, ferias: 0, feriado: 0, especial: 0 };
-    eventos.forEach(e => { c[e.tipo]++; });
-    return c;
-  }, [eventos]);
 
   // Group events by month for the new timeline
   const months = useMemo(() => {
@@ -340,11 +339,11 @@ export default function CalendarioAcademico() {
       const nome = meta?.nome || "Sessão";
       const ordem = meta?.ordem ?? 999;
       if (s.mode === "periodo" && s.datas[0] && s.data_fim) {
-        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.data_fim, ordem });
+        out.push({ id: `__ses_${s.id}`, tipo: "candidaturas", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.data_fim, ordem });
       } else if (s.mode === "dia" && s.datas[0]) {
-        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.datas[0], ordem });
+        out.push({ id: `__ses_${s.id}`, tipo: "candidaturas", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.datas[0], ordem });
       } else if (s.mode === "dias" && s.datas.length > 0) {
-        s.datas.forEach((d, i) => out.push({ id: `__ses_${s.id}_${i}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: d, fim: d, ordem }));
+        s.datas.forEach((d, i) => out.push({ id: `__ses_${s.id}_${i}`, tipo: "candidaturas", titulo: `Candidaturas — ${nome}`, inicio: d, fim: d, ordem }));
       }
     });
     return out;
@@ -354,15 +353,21 @@ export default function CalendarioAcademico() {
     { id: "__inicio_ano", tipo: "especial", titulo: "Início do Ano Letivo", inicio, fim: inicio },
     { id: "__fim_ano",    tipo: "especial", titulo: "Fim do Ano Letivo",    inicio: fim, fim },
     ...semestres.flatMap(s => [
-      { id: `__sem_${s.id}_ini`, tipo: "especial" as EventoTipo, titulo: `Início do ${s.nome}`, inicio: s.inicio, fim: s.inicio },
-      { id: `__sem_${s.id}_fim`, tipo: "especial" as EventoTipo, titulo: `Fim do ${s.nome}`, inicio: s.fim, fim: s.fim },
+      { id: `__sem_${s.id}_ini`, tipo: "semestre" as EventoTipo, titulo: `Início do ${s.nome}`, inicio: s.inicio, fim: s.inicio },
+      { id: `__sem_${s.id}_fim`, tipo: "semestre" as EventoTipo, titulo: `Fim do ${s.nome}`, inicio: s.fim, fim: s.fim },
 
     ]),
-    { id: "__cand_ini", tipo: "especial", titulo: "Início das Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.inicio },
-    { id: "__cand_fim", tipo: "especial", titulo: "Fim das Candidaturas",    inicio: candidaturas.fim,    fim: candidaturas.fim },
+    { id: "__cand_ini", tipo: "candidaturas", titulo: "Início das Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.inicio },
+    { id: "__cand_fim", tipo: "candidaturas", titulo: "Fim das Candidaturas",    inicio: candidaturas.fim,    fim: candidaturas.fim },
     ...sessaoEvents,
     ...eventos,
   ], [eventos, inicio, fim, semestres, candidaturas, sessaoEvents]);
+
+  const counts = useMemo(() => {
+    const c: Record<EventoTipo, number> = { exames: 0, ferias: 0, feriado: 0, especial: 0, semestre: 0, candidaturas: 0 };
+    displayEventos.forEach(e => { c[e.tipo]++; });
+    return c;
+  }, [displayEventos]);
 
   const eventsByMonth = useMemo(() => {
     const map: Record<string, Evento[]> = {};
@@ -744,7 +749,7 @@ export default function CalendarioAcademico() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="text-[10px] uppercase tracking-wide text-muted-foreground">Tipo de evento</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {(Object.keys(TIPO_META) as EventoTipo[]).map(t => {
+            {ADDABLE_TIPOS.map(t => {
               const M = TIPO_META[t]; const Icon = M.icon;
               return (
                 <DropdownMenuItem key={t} onClick={() => add(t)} className="gap-2 cursor-pointer">
@@ -775,7 +780,7 @@ export default function CalendarioAcademico() {
                     <span className="inline-flex items-center gap-1.5"><Icon className="w-3 h-3" /> {M.label}</span>
                   </SelectTrigger>
                   <SelectContent>
-                    {(Object.keys(TIPO_META) as EventoTipo[]).map(t => <SelectItem key={t} value={t}>{TIPO_META[t].label}</SelectItem>)}
+                    {ADDABLE_TIPOS.map(t => <SelectItem key={t} value={t}>{TIPO_META[t].label}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 {e.tipo === "exames" && !isAuto ? (
