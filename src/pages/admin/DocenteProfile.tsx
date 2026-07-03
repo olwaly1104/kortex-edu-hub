@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,11 +7,12 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar,
-  GraduationCap, FileText, Building2, IdCard, Award, BookOpen, Briefcase, Eye, Download,
+  GraduationCap, FileText, Building2, IdCard, Award, BookOpen, Briefcase, Eye, Download, Pencil,
 } from "lucide-react";
-import { loadDocentes } from "@/lib/peopleStorage";
+import { loadDocentes, saveDocentes, type DocenteRow } from "@/lib/peopleStorage";
+import { useAuth } from "@/contexts/AuthContext";
 import { ModuleTag } from "@/components/chat/ModuleTag";
-import { supabase } from "@/integrations/supabase/client";
+import { DocenteFormDialog } from "@/components/admin/DocenteFormDialog";
 import DocenteDocPreview from "./DocenteDocPreview";
 
 export default function AdminDocenteProfile() {
