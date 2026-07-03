@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar,
   GraduationCap, FileText, Building2, IdCard, Award, BookOpen, Briefcase, Eye, Download,
@@ -33,7 +34,10 @@ export default function AdminDocenteProfile() {
   const displayId = `DOC-${(docente.id || "00000000").slice(0, 8).toUpperCase()}`;
   const genero = docente.genero === "M" ? "Masculino" : docente.genero === "F" ? "Feminino" : (docente.genero || "—");
 
-  const isCoordenador = /coordenador/i.test(docente.cargo || "");
+  const isCoordenador =
+    /coordenador/i.test(docente.cargo || "") ||
+    /coordenador/i.test(docente.moduloKortex || "") ||
+    /coordenador/i.test((docente as any).categoria || "");
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
@@ -72,7 +76,9 @@ export default function AdminDocenteProfile() {
               <div className="flex-1 min-w-0">
                 <span className="text-[10px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">Perfil do Docente</span>
                 <div className="flex items-center gap-2 mt-1">
-                  <ModuleTag modulo={docente.moduloKortex} />
+                  <Badge className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/10 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">
+                    <GraduationCap className="w-3 h-3 mr-1" /> Docente
+                  </Badge>
                 </div>
                 <h1 className="text-2xl font-bold text-foreground leading-tight mt-1.5">{fullName}</h1>
                 <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
