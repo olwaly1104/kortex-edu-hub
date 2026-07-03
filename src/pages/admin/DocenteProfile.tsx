@@ -216,6 +216,21 @@ export default function AdminDocenteProfile() {
           <DocenteDocPreview docente={docente} displayId={displayId} />
         </DialogContent>
       </Dialog>
+
+      {canEdit && (
+        <DocenteFormDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          initial={docente}
+          onSave={(updated: DocenteRow) => {
+            const all = loadDocentes();
+            const next = all.map((r) => (r.id === docente.id ? { ...updated, id: docente.id } : r));
+            saveDocentes(next);
+            setEditOpen(false);
+            setRowsVersion((v) => v + 1);
+          }}
+        />
+      )}
     </div>
   );
 }
