@@ -34,7 +34,10 @@ export default function AdminDocenteProfile() {
   const displayId = `DOC-${(docente.id || "00000000").slice(0, 8).toUpperCase()}`;
   const genero = docente.genero === "M" ? "Masculino" : docente.genero === "F" ? "Feminino" : (docente.genero || "—");
 
-  const isCoordenador = /coordenador/i.test(docente.cargo || "");
+  const isCoordenador =
+    /coordenador/i.test(docente.cargo || "") ||
+    /coordenador/i.test(docente.moduloKortex || "") ||
+    /coordenador/i.test((docente as any).categoria || "");
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
