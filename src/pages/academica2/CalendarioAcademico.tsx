@@ -301,10 +301,11 @@ export default function CalendarioAcademico() {
   };
 
   const filtered = useMemo(() =>
-    (filter === "all" ? eventos : eventos.filter(e => e.tipo === filter))
+    (filter === "all" ? displayEventos : displayEventos.filter(e => e.tipo === filter))
       .slice().sort((a, b) => a.inicio.localeCompare(b.inicio)),
-    [eventos, filter]
+    [displayEventos, filter]
   );
+
 
   const counts = useMemo(() => {
     const c: Record<EventoTipo, number> = { semestre: 0, exames: 0, ferias: 0, feriado: 0, especial: 0 };
