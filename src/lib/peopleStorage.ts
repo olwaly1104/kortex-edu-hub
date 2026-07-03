@@ -97,6 +97,7 @@ const docenteToDb = (r: DocenteRow, owner: string) => ({
   contacto: r.contacto || null,
   faculdade: r.faculdade || null,
   departamento: r.departamento || null,
+  curso: r.curso || null,
   categoria: r.categoria || null,
   cargo: r.cargo || null,
   nascimento: r.nascimento || null,
