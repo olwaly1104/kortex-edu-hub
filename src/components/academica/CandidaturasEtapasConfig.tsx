@@ -500,7 +500,11 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                       )}
                     </td>
                     <td className="px-2 py-2">
-                      <Input type="time" className="h-8 text-xs" value={sessao.hora || ""} onChange={e => updSessao(sessao.id, { hora: e.target.value })} />
+                      {sessao.mode === "dias" ? (
+                        <span className="text-[10px] text-muted-foreground italic">por data</span>
+                      ) : (
+                        <Input type="time" className="h-8 text-xs" value={sessao.hora || ""} onChange={e => updSessao(sessao.id, { hora: e.target.value })} />
+                      )}
                     </td>
                     <td className="px-2 py-2">
                       <Input className="h-8 text-xs" value={sessao.local || ""} onChange={e => updSessao(sessao.id, { local: e.target.value })} placeholder="Ex: Anfiteatro A" />
