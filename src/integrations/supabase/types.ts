@@ -646,6 +646,7 @@ export type Database = {
           contacto: string | null
           contrato: string | null
           created_at: string
+          curso: string | null
           cv_file_name: string | null
           departamento: string | null
           diploma_file_name: string | null
@@ -677,6 +678,7 @@ export type Database = {
           contacto?: string | null
           contrato?: string | null
           created_at?: string
+          curso?: string | null
           cv_file_name?: string | null
           departamento?: string | null
           diploma_file_name?: string | null
@@ -708,6 +710,7 @@ export type Database = {
           contacto?: string | null
           contrato?: string | null
           created_at?: string
+          curso?: string | null
           cv_file_name?: string | null
           departamento?: string | null
           diploma_file_name?: string | null
