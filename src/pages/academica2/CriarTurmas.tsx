@@ -352,50 +352,6 @@ export default function CriarTurmas() {
         </DialogContent>
       </Dialog>
 
-
-      <Dialog open={!!novaTurma} onOpenChange={(o) => !o && setNovaTurma(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Plus className="w-4 h-4 text-primary" /> Nova Turma</DialogTitle>
-            <DialogDescription className="text-xs">
-              {curso && novaTurma ? `${curso.name} · ${novaTurma.ano}º Ano` : ""}
-            </DialogDescription>
-          </DialogHeader>
-          {novaTurma && curso && (
-            <div className="space-y-3">
-              <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between">
-                <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Sigla</span>
-                <span className="text-sm font-bold text-primary">{curso.code}-{novaTurma.ano}{(novaTurma.letra || "?").toUpperCase()}</span>
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-medium">Nome / Letra da turma</label>
-                <Input value={novaTurma.letra} onChange={(e) => setNovaTurma({ ...novaTurma, letra: e.target.value.toUpperCase().slice(0, 4) })} placeholder="Ex.: A" className="h-9" />
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1">
-                  <label className="text-xs font-medium">Sala</label>
-                  <Input value={novaTurma.sala} onChange={(e) => setNovaTurma({ ...novaTurma, sala: e.target.value })} placeholder="Ex.: S-201" className="h-9" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs font-medium">Turno</label>
-                  <Select value={novaTurma.turno} onValueChange={(v) => setNovaTurma({ ...novaTurma, turno: v })}>
-                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                    <SelectContent>{turnos.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="space-y-1">
-                <label className="text-xs font-medium">Capacidade</label>
-                <Input type="number" value={novaTurma.capacidade} onChange={(e) => setNovaTurma({ ...novaTurma, capacidade: +e.target.value || 0 })} className="h-9" />
-              </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="outline" onClick={() => setNovaTurma(null)}>Cancelar</Button>
-                <Button onClick={confirmarNovaTurma} className="gap-1"><Check className="w-4 h-4" /> Criar Turma</Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
