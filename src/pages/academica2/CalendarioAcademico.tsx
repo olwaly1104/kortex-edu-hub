@@ -7,7 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { ArrowLeft, Check, CalendarDays, Plus, Trash2, Wand2, Sparkles, Sun, BookOpen, FileSignature, Coffee, Star, ChevronDown, ChevronLeft, ChevronRight, LayoutGrid, CalendarRange } from "lucide-react";
+import { ArrowLeft, Check, CalendarDays, Plus, Trash2, Wand2, Sparkles, Sun, BookOpen, FileSignature, Coffee, Star, ChevronDown, ChevronLeft, ChevronRight, LayoutGrid, CalendarRange, Settings2 } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -95,6 +97,18 @@ const DEFAULT_TURNOS: Turno[] = [
 
 const TURNOS_KEY = "upra:turnos-cfg";
 const CAND_KEY = "upra:candidaturas-cfg";
+const SEMESTRES_KEY = "upra:semestres-cfg";
+
+type SemestreCfg = { id: string; nome: string; inicio: string; fim: string };
+const buildDefaultSemestres = (inicioAno: string, fimAno: string): SemestreCfg[] => {
+  const s = new Date(inicioAno); const e = new Date(fimAno);
+  const half = new Date(s.getTime() + (e.getTime() - s.getTime()) / 2);
+  return [
+    { id: "sem-1", nome: "1º Semestre", inicio: fmt(s), fim: fmt(addDays(half, -1)) },
+    { id: "sem-2", nome: "2º Semestre", inicio: fmt(half), fim: fmt(e) },
+  ];
+};
+
 
 function loadJSON<T>(key: string, fallback: T): T {
   try { const r = localStorage.getItem(key); return r ? (JSON.parse(r) as T) : fallback; } catch { return fallback; }
@@ -124,6 +138,16 @@ export default function CalendarioAcademico() {
   const addTurno = () => setTurnos(p => [...p, { id: `t-${Date.now()}`, nome: `Turno ${p.length + 1}`, inicio: "08:00", fim: "12:00" }]);
   const updTurno = (id: string, patch: Partial<Turno>) => setTurnos(p => p.map(t => t.id === id ? { ...t, ...patch } : t));
   const rmTurno = (id: string) => setTurnos(p => p.filter(t => t.id !== id));
+
+  // Semestres configuration
+  const [semestres, setSemestres] = useState<SemestreCfg[]>(
+    () => loadJSON(SEMESTRES_KEY, buildDefaultSemestres(initial.inicio, initial.fim))
+  );
+  useEffect(() => { try { localStorage.setItem(SEMESTRES_KEY, JSON.stringify(semestres)); } catch {} }, [semestres]);
+  const addSemestre = () => setSemestres(p => [...p, { id: `sem-${Date.now()}`, nome: `${p.length + 1}º Semestre`, inicio, fim }]);
+  const updSemestre = (id: string, patch: Partial<SemestreCfg>) => setSemestres(p => p.map(s => s.id === id ? { ...s, ...patch } : s));
+  const rmSemestre = (id: string) => setSemestres(p => p.filter(s => s.id !== id));
+
 
   const changeAno = (v: string) => {
     setAnoLetivo(v);
@@ -247,8 +271,16 @@ export default function CalendarioAcademico() {
         </div>
       )}
 
-      {/* Ano Letivo + Turnos + Candidaturas */}
+      <Tabs defaultValue="config" className="w-full">
+        <TabsList className="grid grid-cols-2 w-full max-w-lg">
+          <TabsTrigger value="config" className="gap-1.5"><Settings2 className="w-3.5 h-3.5" /> Configuração do Ano Letivo</TabsTrigger>
+          <TabsTrigger value="calendario" className="gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Calendário do Ano Letivo</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="config" className="space-y-6 mt-4">
+      {/* Ano Letivo + Turnos + Semestres + Candidaturas */}
       <Card className="overflow-hidden">
+
         <div className="px-5 py-4 border-b bg-muted/30">
           <div className="flex items-center gap-2">
             <CalendarDays className="w-4 h-4 text-primary" />
@@ -318,7 +350,35 @@ export default function CalendarioAcademico() {
             </div>
           </section>
 
+          {/* Semestres */}
+          <section className="px-5 py-4 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 items-start">
+            <div>
+              <p className="text-xs font-medium flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5 text-primary" /> Semestres</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{semestres.length} configurado{semestres.length === 1 ? "" : "s"}</p>
+            </div>
+            <div className="space-y-2">
+              <div className="grid grid-cols-[1fr_140px_140px_36px] gap-2 items-center text-[10px] uppercase tracking-wide text-muted-foreground px-1">
+                <span>Nome</span><span>Início</span><span>Fim</span><span />
+              </div>
+              {semestres.map(s => (
+                <div key={s.id} className="grid grid-cols-[1fr_140px_140px_36px] gap-2 items-center">
+                  <Input value={s.nome} onChange={e => updSemestre(s.id, { nome: e.target.value })} placeholder="Nome do semestre" className="h-8 text-xs" />
+                  <Input type="date" value={s.inicio} onChange={e => updSemestre(s.id, { inicio: e.target.value })} className="h-8 text-xs" />
+                  <Input type="date" value={s.fim} onChange={e => updSemestre(s.id, { fim: e.target.value })} className="h-8 text-xs" />
+                  <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    onClick={() => { if (confirm(`Remover "${s.nome}"?`)) rmSemestre(s.id); }}>
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              ))}
+              <Button size="sm" variant="outline" className="h-8 gap-1 mt-1" onClick={addSemestre}>
+                <Plus className="w-3.5 h-3.5" /> Adicionar Semestre
+              </Button>
+            </div>
+          </section>
+
           {/* Candidaturas */}
+
           <section className="px-5 py-4 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 items-start">
             <div>
               <p className="text-xs font-medium flex items-center gap-1.5"><FileSignature className="w-3.5 h-3.5 text-primary" /> Candidaturas</p>
@@ -341,13 +401,11 @@ export default function CalendarioAcademico() {
           </section>
         </div>
       </Card>
+        </TabsContent>
 
-
-
-
-
-
+        <TabsContent value="calendario" className="space-y-6 mt-4">
       {/* KPIs */}
+
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {(Object.keys(TIPO_META) as EventoTipo[]).map(t => {
           const M = TIPO_META[t]; const Icon = M.icon;
@@ -591,6 +649,10 @@ export default function CalendarioAcademico() {
           )}
         </div>
       </Card>
+        </TabsContent>
+      </Tabs>
+
+
 
       <div className="flex justify-end gap-2 pt-4">
         <Button variant="outline" asChild><Link to="/areaacademica/criador/turmas">Voltar</Link></Button>
