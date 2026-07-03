@@ -42,7 +42,6 @@ export default function DocenteDocPreview({ docente: d, displayId }: Props) {
         ["Data de nascimento", fmtDataShort(d.nascimento)],
         ["Género", generoLabel(d.genero)],
         ["Nº Bilhete de Identidade", d.bilhete || "—"],
-        ["Módulo Kortex", moduloLabel(d.moduloKortex)],
       ],
     },
     {
@@ -53,6 +52,7 @@ export default function DocenteDocPreview({ docente: d, displayId }: Props) {
         ["Departamento", d.departamento || "—"],
         ["Cargo", d.cargo || "—"],
         ["Contrato", d.contrato || "—"],
+        ["Módulo Kortex", moduloLabel(d.moduloKortex)],
         ["Email institucional", d.email || "—"],
       ],
     },
