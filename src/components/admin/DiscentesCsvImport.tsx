@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Upload, FileSpreadsheet, Download, X, Check, AlertCircle,
-  Trash2, Loader2, Sparkles, ArrowRight,
+  Trash2, Loader2, Sparkles, ArrowRight, UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useCursos, useFaculdades, useCreateEstudante } from "@/lib/useInstitution";
@@ -101,9 +101,10 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   onImported?: () => void;
+  onSwitchToManual?: () => void;
 };
 
-export function DiscentesCsvImport({ open, onOpenChange, onImported }: Props) {
+export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToManual }: Props) {
   const { data: cursos = [] } = useCursos();
   const { data: faculdades = [] } = useFaculdades();
   const createMut = useCreateEstudante();
@@ -309,7 +310,8 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported }: Props) {
   return (
     <Dialog open={open} onOpenChange={(v) => (v ? onOpenChange(true) : close())}>
       <DialogContent className="max-w-6xl max-h-[92vh] overflow-hidden p-0 flex flex-col">
-        <div className="px-6 pt-5 pb-4 border-b bg-gradient-to-br from-primary/5 via-background to-background">
+        <div className="px-6 pt-5 pb-4 border-b bg-gradient-to-br from-primary/5 via-background to-background space-y-3">
+          {onSwitchToManual && <ModeToggle mode="csv" onSwitchToManual={onSwitchToManual} />}
           <DialogHeader className="space-y-1.5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
@@ -567,5 +569,30 @@ function StatChip({ label, value, color }: { label: string; value: number; color
     <span className={`text-[10px] font-semibold uppercase tracking-wide px-2 py-1 rounded-md border ${cls}`}>
       {label} <span className="tabular-nums ml-1">{value}</span>
     </span>
+  );
+}
+
+export function ModeToggle({
+  mode,
+  onSwitchToManual,
+  onSwitchToCsv,
+}: {
+  mode: "manual" | "csv";
+  onSwitchToManual?: () => void;
+  onSwitchToCsv?: () => void;
+}) {
+  const btn = (active: boolean) =>
+    `flex-1 h-8 inline-flex items-center justify-center gap-1.5 text-[11.5px] font-semibold rounded-md transition-colors ${
+      active ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+    }`;
+  return (
+    <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-muted border w-full max-w-[320px]">
+      <button type="button" className={btn(mode === "manual")} onClick={onSwitchToManual}>
+        <UserPlus className="w-3.5 h-3.5" /> Manual
+      </button>
+      <button type="button" className={btn(mode === "csv")} onClick={onSwitchToCsv}>
+        <FileSpreadsheet className="w-3.5 h-3.5" /> Importar CSV
+      </button>
+    </div>
   );
 }

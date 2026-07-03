@@ -12,7 +12,7 @@ import {
   GraduationCap, Plus, Trash2, Users, BookOpen, Layers, Loader2,
   Camera, Upload, FileText, IdCard, Check, X, Search, Pencil, FileSpreadsheet,
 } from "lucide-react";
-import { DiscentesCsvImport } from "@/components/admin/DiscentesCsvImport";
+import { DiscentesCsvImport, ModeToggle } from "@/components/admin/DiscentesCsvImport";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -433,17 +433,16 @@ export default function AdminDiscentes() {
           />
         </div>
         <span className="text-[11px] text-muted-foreground">{filtered.length} discentes</span>
-        <div className="ml-auto flex items-center gap-1.5">
-          <Button size="sm" variant="outline" onClick={() => setCsvOpen(true)} className="gap-1">
-            <FileSpreadsheet className="w-3.5 h-3.5" /> Importar CSV
-          </Button>
-          <Button size="sm" onClick={() => setOpen(true)} className="gap-1">
-            <Plus className="w-3.5 h-3.5" /> Adicionar Discente
-          </Button>
-        </div>
+        <Button size="sm" onClick={() => setOpen(true)} className="ml-auto gap-1">
+          <Plus className="w-3.5 h-3.5" /> Adicionar Discente
+        </Button>
       </div>
 
-      <DiscentesCsvImport open={csvOpen} onOpenChange={setCsvOpen} />
+      <DiscentesCsvImport
+        open={csvOpen}
+        onOpenChange={setCsvOpen}
+        onSwitchToManual={() => { setCsvOpen(false); setOpen(true); }}
+      />
 
       {isLoading ? (
         <Card className="p-10 flex items-center justify-center text-xs text-muted-foreground italic gap-2">
@@ -458,14 +457,9 @@ export default function AdminDiscentes() {
             <p className="text-sm font-semibold">Nenhum discente registado</p>
             <p className="text-xs text-muted-foreground mt-0.5">Adicione discentes para os atribuir a cursos e turmas.</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => setCsvOpen(true)} className="gap-1">
-              <FileSpreadsheet className="w-3.5 h-3.5" /> Importar CSV
-            </Button>
-            <Button size="sm" onClick={() => setOpen(true)} className="gap-1">
-              <Plus className="w-3.5 h-3.5" /> Adicionar Discente
-            </Button>
-          </div>
+          <Button size="sm" onClick={() => setOpen(true)} className="gap-1">
+            <Plus className="w-3.5 h-3.5" /> Adicionar Discente
+          </Button>
         </Card>
       ) : (
         <Card className="overflow-hidden">
@@ -536,7 +530,8 @@ export default function AdminDiscentes() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
           {/* Header */}
-          <div className="px-6 pt-6 pb-5 border-b bg-gradient-to-br from-primary/5 via-background to-background">
+          <div className="px-6 pt-6 pb-5 border-b bg-gradient-to-br from-primary/5 via-background to-background space-y-3">
+            <ModeToggle mode="manual" onSwitchToCsv={() => { setOpen(false); setCsvOpen(true); }} />
             <DialogHeader className="space-y-2">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
