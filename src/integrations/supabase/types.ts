@@ -327,6 +327,48 @@ export type Database = {
         }
         Relationships: []
       }
+      candidaturas_estados: {
+        Row: {
+          color: string
+          created_at: string
+          descricao: string | null
+          id: string
+          institution_id: string | null
+          is_default: boolean
+          key: string
+          label: string
+          ordem: number
+          owner_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          institution_id?: string | null
+          is_default?: boolean
+          key: string
+          label: string
+          ordem?: number
+          owner_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          institution_id?: string | null
+          is_default?: boolean
+          key?: string
+          label?: string
+          ordem?: number
+          owner_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       candidaturas_etapas: {
         Row: {
           agenda: boolean
