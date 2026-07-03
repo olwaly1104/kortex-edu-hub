@@ -121,7 +121,7 @@ export default function CalendarioAcademico() {
   const initial = rangeFromAno("2025/2026");
   const [inicio, setInicio] = useState(initial.inicio);
   const [fim, setFim] = useState(initial.fim);
-  const [eventos, setEventos] = useState<Evento[]>(() => buildAuto(initial.inicio, initial.fim));
+  const [eventos, setEventos] = useState<Evento[]>([]);
   const [filter, setFilter] = useState<EventoTipo | "all">("all");
   const [planView, setPlanView] = useState<"cards" | "mensal">("cards");
   const [monthCursor, setMonthCursor] = useState(() => { const d = new Date(initial.inicio); return new Date(d.getFullYear(), d.getMonth(), 1); });
@@ -154,15 +154,15 @@ export default function CalendarioAcademico() {
     const r = rangeFromAno(v);
     setInicio(r.inicio);
     setFim(r.fim);
-    setEventos(buildAuto(r.inicio, r.fim));
+    setEventos([]);
     const d = new Date(r.inicio);
     setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
   };
 
 
   const regenerate = () => {
-    setEventos(buildAuto(inicio, fim));
-    toast.success("Calendário regenerado automaticamente");
+    setEventos([]);
+    toast.success("Calendário limpo");
   };
 
   const confirmCalendar = () => {
@@ -422,7 +422,7 @@ export default function CalendarioAcademico() {
       <Card className="p-4 space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <p className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-primary" /> Plano do Ano — {anoLetivo}</p>
+            <p className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-primary" /> Pré-visualização do Ano — {anoLetivo}</p>
             <p className="text-[11px] text-muted-foreground mt-0.5">{months.length} meses · {eventos.length} eventos</p>
           </div>
           <div className="flex items-center gap-3">
