@@ -458,9 +458,14 @@ export default function AdminDiscentes() {
             <p className="text-sm font-semibold">Nenhum discente registado</p>
             <p className="text-xs text-muted-foreground mt-0.5">Adicione discentes para os atribuir a cursos e turmas.</p>
           </div>
-          <Button size="sm" onClick={() => setOpen(true)} className="gap-1">
-            <Plus className="w-3.5 h-3.5" /> Adicionar Discente
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => setCsvOpen(true)} className="gap-1">
+              <FileSpreadsheet className="w-3.5 h-3.5" /> Importar CSV
+            </Button>
+            <Button size="sm" onClick={() => setOpen(true)} className="gap-1">
+              <Plus className="w-3.5 h-3.5" /> Adicionar Discente
+            </Button>
+          </div>
         </Card>
       ) : (
         <Card className="overflow-hidden">
