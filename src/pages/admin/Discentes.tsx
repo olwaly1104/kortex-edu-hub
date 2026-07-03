@@ -10,8 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import {
   GraduationCap, Plus, Trash2, Users, BookOpen, Layers, Loader2,
-  Camera, Upload, FileText, IdCard, Check, X, Search, Pencil,
+  Camera, Upload, FileText, IdCard, Check, X, Search, Pencil, FileSpreadsheet,
 } from "lucide-react";
+import { DiscentesCsvImport } from "@/components/admin/DiscentesCsvImport";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
