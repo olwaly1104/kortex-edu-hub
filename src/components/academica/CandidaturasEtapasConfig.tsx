@@ -191,10 +191,13 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
               ) : etapas.map(et => (
                 <tr key={et.id} className="border-t align-top">
                   <td className="px-3 py-2">
-                    <Input value={et.nome} onChange={e => setEtapas(p => p.map(x => x.id === et.id ? { ...x, nome: e.target.value } : x))}
+                    <Input value={et.nome} data-etapa-id={et.id}
+                      placeholder="Nome da etapa"
+                      onChange={e => setEtapas(p => p.map(x => x.id === et.id ? { ...x, nome: e.target.value } : x))}
                       onBlur={e => updEtapa(et.id, { nome: e.target.value })}
                       disabled={readOnly} readOnly={readOnly}
                       className="h-8 text-xs" />
+
                   </td>
                   <td className="px-3 py-2 text-center">
                     <Checkbox checked={et.obrigatoria} disabled={readOnly} onCheckedChange={v => updEtapa(et.id, { obrigatoria: !!v })} />
