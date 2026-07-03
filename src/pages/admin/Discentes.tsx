@@ -433,10 +433,17 @@ export default function AdminDiscentes() {
           />
         </div>
         <span className="text-[11px] text-muted-foreground">{filtered.length} discentes</span>
-        <Button size="sm" onClick={() => setOpen(true)} className="ml-auto gap-1">
-          <Plus className="w-3.5 h-3.5" /> Adicionar Discente
-        </Button>
+        <div className="ml-auto flex items-center gap-1.5">
+          <Button size="sm" variant="outline" onClick={() => setCsvOpen(true)} className="gap-1">
+            <FileSpreadsheet className="w-3.5 h-3.5" /> Importar CSV
+          </Button>
+          <Button size="sm" onClick={() => setOpen(true)} className="gap-1">
+            <Plus className="w-3.5 h-3.5" /> Adicionar Discente
+          </Button>
+        </div>
       </div>
+
+      <DiscentesCsvImport open={csvOpen} onOpenChange={setCsvOpen} />
 
       {isLoading ? (
         <Card className="p-10 flex items-center justify-center text-xs text-muted-foreground italic gap-2">
