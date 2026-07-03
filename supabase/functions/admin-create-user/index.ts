@@ -180,6 +180,7 @@ Deno.serve(async (req) => {
         email,
         funcao: funcaoMap[modulo] || modulo,
         departamento: funcaoMap[modulo] || modulo,
+        modulo_kortex: modulo,
       }, { onConflict: "id" });
       if (stErr) console.error("staff upsert failed:", stErr.message);
     }
