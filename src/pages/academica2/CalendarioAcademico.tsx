@@ -749,7 +749,7 @@ export default function CalendarioAcademico() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="text-[10px] uppercase tracking-wide text-muted-foreground">Tipo de evento</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {(Object.keys(TIPO_META) as EventoTipo[]).map(t => {
+            {ADDABLE_TIPOS.map(t => {
               const M = TIPO_META[t]; const Icon = M.icon;
               return (
                 <DropdownMenuItem key={t} onClick={() => add(t)} className="gap-2 cursor-pointer">
