@@ -86,7 +86,11 @@ export default function AdminDocenteProfile() {
                       <Briefcase className="w-3 h-3" /> {docente.departamento}
                     </span>
                   )}
-                </div>
+                  {isCoordenador && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 text-[11px] font-semibold border border-amber-200">
+                      <Award className="w-3 h-3" /> Coordenador
+                    </span>
+                  )}
 
                 <div className="flex items-center gap-2 mt-4 flex-wrap">
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
