@@ -178,25 +178,11 @@ export default function AdminDocenteProfile() {
 
             <SectionCard title="Afiliação Institucional" icon={<GraduationCap className="w-4 h-4" />}>
               <InfoRow label="Faculdade" value={docente.faculdade || "—"} icon={<Building2 className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Curso" value={docente.curso || "—"} icon={<BookOpen className="w-4 h-4 text-primary" />} />
               <InfoRow label="Departamento" value={docente.departamento || "—"} icon={<Briefcase className="w-4 h-4 text-primary" />} />
               <InfoRow label="Cargo" value={docente.cargo || "—"} icon={<Users className="w-4 h-4 text-primary" />} />
               <InfoRow label="Contrato" value={docente.contrato || "—"} icon={<FileText className="w-4 h-4 text-primary" />} />
               <InfoRow label="ID do Docente" value={docente.id} icon={<IdCard className="w-4 h-4 text-primary" />} />
-              <div className="px-5 py-3 flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <BookOpen className="w-4 h-4 text-primary" />
-                  </div>
-                  <p className="text-sm text-muted-foreground truncate">Cadeiras</p>
-                </div>
-                <div className="flex flex-wrap gap-1.5 justify-end max-w-[65%]">
-                  {cadeiras.length ? cadeiras.map((c) => (
-                    <span key={c} className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-semibold border border-primary/20">
-                      {c}
-                    </span>
-                  )) : <span className="text-sm font-semibold text-foreground">—</span>}
-                </div>
-              </div>
             </SectionCard>
           </div>
         </TabsContent>
