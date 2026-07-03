@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
   Upload, FileSpreadsheet, X, Check, AlertCircle,
-  Trash2, Loader2, Sparkles, ArrowRight, UserPlus, Eye,
+  Trash2, Loader2, Sparkles, UserPlus, Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useCursos, useFaculdades, useCreateEstudante } from "@/lib/useInstitution";
