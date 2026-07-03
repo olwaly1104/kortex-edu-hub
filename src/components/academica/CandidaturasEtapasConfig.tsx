@@ -430,7 +430,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                       <Select value={sessao.mode || undefined} onValueChange={(v: "dia" | "dias" | "periodo") => updSessao(sessao.id, {
                         mode: v,
                         datas: v === "periodo" ? [sessao.datas[0] || ""] : (v === "dia" ? sessao.datas.slice(0, 1) : sessao.datas),
-                        data_fim: v === "periodo" ? (sessao.data_fim || "") : null,
+                        data_fim: v === "periodo" ? (sessao.data_fim || null) : null,
                       })}>
                         <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
                         <SelectContent>
