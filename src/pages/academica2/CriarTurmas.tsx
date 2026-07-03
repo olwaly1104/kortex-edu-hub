@@ -381,8 +381,7 @@ export default function CriarTurmas() {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
-  );
+
 
       <Dialog open={!!novaTurma} onOpenChange={(o) => !o && setNovaTurma(null)}>
         <DialogContent className="max-w-md">
