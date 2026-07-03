@@ -434,7 +434,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
             <tbody>
               {sessoesAgendadas.length === 0 ? (
                 <tr><td colSpan={6} className="px-3 py-6 text-center text-muted-foreground italic">
-                  Sem etapas agendáveis. Ative "Agenda" numa etapa acima para criar uma sessão.
+                  Sem etapas agendáveis. Ative "Agendamento" numa etapa acima para criar uma sessão.
                 </td></tr>
               ) : sessoesAgendadas.map(({ etapa, sessao }) => {
                 if (!sessao) return null;
