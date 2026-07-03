@@ -454,18 +454,18 @@ export function useBulkCreateEstudantes() {
       const inst = await currentInstitutionId();
       if (!inst) throw new Error("Sessão expirada.");
       if (inputs.length === 0) return [];
-      const accounts = await Promise.all(inputs.map((i) => provisionStudentAccount(i.nome, i.email)));
-      const rows = inputs.map((i, index) => ({
-        id: accounts[index].id,
-        owner_user_id: inst,
-        ano: "1",
-        turma: "A",
-        origem: "importado",
-        ...i,
-      }));
+      const accounts = await Promise.all(
+        inputs.map((i) => provisionStudentAccount(i.nome, i.email, {
+          ...i,
+          ano: i.ano || "1",
+          turma: i.turma || "A",
+          origem: i.origem || "importado",
+        }))
+      );
+      const ids = accounts.map((a) => a.id);
       const { data, error } = await (supabase.from("estudantes" as any) as any)
-        .insert(rows)
-        .select();
+        .select("*")
+        .in("id", ids);
       if (error) throw error;
       return (data ?? []) as EstudanteRow[];
     },
