@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { loadDocentes } from "@/lib/peopleStorage";
 import { ModuleTag } from "@/components/chat/ModuleTag";
+import { supabase } from "@/integrations/supabase/client";
 import DocenteDocPreview from "./DocenteDocPreview";
 
 export default function AdminDocenteProfile() {
@@ -19,6 +20,22 @@ export default function AdminDocenteProfile() {
   const rows = useMemo(() => loadDocentes(), []);
   const docente = useMemo(() => rows.find((r) => r.id === docenteId), [rows, docenteId]);
   const [docOpen, setDocOpen] = useState(false);
+  const [cadeiras, setCadeiras] = useState<string[]>([]);
+
+  const fullNameLookup = docente ? `${docente.primeiroNome} ${docente.ultimoNome}`.trim() : "";
+  useEffect(() => {
+    if (!docente) return;
+    (async () => {
+      const { data } = await (supabase.from("cadeiras" as any) as any)
+        .select("name, docente")
+        .order("ano", { ascending: true });
+      const mine = (data ?? []).filter((c: any) =>
+        (c.docente || "").trim().toLowerCase() === fullNameLookup.toLowerCase()
+      );
+      setCadeiras(mine.map((c: any) => c.name));
+    })();
+  }, [docente?.id, fullNameLookup]);
+
 
   if (!docente) {
     return (
@@ -160,6 +177,21 @@ export default function AdminDocenteProfile() {
               <InfoRow label="Cargo" value={docente.cargo || "—"} icon={<Users className="w-4 h-4 text-primary" />} />
               <InfoRow label="Contrato" value={docente.contrato || "—"} icon={<FileText className="w-4 h-4 text-primary" />} />
               <InfoRow label="ID do Docente" value={docente.id} icon={<IdCard className="w-4 h-4 text-primary" />} />
+              <div className="px-5 py-3 flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <BookOpen className="w-4 h-4 text-primary" />
+                  </div>
+                  <p className="text-sm text-muted-foreground truncate">Cadeiras</p>
+                </div>
+                <div className="flex flex-wrap gap-1.5 justify-end max-w-[65%]">
+                  {cadeiras.length ? cadeiras.map((c) => (
+                    <span key={c} className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-semibold border border-primary/20">
+                      {c}
+                    </span>
+                  )) : <span className="text-sm font-semibold text-foreground">—</span>}
+                </div>
+              </div>
             </SectionCard>
           </div>
         </TabsContent>
