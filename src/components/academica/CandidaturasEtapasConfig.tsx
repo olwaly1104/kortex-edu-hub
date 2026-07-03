@@ -280,18 +280,18 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
             <div className="text-right">Ação</div>
           </div>
           {estadosAll.map(es => {
-            const isDefault = DEFAULT_ESTADO_KEYS.has(es.key);
+            const isDefault = !!es.is_default;
             return (
               <div key={es.key} className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
                 <Input className="h-9" placeholder="Ex: Agendado" value={es.label}
                   disabled={readOnly} readOnly={readOnly}
-                  onChange={e => updEstado(es.key, { label: e.target.value })} />
+                  onChange={e => updEstado(es, { label: e.target.value })} />
                 <Input className="h-9" placeholder="Descrição curta do estado" value={es.descricao ?? ""}
                   disabled={readOnly} readOnly={readOnly}
-                  onChange={e => updEstado(es.key, { descricao: e.target.value })} />
+                  onChange={e => updEstado(es, { descricao: e.target.value })} />
                 <select className="h-9 rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50"
                   value={es.color} disabled={readOnly}
-                  onChange={e => updEstado(es.key, { color: e.target.value })}>
+                  onChange={e => updEstado(es, { color: e.target.value })}>
                   {COR_OPCOES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
                 <span className={cn("inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium", es.color)}>
@@ -300,7 +300,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                 <div className="flex justify-end">
                   {!readOnly && !isDefault && (
                     <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                      onClick={() => rmEstado(es.key)}>
+                      onClick={() => rmEstado(es)}>
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
                   )}
