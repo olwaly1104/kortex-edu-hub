@@ -49,8 +49,7 @@ const HEADER_MAP: Record<string, string> = {
   ultimonome: "ultimo_nome", apelido: "ultimo_nome", ultimo: "ultimo_nome", lastname: "ultimo_nome", sobrenome: "ultimo_nome",
   faculdade: "faculdade", faculty: "faculdade", sigla: "faculdade",
   curso: "curso", nomedocurso: "curso", nomecurso: "curso", codigo: "curso", codigocurso: "curso", coursecode: "curso", coursename: "curso",
-  ano: "ano", year: "ano",
-  turma: "turma", class: "turma",
+  ano: "ano", year: "ano", anocurricular: "ano",
   nascimento: "nascimento", datanascimento: "nascimento", birthdate: "nascimento",
   genero: "genero", sexo: "genero", gender: "genero",
   regime: "regime",
@@ -61,7 +60,7 @@ const HEADER_MAP: Record<string, string> = {
   endereco: "endereco", morada: "endereco", address: "endereco",
 };
 
-const FIELDS = ["nome_completo","primeiro_nome","ultimo_nome","faculdade","curso","ano","turma","nascimento","genero","regime","telemovel","bilhete","provincia","municipio","endereco"] as const;
+const FIELDS = ["nome_completo","primeiro_nome","ultimo_nome","faculdade","curso","ano","nascimento","genero","regime","telemovel","bilhete","provincia","municipio","endereco"] as const;
 type Field = typeof FIELDS[number];
 
 const splitName = (full: string): [string, string] => {
