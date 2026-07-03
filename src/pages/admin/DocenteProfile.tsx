@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar,
   GraduationCap, FileText, Building2, IdCard, Award, BookOpen, Briefcase, Eye, Download,
