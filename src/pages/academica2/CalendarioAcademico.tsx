@@ -375,11 +375,12 @@ export default function CalendarioAcademico() {
     return map;
   }, [displayEventos]);
 
-  const filtered = useMemo(() =>
-    (filter === "all" ? displayEventos : displayEventos.filter(e => e.tipo === filter))
-      .slice().sort((a, b) => a.inicio.localeCompare(b.inicio)),
-    [displayEventos, filter]
-  );
+  const filtered = useMemo(() => {
+    const list = filter === "all" ? displayEventos : displayEventos.filter(e => e.tipo === filter);
+    const autos = list.filter(e => e.id.startsWith("__")).slice().sort((a, b) => a.inicio.localeCompare(b.inicio));
+    const manuals = list.filter(e => !e.id.startsWith("__"));
+    return [...autos, ...manuals];
+  }, [displayEventos, filter]);
 
 
   return (
