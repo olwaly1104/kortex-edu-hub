@@ -316,6 +316,9 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
         </div>
       </div>
 
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Etapas do Processo</p>
             <p className="text-[11px] text-muted-foreground">{etapas.length} etapa{etapas.length === 1 ? "" : "s"} · dados reais partilhados com GAP</p>
           </div>
