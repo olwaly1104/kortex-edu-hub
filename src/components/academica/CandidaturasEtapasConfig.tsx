@@ -187,25 +187,26 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                   <td className="px-3 py-2">
                     <Input value={et.nome} onChange={e => setEtapas(p => p.map(x => x.id === et.id ? { ...x, nome: e.target.value } : x))}
                       onBlur={e => updEtapa(et.id, { nome: e.target.value })}
+                      disabled={readOnly} readOnly={readOnly}
                       className="h-8 text-xs" />
                   </td>
                   <td className="px-3 py-2 text-center">
-                    <Checkbox checked={et.obrigatoria} onCheckedChange={v => updEtapa(et.id, { obrigatoria: !!v })} />
+                    <Checkbox checked={et.obrigatoria} disabled={readOnly} onCheckedChange={v => updEtapa(et.id, { obrigatoria: !!v })} />
                   </td>
                   <td className="px-3 py-2 text-center">
-                    <Checkbox checked={et.agenda} onCheckedChange={v => updEtapa(et.id, { agenda: !!v })} />
+                    <Checkbox checked={et.agenda} disabled={readOnly} onCheckedChange={v => updEtapa(et.id, { agenda: !!v })} />
                   </td>
                   <td className="px-3 py-2">
                     <Popover>
-                      <PopoverTrigger asChild>
-                        <button className="flex flex-wrap gap-1 min-h-[28px] w-full hover:bg-muted/30 rounded px-1 py-0.5">
+                      <PopoverTrigger asChild disabled={readOnly}>
+                        <button className="flex flex-wrap gap-1 min-h-[28px] w-full hover:bg-muted/30 rounded px-1 py-0.5 disabled:cursor-default disabled:hover:bg-transparent">
                           {et.estados_possiveis.length === 0 ? (
                             <span className="text-muted-foreground italic text-[11px]">Nenhum</span>
                           ) : et.estados_possiveis.map(k => {
                             const m = estadoMeta(k);
                             return <Badge key={k} variant="outline" className={cn("text-[10px]", m.color)}>{m.label}</Badge>;
                           })}
-                          <ChevronDown className="w-3 h-3 ml-auto text-muted-foreground self-center" />
+                          {!readOnly && <ChevronDown className="w-3 h-3 ml-auto text-muted-foreground self-center" />}
                         </button>
                       </PopoverTrigger>
                       <PopoverContent align="start" className="w-56 p-2 space-y-1">
@@ -219,10 +220,12 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                     </Popover>
                   </td>
                   <td className="px-2 py-2">
-                    <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                      onClick={() => rmEtapa(et.id, et.nome)}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                    {!readOnly && (
+                      <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                        onClick={() => rmEtapa(et.id, et.nome)}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))}
