@@ -153,17 +153,70 @@ export default function CalendarioAcademico() {
     return () => { cancel = true; };
   }, [anoLetivo]);
 
-  // Candidaturas configuration (application windows) — window + vagas only; etapas live in DB below.
-  type CandCfg = { inicio: string; fim: string; vagas: number; taxa: number };
-  const [candidaturas, setCandidaturas] = useState<CandCfg>(
-    () => {
-      const y = initial.inicio.slice(0, 4);
-      const defaults: CandCfg = { inicio: `${y}-05-01`, fim: `${y}-08-15`, vagas: 200, taxa: 15000 };
-      const loaded = loadJSON<CandCfg>(CAND_KEY, defaults);
-      return { ...defaults, ...loaded };
+  // Candidaturas window (backend-backed, per ano_letivo)
+  type CandCfg = { inicio: string; fim: string };
+  const [candidaturas, setCandidaturas] = useState<CandCfg>(() => {
+    const y = initial.inicio.slice(0, 4);
+    return { inicio: `${y}-05-01`, fim: `${y}-08-15` };
+  });
+  const [candJanelaId, setCandJanelaId] = useState<string | null>(null);
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setAuthUserId(data.user?.id ?? null)); }, []);
+
+  // Load janela for current ano letivo
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      const { data } = await (supabase.from as any)("candidaturas_janela")
+        .select("id, inicio, fim").eq("ano_letivo", anoLetivo).maybeSingle();
+      if (cancel) return;
+      if (data) {
+        setCandJanelaId(data.id);
+        setCandidaturas({ inicio: data.inicio, fim: data.fim });
+      } else {
+        setCandJanelaId(null);
+        const y = rangeFromAno(anoLetivo).inicio.slice(0, 4);
+        setCandidaturas({ inicio: `${y}-05-01`, fim: `${y}-08-15` });
+      }
+    })();
+    return () => { cancel = true; };
+  }, [anoLetivo]);
+
+  const saveJanela = async (patch: Partial<CandCfg>) => {
+    const next = { ...candidaturas, ...patch };
+    setCandidaturas(next);
+    if (!authUserId) return;
+    if (candJanelaId) {
+      await (supabase.from as any)("candidaturas_janela").update({ inicio: next.inicio, fim: next.fim }).eq("id", candJanelaId);
+    } else {
+      const { data } = await (supabase.from as any)("candidaturas_janela")
+        .insert({ owner_user_id: authUserId, ano_letivo: anoLetivo, inicio: next.inicio, fim: next.fim })
+        .select("id").single();
+      if (data?.id) setCandJanelaId(data.id);
     }
-  );
-  useEffect(() => { try { localStorage.setItem(CAND_KEY, JSON.stringify(candidaturas)); } catch {} }, [candidaturas]);
+  };
+
+  // Load all scheduled sessões (with etapa name) for preview + read-only list
+  type SessaoRow = { id: string; etapa_id: string; mode: string | null; datas: string[]; data_fim: string | null; hora: string | null; horas: string[]; local: string | null };
+  type EtapaRow = { id: string; nome: string };
+  const [sessoesAgendadas, setSessoesAgendadas] = useState<SessaoRow[]>([]);
+  const [etapasMap, setEtapasMap] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      const [{ data: se }, { data: et }] = await Promise.all([
+        supabase.from("candidaturas_sessoes").select("id,etapa_id,mode,datas,data_fim,hora,horas,local"),
+        supabase.from("candidaturas_etapas").select("id,nome"),
+      ]);
+      if (cancel) return;
+      setSessoesAgendadas(((se ?? []) as any[]).map(r => ({ ...r, datas: r.datas ?? [], horas: r.horas ?? [] })) as SessaoRow[]);
+      const map: Record<string, string> = {};
+      ((et ?? []) as EtapaRow[]).forEach(e => { map[e.id] = e.nome; });
+      setEtapasMap(map);
+    })();
+    return () => { cancel = true; };
+  }, [anoLetivo]);
+
 
   // Turnos configuration
   const [turnos, setTurnos] = useState<Turno[]>(() => loadJSON(TURNOS_KEY, DEFAULT_TURNOS));
@@ -276,6 +329,21 @@ export default function CalendarioAcademico() {
     return out;
   }, [inicio, fim]);
 
+  const sessaoEvents = useMemo<Evento[]>(() => {
+    const out: Evento[] = [];
+    sessoesAgendadas.forEach(s => {
+      const nome = etapasMap[s.etapa_id] || "Sessão";
+      if (s.mode === "periodo" && s.datas[0] && s.data_fim) {
+        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.data_fim });
+      } else if (s.mode === "dia" && s.datas[0]) {
+        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.datas[0] });
+      } else if (s.mode === "dias") {
+        s.datas.forEach((d, i) => out.push({ id: `__ses_${s.id}_${i}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: d, fim: d }));
+      }
+    });
+    return out;
+  }, [sessoesAgendadas, etapasMap]);
+
   const displayEventos = useMemo<Evento[]>(() => [
     { id: "__inicio_ano", tipo: "especial", titulo: "Início do Ano Letivo", inicio, fim: inicio },
     { id: "__fim_ano",    tipo: "especial", titulo: "Fim do Ano Letivo",    inicio: fim, fim },
@@ -283,10 +351,11 @@ export default function CalendarioAcademico() {
       { id: `__sem_${s.id}_ini`, tipo: "semestre" as EventoTipo, titulo: `Início do ${s.nome}`, inicio: s.inicio, fim: s.inicio },
       { id: `__sem_${s.id}_fim`, tipo: "semestre" as EventoTipo, titulo: `Fim do ${s.nome}`, inicio: s.fim, fim: s.fim },
     ]),
-    { id: "__cand", tipo: "especial", titulo: "Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.fim },
-
+    { id: "__cand_ini", tipo: "especial", titulo: "Início das Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.inicio },
+    { id: "__cand_fim", tipo: "especial", titulo: "Fim das Candidaturas",    inicio: candidaturas.fim,    fim: candidaturas.fim },
+    ...sessaoEvents,
     ...eventos,
-  ], [eventos, inicio, fim, semestres, candidaturas]);
+  ], [eventos, inicio, fim, semestres, candidaturas, sessaoEvents]);
 
   const eventsByMonth = useMemo(() => {
     const map: Record<string, Evento[]> = {};
@@ -433,6 +502,49 @@ export default function CalendarioAcademico() {
               <Button size="sm" variant="outline" className="h-8 gap-1 mt-1" onClick={addSemestre}>
                 <Plus className="w-3.5 h-3.5" /> Adicionar Semestre
               </Button>
+            </div>
+          </section>
+
+          {/* Candidaturas */}
+          <section className="px-5 py-4 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 items-start">
+            <div>
+              <p className="text-xs font-medium flex items-center gap-1.5"><FileSignature className="w-3.5 h-3.5 text-primary" /> Candidaturas</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Janela de candidaturas e sessões agendadas</p>
+            </div>
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <p className="text-[11px] text-muted-foreground mb-1">Início das candidaturas</p>
+                  <Input type="date" value={candidaturas.inicio} onChange={e => saveJanela({ inicio: e.target.value })} className="h-9" />
+                </div>
+                <div>
+                  <p className="text-[11px] text-muted-foreground mb-1">Fim das candidaturas</p>
+                  <Input type="date" value={candidaturas.fim} onChange={e => saveJanela({ fim: e.target.value })} className="h-9" />
+                </div>
+              </div>
+              <div className="rounded-md border overflow-hidden">
+                <div className="px-3 py-2 border-b bg-muted/30 flex items-center justify-between">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Sessões agendadas</p>
+                  <Badge variant="outline" className="text-[10px] h-5">{sessaoEvents.length}</Badge>
+                </div>
+                {sessaoEvents.length === 0 ? (
+                  <p className="px-3 py-3 text-[11px] text-muted-foreground italic">Sem sessões agendadas. Configure em <Link to="/admin/faculdades-cursos?tab=candidaturas" className="text-primary hover:underline">Candidaturas</Link>.</p>
+                ) : (
+                  <div className="divide-y">
+                    {sessaoEvents
+                      .slice()
+                      .sort((a, b) => a.inicio.localeCompare(b.inicio))
+                      .map(ev => (
+                        <div key={ev.id} className="px-3 py-2 flex items-center justify-between gap-3 text-xs">
+                          <span className="font-medium truncate">{ev.titulo.replace(/^Candidaturas — /, "")}</span>
+                          <span className="text-muted-foreground tabular-nums shrink-0">
+                            {ev.inicio === ev.fim ? fmtPT(ev.inicio) : `${fmtPT(ev.inicio)} → ${fmtPT(ev.fim)}`}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
           </section>
 
