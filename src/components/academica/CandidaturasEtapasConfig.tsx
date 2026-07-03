@@ -36,7 +36,6 @@ type Sessao = {
 };
 
 type EstadoDef = { key: string; label: string; color: string };
-type CategoriaDef = { id: string; nome: string; color: string };
 
 const DEFAULT_ESTADOS: EstadoDef[] = [
   { key: "agendado", label: "Agendado", color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -47,48 +46,38 @@ const DEFAULT_ESTADOS: EstadoDef[] = [
 ];
 const DEFAULT_ESTADO_KEYS = new Set(DEFAULT_ESTADOS.map(e => e.key));
 
-const DEFAULT_CATEGORIAS: CategoriaDef[] = [
-  { id: "c-nova",   nome: "Nova",         color: "bg-blue-50 text-blue-700 border-blue-200" },
-  { id: "c-anali",  nome: "Em Análise",   color: "bg-amber-50 text-amber-700 border-amber-200" },
-  { id: "c-aprov",  nome: "Aprovada",     color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  { id: "c-repro",  nome: "Reprovada",    color: "bg-red-50 text-red-700 border-red-200" },
+const PALETTE: { name: string; color: string }[] = [
+  { name: "Azul",    color: "bg-blue-50 text-blue-700 border-blue-200" },
+  { name: "Verde",   color: "bg-green-50 text-green-700 border-green-200" },
+  { name: "Âmbar",   color: "bg-amber-50 text-amber-700 border-amber-200" },
+  { name: "Esmeralda", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  { name: "Vermelho", color: "bg-red-50 text-red-700 border-red-200" },
+  { name: "Violeta", color: "bg-violet-50 text-violet-700 border-violet-200" },
+  { name: "Céu",     color: "bg-sky-50 text-sky-700 border-sky-200" },
+  { name: "Rosa",    color: "bg-rose-50 text-rose-700 border-rose-200" },
+  { name: "Cinza",   color: "bg-slate-100 text-slate-700 border-slate-200" },
 ];
+const nextColor = (i: number) => PALETTE[i % PALETTE.length].color;
 
-const PALETTE = [
-  "bg-blue-50 text-blue-700 border-blue-200",
-  "bg-green-50 text-green-700 border-green-200",
-  "bg-amber-50 text-amber-700 border-amber-200",
-  "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "bg-red-50 text-red-700 border-red-200",
-  "bg-violet-50 text-violet-700 border-violet-200",
-  "bg-sky-50 text-sky-700 border-sky-200",
-  "bg-rose-50 text-rose-700 border-rose-200",
-  "bg-slate-100 text-slate-700 border-slate-200",
-];
-const nextColor = (i: number) => PALETTE[i % PALETTE.length];
+const ESTADOS_KEY = "upra:cand-estados-v2";
 
-const ESTADOS_KEY = "upra:cand-estados-custom";
-const CATEGORIAS_KEY = "upra:cand-categorias";
-
-function loadCustomEstados(): EstadoDef[] {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem(ESTADOS_KEY) || "[]"); } catch { return []; }
+function loadEstados(): EstadoDef[] {
+  if (typeof window === "undefined") return DEFAULT_ESTADOS;
+  try {
+    const raw = localStorage.getItem(ESTADOS_KEY);
+    if (!raw) return DEFAULT_ESTADOS;
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr) || arr.length === 0) return DEFAULT_ESTADOS;
+    // ensure all default keys still exist
+    const keys = new Set(arr.map((e: EstadoDef) => e.key));
+    const missing = DEFAULT_ESTADOS.filter(d => !keys.has(d.key));
+    return [...arr, ...missing];
+  } catch { return DEFAULT_ESTADOS; }
 }
-function saveCustomEstados(v: EstadoDef[]) {
+function saveEstados(v: EstadoDef[]) {
   try { localStorage.setItem(ESTADOS_KEY, JSON.stringify(v)); } catch {}
 }
-function loadCategorias(): CategoriaDef[] {
-  if (typeof window === "undefined") return DEFAULT_CATEGORIAS;
-  try {
-    const raw = localStorage.getItem(CATEGORIAS_KEY);
-    if (!raw) return DEFAULT_CATEGORIAS;
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr) && arr.length ? arr : DEFAULT_CATEGORIAS;
-  } catch { return DEFAULT_CATEGORIAS; }
-}
-function saveCategorias(v: CategoriaDef[]) {
-  try { localStorage.setItem(CATEGORIAS_KEY, JSON.stringify(v)); } catch {}
-}
+
 
 
 const DEFAULT_ETAPAS = [
@@ -107,12 +96,9 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
   const [loading, setLoading] = useState(true);
   const [docentes, setDocentes] = useState<DocenteRow[]>(() => loadDocentes());
-  const [customEstados, setCustomEstados] = useState<EstadoDef[]>(() => loadCustomEstados());
-  const [categorias, setCategorias] = useState<CategoriaDef[]>(() => loadCategorias());
+  const [estadosAll, setEstadosAll] = useState<EstadoDef[]>(() => loadEstados());
   const [newEstado, setNewEstado] = useState("");
-  const [newCategoria, setNewCategoria] = useState("");
 
-  const estadosAll = useMemo<EstadoDef[]>(() => [...DEFAULT_ESTADOS, ...customEstados], [customEstados]);
   const estadoMeta = (k: string): EstadoDef =>
     estadosAll.find(e => e.key === k) ?? { key: k, label: k, color: "bg-muted text-foreground border-border" };
 
@@ -196,50 +182,36 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   };
 
 
-  const toggleEstado = (et: Etapa, key: string) => {
-    const has = et.estados_possiveis.includes(key);
-    const next = has ? et.estados_possiveis.filter(k => k !== key) : [...et.estados_possiveis, key];
-    updEtapa(et.id, { estados_possiveis: next });
-  };
-
   const addEstado = () => {
-    const label = newEstado.trim();
-    if (!label) return;
-    const key = label.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").slice(0, 32) || `estado-${Date.now()}`;
-    if (estadosAll.some(e => e.key === key)) { toast.error("Já existe um estado com esse nome."); return; }
-    const next = [...customEstados, { key, label, color: nextColor(estadosAll.length) }];
-    setCustomEstados(next); saveCustomEstados(next); setNewEstado("");
+    const label = newEstado.trim() || `Estado ${estadosAll.length + 1}`;
+    const base = label.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").slice(0, 32) || "estado";
+    let key = base;
+    let i = 1;
+    while (estadosAll.some(e => e.key === key)) { key = `${base}-${i++}`; }
+    const next = [...estadosAll, { key, label, color: nextColor(estadosAll.length) }];
+    setEstadosAll(next); saveEstados(next); setNewEstado("");
   };
   const rmEstado = (key: string) => {
     if (DEFAULT_ESTADO_KEYS.has(key)) { toast.error("Estado predefinido — não pode ser removido."); return; }
-    const next = customEstados.filter(e => e.key !== key);
-    setCustomEstados(next); saveCustomEstados(next);
+    const next = estadosAll.filter(e => e.key !== key);
+    setEstadosAll(next); saveEstados(next);
     etapas.forEach(et => {
       if (et.estados_possiveis.includes(key)) {
         updEtapa(et.id, { estados_possiveis: et.estados_possiveis.filter(k => k !== key) });
       }
     });
   };
-  const renameEstado = (key: string, label: string) => {
-    if (DEFAULT_ESTADO_KEYS.has(key)) return;
-    const next = customEstados.map(e => e.key === key ? { ...e, label } : e);
-    setCustomEstados(next); saveCustomEstados(next);
+  const updEstado = (key: string, patch: Partial<EstadoDef>) => {
+    const next = estadosAll.map(e => e.key === key ? { ...e, ...patch } : e);
+    setEstadosAll(next); saveEstados(next);
   };
 
-  const addCategoria = () => {
-    const nome = newCategoria.trim();
-    if (!nome) return;
-    const next = [...categorias, { id: `c-${Date.now()}`, nome, color: nextColor(categorias.length) }];
-    setCategorias(next); saveCategorias(next); setNewCategoria("");
+  const toggleEstado = (et: Etapa, key: string) => {
+    const has = et.estados_possiveis.includes(key);
+    const next = has ? et.estados_possiveis.filter(k => k !== key) : [...et.estados_possiveis, key];
+    updEtapa(et.id, { estados_possiveis: next });
   };
-  const rmCategoria = (id: string) => {
-    const next = categorias.filter(c => c.id !== id);
-    setCategorias(next); saveCategorias(next);
-  };
-  const renameCategoria = (id: string, nome: string) => {
-    const next = categorias.map(c => c.id === id ? { ...c, nome } : c);
-    setCategorias(next); saveCategorias(next);
-  };
+
 
 
   const updSessao = async (id: string, patch: Partial<Sessao>) => {
@@ -265,38 +237,74 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     <fieldset disabled={readOnly} className="space-y-4 disabled:opacity-100">
       <div className="space-y-4">
 
-      {/* ESTADOS POSSÍVEIS (editável) */}
+      {/* ESTADOS POSSÍVEIS (editável, com pré-visualização e cor) */}
       <div>
-        <div className="mb-2 flex items-end justify-between gap-2">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estados possíveis</p>
-            <p className="text-[11px] text-muted-foreground">Vocabulário de estados que cada etapa pode assumir.</p>
-          </div>
+        <div className="mb-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estados possíveis</p>
+          <p className="text-[11px] text-muted-foreground">Vocabulário de estados que cada etapa pode assumir. Edite nome e cor.</p>
         </div>
-        <div className="rounded-lg border p-3 space-y-2">
-          <div className="flex flex-wrap gap-1.5">
-            {estadosAll.map(e => {
-              const isDefault = DEFAULT_ESTADO_KEYS.has(e.key);
-              return (
-                <span key={e.key} className={cn("inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px]", e.color)}>
-                  {isDefault || readOnly ? (
-                    <span>{e.label}</span>
-                  ) : (
-                    <input
-                      value={e.label}
-                      onChange={ev => renameEstado(e.key, ev.target.value)}
-                      className="bg-transparent border-0 outline-none w-[9ch] text-[11px]"
-                    />
-                  )}
-                  {!isDefault && !readOnly && (
-                    <button onClick={() => rmEstado(e.key)} className="hover:text-destructive"><Trash2 className="w-2.5 h-2.5" /></button>
-                  )}
-                </span>
-              );
-            })}
-          </div>
+        <div className="rounded-lg border overflow-hidden">
+          <table className="w-full text-xs">
+            <thead className="bg-muted/40 text-[10px] uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left w-32">Pré-visualização</th>
+                <th className="px-3 py-2 text-left">Nome</th>
+                <th className="px-3 py-2 text-left w-40">Cor</th>
+                <th className="w-10"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {estadosAll.map(e => {
+                const isDefault = DEFAULT_ESTADO_KEYS.has(e.key);
+                return (
+                  <tr key={e.key} className="border-t align-middle">
+                    <td className="px-3 py-2">
+                      <Badge variant="outline" className={cn("text-[11px]", e.color)}>{e.label || "—"}</Badge>
+                    </td>
+                    <td className="px-3 py-2">
+                      <Input value={e.label} disabled={readOnly} readOnly={readOnly}
+                        onChange={ev => updEstado(e.key, { label: ev.target.value })}
+                        className="h-8 text-xs" />
+                    </td>
+                    <td className="px-3 py-2">
+                      <Popover>
+                        <PopoverTrigger asChild disabled={readOnly}>
+                          <button className="flex items-center gap-2 h-8 w-full rounded-md border px-2 hover:bg-muted/30 disabled:cursor-default">
+                            <span className={cn("inline-block w-4 h-4 rounded border", e.color)} />
+                            <span className="text-[11px] text-muted-foreground">
+                              {PALETTE.find(p => p.color === e.color)?.name ?? "Personalizada"}
+                            </span>
+                            {!readOnly && <ChevronDown className="w-3 h-3 ml-auto text-muted-foreground" />}
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent align="start" className="w-56 p-2 grid grid-cols-3 gap-1.5">
+                          {PALETTE.map(p => (
+                            <button key={p.color}
+                              onClick={() => updEstado(e.key, { color: p.color })}
+                              className={cn("flex flex-col items-center gap-1 rounded-md border p-1.5 hover:bg-muted/40", e.color === p.color && "ring-2 ring-primary")}>
+                              <span className={cn("inline-block w-full h-5 rounded", p.color)} />
+                              <span className="text-[10px] text-muted-foreground">{p.name}</span>
+                            </button>
+                          ))}
+                        </PopoverContent>
+                      </Popover>
+                    </td>
+                    <td className="px-2 py-2">
+                      {!readOnly && !isDefault && (
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                          onClick={() => rmEstado(e.key)}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                      {isDefault && <Badge variant="outline" className="text-[9px] uppercase tracking-wide">Predefinido</Badge>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
           {!readOnly && (
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-2 p-2 border-t bg-muted/20">
               <Input value={newEstado} onChange={e => setNewEstado(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addEstado(); } }}
                 placeholder="Novo estado (ex: Em revisão)" className="h-8 text-xs max-w-[240px]" />
@@ -308,48 +316,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
         </div>
       </div>
 
-      {/* CATEGORIAS DE CANDIDATURA */}
       <div>
-        <div className="mb-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Categorias de candidatura</p>
-          <p className="text-[11px] text-muted-foreground">Classificação global de cada candidatura ao longo do processo.</p>
-        </div>
-        <div className="rounded-lg border p-3 space-y-2">
-          <div className="flex flex-wrap gap-1.5">
-            {categorias.map(c => (
-              <span key={c.id} className={cn("inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px]", c.color)}>
-                {readOnly ? (
-                  <span>{c.nome}</span>
-                ) : (
-                  <input
-                    value={c.nome}
-                    onChange={ev => renameCategoria(c.id, ev.target.value)}
-                    className="bg-transparent border-0 outline-none w-[10ch] text-[11px]"
-                  />
-                )}
-                {!readOnly && (
-                  <button onClick={() => rmCategoria(c.id)} className="hover:text-destructive"><Trash2 className="w-2.5 h-2.5" /></button>
-                )}
-              </span>
-            ))}
-            {categorias.length === 0 && <span className="text-[11px] text-muted-foreground italic">Sem categorias.</span>}
-          </div>
-          {!readOnly && (
-            <div className="flex items-center gap-2 pt-1">
-              <Input value={newCategoria} onChange={e => setNewCategoria(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addCategoria(); } }}
-                placeholder="Nova categoria (ex: Bolseiro)" className="h-8 text-xs max-w-[240px]" />
-              <Button size="sm" variant="outline" className="h-8 gap-1 text-xs" onClick={addCategoria}>
-                <Plus className="w-3 h-3" /> Adicionar Categoria
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-
-
-      <div>
-
         <div className="flex items-center justify-between mb-2">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Etapas do Processo</p>
