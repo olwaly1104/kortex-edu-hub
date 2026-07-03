@@ -294,7 +294,7 @@ export default function CriarTurmas() {
                     <Badge variant="outline" className="text-[10px]">{arr.length} turmas</Badge>
                     <Badge variant="outline" className="text-[10px]">{arr.reduce((a, t) => a + t.capacidade, 0)} lugares</Badge>
                   </div>
-                  <Button size="sm" variant="ghost" onClick={() => addTurma(curso.id, ano)} disabled={createMut.isPending} className="h-7 gap-1 text-xs">
+                  <Button size="sm" variant="ghost" onClick={() => openAddTurma(curso.id, ano)} className="h-7 gap-1 text-xs">
                     <Plus className="w-3 h-3" /> Adicionar Turma
                   </Button>
                 </div>
