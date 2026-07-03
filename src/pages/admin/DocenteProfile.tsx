@@ -33,20 +33,14 @@ export default function AdminDocenteProfile() {
   const displayId = `DOC-${(docente.id || "00000000").slice(0, 8).toUpperCase()}`;
   const genero = docente.genero === "M" ? "Masculino" : docente.genero === "F" ? "Feminino" : (docente.genero || "—");
 
+  const isCoordenador = /coordenador/i.test(docente.cargo || "");
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 -ml-2">
           <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => setDocOpen(true)}>
-            <Eye className="w-3.5 h-3.5" /> Ver documento
-          </Button>
-          <Button size="sm" className="gap-1.5 h-8 text-xs" onClick={() => setDocOpen(true)}>
-            <Download className="w-3.5 h-3.5" /> Descarregar
-          </Button>
-        </div>
       </div>
 
       {/* Identity header */}
