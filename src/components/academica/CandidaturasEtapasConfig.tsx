@@ -90,6 +90,10 @@ const isProtected = (nome: string) => PROTECTED_NAMES.has((nome || "").trim().to
 
 export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnly?: boolean }) {
   const { user } = useAuth();
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setAuthUserId(data.user?.id ?? null));
+  }, []);
   const [etapas, setEtapas] = useState<Etapa[]>([]);
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
   const [loading, setLoading] = useState(true);
