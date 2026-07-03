@@ -478,41 +478,7 @@ export default function CalendarioAcademico() {
         </div>
       </Card>
 
-      {/* ============ CANDIDATURAS (parâmetros + etapas + sessões) ============ */}
-      <Card className="overflow-hidden">
-        <div className="px-5 py-4 border-b bg-muted/30">
-          <div className="flex items-center gap-2">
-            <FileSignature className="w-4 h-4 text-primary" />
-            <p className="text-sm font-semibold">Candidaturas</p>
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">Janela de candidaturas, vagas, etapas do processo e sessões agendadas</p>
-        </div>
-        <div className="divide-y">
-          <section className="px-5 py-4 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 items-start">
-            <div>
-              <p className="text-xs font-medium flex items-center gap-1.5"><Settings2 className="w-3.5 h-3.5 text-primary" /> Parâmetros gerais</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">Janela e vagas totais</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <label className="text-[11px] text-muted-foreground mb-1 block">Início das candidaturas</label>
-                <Input type="date" value={candidaturas.inicio} onChange={e => setCandidaturas(c => ({ ...c, inicio: e.target.value }))} className="h-9" />
-              </div>
-              <div>
-                <label className="text-[11px] text-muted-foreground mb-1 block">Fim das candidaturas</label>
-                <Input type="date" value={candidaturas.fim} onChange={e => setCandidaturas(c => ({ ...c, fim: e.target.value }))} className="h-9" />
-              </div>
-              <div>
-                <label className="text-[11px] text-muted-foreground mb-1 block">Vagas totais</label>
-                <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} className="h-9" />
-              </div>
-            </div>
-          </section>
-          <section className="px-5 py-4">
-            <CandidaturasEtapasConfig />
-          </section>
-        </div>
-      </Card>
+
 
 
         </TabsContent>
