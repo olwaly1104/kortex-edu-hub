@@ -372,6 +372,13 @@ export default function CalendarioAcademico() {
     return map;
   }, [displayEventos]);
 
+  const filtered = useMemo(() =>
+    (filter === "all" ? displayEventos : displayEventos.filter(e => e.tipo === filter))
+      .slice().sort((a, b) => a.inicio.localeCompare(b.inicio)),
+    [displayEventos, filter]
+  );
+
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <OnboardingStepBanner actions={
