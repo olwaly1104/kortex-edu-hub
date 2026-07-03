@@ -137,8 +137,10 @@ export default function AdminDocenteProfile() {
               <p className="text-sm font-semibold mt-1.5">{docente.contrato || "—"}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Grau Académico</p>
-              <p className="text-sm font-semibold mt-1.5">{docente.grau || "—"}</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Estado</p>
+              <div className="mt-1.5">
+                <Badge className="bg-emerald-100 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5">Ativo</Badge>
+              </div>
             </div>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Minha Presença</p>
