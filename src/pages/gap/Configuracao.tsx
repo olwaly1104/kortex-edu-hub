@@ -31,6 +31,7 @@ import { FinHeader } from "@/pages/financas/_FinHeader";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import CandidaturasEtapasConfig from "@/components/academica/CandidaturasEtapasConfig";
+import CandidaturasPage from "@/pages/academica2/CandidaturasPage";
 
 type EstadoItem = { key: string; label: string; color: string; descricao?: string };
 type CategoriaItem = { key: string; label: string; color: string; descricao?: string };
@@ -810,48 +811,14 @@ export default function GapConfiguracao() {
           </Card>
         </TabsContent>
 
-        {/* ============ CANDIDATURAS (leitura — partilhadas com Académica) ============ */}
-        <TabsContent value="candidaturas" className="space-y-6 mt-0">
-          <Card className="overflow-hidden">
-            <div className="px-5 py-4 border-b bg-muted/30 flex items-center gap-2">
-              <GraduationCap className="w-4 h-4 text-primary" />
-              <div className="min-w-0">
-                <h2 className="text-sm font-bold text-foreground">Candidaturas</h2>
-                <p className="text-[11px] text-muted-foreground">Configuração definida na Área Académica · apenas leitura</p>
-              </div>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground ml-auto shrink-0">Apenas leitura</span>
-            </div>
-            <div className="divide-y">
-              <section className="px-5 py-4 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 items-start">
-                <div>
-                  <p className="text-xs font-medium flex items-center gap-1.5"><Settings2 className="w-3.5 h-3.5 text-primary" /> Parâmetros gerais</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Janela e vagas totais</p>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="text-[11px] text-muted-foreground mb-1 block">Início das candidaturas</label>
-                    <Input type="date" value={cdPeriodoInicio} disabled readOnly className="h-9" />
-                  </div>
-                  <div>
-                    <label className="text-[11px] text-muted-foreground mb-1 block">Fim das candidaturas</label>
-                    <Input type="date" value={cdPeriodoFim} disabled readOnly className="h-9" />
-                  </div>
-                  <div>
-                    <label className="text-[11px] text-muted-foreground mb-1 block">Vagas totais</label>
-                    <Input type="number" value={cdMaxOpcoes as any} disabled readOnly className="h-9" />
-                  </div>
-                </div>
-              </section>
-              <section className="px-5 py-4">
-                <CandidaturasEtapasConfig readOnly />
-              </section>
-            </div>
-          </Card>
-
-          <p className="text-[11px] text-muted-foreground">
+        {/* ============ CANDIDATURAS (leitura — partilhadas com Área Académica) ============ */}
+        <TabsContent value="candidaturas" className="space-y-4 mt-0">
+          <CandidaturasPage readOnly />
+          <p className="text-[11px] text-muted-foreground px-2">
             Total de candidaturas registadas no sistema: <span className="font-semibold text-foreground tabular-nums">{allCandidaturas.length}</span>
           </p>
         </TabsContent>
+
 
       </Tabs>
 
