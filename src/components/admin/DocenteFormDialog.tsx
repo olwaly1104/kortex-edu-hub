@@ -331,7 +331,7 @@ export function DocenteFormDialog({
             </section>
 
             <section>
-              <SectionTitle index={4} icon={<Award className="w-3.5 h-3.5" />} title="Documentação Anexa" hint="CV e diploma" />
+              <SectionTitle index={5} icon={<Award className="w-3.5 h-3.5" />} title="Documentação Anexa" hint="CV e diploma" />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <Field label="Curriculum Vitae (CV)">
                   <FileButton fileName={draft.cvFileName} onPick={(f) => setF("cvFileName", f?.name || "")} inputRef={cvInput} accept="application/pdf,.doc,.docx" Icon={FileText} />
