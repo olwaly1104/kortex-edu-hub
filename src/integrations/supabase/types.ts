@@ -85,6 +85,51 @@ export type Database = {
           },
         ]
       }
+      ano_letivo_eventos: {
+        Row: {
+          ano_letivo: string
+          created_at: string
+          epoca: string | null
+          fim: string
+          id: string
+          inicio: string
+          institution_id: string | null
+          owner_user_id: string
+          semestre: string | null
+          tipo: string
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          ano_letivo: string
+          created_at?: string
+          epoca?: string | null
+          fim: string
+          id?: string
+          inicio: string
+          institution_id?: string | null
+          owner_user_id?: string
+          semestre?: string | null
+          tipo: string
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          ano_letivo?: string
+          created_at?: string
+          epoca?: string | null
+          fim?: string
+          id?: string
+          inicio?: string
+          institution_id?: string | null
+          owner_user_id?: string
+          semestre?: string | null
+          tipo?: string
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       anuncios: {
         Row: {
           author: string | null
