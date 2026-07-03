@@ -108,6 +108,14 @@ export function DocenteFormDialog({
     setDraft(emptyDocente());
   };
 
+  const simpleOk = !!draft.primeiroNome.trim() && !!draft.ultimoNome.trim();
+  const submitSimplificado = () => {
+    if (!simpleOk || !previewEmail) { toast.error("Preencha primeiro e último nome"); return; }
+    if (!window.confirm("Tem a certeza que pretende criar este docente?")) return;
+    onSave({ ...draft, email: previewEmail, categoria: moduloLabel(draft.moduloKortex || "professor"), id: draft.id || `${Date.now()}` });
+    setDraft(emptyDocente());
+  };
+
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) setDraft(emptyDocente()); onOpenChange(v); }}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
@@ -178,8 +186,8 @@ export function DocenteFormDialog({
               <span className="text-[11px] text-muted-foreground">Restantes campos podem ser editados depois.</span>
               <Button
                 size="sm"
-                onClick={submit}
-                disabled={!requiredOk}
+                onClick={submitSimplificado}
+                disabled={!simpleOk}
                 className="h-7 px-2.5 text-[11px] gap-1"
               >
                 <Plus className="w-3 h-3" /> Criar simplificado

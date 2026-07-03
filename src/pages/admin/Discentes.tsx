@@ -293,18 +293,6 @@ export default function AdminDiscentes() {
   const requiredOk = !!(
     draft.primeiroNome.trim() &&
     draft.ultimoNome.trim() &&
-    draft.nascimento &&
-    draft.genero &&
-    draft.regime &&
-    draft.telemovel.trim() &&
-    draft.bilhete.trim() &&
-    draft.provincia &&
-    draft.municipio &&
-    draft.endereco.trim() &&
-    draft.enc_primeiro_nome.trim() &&
-    draft.enc_ultimo_nome.trim() &&
-    draft.enc_parentesco.trim() &&
-    draft.enc_telefone.trim() &&
     draft.faculdade_id &&
     draft.curso_id &&
     draft.ano &&
@@ -571,6 +559,47 @@ export default function AdminDiscentes() {
                     placeholder="Silva"
                     className="h-9 text-sm"
                   />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <Field label="Faculdade *">
+                  <Select value={draft.faculdade_id} onValueChange={(v) => setF("faculdade_id", v)}>
+                    <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                    <SelectContent>
+                      {faculdades.map((f: any) => (
+                        <SelectItem key={f.id} value={f.id}>{f.sigla || f.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Curso *">
+                  <Select value={draft.curso_id} onValueChange={(v) => setF("curso_id", v)} disabled={cursosDaFac.length === 0}>
+                    <SelectTrigger className="h-9 text-xs">
+                      <SelectValue placeholder={cursosDaFac.length === 0 ? "Sem cursos" : "—"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cursosDaFac.map((c: any) => (
+                        <SelectItem key={c.id} value={c.id}>{c.code || c.codigo || c.name || c.nome}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Ano *">
+                  <Select value={draft.ano} onValueChange={(v) => setF("ano", v)} disabled={anosDoCurso.length === 0}>
+                    <SelectTrigger className="h-9 text-xs">
+                      <SelectValue placeholder={anosDoCurso.length === 0 ? "—" : "—"} />
+                    </SelectTrigger>
+                    <SelectContent>{anosDoCurso.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Turma *">
+                  <Select value={draft.turma} onValueChange={(v) => setF("turma", v)} disabled={!draft.ano}>
+                    <SelectTrigger className="h-9 text-xs">
+                      <SelectValue placeholder={!draft.ano ? "—" : "—"} />
+                    </SelectTrigger>
+                    <SelectContent>{turmasDoAno.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                  </Select>
                 </Field>
               </div>
 
