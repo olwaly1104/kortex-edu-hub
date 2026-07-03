@@ -1,14 +1,15 @@
 import { useSearchParams } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Building2, BookOpen, CalendarDays, Users, Award } from "lucide-react";
+import { Building2, BookOpen, CalendarDays, Users, Award, FileSignature } from "lucide-react";
 import { OnboardingStepBanner, SuppressOnboardingBanner } from "@/components/admin/OnboardingStepBanner";
 import AdminFaculdadesCursos from "./FaculdadesCursos";
 import GerarCadeiras from "../academica2/GerarCadeiras";
 import CalendarioAcademico from "../academica2/CalendarioAcademico";
 import CriarTurmas from "../academica2/CriarTurmas";
 import CriterioAcademico from "./CriterioAcademico";
+import CandidaturasPage from "../academica2/CandidaturasPage";
 
-type TabKey = "faculdades" | "cadeiras" | "calendario" | "turmas" | "criterio";
+type TabKey = "faculdades" | "cadeiras" | "calendario" | "turmas" | "criterio" | "candidaturas";
 
 const STEP_FOR: Record<TabKey, string> = {
   faculdades: "aca.fac",
@@ -16,7 +17,9 @@ const STEP_FOR: Record<TabKey, string> = {
   calendario: "aca.cal",
   turmas: "aca.tur",
   criterio: "aca.cri",
+  candidaturas: "aca.cand",
 };
+
 
 export default function AreaAcademica() {
   const [params, setParams] = useSearchParams();
