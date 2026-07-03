@@ -369,7 +369,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                     </Popover>
                   </td>
                   <td className="px-2 py-2">
-                    {!readOnly && !locked && (
+                    {!readOnly && (
                       <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
                         onClick={() => rmEtapa(et.id, et.nome)}>
                         <Trash2 className="w-3.5 h-3.5" />
