@@ -36,7 +36,7 @@ type Sessao = {
   capacidade: number | null;
 };
 
-type EstadoDef = { key: string; label: string; color: string; descricao?: string };
+type EstadoDef = { id?: string; key: string; label: string; color: string; descricao?: string | null; is_default?: boolean; ordem?: number };
 
 const COR_OPCOES: { label: string; value: string }[] = [
   { label: "Verde",    value: "bg-green-100 text-green-700 border-green-200" },
@@ -47,54 +47,31 @@ const COR_OPCOES: { label: string; value: string }[] = [
   { label: "Violeta",  value: "bg-violet-100 text-violet-700 border-violet-200" },
 ];
 
-const DEFAULT_ESTADOS: EstadoDef[] = [
-  { key: "agendado",  label: "Agendado",  color: "bg-blue-100 text-blue-700 border-blue-200",       descricao: "Sessão marcada, aguarda realização." },
-  { key: "completo",  label: "Completo",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Etapa concluída pelo candidato." },
-  { key: "remarcado", label: "Remarcado", color: "bg-amber-100 text-amber-700 border-amber-200",    descricao: "Data alterada para nova sessão." },
-  { key: "aprovado",  label: "Aprovado",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Candidato aprovado nesta etapa." },
-  { key: "reprovado", label: "Reprovado", color: "bg-red-100 text-red-700 border-red-200",          descricao: "Candidato reprovado nesta etapa." },
+const DEFAULT_ESTADOS: Omit<EstadoDef, "id">[] = [
+  { key: "agendado",  label: "Agendado",  color: "bg-blue-100 text-blue-700 border-blue-200",       descricao: "Sessão marcada, aguarda realização.", is_default: true, ordem: 0 },
+  { key: "completo",  label: "Completo",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Etapa concluída pelo candidato.",     is_default: true, ordem: 1 },
+  { key: "remarcado", label: "Remarcado", color: "bg-amber-100 text-amber-700 border-amber-200",    descricao: "Data alterada para nova sessão.",     is_default: true, ordem: 2 },
+  { key: "aprovado",  label: "Aprovado",  color: "bg-green-100 text-green-700 border-green-200",    descricao: "Candidato aprovado nesta etapa.",     is_default: true, ordem: 3 },
+  { key: "reprovado", label: "Reprovado", color: "bg-red-100 text-red-700 border-red-200",          descricao: "Candidato reprovado nesta etapa.",    is_default: true, ordem: 4 },
 ];
-const DEFAULT_ESTADO_KEYS = new Set(DEFAULT_ESTADOS.map(e => e.key));
 
 const nextColor = (i: number) => COR_OPCOES[i % COR_OPCOES.length].value;
 
-const ESTADOS_KEY = "upra:cand-estados-v2";
-
 const parseIsoLocal = (value?: string | null): Date | undefined => {
   if (!value) return undefined;
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) return undefined;
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = Number(match[3]);
-  const date = new Date(year, month - 1, day);
-  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return undefined;
-  return date;
+  const m = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return undefined;
+  const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+  return isNaN(d.getTime()) ? undefined : d;
 };
-
 const formatIsoLocal = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 };
 
-function loadEstados(): EstadoDef[] {
-  if (typeof window === "undefined") return DEFAULT_ESTADOS;
-  try {
-    const raw = localStorage.getItem(ESTADOS_KEY);
-    if (!raw) return DEFAULT_ESTADOS;
-    const arr = JSON.parse(raw);
-    if (!Array.isArray(arr) || arr.length === 0) return DEFAULT_ESTADOS;
-    // ensure all default keys still exist
-    const keys = new Set(arr.map((e: EstadoDef) => e.key));
-    const missing = DEFAULT_ESTADOS.filter(d => !keys.has(d.key));
-    return [...arr, ...missing];
-  } catch { return DEFAULT_ESTADOS; }
-}
-function saveEstados(v: EstadoDef[]) {
-  try { localStorage.setItem(ESTADOS_KEY, JSON.stringify(v)); } catch {}
-}
+
 
 
 
@@ -122,7 +99,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     supabase.from("edificios").select("id,sigla,nome").order("sigla").then(({ data }) => setGeopontos(data ?? []));
   }, []);
   const [docentes, setDocentes] = useState<DocenteRow[]>(() => loadDocentes());
-  const [estadosAll, setEstadosAll] = useState<EstadoDef[]>(() => loadEstados());
+  const [estadosAll, setEstadosAll] = useState<EstadoDef[]>([]);
   const [newEstado, setNewEstado] = useState("");
 
   const estadoMeta = (k: string): EstadoDef =>
@@ -137,12 +114,12 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
 
   const load = async () => {
     setLoading(true);
-    const [e, s] = await Promise.all([
+    const [e, s, es] = await Promise.all([
       supabase.from("candidaturas_etapas").select("*").order("ordem"),
       supabase.from("candidaturas_sessoes").select("*"),
+      (supabase.from as any)("candidaturas_estados").select("*").order("ordem"),
     ]);
     let etapasRows = (e.error ? [] : (e.data ?? [])) as Etapa[];
-    // Ensure all protected defaults exist (seed missing ones)
     if (!e.error && authUserId) {
       const existing = new Set(etapasRows.map(r => (r.nome || "").trim().toLowerCase()));
       const missing = DEFAULT_ETAPAS.filter(d => !existing.has(d.nome.toLowerCase()))
@@ -155,6 +132,19 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     setEtapas(etapasRows);
 
     if (!s.error) setSessoes(((s.data ?? []) as any[]).map(r => ({ ...r, mode: r.mode ?? "", horas: Array.isArray(r.horas) ? r.horas : [] })) as Sessao[]);
+
+    let estadosRows = (es.error ? [] : (es.data ?? [])) as EstadoDef[];
+    if (!es.error && authUserId) {
+      const existingKeys = new Set(estadosRows.map(r => r.key));
+      const missing = DEFAULT_ESTADOS.filter(d => !existingKeys.has(d.key))
+        .map(d => ({ ...d, owner_user_id: authUserId }));
+      if (missing.length) {
+        const ins = await (supabase.from as any)("candidaturas_estados").insert(missing).select("*");
+        if (!ins.error) estadosRows = [...estadosRows, ...((ins.data ?? []) as EstadoDef[])]
+          .sort((a, b) => (a.ordem ?? 0) - (b.ordem ?? 0));
+      }
+    }
+    setEstadosAll(estadosRows);
     setLoading(false);
   };
   useEffect(() => { load(); }, [authUserId]);
@@ -208,28 +198,35 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   };
 
 
-  const addEstado = () => {
+  const addEstado = async () => {
     const label = newEstado.trim() || `Estado ${estadosAll.length + 1}`;
     const base = label.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").slice(0, 32) || "estado";
     let key = base;
     let i = 1;
     while (estadosAll.some(e => e.key === key)) { key = `${base}-${i++}`; }
-    const next = [...estadosAll, { key, label, color: nextColor(estadosAll.length) }];
-    setEstadosAll(next); saveEstados(next); setNewEstado("");
+    const row = { key, label, color: nextColor(estadosAll.length), ordem: estadosAll.length, owner_user_id: authUserId, is_default: false };
+    const { data, error } = await (supabase.from as any)("candidaturas_estados").insert(row).select("*").single();
+    if (error) { toast.error(error.message); return; }
+    setEstadosAll(prev => [...prev, data as EstadoDef]);
+    setNewEstado("");
   };
-  const rmEstado = (key: string) => {
-    if (DEFAULT_ESTADO_KEYS.has(key)) { toast.error("Estado predefinido — não pode ser removido."); return; }
-    const next = estadosAll.filter(e => e.key !== key);
-    setEstadosAll(next); saveEstados(next);
+  const rmEstado = async (est: EstadoDef) => {
+    if (est.is_default) { toast.error("Estado predefinido — não pode ser removido."); return; }
+    if (!est.id) return;
+    const { error } = await (supabase.from as any)("candidaturas_estados").delete().eq("id", est.id);
+    if (error) { toast.error(error.message); return; }
+    setEstadosAll(prev => prev.filter(e => e.key !== est.key));
     etapas.forEach(et => {
-      if (et.estados_possiveis.includes(key)) {
-        updEtapa(et.id, { estados_possiveis: et.estados_possiveis.filter(k => k !== key) });
+      if (et.estados_possiveis.includes(est.key)) {
+        updEtapa(et.id, { estados_possiveis: et.estados_possiveis.filter(k => k !== est.key) });
       }
     });
   };
-  const updEstado = (key: string, patch: Partial<EstadoDef>) => {
-    const next = estadosAll.map(e => e.key === key ? { ...e, ...patch } : e);
-    setEstadosAll(next); saveEstados(next);
+  const updEstado = async (est: EstadoDef, patch: Partial<EstadoDef>) => {
+    setEstadosAll(prev => prev.map(e => e.key === est.key ? { ...e, ...patch } : e));
+    if (!est.id) return;
+    const { error } = await (supabase.from as any)("candidaturas_estados").update(patch).eq("id", est.id);
+    if (error) toast.error(error.message);
   };
 
   const toggleEstado = (et: Etapa, key: string) => {
@@ -283,18 +280,18 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
             <div className="text-right">Ação</div>
           </div>
           {estadosAll.map(es => {
-            const isDefault = DEFAULT_ESTADO_KEYS.has(es.key);
+            const isDefault = !!es.is_default;
             return (
               <div key={es.key} className="grid grid-cols-[1fr_1.4fr_180px_120px_40px] gap-3 px-5 py-2.5 items-center text-sm">
                 <Input className="h-9" placeholder="Ex: Agendado" value={es.label}
                   disabled={readOnly} readOnly={readOnly}
-                  onChange={e => updEstado(es.key, { label: e.target.value })} />
+                  onChange={e => updEstado(es, { label: e.target.value })} />
                 <Input className="h-9" placeholder="Descrição curta do estado" value={es.descricao ?? ""}
                   disabled={readOnly} readOnly={readOnly}
-                  onChange={e => updEstado(es.key, { descricao: e.target.value })} />
+                  onChange={e => updEstado(es, { descricao: e.target.value })} />
                 <select className="h-9 rounded-md border border-input bg-background px-2 text-sm disabled:opacity-50"
                   value={es.color} disabled={readOnly}
-                  onChange={e => updEstado(es.key, { color: e.target.value })}>
+                  onChange={e => updEstado(es, { color: e.target.value })}>
                   {COR_OPCOES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
                 <span className={cn("inline-flex items-center justify-center px-2.5 py-1 rounded-md border text-xs font-medium", es.color)}>
@@ -303,7 +300,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                 <div className="flex justify-end">
                   {!readOnly && !isDefault && (
                     <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                      onClick={() => rmEstado(es.key)}>
+                      onClick={() => rmEstado(es)}>
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
                   )}
