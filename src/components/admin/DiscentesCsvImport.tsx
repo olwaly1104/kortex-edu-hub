@@ -633,7 +633,8 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
             </div>
           </>
         )}
-    </div>
+    </div>,
+    document.body,
   );
 }
 
