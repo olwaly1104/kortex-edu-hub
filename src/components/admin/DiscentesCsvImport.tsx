@@ -192,7 +192,6 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       const facId = resolveFaculdade(facRaw);
       r.faculdade_id = facId;
       r.curso_id = resolveCurso(cursoRaw, facId);
-      if (!r.turma) r.turma = "A";
       if (!r.regime) r.regime = "normal";
       return r;
     });
