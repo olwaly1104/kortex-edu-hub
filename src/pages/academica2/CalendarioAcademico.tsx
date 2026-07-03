@@ -451,18 +451,45 @@ export default function CalendarioAcademico() {
               <p className="text-xs font-medium flex items-center gap-1.5"><FileSignature className="w-3.5 h-3.5 text-primary" /> Candidaturas</p>
               <p className="text-[11px] text-muted-foreground mt-0.5">Janela de inscrições e vagas</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div>
-                <p className="text-[11px] text-muted-foreground mb-1">Abertura</p>
-                <Input type="date" value={candidaturas.inicio} onChange={e => setCandidaturas(c => ({ ...c, inicio: e.target.value }))} className="h-9" />
+            <div className="space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <p className="text-[11px] text-muted-foreground mb-1">Abertura</p>
+                  <Input type="date" value={candidaturas.inicio} onChange={e => setCandidaturas(c => ({ ...c, inicio: e.target.value }))} className="h-9" />
+                </div>
+                <div>
+                  <p className="text-[11px] text-muted-foreground mb-1">Encerramento</p>
+                  <Input type="date" value={candidaturas.fim} onChange={e => setCandidaturas(c => ({ ...c, fim: e.target.value }))} className="h-9" />
+                </div>
+                <div>
+                  <p className="text-[11px] text-muted-foreground mb-1">Vagas totais</p>
+                  <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} className="h-9" />
+                </div>
               </div>
-              <div>
-                <p className="text-[11px] text-muted-foreground mb-1">Encerramento</p>
-                <Input type="date" value={candidaturas.fim} onChange={e => setCandidaturas(c => ({ ...c, fim: e.target.value }))} className="h-9" />
-              </div>
-              <div>
-                <p className="text-[11px] text-muted-foreground mb-1">Vagas totais</p>
-                <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} className="h-9" />
+              <div className="pt-2 border-t">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Etapas do Processo</p>
+                  <Button size="sm" variant="outline" className="h-7 gap-1 text-xs" onClick={addEtapa}>
+                    <Plus className="w-3 h-3" /> Adicionar Etapa
+                  </Button>
+                </div>
+                {candidaturas.etapas.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">Sem etapas configuradas.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {candidaturas.etapas.map(et => (
+                      <div key={et.id} className="grid grid-cols-[1fr_130px_130px_32px] gap-2 items-center">
+                        <Input value={et.nome} onChange={e => updEtapa(et.id, { nome: e.target.value })} placeholder="Nome da etapa" className="h-8 text-xs" />
+                        <Input type="date" value={et.inicio} onChange={e => updEtapa(et.id, { inicio: e.target.value })} className="h-8 text-xs" />
+                        <Input type="date" value={et.fim} onChange={e => updEtapa(et.id, { fim: e.target.value })} className="h-8 text-xs" />
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                          onClick={() => { if (confirm(`Remover etapa "${et.nome}"?`)) rmEtapa(et.id); }}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </section>
