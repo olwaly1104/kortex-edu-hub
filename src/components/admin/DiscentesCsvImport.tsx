@@ -535,10 +535,6 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                           </Select>
                         </td>
                         <td className="px-1 py-1">
-                          <Input value={r.turma} onChange={(e) => setCell(r._key, { turma: e.target.value.toUpperCase().slice(0, 2) })}
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
-                        </td>
-                        <td className="px-1 py-1">
                           <Select value={r.regime || "normal"} onValueChange={(v) => setCell(r._key, { regime: v as any })}>
                             <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue /></SelectTrigger>
                             <SelectContent>
