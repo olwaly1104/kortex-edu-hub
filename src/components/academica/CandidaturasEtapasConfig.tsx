@@ -152,7 +152,9 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   }, [etapas, sessoes]);
 
   return (
-    <div className="space-y-4">
+    <fieldset disabled={readOnly} className="space-y-4 disabled:opacity-100">
+      <div className="space-y-4">
+
       {/* ETAPAS */}
       <div>
         <div className="flex items-center justify-between mb-2">
