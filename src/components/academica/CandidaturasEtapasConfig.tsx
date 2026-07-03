@@ -36,7 +36,6 @@ type Sessao = {
 };
 
 type EstadoDef = { key: string; label: string; color: string };
-type CategoriaDef = { id: string; nome: string; color: string };
 
 const DEFAULT_ESTADOS: EstadoDef[] = [
   { key: "agendado", label: "Agendado", color: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -47,48 +46,38 @@ const DEFAULT_ESTADOS: EstadoDef[] = [
 ];
 const DEFAULT_ESTADO_KEYS = new Set(DEFAULT_ESTADOS.map(e => e.key));
 
-const DEFAULT_CATEGORIAS: CategoriaDef[] = [
-  { id: "c-nova",   nome: "Nova",         color: "bg-blue-50 text-blue-700 border-blue-200" },
-  { id: "c-anali",  nome: "Em Análise",   color: "bg-amber-50 text-amber-700 border-amber-200" },
-  { id: "c-aprov",  nome: "Aprovada",     color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
-  { id: "c-repro",  nome: "Reprovada",    color: "bg-red-50 text-red-700 border-red-200" },
+const PALETTE: { name: string; color: string }[] = [
+  { name: "Azul",    color: "bg-blue-50 text-blue-700 border-blue-200" },
+  { name: "Verde",   color: "bg-green-50 text-green-700 border-green-200" },
+  { name: "Âmbar",   color: "bg-amber-50 text-amber-700 border-amber-200" },
+  { name: "Esmeralda", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+  { name: "Vermelho", color: "bg-red-50 text-red-700 border-red-200" },
+  { name: "Violeta", color: "bg-violet-50 text-violet-700 border-violet-200" },
+  { name: "Céu",     color: "bg-sky-50 text-sky-700 border-sky-200" },
+  { name: "Rosa",    color: "bg-rose-50 text-rose-700 border-rose-200" },
+  { name: "Cinza",   color: "bg-slate-100 text-slate-700 border-slate-200" },
 ];
+const nextColor = (i: number) => PALETTE[i % PALETTE.length].color;
 
-const PALETTE = [
-  "bg-blue-50 text-blue-700 border-blue-200",
-  "bg-green-50 text-green-700 border-green-200",
-  "bg-amber-50 text-amber-700 border-amber-200",
-  "bg-emerald-50 text-emerald-700 border-emerald-200",
-  "bg-red-50 text-red-700 border-red-200",
-  "bg-violet-50 text-violet-700 border-violet-200",
-  "bg-sky-50 text-sky-700 border-sky-200",
-  "bg-rose-50 text-rose-700 border-rose-200",
-  "bg-slate-100 text-slate-700 border-slate-200",
-];
-const nextColor = (i: number) => PALETTE[i % PALETTE.length];
+const ESTADOS_KEY = "upra:cand-estados-v2";
 
-const ESTADOS_KEY = "upra:cand-estados-custom";
-const CATEGORIAS_KEY = "upra:cand-categorias";
-
-function loadCustomEstados(): EstadoDef[] {
-  if (typeof window === "undefined") return [];
-  try { return JSON.parse(localStorage.getItem(ESTADOS_KEY) || "[]"); } catch { return []; }
+function loadEstados(): EstadoDef[] {
+  if (typeof window === "undefined") return DEFAULT_ESTADOS;
+  try {
+    const raw = localStorage.getItem(ESTADOS_KEY);
+    if (!raw) return DEFAULT_ESTADOS;
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr) || arr.length === 0) return DEFAULT_ESTADOS;
+    // ensure all default keys still exist
+    const keys = new Set(arr.map((e: EstadoDef) => e.key));
+    const missing = DEFAULT_ESTADOS.filter(d => !keys.has(d.key));
+    return [...arr, ...missing];
+  } catch { return DEFAULT_ESTADOS; }
 }
-function saveCustomEstados(v: EstadoDef[]) {
+function saveEstados(v: EstadoDef[]) {
   try { localStorage.setItem(ESTADOS_KEY, JSON.stringify(v)); } catch {}
 }
-function loadCategorias(): CategoriaDef[] {
-  if (typeof window === "undefined") return DEFAULT_CATEGORIAS;
-  try {
-    const raw = localStorage.getItem(CATEGORIAS_KEY);
-    if (!raw) return DEFAULT_CATEGORIAS;
-    const arr = JSON.parse(raw);
-    return Array.isArray(arr) && arr.length ? arr : DEFAULT_CATEGORIAS;
-  } catch { return DEFAULT_CATEGORIAS; }
-}
-function saveCategorias(v: CategoriaDef[]) {
-  try { localStorage.setItem(CATEGORIAS_KEY, JSON.stringify(v)); } catch {}
-}
+
 
 
 const DEFAULT_ETAPAS = [
