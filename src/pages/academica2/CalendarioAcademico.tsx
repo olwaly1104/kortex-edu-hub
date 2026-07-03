@@ -343,7 +343,7 @@ export default function CalendarioAcademico() {
         out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.data_fim, ordem });
       } else if (s.mode === "dia" && s.datas[0]) {
         out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.datas[0], ordem });
-      } else if (s.mode === "dias") {
+      } else if (s.mode === "dias" && s.datas.length > 0) {
         s.datas.forEach((d, i) => out.push({ id: `__ses_${s.id}_${i}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: d, fim: d, ordem }));
       }
     });
