@@ -126,6 +126,8 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   };
 
   const close = () => { resetAll(); onOpenChange(false); };
+  const backToUpload = () => { setStage("upload"); };
+  const openPreview = () => { setStage("preview"); };
 
   /* resolve faculdade/curso from free-text using sigla/code/name */
   const resolveFaculdade = (raw: string) => {
