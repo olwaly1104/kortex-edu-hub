@@ -574,8 +574,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
             </div>
           </>
         )}
-      </DialogContent>
-    </Dialog>
+    </div>
   );
 }
 
