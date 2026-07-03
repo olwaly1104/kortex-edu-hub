@@ -30,7 +30,7 @@ type Evento = {
 };
 
 const TIPO_META: Record<EventoTipo, { label: string; color: string; dot: string; ring: string; icon: typeof BookOpen }> = {
-  semestre: { label: "Semestre", color: "bg-primary text-primary-foreground",  dot: "bg-primary",     ring: "border-l-primary",     icon: BookOpen },
+  
   exames:   { label: "Exames",   color: "bg-amber-500 text-white",             dot: "bg-amber-500",   ring: "border-l-amber-500",   icon: FileSignature },
   ferias:   { label: "Férias",   color: "bg-sky-500 text-white",               dot: "bg-sky-500",     ring: "border-l-sky-500",     icon: Sun },
   feriado:  { label: "Feriado",  color: "bg-rose-500 text-white",              dot: "bg-rose-500",    ring: "border-l-rose-500",    icon: Star },
