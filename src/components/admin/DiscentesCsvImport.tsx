@@ -581,7 +581,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                           <Select value={r.faculdade_id} onValueChange={(v) => setCell(r._key, { faculdade_id: v, curso_id: "" })}>
                             <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
                             <SelectContent>
-                              {faculdades.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.sigla || f.name}</SelectItem>)}
+                              {faculdades.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
                             </SelectContent>
                           </Select>
                         </td>
