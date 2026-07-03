@@ -14,6 +14,7 @@ type Body = {
   password?: string;
   name?: string;
   modulo?: string;
+  estudante?: Record<string, unknown>;
 };
 
 const ALLOWED_ROLES = new Set([
