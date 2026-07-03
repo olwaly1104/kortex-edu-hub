@@ -90,13 +90,9 @@ export default function CandidaturasPage({ readOnly = false }: { readOnly?: bool
             <Input type="number" min={0} value={cfg.taxa} disabled={readOnly} readOnly={readOnly}
               onChange={e => update({ taxa: e.target.value === "" ? "" : Number(e.target.value) })} className="h-9" />
           </div>
-          <div>
-            <label className="text-[11px] text-muted-foreground mb-1 block">Vagas totais</label>
-            <Input type="number" min={0} value={cfg.vagas} disabled={readOnly} readOnly={readOnly}
-              onChange={e => update({ vagas: e.target.value === "" ? "" : Number(e.target.value) })} className="h-9" />
-          </div>
         </div>
       </Card>
+
 
       {/* Estados + Etapas + Sessões (shared, wired to real DB) */}
       <Card className="p-5">
