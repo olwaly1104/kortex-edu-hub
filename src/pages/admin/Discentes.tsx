@@ -530,7 +530,8 @@ export default function AdminDiscentes() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
           {/* Header */}
-          <div className="px-6 pt-6 pb-5 border-b bg-gradient-to-br from-primary/5 via-background to-background">
+          <div className="px-6 pt-6 pb-5 border-b bg-gradient-to-br from-primary/5 via-background to-background space-y-3">
+            <ModeToggle mode="manual" onSwitchToCsv={() => { setOpen(false); setCsvOpen(true); }} />
             <DialogHeader className="space-y-2">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
