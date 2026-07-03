@@ -31,6 +31,7 @@ export type DocenteRow = {
   contacto: string;
   faculdade: string;
   departamento?: string;
+  curso?: string;
   categoria: string;
   cargo: string;
   nascimento?: string;
@@ -96,6 +97,7 @@ const docenteToDb = (r: DocenteRow, owner: string) => ({
   contacto: r.contacto || null,
   faculdade: r.faculdade || null,
   departamento: r.departamento || null,
+  curso: r.curso || null,
   categoria: r.categoria || null,
   cargo: r.cargo || null,
   nascimento: r.nascimento || null,
@@ -125,6 +127,7 @@ const docenteFromDb = (r: any): DocenteRow => ({
   contacto: r.contacto || "",
   faculdade: r.faculdade || "",
   departamento: r.departamento || "",
+  curso: r.curso || "",
   categoria: r.categoria || "",
   cargo: r.cargo || "",
   nascimento: r.nascimento || "",

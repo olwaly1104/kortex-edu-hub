@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,34 +7,26 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft, Mail, MessageCircle, Users, Phone, MapPin, UserCheck, Calendar,
-  GraduationCap, FileText, Building2, IdCard, Award, BookOpen, Briefcase, Eye, Download,
+  GraduationCap, FileText, Building2, IdCard, Award, BookOpen, Briefcase, Eye, Download, Pencil,
 } from "lucide-react";
-import { loadDocentes } from "@/lib/peopleStorage";
+import { loadDocentes, saveDocentes, type DocenteRow } from "@/lib/peopleStorage";
+import { useAuth } from "@/contexts/AuthContext";
 import { ModuleTag } from "@/components/chat/ModuleTag";
-import { supabase } from "@/integrations/supabase/client";
+import { DocenteFormDialog } from "@/components/admin/DocenteFormDialog";
 import DocenteDocPreview from "./DocenteDocPreview";
 
 export default function AdminDocenteProfile() {
   const { docenteId } = useParams();
   const navigate = useNavigate();
-  const rows = useMemo(() => loadDocentes(), []);
+  const { user } = useAuth();
+  const [rowsVersion, setRowsVersion] = useState(0);
+  const rows = useMemo(() => loadDocentes(), [rowsVersion]);
   const docente = useMemo(() => rows.find((r) => r.id === docenteId), [rows, docenteId]);
   const [docOpen, setDocOpen] = useState(false);
-  const [cadeiras, setCadeiras] = useState<string[]>([]);
+  const [editOpen, setEditOpen] = useState(false);
 
-  const fullNameLookup = docente ? `${docente.primeiroNome} ${docente.ultimoNome}`.trim() : "";
-  useEffect(() => {
-    if (!docente) return;
-    (async () => {
-      const { data } = await (supabase.from("cadeiras" as any) as any)
-        .select("name, docente")
-        .order("ano", { ascending: true });
-      const mine = (data ?? []).filter((c: any) =>
-        (c.docente || "").trim().toLowerCase() === fullNameLookup.toLowerCase()
-      );
-      setCadeiras(mine.map((c: any) => c.name));
-    })();
-  }, [docente?.id, fullNameLookup]);
+  const canEdit = user?.role === "admin" || user?.email?.toLowerCase() === docente?.email?.toLowerCase();
+
 
 
   if (!docente) {
@@ -58,10 +50,15 @@ export default function AdminDocenteProfile() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 -ml-2">
           <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
+        {canEdit && (
+          <Button size="sm" variant="outline" onClick={() => setEditOpen(true)} className="gap-1.5 h-8">
+            <Pencil className="w-3.5 h-3.5" /> Editar
+          </Button>
+        )}
       </div>
 
       {/* Identity header */}
@@ -107,6 +104,11 @@ export default function AdminDocenteProfile() {
                   {docente.departamento && (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[11px] font-semibold border border-blue-200">
                       <Briefcase className="w-3 h-3" /> {docente.departamento}
+                    </span>
+                  )}
+                  {docente.curso && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-200">
+                      <BookOpen className="w-3 h-3" /> {docente.curso}
                     </span>
                   )}
                 </div>
@@ -173,25 +175,11 @@ export default function AdminDocenteProfile() {
 
             <SectionCard title="Afiliação Institucional" icon={<GraduationCap className="w-4 h-4" />}>
               <InfoRow label="Faculdade" value={docente.faculdade || "—"} icon={<Building2 className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Curso" value={docente.curso || "—"} icon={<BookOpen className="w-4 h-4 text-primary" />} />
               <InfoRow label="Departamento" value={docente.departamento || "—"} icon={<Briefcase className="w-4 h-4 text-primary" />} />
               <InfoRow label="Cargo" value={docente.cargo || "—"} icon={<Users className="w-4 h-4 text-primary" />} />
               <InfoRow label="Contrato" value={docente.contrato || "—"} icon={<FileText className="w-4 h-4 text-primary" />} />
               <InfoRow label="ID do Docente" value={docente.id} icon={<IdCard className="w-4 h-4 text-primary" />} />
-              <div className="px-5 py-3 flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <BookOpen className="w-4 h-4 text-primary" />
-                  </div>
-                  <p className="text-sm text-muted-foreground truncate">Cadeiras</p>
-                </div>
-                <div className="flex flex-wrap gap-1.5 justify-end max-w-[65%]">
-                  {cadeiras.length ? cadeiras.map((c) => (
-                    <span key={c} className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-semibold border border-primary/20">
-                      {c}
-                    </span>
-                  )) : <span className="text-sm font-semibold text-foreground">—</span>}
-                </div>
-              </div>
             </SectionCard>
           </div>
         </TabsContent>
@@ -228,6 +216,21 @@ export default function AdminDocenteProfile() {
           <DocenteDocPreview docente={docente} displayId={displayId} />
         </DialogContent>
       </Dialog>
+
+      {canEdit && (
+        <DocenteFormDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          initial={docente}
+          onSave={(updated: DocenteRow) => {
+            const all = loadDocentes();
+            const next = all.map((r) => (r.id === docente.id ? { ...updated, id: docente.id } : r));
+            saveDocentes(next);
+            setEditOpen(false);
+            setRowsVersion((v) => v + 1);
+          }}
+        />
+      )}
     </div>
   );
 }
