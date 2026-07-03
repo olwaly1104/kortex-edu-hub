@@ -130,6 +130,10 @@ export default function DocenteDocPreview({ docente: d, displayId }: Props) {
                     <span className="font-semibold text-neutral-900 text-[10.5px]">{d.faculdade || "—"}</span>
                   </div>
                   <div>
+                    <p className="text-[8.5px] uppercase tracking-[0.18em] text-neutral-500 font-semibold mb-0.5">Curso</p>
+                    <span className="font-semibold text-neutral-900 text-[10.5px]">{d.curso || "—"}</span>
+                  </div>
+                  <div>
                     <p className="text-[8.5px] uppercase tracking-[0.18em] text-neutral-500 font-semibold mb-0.5">Departamento</p>
                     <span className="font-semibold text-neutral-900 text-[10.5px]">{d.departamento || "—"}</span>
                   </div>
@@ -137,10 +141,7 @@ export default function DocenteDocPreview({ docente: d, displayId }: Props) {
                     <p className="text-[8.5px] uppercase tracking-[0.18em] text-neutral-500 font-semibold mb-0.5">Cargo</p>
                     <span className="font-semibold text-neutral-900 text-[10.5px]">{d.cargo || "—"}</span>
                   </div>
-                  <div>
-                    <p className="text-[8.5px] uppercase tracking-[0.18em] text-neutral-500 font-semibold mb-0.5">Módulo</p>
-                    <span className="uppercase tracking-[0.14em] font-bold text-neutral-900 text-[10.5px]">{moduloLabel(d.moduloKortex)}</span>
-                  </div>
+
                 </div>
               </div>
 
