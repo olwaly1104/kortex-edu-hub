@@ -20,6 +20,22 @@ export default function AdminDocenteProfile() {
   const rows = useMemo(() => loadDocentes(), []);
   const docente = useMemo(() => rows.find((r) => r.id === docenteId), [rows, docenteId]);
   const [docOpen, setDocOpen] = useState(false);
+  const [cadeiras, setCadeiras] = useState<string[]>([]);
+
+  const fullNameLookup = docente ? `${docente.primeiroNome} ${docente.ultimoNome}`.trim() : "";
+  useEffect(() => {
+    if (!docente) return;
+    (async () => {
+      const { data } = await (supabase.from("cadeiras" as any) as any)
+        .select("name, docente")
+        .order("ano", { ascending: true });
+      const mine = (data ?? []).filter((c: any) =>
+        (c.docente || "").trim().toLowerCase() === fullNameLookup.toLowerCase()
+      );
+      setCadeiras(mine.map((c: any) => c.name));
+    })();
+  }, [docente?.id, fullNameLookup]);
+
 
   if (!docente) {
     return (
