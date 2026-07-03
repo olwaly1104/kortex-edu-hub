@@ -50,10 +50,15 @@ export default function AdminDocenteProfile() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 -ml-2">
           <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
+        {canEdit && (
+          <Button size="sm" variant="outline" onClick={() => setEditOpen(true)} className="gap-1.5 h-8">
+            <Pencil className="w-3.5 h-3.5" /> Editar
+          </Button>
+        )}
       </div>
 
       {/* Identity header */}
