@@ -73,11 +73,12 @@ const buildAuto = (startISO: string, endISO: string): Evento[] => {
   const year = start.getFullYear();
   const nextYear = end.getFullYear();
   return [
-    { id: "s1",  tipo: "semestre", titulo: "1º Semestre — Aulas",        inicio: fmt(addDays(start, 14)), fim: fmt(addDays(start, 14 + 16 * 7)) },
+    { id: "s1",  tipo: "especial", titulo: "1º Semestre — Aulas",        inicio: fmt(addDays(start, 14)), fim: fmt(addDays(start, 14 + 16 * 7)) },
     { id: "e1",  tipo: "exames",   titulo: "Exames — 1ª Época (1º Semestre)", inicio: fmt(addDays(start, 14 + 16 * 7 + 7)), fim: fmt(addDays(start, 14 + 16 * 7 + 21)), epoca: "1", semestre: "1" },
     { id: "e1b", tipo: "exames",   titulo: "Exames — 2ª Época (1º Semestre)", inicio: fmt(addDays(start, 14 + 16 * 7 + 28)), fim: fmt(addDays(start, 14 + 16 * 7 + 42)), epoca: "2", semestre: "1" },
     { id: "h1",  tipo: "ferias",   titulo: "Férias de Inverno",          inicio: `${year}-12-22`,         fim: `${nextYear}-01-05` },
-    { id: "s2",  tipo: "semestre", titulo: "2º Semestre — Aulas",        inicio: fmt(half),               fim: fmt(addDays(half, 16 * 7)) },
+    { id: "s2",  tipo: "especial", titulo: "2º Semestre — Aulas",        inicio: fmt(half),               fim: fmt(addDays(half, 16 * 7)) },
+
     { id: "e2",  tipo: "exames",   titulo: "Exames — 1ª Época (2º Semestre)", inicio: fmt(addDays(half, 16 * 7 + 7)),  fim: fmt(addDays(half, 16 * 7 + 21)), epoca: "1", semestre: "2" },
     { id: "e2b", tipo: "exames",   titulo: "Exames — 2ª Época (2º Semestre)", inicio: fmt(addDays(half, 16 * 7 + 28)), fim: fmt(addDays(half, 16 * 7 + 42)), epoca: "2", semestre: "2" },
     { id: "esp", tipo: "exames",   titulo: "Exames — Época Especial",    inicio: `${nextYear}-09-15`,     fim: `${nextYear}-09-26`, epoca: "especial", semestre: null },
