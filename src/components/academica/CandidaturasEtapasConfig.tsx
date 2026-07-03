@@ -442,11 +442,30 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                     </td>
                     <td className="px-2 py-2">
                       {sessao.mode === "periodo" ? (
-                        <div className="flex items-center gap-1">
-                          <Input type="date" className="h-8 text-xs" value={sessao.datas[0] || ""} onChange={e => updSessao(sessao.id, { datas: [e.target.value] })} />
-                          <span className="text-muted-foreground">→</span>
-                          <Input type="date" className="h-8 text-xs" value={sessao.data_fim || ""} onChange={e => updSessao(sessao.id, { data_fim: e.target.value })} />
-                        </div>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
+                              {sessao.datas[0] && sessao.data_fim
+                                ? `${sessao.datas[0]} → ${sessao.data_fim}`
+                                : sessao.datas[0]
+                                  ? `${sessao.datas[0]} → …`
+                                  : <span className="text-muted-foreground">Escolher período</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+                            <Calendar mode="range"
+                              selected={{
+                                from: sessao.datas[0] ? new Date(sessao.datas[0]) : undefined,
+                                to: sessao.data_fim ? new Date(sessao.data_fim) : undefined,
+                              }}
+                              onSelect={(r: any) => updSessao(sessao.id, {
+                                datas: r?.from ? [r.from.toISOString().slice(0, 10)] : [],
+                                data_fim: r?.to ? r.to.toISOString().slice(0, 10) : null,
+                              })}
+                              numberOfMonths={2}
+                              className="p-3 pointer-events-auto" />
+                          </PopoverContent>
+                        </Popover>
                       ) : sessao.mode === "dia" ? (
                         <Popover>
                           <PopoverTrigger asChild>
