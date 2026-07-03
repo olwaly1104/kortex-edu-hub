@@ -300,11 +300,8 @@ export default function CalendarioAcademico() {
     toast.success(`${TIPO_META[tipo].label} adicionado`);
   };
 
-  const filtered = useMemo(() =>
-    (filter === "all" ? displayEventos : displayEventos.filter(e => e.tipo === filter))
-      .slice().sort((a, b) => a.inicio.localeCompare(b.inicio)),
-    [displayEventos, filter]
-  );
+
+
 
 
   const counts = useMemo(() => {
