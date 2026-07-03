@@ -153,17 +153,70 @@ export default function CalendarioAcademico() {
     return () => { cancel = true; };
   }, [anoLetivo]);
 
-  // Candidaturas configuration (application windows) — window + vagas only; etapas live in DB below.
-  type CandCfg = { inicio: string; fim: string; vagas: number; taxa: number };
-  const [candidaturas, setCandidaturas] = useState<CandCfg>(
-    () => {
-      const y = initial.inicio.slice(0, 4);
-      const defaults: CandCfg = { inicio: `${y}-05-01`, fim: `${y}-08-15`, vagas: 200, taxa: 15000 };
-      const loaded = loadJSON<CandCfg>(CAND_KEY, defaults);
-      return { ...defaults, ...loaded };
+  // Candidaturas window (backend-backed, per ano_letivo)
+  type CandCfg = { inicio: string; fim: string };
+  const [candidaturas, setCandidaturas] = useState<CandCfg>(() => {
+    const y = initial.inicio.slice(0, 4);
+    return { inicio: `${y}-05-01`, fim: `${y}-08-15` };
+  });
+  const [candJanelaId, setCandJanelaId] = useState<string | null>(null);
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  useEffect(() => { supabase.auth.getUser().then(({ data }) => setAuthUserId(data.user?.id ?? null)); }, []);
+
+  // Load janela for current ano letivo
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      const { data } = await (supabase.from as any)("candidaturas_janela")
+        .select("id, inicio, fim").eq("ano_letivo", anoLetivo).maybeSingle();
+      if (cancel) return;
+      if (data) {
+        setCandJanelaId(data.id);
+        setCandidaturas({ inicio: data.inicio, fim: data.fim });
+      } else {
+        setCandJanelaId(null);
+        const y = rangeFromAno(anoLetivo).inicio.slice(0, 4);
+        setCandidaturas({ inicio: `${y}-05-01`, fim: `${y}-08-15` });
+      }
+    })();
+    return () => { cancel = true; };
+  }, [anoLetivo]);
+
+  const saveJanela = async (patch: Partial<CandCfg>) => {
+    const next = { ...candidaturas, ...patch };
+    setCandidaturas(next);
+    if (!authUserId) return;
+    if (candJanelaId) {
+      await (supabase.from as any)("candidaturas_janela").update({ inicio: next.inicio, fim: next.fim }).eq("id", candJanelaId);
+    } else {
+      const { data } = await (supabase.from as any)("candidaturas_janela")
+        .insert({ owner_user_id: authUserId, ano_letivo: anoLetivo, inicio: next.inicio, fim: next.fim })
+        .select("id").single();
+      if (data?.id) setCandJanelaId(data.id);
     }
-  );
-  useEffect(() => { try { localStorage.setItem(CAND_KEY, JSON.stringify(candidaturas)); } catch {} }, [candidaturas]);
+  };
+
+  // Load all scheduled sessões (with etapa name) for preview + read-only list
+  type SessaoRow = { id: string; etapa_id: string; mode: string | null; datas: string[]; data_fim: string | null; hora: string | null; horas: string[]; local: string | null };
+  type EtapaRow = { id: string; nome: string };
+  const [sessoesAgendadas, setSessoesAgendadas] = useState<SessaoRow[]>([]);
+  const [etapasMap, setEtapasMap] = useState<Record<string, string>>({});
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      const [{ data: se }, { data: et }] = await Promise.all([
+        supabase.from("candidaturas_sessoes").select("id,etapa_id,mode,datas,data_fim,hora,horas,local"),
+        supabase.from("candidaturas_etapas").select("id,nome"),
+      ]);
+      if (cancel) return;
+      setSessoesAgendadas(((se ?? []) as any[]).map(r => ({ ...r, datas: r.datas ?? [], horas: r.horas ?? [] })) as SessaoRow[]);
+      const map: Record<string, string> = {};
+      ((et ?? []) as EtapaRow[]).forEach(e => { map[e.id] = e.nome; });
+      setEtapasMap(map);
+    })();
+    return () => { cancel = true; };
+  }, [anoLetivo]);
+
 
   // Turnos configuration
   const [turnos, setTurnos] = useState<Turno[]>(() => loadJSON(TURNOS_KEY, DEFAULT_TURNOS));
