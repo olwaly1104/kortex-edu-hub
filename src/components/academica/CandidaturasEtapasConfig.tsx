@@ -133,7 +133,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     if (!s.error) setSessoes(((s.data ?? []) as any[]).map(r => ({ ...r, mode: r.mode ?? "" })) as Sessao[]);
     setLoading(false);
   };
-  useEffect(() => { load(); }, [user?.id]);
+  useEffect(() => { load(); }, [authUserId]);
 
 
   // Auto-create sessão row for every etapa with agenda=true
