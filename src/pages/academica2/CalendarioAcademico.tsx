@@ -649,6 +649,10 @@ export default function CalendarioAcademico() {
           )}
         </div>
       </Card>
+        </TabsContent>
+      </Tabs>
+
+
 
       <div className="flex justify-end gap-2 pt-4">
         <Button variant="outline" asChild><Link to="/areaacademica/criador/turmas">Voltar</Link></Button>
