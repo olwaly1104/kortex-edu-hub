@@ -334,7 +334,7 @@ export default function AdminDiscentes() {
         nome,
         email: previewEmail,
         ano: draft.ano,
-        turma: draft.turma,
+        turma: draft.turma || "A",
         primeiro_nome: draft.primeiroNome.trim(),
         ultimo_nome: draft.ultimoNome.trim() || null,
         nascimento: draft.nascimento || null,
