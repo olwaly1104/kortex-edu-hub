@@ -69,9 +69,12 @@ export default function CriarTurmas() {
 
   const createMut = useMutation({
     mutationFn: async (row: { curso_id: string; ano: string; letra: string }) => {
+      const { data: authData } = await supabase.auth.getUser();
+      const authId = authData?.user?.id;
+      if (!authId) throw new Error("Sessão expirada. Volte a iniciar sessão.");
       const { error } = await supabase.from("turmas").insert({
         ...row,
-        owner_user_id: user?.id!,
+        owner_user_id: authId,
         capacidade: 32,
         turno: "Manhã",
       });
