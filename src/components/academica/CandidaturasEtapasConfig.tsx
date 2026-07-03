@@ -152,11 +152,11 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
       }
       load();
     })();
-  }, [etapas, sessoes, loading, user?.id]);
+  }, [etapas, sessoes, loading, authUserId]);
 
   const addEtapa = async () => {
     const { data, error } = await supabase.from("candidaturas_etapas").insert({
-      nome: "", ordem: etapas.length, owner_user_id: user?.id,
+      nome: "", ordem: etapas.length, owner_user_id: authUserId,
       agenda: false, obrigatoria: false, estados_possiveis: [],
     }).select("*").single();
     if (error) { toast.error(error.message); return; }
