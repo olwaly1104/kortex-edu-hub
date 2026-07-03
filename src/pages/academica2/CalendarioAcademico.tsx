@@ -271,7 +271,10 @@ export default function CalendarioAcademico() {
   const displayEventos = useMemo<Evento[]>(() => [
     { id: "__inicio_ano", tipo: "especial", titulo: "Início do Ano Letivo", inicio, fim: inicio },
     { id: "__fim_ano",    tipo: "especial", titulo: "Fim do Ano Letivo",    inicio: fim, fim },
-    ...semestres.map(s => ({ id: `__sem_${s.id}`, tipo: "semestre" as EventoTipo, titulo: s.nome, inicio: s.inicio, fim: s.fim })),
+    ...semestres.flatMap(s => [
+      { id: `__sem_${s.id}_ini`, tipo: "semestre" as EventoTipo, titulo: `Início do ${s.nome}`, inicio: s.inicio, fim: s.inicio },
+      { id: `__sem_${s.id}_fim`, tipo: "semestre" as EventoTipo, titulo: `Fim do ${s.nome}`, inicio: s.fim, fim: s.fim },
+    ]),
     { id: "__cand", tipo: "especial", titulo: "Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.fim },
     ...eventos,
   ], [eventos, inicio, fim, semestres, candidaturas]);
