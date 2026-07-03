@@ -76,18 +76,18 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
       supabase.from("candidaturas_sessoes").select("*"),
     ]);
     let etapasRows = (e.error ? [] : (e.data ?? [])) as Etapa[];
-    // Seed defaults (same as GAP) if empty
-    if (!e.error && etapasRows.length === 0 && user?.id) {
-      const defaults = [
-        { nome: "Submissão da candidatura", ordem: 0, agenda: false, obrigatoria: true, estados_possiveis: ["completo"] },
-        { nome: "Entrevista",               ordem: 1, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "completo", "remarcado"] },
-        { nome: "Curso Preparatório",       ordem: 2, agenda: true,  obrigatoria: false, estados_possiveis: ["agendado", "completo", "remarcado"] },
-        { nome: "Exame de Acesso",          ordem: 3, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
-      ].map(d => ({ ...d, owner_user_id: user.id }));
-      const ins = await supabase.from("candidaturas_etapas").insert(defaults).select("*");
-      if (!ins.error) etapasRows = (ins.data ?? []) as Etapa[];
+    // Ensure all protected defaults exist (seed missing ones)
+    if (!e.error && user?.id) {
+      const existing = new Set(etapasRows.map(r => (r.nome || "").trim().toLowerCase()));
+      const missing = DEFAULT_ETAPAS.filter(d => !existing.has(d.nome.toLowerCase()))
+        .map(d => ({ ...d, owner_user_id: user.id }));
+      if (missing.length) {
+        const ins = await supabase.from("candidaturas_etapas").insert(missing).select("*");
+        if (!ins.error) etapasRows = [...etapasRows, ...((ins.data ?? []) as Etapa[])].sort((a, b) => a.ordem - b.ordem);
+      }
     }
     setEtapas(etapasRows);
+
     if (!s.error) setSessoes(((s.data ?? []) as any[]).map(r => ({ ...r, mode: r.mode ?? "" })) as Sessao[]);
     setLoading(false);
   };
