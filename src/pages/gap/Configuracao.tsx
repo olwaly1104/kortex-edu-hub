@@ -288,6 +288,25 @@ export default function GapConfiguracao() {
   const [cdMaxOpcoes, setCdMaxOpcoes] = useState<number | "">("");
   const [cdPeriodoInicio, setCdPeriodoInicio] = useState("");
   const [cdPeriodoFim, setCdPeriodoFim] = useState("");
+  // Read Candidaturas config shared with Área Académica
+  useEffect(() => {
+    const readCfg = () => {
+      try {
+        const raw = localStorage.getItem("upra:candidaturas-cfg");
+        if (!raw) return;
+        const c = JSON.parse(raw);
+        setCdPeriodoInicio(c.inicio || "");
+        setCdPeriodoFim(c.fim || "");
+        setCdMaxOpcoes(typeof c.vagas === "number" ? c.vagas : "");
+        setCdTaxa(typeof c.taxa === "number" ? c.taxa : "");
+      } catch {}
+    };
+    readCfg();
+    const onStorage = (e: StorageEvent) => { if (e.key === "upra:candidaturas-cfg") readCfg(); };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
 
   const [cdEstadoOpen, setCdEstadoOpen] = useState(false);
   const [cdEtapaOpen, setCdEtapaOpen] = useState(false);
