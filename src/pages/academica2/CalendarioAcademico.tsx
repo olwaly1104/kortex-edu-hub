@@ -306,7 +306,7 @@ export default function CalendarioAcademico() {
 
 
   const counts = useMemo(() => {
-    const c: Record<EventoTipo, number> = { semestre: 0, exames: 0, ferias: 0, feriado: 0, especial: 0 };
+    const c: Record<EventoTipo, number> = { exames: 0, ferias: 0, feriado: 0, especial: 0 };
     eventos.forEach(e => { c[e.tipo]++; });
     return c;
   }, [eventos]);
