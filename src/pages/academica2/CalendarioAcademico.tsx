@@ -401,13 +401,11 @@ export default function CalendarioAcademico() {
           </section>
         </div>
       </Card>
+        </TabsContent>
 
-
-
-
-
-
+        <TabsContent value="calendario" className="space-y-6 mt-4">
       {/* KPIs */}
+
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         {(Object.keys(TIPO_META) as EventoTipo[]).map(t => {
           const M = TIPO_META[t]; const Icon = M.icon;
