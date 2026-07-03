@@ -1,11 +1,10 @@
 import { useMemo, useRef, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Upload, FileSpreadsheet, Download, X, Check, AlertCircle,
+  Upload, FileSpreadsheet, X, Check, AlertCircle,
   Trash2, Loader2, Sparkles, ArrowRight, UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
