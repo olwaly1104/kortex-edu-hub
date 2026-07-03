@@ -562,11 +562,12 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                         title={bad ? `Falta: ${errs.join(", ")}` : ""}
                       >
                         <td className="px-3 py-1.5">
-                          <Checkbox checked={r._selected} onCheckedChange={(v) => setCell(r._key, { _selected: !!v })} />
-                        </td>
-                        <td className="px-2 py-1.5 text-muted-foreground tabular-nums">
-                          {bad ? <AlertCircle className="w-3.5 h-3.5 text-amber-600 inline-block mr-0.5" /> : <Check className="w-3.5 h-3.5 text-emerald-600 inline-block mr-0.5" />}
-                          {idx + 1}
+                          <div className="flex items-center gap-1.5">
+                            <Checkbox checked={r._selected} onCheckedChange={(v) => setCell(r._key, { _selected: !!v })} />
+                            {bad
+                              ? <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                              : <Check className="w-3.5 h-3.5 text-emerald-600" />}
+                          </div>
                         </td>
                         <td className="px-1 py-1">
                           <Input value={r.primeiro_nome} onChange={(e) => setCell(r._key, { primeiro_nome: e.target.value })}
