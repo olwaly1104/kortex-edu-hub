@@ -571,3 +571,28 @@ function StatChip({ label, value, color }: { label: string; value: number; color
     </span>
   );
 }
+
+export function ModeToggle({
+  mode,
+  onSwitchToManual,
+  onSwitchToCsv,
+}: {
+  mode: "manual" | "csv";
+  onSwitchToManual?: () => void;
+  onSwitchToCsv?: () => void;
+}) {
+  const btn = (active: boolean) =>
+    `flex-1 h-8 inline-flex items-center justify-center gap-1.5 text-[11.5px] font-semibold rounded-md transition-colors ${
+      active ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+    }`;
+  return (
+    <div className="inline-flex items-center gap-1 p-1 rounded-lg bg-muted border w-full max-w-[320px]">
+      <button type="button" className={btn(mode === "manual")} onClick={onSwitchToManual}>
+        <UserPlus className="w-3.5 h-3.5" /> Manual
+      </button>
+      <button type="button" className={btn(mode === "csv")} onClick={onSwitchToCsv}>
+        <FileSpreadsheet className="w-3.5 h-3.5" /> Importar CSV
+      </button>
+    </div>
+  );
+}
