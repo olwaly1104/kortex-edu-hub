@@ -30,6 +30,7 @@ type Sessao = {
   datas: string[];
   data_fim: string | null;
   hora: string | null;
+  horas: string[];
   local: string | null;
   responsavel_id: string | null;
   capacidade: number | null;
