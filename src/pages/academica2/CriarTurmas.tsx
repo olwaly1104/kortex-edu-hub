@@ -72,6 +72,7 @@ export default function CriarTurmas() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const salasOpts = useSalasDisponiveis();
+  const turnosOpts = useTurnosConfig();
 
 
   const { data: faculdades = [] } = useQuery({
