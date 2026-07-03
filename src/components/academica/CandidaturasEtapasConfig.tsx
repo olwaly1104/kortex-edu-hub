@@ -145,7 +145,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
       for (const et of need) {
         await supabase.from("candidaturas_sessoes").insert({
           etapa_id: et.id,
-          owner_user_id: user?.id,
+          owner_user_id: authUserId,
           mode: "",
           datas: [],
         });
