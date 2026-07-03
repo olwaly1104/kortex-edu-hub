@@ -45,6 +45,16 @@ const ESTADOS_DISPONIVEIS = [
 
 const estadoMeta = (k: string) => ESTADOS_DISPONIVEIS.find(e => e.key === k) ?? { key: k, label: k, color: "bg-muted text-foreground border-border" };
 
+const DEFAULT_ETAPAS = [
+  { nome: "Submissão da candidatura", ordem: 0, agenda: false, obrigatoria: true, estados_possiveis: ["completo"] },
+  { nome: "Entrevista",               ordem: 1, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "completo", "remarcado"] },
+  { nome: "Curso Preparatório",       ordem: 2, agenda: true,  obrigatoria: false, estados_possiveis: ["agendado", "completo", "remarcado"] },
+  { nome: "Exame de Acesso",          ordem: 3, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
+];
+const PROTECTED_NAMES = new Set(DEFAULT_ETAPAS.map(d => d.nome.toLowerCase()));
+const isProtected = (nome: string) => PROTECTED_NAMES.has((nome || "").trim().toLowerCase());
+
+
 export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnly?: boolean }) {
   const { user } = useAuth();
   const [etapas, setEtapas] = useState<Etapa[]>([]);
