@@ -65,11 +65,24 @@ export default function CandidaturasEtapasConfig() {
       supabase.from("candidaturas_etapas").select("*").order("ordem"),
       supabase.from("candidaturas_sessoes").select("*"),
     ]);
-    if (!e.error) setEtapas((e.data ?? []) as Etapa[]);
+    let etapasRows = (e.error ? [] : (e.data ?? [])) as Etapa[];
+    // Seed defaults (same as GAP) if empty
+    if (!e.error && etapasRows.length === 0 && user?.id) {
+      const defaults = [
+        { nome: "Submissão da candidatura", ordem: 0, agenda: false, obrigatoria: true, estados_possiveis: ["completo"] },
+        { nome: "Entrevista",               ordem: 1, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "completo", "remarcado"] },
+        { nome: "Curso Preparatório",       ordem: 2, agenda: true,  obrigatoria: false, estados_possiveis: ["agendado", "completo", "remarcado"] },
+        { nome: "Exame de Acesso",          ordem: 3, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
+      ].map(d => ({ ...d, owner_user_id: user.id }));
+      const ins = await supabase.from("candidaturas_etapas").insert(defaults).select("*");
+      if (!ins.error) etapasRows = (ins.data ?? []) as Etapa[];
+    }
+    setEtapas(etapasRows);
     if (!s.error) setSessoes(((s.data ?? []) as any[]).map(r => ({ ...r, mode: r.mode ?? "" })) as Sessao[]);
     setLoading(false);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [user?.id]);
+
 
   // Auto-create sessão row for every etapa with agenda=true
   useEffect(() => {
