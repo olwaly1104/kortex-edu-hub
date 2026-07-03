@@ -254,7 +254,9 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                   </td>
 
                 </tr>
-              ))}
+                );
+              })}
+
             </tbody>
           </table>
         </div>
