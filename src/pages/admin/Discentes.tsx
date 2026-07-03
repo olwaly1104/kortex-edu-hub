@@ -12,7 +12,7 @@ import {
   GraduationCap, Plus, Trash2, Users, BookOpen, Layers, Loader2,
   Camera, Upload, FileText, IdCard, Check, X, Search, Pencil, FileSpreadsheet,
 } from "lucide-react";
-import { DiscentesCsvImport } from "@/components/admin/DiscentesCsvImport";
+import { DiscentesCsvImport, ModeToggle } from "@/components/admin/DiscentesCsvImport";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
