@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 type EventoTipo = "semestre" | "exames" | "ferias" | "feriado" | "especial";
 type Epoca = "1" | "2" | "especial";
@@ -126,6 +127,30 @@ export default function CalendarioAcademico() {
   const [planView, setPlanView] = useState<"cards" | "mensal">("cards");
   const [monthCursor, setMonthCursor] = useState(() => { const d = new Date(initial.inicio); return new Date(d.getFullYear(), d.getMonth(), 1); });
 
+  // Load eventos from backend for the current ano letivo
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from("ano_letivo_eventos")
+        .select("id, tipo, titulo, inicio, fim, epoca, semestre")
+        .eq("ano_letivo", anoLetivo)
+        .order("inicio", { ascending: true });
+      if (cancel) return;
+      if (error) { console.error(error); return; }
+      setEventos((data ?? []).map(r => ({
+        id: r.id,
+        tipo: r.tipo as EventoTipo,
+        titulo: r.titulo,
+        inicio: r.inicio,
+        fim: r.fim,
+        epoca: (r.epoca ?? undefined) as Epoca | undefined,
+        semestre: (r.semestre ?? null) as Semestre | null,
+      })));
+    })();
+    return () => { cancel = true; };
+  }, [anoLetivo]);
+
   // Candidaturas configuration (application windows)
   const [candidaturas, setCandidaturas] = useState<{ inicio: string; fim: string; vagas: number; taxa: number }>(
     () => loadJSON(CAND_KEY, { inicio: `${initial.inicio.slice(0,4)}-05-01`, fim: `${initial.inicio.slice(0,4)}-08-15`, vagas: 200, taxa: 15000 })
@@ -154,13 +179,15 @@ export default function CalendarioAcademico() {
     const r = rangeFromAno(v);
     setInicio(r.inicio);
     setFim(r.fim);
-    setEventos([]);
     const d = new Date(r.inicio);
     setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
   };
 
 
-  const regenerate = () => {
+  const regenerate = async () => {
+    if (!confirm("Remover todos os eventos deste ano letivo?")) return;
+    const { error } = await supabase.from("ano_letivo_eventos").delete().eq("ano_letivo", anoLetivo);
+    if (error) { toast.error("Erro ao limpar"); return; }
     setEventos([]);
     toast.success("Calendário limpo");
   };
@@ -170,29 +197,45 @@ export default function CalendarioAcademico() {
     toast.success("Calendário académico confirmado");
   };
 
-  const update = (id: string, patch: Partial<Evento>) =>
-    setEventos(prev => prev.map(e => {
-      if (e.id !== id) return e;
-      const next = { ...e, ...patch };
-      if ("tipo" in patch && next.tipo === "exames") {
-        next.epoca ??= "1";
-        next.semestre ??= "1";
-        next.titulo = buildExameTitulo(next.epoca, next.semestre);
-      }
-      if (next.tipo === "exames" && ("epoca" in patch || "semestre" in patch)) {
-        next.titulo = buildExameTitulo(next.epoca, next.semestre);
-      }
-      return next;
-    }));
-  const remove = (id: string) => setEventos(prev => prev.filter(e => e.id !== id));
-  const add = (tipo: EventoTipo) => {
-    const base: Evento = { id: `n-${Date.now()}`, tipo, titulo: `Novo ${TIPO_META[tipo].label}`, inicio, fim: inicio };
+  const update = async (id: string, patch: Partial<Evento>) => {
+    const current = eventos.find(e => e.id === id);
+    if (!current) return;
+    const next = { ...current, ...patch };
+    if ("tipo" in patch && next.tipo === "exames") {
+      next.epoca ??= "1";
+      next.semestre ??= "1";
+      next.titulo = buildExameTitulo(next.epoca, next.semestre);
+    }
+    if (next.tipo === "exames" && ("epoca" in patch || "semestre" in patch)) {
+      next.titulo = buildExameTitulo(next.epoca, next.semestre);
+    }
+    setEventos(prev => prev.map(e => e.id === id ? next : e));
+    const { error } = await supabase.from("ano_letivo_eventos").update({
+      tipo: next.tipo, titulo: next.titulo, inicio: next.inicio, fim: next.fim,
+      epoca: next.epoca ?? null, semestre: next.semestre ?? null,
+    }).eq("id", id);
+    if (error) toast.error("Erro a guardar");
+  };
+  const remove = async (id: string) => {
+    setEventos(prev => prev.filter(e => e.id !== id));
+    const { error } = await supabase.from("ano_letivo_eventos").delete().eq("id", id);
+    if (error) toast.error("Erro ao remover");
+  };
+  const add = async (tipo: EventoTipo) => {
+    if (!user?.id) { toast.error("Sessão inválida"); return; }
+    const base = { tipo, titulo: `Novo ${TIPO_META[tipo].label}`, inicio, fim: inicio } as Evento;
     if (tipo === "exames") {
-      base.epoca = "1";
-      base.semestre = "1";
+      base.epoca = "1"; base.semestre = "1";
       base.titulo = buildExameTitulo(base.epoca, base.semestre);
     }
-    setEventos(prev => [...prev, base]);
+    const { data, error } = await supabase.from("ano_letivo_eventos").insert({
+      owner_user_id: user.id,
+      ano_letivo: anoLetivo,
+      tipo: base.tipo, titulo: base.titulo, inicio: base.inicio, fim: base.fim,
+      epoca: base.epoca ?? null, semestre: base.semestre ?? null,
+    }).select("id").single();
+    if (error || !data) { toast.error("Erro ao adicionar"); return; }
+    setEventos(prev => [...prev, { ...base, id: data.id }]);
     toast.success(`${TIPO_META[tipo].label} adicionado`);
   };
 
@@ -228,8 +271,10 @@ export default function CalendarioAcademico() {
   const displayEventos = useMemo<Evento[]>(() => [
     { id: "__inicio_ano", tipo: "especial", titulo: "Início do Ano Letivo", inicio, fim: inicio },
     { id: "__fim_ano",    tipo: "especial", titulo: "Fim do Ano Letivo",    inicio: fim, fim },
+    ...semestres.map(s => ({ id: `__sem_${s.id}`, tipo: "semestre" as EventoTipo, titulo: s.nome, inicio: s.inicio, fim: s.fim })),
+    { id: "__cand", tipo: "especial", titulo: "Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.fim },
     ...eventos,
-  ], [eventos, inicio, fim]);
+  ], [eventos, inicio, fim, semestres, candidaturas]);
 
   const eventsByMonth = useMemo(() => {
     const map: Record<string, Evento[]> = {};
