@@ -437,36 +437,42 @@ export default function CalendarioAcademico() {
         </div>
       </Card>
 
-      {/* ============ CANDIDATURAS ============ */}
-      {/* Parâmetros gerais — período de candidaturas */}
-      <Card className="p-5">
-        <div className="flex items-center justify-between mb-4">
+      {/* ============ CANDIDATURAS (parâmetros + etapas + sessões) ============ */}
+      <Card className="overflow-hidden">
+        <div className="px-5 py-4 border-b bg-muted/30">
           <div className="flex items-center gap-2">
-            <Settings2 className="w-4 h-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold text-foreground">Parâmetros gerais</h2>
+            <FileSignature className="w-4 h-4 text-primary" />
+            <p className="text-sm font-semibold">Candidaturas</p>
           </div>
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Candidaturas</span>
+          <p className="text-[11px] text-muted-foreground mt-0.5">Janela de candidaturas, vagas, etapas do processo e sessões agendadas</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Início das candidaturas</label>
-            <Input type="date" value={candidaturas.inicio} onChange={e => setCandidaturas(c => ({ ...c, inicio: e.target.value }))} />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Fim das candidaturas</label>
-            <Input type="date" value={candidaturas.fim} onChange={e => setCandidaturas(c => ({ ...c, fim: e.target.value }))} />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Vagas totais</label>
-            <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} />
-          </div>
+        <div className="divide-y">
+          <section className="px-5 py-4 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 items-start">
+            <div>
+              <p className="text-xs font-medium flex items-center gap-1.5"><Settings2 className="w-3.5 h-3.5 text-primary" /> Parâmetros gerais</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">Janela e vagas totais</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="text-[11px] text-muted-foreground mb-1 block">Início das candidaturas</label>
+                <Input type="date" value={candidaturas.inicio} onChange={e => setCandidaturas(c => ({ ...c, inicio: e.target.value }))} className="h-9" />
+              </div>
+              <div>
+                <label className="text-[11px] text-muted-foreground mb-1 block">Fim das candidaturas</label>
+                <Input type="date" value={candidaturas.fim} onChange={e => setCandidaturas(c => ({ ...c, fim: e.target.value }))} className="h-9" />
+              </div>
+              <div>
+                <label className="text-[11px] text-muted-foreground mb-1 block">Vagas totais</label>
+                <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} className="h-9" />
+              </div>
+            </div>
+          </section>
+          <section className="px-5 py-4">
+            <CandidaturasEtapasConfig />
+          </section>
         </div>
       </Card>
 
-      {/* Etapas + Sessões Agendadas (real DB, mesmo modelo do GAP) */}
-      <Card className="p-5">
-        <CandidaturasEtapasConfig />
-      </Card>
 
         </TabsContent>
 
