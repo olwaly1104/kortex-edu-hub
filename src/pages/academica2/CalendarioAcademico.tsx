@@ -121,7 +121,7 @@ export default function CalendarioAcademico() {
   const initial = rangeFromAno("2025/2026");
   const [inicio, setInicio] = useState(initial.inicio);
   const [fim, setFim] = useState(initial.fim);
-  const [eventos, setEventos] = useState<Evento[]>(() => buildAuto(initial.inicio, initial.fim));
+  const [eventos, setEventos] = useState<Evento[]>([]);
   const [filter, setFilter] = useState<EventoTipo | "all">("all");
   const [planView, setPlanView] = useState<"cards" | "mensal">("cards");
   const [monthCursor, setMonthCursor] = useState(() => { const d = new Date(initial.inicio); return new Date(d.getFullYear(), d.getMonth(), 1); });
