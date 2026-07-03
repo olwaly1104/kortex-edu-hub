@@ -408,6 +408,39 @@ export type Database = {
         }
         Relationships: []
       }
+      candidaturas_janela: {
+        Row: {
+          ano_letivo: string
+          created_at: string
+          fim: string
+          id: string
+          inicio: string
+          institution_id: string | null
+          owner_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          ano_letivo: string
+          created_at?: string
+          fim: string
+          id?: string
+          inicio: string
+          institution_id?: string | null
+          owner_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          ano_letivo?: string
+          created_at?: string
+          fim?: string
+          id?: string
+          inicio?: string
+          institution_id?: string | null
+          owner_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       candidaturas_sessoes: {
         Row: {
           capacidade: number | null
