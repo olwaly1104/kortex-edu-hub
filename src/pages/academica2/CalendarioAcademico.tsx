@@ -97,6 +97,18 @@ const DEFAULT_TURNOS: Turno[] = [
 
 const TURNOS_KEY = "upra:turnos-cfg";
 const CAND_KEY = "upra:candidaturas-cfg";
+const SEMESTRES_KEY = "upra:semestres-cfg";
+
+type SemestreCfg = { id: string; nome: string; inicio: string; fim: string };
+const buildDefaultSemestres = (inicioAno: string, fimAno: string): SemestreCfg[] => {
+  const s = new Date(inicioAno); const e = new Date(fimAno);
+  const half = new Date(s.getTime() + (e.getTime() - s.getTime()) / 2);
+  return [
+    { id: "sem-1", nome: "1º Semestre", inicio: fmt(s), fim: fmt(addDays(half, -1)) },
+    { id: "sem-2", nome: "2º Semestre", inicio: fmt(half), fim: fmt(e) },
+  ];
+};
+
 
 function loadJSON<T>(key: string, fallback: T): T {
   try { const r = localStorage.getItem(key); return r ? (JSON.parse(r) as T) : fallback; } catch { return fallback; }
