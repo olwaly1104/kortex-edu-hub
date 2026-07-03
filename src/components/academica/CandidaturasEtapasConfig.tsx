@@ -172,7 +172,21 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
       <div className="space-y-4">
 
       {/* ETAPAS */}
+      {/* ESTADOS POSSÍVEIS (referência global) */}
       <div>
+        <div className="mb-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estados possíveis</p>
+          <p className="text-[11px] text-muted-foreground">Vocabulário de estados que cada etapa pode assumir.</p>
+        </div>
+        <div className="rounded-lg border p-3 flex flex-wrap gap-1.5">
+          {ESTADOS_DISPONIVEIS.map(e => (
+            <Badge key={e.key} variant="outline" className={cn("text-[11px]", e.color)}>{e.label}</Badge>
+          ))}
+        </div>
+      </div>
+
+      <div>
+
         <div className="flex items-center justify-between mb-2">
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Etapas do Processo</p>
