@@ -78,7 +78,6 @@ type Row = {
   faculdade_id: string;   // resolved id
   curso_id: string;       // resolved id
   ano: string;
-  turma: string;
   nascimento: string;
   genero: "M" | "F" | "Outro" | "";
   regime: "normal" | "bolseiro" | "";
@@ -93,11 +92,11 @@ const emptyRow = (): Row => ({
   _key: Math.random().toString(36).slice(2),
   _selected: true,
   primeiro_nome: "", ultimo_nome: "", faculdade_id: "", curso_id: "",
-  ano: "", turma: "A", nascimento: "", genero: "", regime: "",
+  ano: "", nascimento: "", genero: "", regime: "",
   telemovel: "", bilhete: "", provincia: "", municipio: "", endereco: "",
 });
 
-const RECOGNIZED_COLS = ["nome","faculdade","curso","ano","turma","genero","regime","telemovel","bilhete","nascimento","provincia","municipio","endereco"];
+const RECOGNIZED_COLS = ["nome","faculdade","curso","ano","genero","regime","telemovel","bilhete","nascimento","provincia","municipio","endereco"];
 
 /* ---------------- component ---------------- */
 
