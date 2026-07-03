@@ -37,23 +37,23 @@ export default function AreaAcademica() {
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-4">
       <OnboardingStepBanner />
       <Tabs value={tab} onValueChange={onChange} className="space-y-4">
-        <TabsList className="grid grid-cols-6 w-full max-w-4xl">
-          <TabsTrigger value="faculdades" className="gap-1.5">
+        <TabsList className="inline-flex h-auto flex-wrap w-full lg:w-auto gap-1 p-1">
+          <TabsTrigger value="faculdades" className="gap-1.5 whitespace-nowrap">
             <Building2 className="w-3.5 h-3.5" /> Faculdades & Cursos
           </TabsTrigger>
-          <TabsTrigger value="cadeiras" className="gap-1.5">
+          <TabsTrigger value="cadeiras" className="gap-1.5 whitespace-nowrap">
             <BookOpen className="w-3.5 h-3.5" /> Cadeiras
           </TabsTrigger>
-          <TabsTrigger value="calendario" className="gap-1.5">
+          <TabsTrigger value="calendario" className="gap-1.5 whitespace-nowrap">
             <CalendarDays className="w-3.5 h-3.5" /> Ano lectivo & Calendário
           </TabsTrigger>
-          <TabsTrigger value="candidaturas" className="gap-1.5">
+          <TabsTrigger value="candidaturas" className="gap-1.5 whitespace-nowrap">
             <FileSignature className="w-3.5 h-3.5" /> Candidaturas
           </TabsTrigger>
-          <TabsTrigger value="turmas" className="gap-1.5">
+          <TabsTrigger value="turmas" className="gap-1.5 whitespace-nowrap">
             <Users className="w-3.5 h-3.5" /> Turmas
           </TabsTrigger>
-          <TabsTrigger value="criterio" className="gap-1.5">
+          <TabsTrigger value="criterio" className="gap-1.5 whitespace-nowrap">
             <Award className="w-3.5 h-3.5" /> Critério Académico
           </TabsTrigger>
         </TabsList>
