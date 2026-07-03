@@ -225,19 +225,88 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     <fieldset disabled={readOnly} className="space-y-4 disabled:opacity-100">
       <div className="space-y-4">
 
-      {/* ETAPAS */}
-      {/* ESTADOS POSSÍVEIS (referência global) */}
+      {/* ESTADOS POSSÍVEIS (editável) */}
       <div>
-        <div className="mb-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estados possíveis</p>
-          <p className="text-[11px] text-muted-foreground">Vocabulário de estados que cada etapa pode assumir.</p>
+        <div className="mb-2 flex items-end justify-between gap-2">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estados possíveis</p>
+            <p className="text-[11px] text-muted-foreground">Vocabulário de estados que cada etapa pode assumir.</p>
+          </div>
         </div>
-        <div className="rounded-lg border p-3 flex flex-wrap gap-1.5">
-          {ESTADOS_DISPONIVEIS.map(e => (
-            <Badge key={e.key} variant="outline" className={cn("text-[11px]", e.color)}>{e.label}</Badge>
-          ))}
+        <div className="rounded-lg border p-3 space-y-2">
+          <div className="flex flex-wrap gap-1.5">
+            {estadosAll.map(e => {
+              const isDefault = DEFAULT_ESTADO_KEYS.has(e.key);
+              return (
+                <span key={e.key} className={cn("inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px]", e.color)}>
+                  {isDefault || readOnly ? (
+                    <span>{e.label}</span>
+                  ) : (
+                    <input
+                      value={e.label}
+                      onChange={ev => renameEstado(e.key, ev.target.value)}
+                      className="bg-transparent border-0 outline-none w-[9ch] text-[11px]"
+                    />
+                  )}
+                  {!isDefault && !readOnly && (
+                    <button onClick={() => rmEstado(e.key)} className="hover:text-destructive"><Trash2 className="w-2.5 h-2.5" /></button>
+                  )}
+                </span>
+              );
+            })}
+          </div>
+          {!readOnly && (
+            <div className="flex items-center gap-2 pt-1">
+              <Input value={newEstado} onChange={e => setNewEstado(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addEstado(); } }}
+                placeholder="Novo estado (ex: Em revisão)" className="h-8 text-xs max-w-[240px]" />
+              <Button size="sm" variant="outline" className="h-8 gap-1 text-xs" onClick={addEstado}>
+                <Plus className="w-3 h-3" /> Adicionar Estado
+              </Button>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* CATEGORIAS DE CANDIDATURA */}
+      <div>
+        <div className="mb-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Categorias de candidatura</p>
+          <p className="text-[11px] text-muted-foreground">Classificação global de cada candidatura ao longo do processo.</p>
+        </div>
+        <div className="rounded-lg border p-3 space-y-2">
+          <div className="flex flex-wrap gap-1.5">
+            {categorias.map(c => (
+              <span key={c.id} className={cn("inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px]", c.color)}>
+                {readOnly ? (
+                  <span>{c.nome}</span>
+                ) : (
+                  <input
+                    value={c.nome}
+                    onChange={ev => renameCategoria(c.id, ev.target.value)}
+                    className="bg-transparent border-0 outline-none w-[10ch] text-[11px]"
+                  />
+                )}
+                {!readOnly && (
+                  <button onClick={() => rmCategoria(c.id)} className="hover:text-destructive"><Trash2 className="w-2.5 h-2.5" /></button>
+                )}
+              </span>
+            ))}
+            {categorias.length === 0 && <span className="text-[11px] text-muted-foreground italic">Sem categorias.</span>}
+          </div>
+          {!readOnly && (
+            <div className="flex items-center gap-2 pt-1">
+              <Input value={newCategoria} onChange={e => setNewCategoria(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addCategoria(); } }}
+                placeholder="Nova categoria (ex: Bolseiro)" className="h-8 text-xs max-w-[240px]" />
+              <Button size="sm" variant="outline" className="h-8 gap-1 text-xs" onClick={addCategoria}>
+                <Plus className="w-3 h-3" /> Adicionar Categoria
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
 
       <div>
 
