@@ -181,6 +181,7 @@ export default function AdminDocenteProfile() {
               <InfoRow label="Departamento" value={docente.departamento || "—"} icon={<Briefcase className="w-4 h-4 text-primary" />} />
               <InfoRow label="Cargo" value={docente.cargo || "—"} icon={<Users className="w-4 h-4 text-primary" />} />
               <InfoRow label="Contrato" value={docente.contrato || "—"} icon={<FileText className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Grau Académico" value={docente.grau || "—"} icon={<Award className="w-4 h-4 text-primary" />} />
               <InfoRow label="ID do Docente" value={docente.id} icon={<IdCard className="w-4 h-4 text-primary" />} />
             </SectionCard>
           </div>
