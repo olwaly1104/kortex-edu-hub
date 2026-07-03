@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 type EventoTipo = "semestre" | "exames" | "ferias" | "feriado" | "especial";
 type Epoca = "1" | "2" | "especial";
