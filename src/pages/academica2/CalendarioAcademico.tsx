@@ -342,7 +342,35 @@ export default function CalendarioAcademico() {
             </div>
           </section>
 
+          {/* Semestres */}
+          <section className="px-5 py-4 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 items-start">
+            <div>
+              <p className="text-xs font-medium flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5 text-primary" /> Semestres</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5">{semestres.length} configurado{semestres.length === 1 ? "" : "s"}</p>
+            </div>
+            <div className="space-y-2">
+              <div className="grid grid-cols-[1fr_140px_140px_36px] gap-2 items-center text-[10px] uppercase tracking-wide text-muted-foreground px-1">
+                <span>Nome</span><span>Início</span><span>Fim</span><span />
+              </div>
+              {semestres.map(s => (
+                <div key={s.id} className="grid grid-cols-[1fr_140px_140px_36px] gap-2 items-center">
+                  <Input value={s.nome} onChange={e => updSemestre(s.id, { nome: e.target.value })} placeholder="Nome do semestre" className="h-8 text-xs" />
+                  <Input type="date" value={s.inicio} onChange={e => updSemestre(s.id, { inicio: e.target.value })} className="h-8 text-xs" />
+                  <Input type="date" value={s.fim} onChange={e => updSemestre(s.id, { fim: e.target.value })} className="h-8 text-xs" />
+                  <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                    onClick={() => { if (confirm(`Remover "${s.nome}"?`)) rmSemestre(s.id); }}>
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              ))}
+              <Button size="sm" variant="outline" className="h-8 gap-1 mt-1" onClick={addSemestre}>
+                <Plus className="w-3.5 h-3.5" /> Adicionar Semestre
+              </Button>
+            </div>
+          </section>
+
           {/* Candidaturas */}
+
           <section className="px-5 py-4 grid grid-cols-1 md:grid-cols-[180px_1fr] gap-4 items-start">
             <div>
               <p className="text-xs font-medium flex items-center gap-1.5"><FileSignature className="w-3.5 h-3.5 text-primary" /> Candidaturas</p>
