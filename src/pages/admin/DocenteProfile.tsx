@@ -33,20 +33,14 @@ export default function AdminDocenteProfile() {
   const displayId = `DOC-${(docente.id || "00000000").slice(0, 8).toUpperCase()}`;
   const genero = docente.genero === "M" ? "Masculino" : docente.genero === "F" ? "Feminino" : (docente.genero || "—");
 
+  const isCoordenador = /coordenador/i.test(docente.cargo || "");
+
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center">
         <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 -ml-2">
           <ArrowLeft className="w-4 h-4" /> Voltar
         </Button>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" className="gap-1.5 h-8 text-xs" onClick={() => setDocOpen(true)}>
-            <Eye className="w-3.5 h-3.5" /> Ver documento
-          </Button>
-          <Button size="sm" className="gap-1.5 h-8 text-xs" onClick={() => setDocOpen(true)}>
-            <Download className="w-3.5 h-3.5" /> Descarregar
-          </Button>
-        </div>
       </div>
 
       {/* Identity header */}
@@ -59,7 +53,15 @@ export default function AdminDocenteProfile() {
               </div>
               <div className="leading-tight">
                 <p className="text-[10px] font-semibold text-foreground tabular-nums">{displayId}</p>
-                <p className="text-[9px] text-muted-foreground">Identificador interno</p>
+                <p className="text-[9px] text-muted-foreground">Gerado automaticamente</p>
+              </div>
+              <div className="flex items-center gap-1 ml-1">
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDocOpen(true)} title="Pré-visualizar">
+                  <Eye className="w-3.5 h-3.5" />
+                </Button>
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setDocOpen(true)} title="Descarregar">
+                  <Download className="w-3.5 h-3.5" />
+                </Button>
               </div>
             </div>
 
@@ -84,7 +86,13 @@ export default function AdminDocenteProfile() {
                       <Briefcase className="w-3 h-3" /> {docente.departamento}
                     </span>
                   )}
+                  {isCoordenador && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 text-[11px] font-semibold border border-amber-200">
+                      <Award className="w-3 h-3" /> Coordenador
+                    </span>
+                  )}
                 </div>
+
 
                 <div className="flex items-center gap-2 mt-4 flex-wrap">
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
@@ -112,10 +120,13 @@ export default function AdminDocenteProfile() {
               <p className="text-sm font-semibold mt-1.5">{docente.grau || "—"}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Experiência</p>
-              <p className="text-sm font-semibold tabular-nums mt-1.5">
-                {docente.anosExperiencia ? `${docente.anosExperiencia} anos` : "—"}
-              </p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Minha Presença</p>
+              <div className="mt-1.5 flex items-center gap-2">
+                <div className="flex-1 max-w-[120px] h-1.5 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full bg-emerald-500" style={{ width: "94%" }} />
+                </div>
+                <span className="text-xs font-semibold tabular-nums text-emerald-700">94%</span>
+              </div>
             </div>
           </div>
         </div>
