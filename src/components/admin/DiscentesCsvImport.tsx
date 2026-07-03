@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Upload, FileSpreadsheet, Download, X, Check, AlertCircle,
-  Trash2, Loader2, Sparkles, ArrowRight,
+  Trash2, Loader2, Sparkles, ArrowRight, UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useCursos, useFaculdades, useCreateEstudante } from "@/lib/useInstitution";
