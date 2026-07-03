@@ -37,7 +37,7 @@ export default function AreaAcademica() {
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-4">
       <OnboardingStepBanner />
       <Tabs value={tab} onValueChange={onChange} className="space-y-4">
-        <TabsList className="grid grid-cols-5 w-full max-w-3xl">
+        <TabsList className="grid grid-cols-6 w-full max-w-4xl">
           <TabsTrigger value="faculdades" className="gap-1.5">
             <Building2 className="w-3.5 h-3.5" /> Faculdades & Cursos
           </TabsTrigger>
@@ -46,6 +46,9 @@ export default function AreaAcademica() {
           </TabsTrigger>
           <TabsTrigger value="calendario" className="gap-1.5">
             <CalendarDays className="w-3.5 h-3.5" /> Ano lectivo & Calendário
+          </TabsTrigger>
+          <TabsTrigger value="candidaturas" className="gap-1.5">
+            <FileSignature className="w-3.5 h-3.5" /> Candidaturas
           </TabsTrigger>
           <TabsTrigger value="turmas" className="gap-1.5">
             <Users className="w-3.5 h-3.5" /> Turmas
@@ -65,6 +68,9 @@ export default function AreaAcademica() {
           <TabsContent value="calendario" className="mt-0">
             <CalendarioAcademico />
           </TabsContent>
+          <TabsContent value="candidaturas" className="mt-0">
+            <CandidaturasPage />
+          </TabsContent>
           <TabsContent value="turmas" className="mt-0">
             <CriarTurmas />
           </TabsContent>
@@ -73,6 +79,7 @@ export default function AreaAcademica() {
           </TabsContent>
         </SuppressOnboardingBanner>
       </Tabs>
+
     </div>
   );
 }
