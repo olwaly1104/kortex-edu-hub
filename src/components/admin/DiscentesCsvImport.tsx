@@ -101,9 +101,10 @@ type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   onImported?: () => void;
+  onSwitchToManual?: () => void;
 };
 
-export function DiscentesCsvImport({ open, onOpenChange, onImported }: Props) {
+export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToManual }: Props) {
   const { data: cursos = [] } = useCursos();
   const { data: faculdades = [] } = useFaculdades();
   const createMut = useCreateEstudante();
