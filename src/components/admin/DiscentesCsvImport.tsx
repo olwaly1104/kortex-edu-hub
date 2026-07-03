@@ -310,7 +310,8 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   return (
     <Dialog open={open} onOpenChange={(v) => (v ? onOpenChange(true) : close())}>
       <DialogContent className="max-w-6xl max-h-[92vh] overflow-hidden p-0 flex flex-col">
-        <div className="px-6 pt-5 pb-4 border-b bg-gradient-to-br from-primary/5 via-background to-background">
+        <div className="px-6 pt-5 pb-4 border-b bg-gradient-to-br from-primary/5 via-background to-background space-y-3">
+          {onSwitchToManual && <ModeToggle mode="csv" onSwitchToManual={onSwitchToManual} />}
           <DialogHeader className="space-y-1.5">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
