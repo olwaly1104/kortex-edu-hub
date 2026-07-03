@@ -454,8 +454,6 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                   {bulkAnos.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Input value={bulkTurma} onChange={(e) => setBulkTurma(e.target.value.toUpperCase().slice(0, 2))}
-                placeholder="Turma" className="h-8 text-xs w-[80px]" />
               <Button size="sm" onClick={applyBulk} className="h-8 gap-1 text-xs">
                 <ArrowRight className="w-3.5 h-3.5" /> Aplicar
               </Button>
