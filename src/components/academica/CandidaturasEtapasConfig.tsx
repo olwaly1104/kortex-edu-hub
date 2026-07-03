@@ -245,30 +245,74 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
             <p className="text-[11px] text-muted-foreground">Vocabulário de estados que cada etapa pode assumir.</p>
           </div>
         </div>
-        <div className="rounded-lg border p-3 space-y-2">
-          <div className="flex flex-wrap gap-1.5">
-            {estadosAll.map(e => {
-              const isDefault = DEFAULT_ESTADO_KEYS.has(e.key);
-              return (
-                <span key={e.key} className={cn("inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px]", e.color)}>
-                  {isDefault || readOnly ? (
-                    <span>{e.label}</span>
-                  ) : (
-                    <input
-                      value={e.label}
-                      onChange={ev => renameEstado(e.key, ev.target.value)}
-                      className="bg-transparent border-0 outline-none w-[9ch] text-[11px]"
-                    />
-                  )}
-                  {!isDefault && !readOnly && (
-                    <button onClick={() => rmEstado(e.key)} className="hover:text-destructive"><Trash2 className="w-2.5 h-2.5" /></button>
-                  )}
-                </span>
-              );
-            })}
-          </div>
+      {/* ESTADOS POSSÍVEIS (editável, com pré-visualização e cor) */}
+      <div>
+        <div className="mb-2">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Estados possíveis</p>
+          <p className="text-[11px] text-muted-foreground">Vocabulário de estados que cada etapa pode assumir. Edite nome e cor.</p>
+        </div>
+        <div className="rounded-lg border overflow-hidden">
+          <table className="w-full text-xs">
+            <thead className="bg-muted/40 text-[10px] uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left w-32">Pré-visualização</th>
+                <th className="px-3 py-2 text-left">Nome</th>
+                <th className="px-3 py-2 text-left w-40">Cor</th>
+                <th className="w-10"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {estadosAll.map(e => {
+                const isDefault = DEFAULT_ESTADO_KEYS.has(e.key);
+                return (
+                  <tr key={e.key} className="border-t align-middle">
+                    <td className="px-3 py-2">
+                      <Badge variant="outline" className={cn("text-[11px]", e.color)}>{e.label || "—"}</Badge>
+                    </td>
+                    <td className="px-3 py-2">
+                      <Input value={e.label} disabled={readOnly} readOnly={readOnly}
+                        onChange={ev => updEstado(e.key, { label: ev.target.value })}
+                        className="h-8 text-xs" />
+                    </td>
+                    <td className="px-3 py-2">
+                      <Popover>
+                        <PopoverTrigger asChild disabled={readOnly}>
+                          <button className="flex items-center gap-2 h-8 w-full rounded-md border px-2 hover:bg-muted/30 disabled:cursor-default">
+                            <span className={cn("inline-block w-4 h-4 rounded border", e.color)} />
+                            <span className="text-[11px] text-muted-foreground">
+                              {PALETTE.find(p => p.color === e.color)?.name ?? "Personalizada"}
+                            </span>
+                            {!readOnly && <ChevronDown className="w-3 h-3 ml-auto text-muted-foreground" />}
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent align="start" className="w-56 p-2 grid grid-cols-3 gap-1.5">
+                          {PALETTE.map(p => (
+                            <button key={p.color}
+                              onClick={() => updEstado(e.key, { color: p.color })}
+                              className={cn("flex flex-col items-center gap-1 rounded-md border p-1.5 hover:bg-muted/40", e.color === p.color && "ring-2 ring-primary")}>
+                              <span className={cn("inline-block w-full h-5 rounded", p.color)} />
+                              <span className="text-[10px] text-muted-foreground">{p.name}</span>
+                            </button>
+                          ))}
+                        </PopoverContent>
+                      </Popover>
+                    </td>
+                    <td className="px-2 py-2">
+                      {!readOnly && !isDefault && (
+                        <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                          onClick={() => rmEstado(e.key)}>
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                      {isDefault && <Badge variant="outline" className="text-[9px] uppercase tracking-wide">Predefinido</Badge>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
           {!readOnly && (
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex items-center gap-2 p-2 border-t bg-muted/20">
               <Input value={newEstado} onChange={e => setNewEstado(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addEstado(); } }}
                 placeholder="Novo estado (ex: Em revisão)" className="h-8 text-xs max-w-[240px]" />
@@ -280,50 +324,6 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
         </div>
       </div>
 
-      {/* CATEGORIAS DE CANDIDATURA */}
-      <div>
-        <div className="mb-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Categorias de candidatura</p>
-          <p className="text-[11px] text-muted-foreground">Classificação global de cada candidatura ao longo do processo.</p>
-        </div>
-        <div className="rounded-lg border p-3 space-y-2">
-          <div className="flex flex-wrap gap-1.5">
-            {categorias.map(c => (
-              <span key={c.id} className={cn("inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px]", c.color)}>
-                {readOnly ? (
-                  <span>{c.nome}</span>
-                ) : (
-                  <input
-                    value={c.nome}
-                    onChange={ev => renameCategoria(c.id, ev.target.value)}
-                    className="bg-transparent border-0 outline-none w-[10ch] text-[11px]"
-                  />
-                )}
-                {!readOnly && (
-                  <button onClick={() => rmCategoria(c.id)} className="hover:text-destructive"><Trash2 className="w-2.5 h-2.5" /></button>
-                )}
-              </span>
-            ))}
-            {categorias.length === 0 && <span className="text-[11px] text-muted-foreground italic">Sem categorias.</span>}
-          </div>
-          {!readOnly && (
-            <div className="flex items-center gap-2 pt-1">
-              <Input value={newCategoria} onChange={e => setNewCategoria(e.target.value)}
-                onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addCategoria(); } }}
-                placeholder="Nova categoria (ex: Bolseiro)" className="h-8 text-xs max-w-[240px]" />
-              <Button size="sm" variant="outline" className="h-8 gap-1 text-xs" onClick={addCategoria}>
-                <Plus className="w-3 h-3" /> Adicionar Categoria
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-
-
-      <div>
-
-        <div className="flex items-center justify-between mb-2">
-          <div>
             <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Etapas do Processo</p>
             <p className="text-[11px] text-muted-foreground">{etapas.length} etapa{etapas.length === 1 ? "" : "s"} · dados reais partilhados com GAP</p>
           </div>
