@@ -182,50 +182,30 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   };
 
 
-  const toggleEstado = (et: Etapa, key: string) => {
-    const has = et.estados_possiveis.includes(key);
-    const next = has ? et.estados_possiveis.filter(k => k !== key) : [...et.estados_possiveis, key];
-    updEtapa(et.id, { estados_possiveis: next });
-  };
-
   const addEstado = () => {
-    const label = newEstado.trim();
-    if (!label) return;
-    const key = label.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").slice(0, 32) || `estado-${Date.now()}`;
-    if (estadosAll.some(e => e.key === key)) { toast.error("Já existe um estado com esse nome."); return; }
-    const next = [...customEstados, { key, label, color: nextColor(estadosAll.length) }];
-    setCustomEstados(next); saveCustomEstados(next); setNewEstado("");
+    const label = newEstado.trim() || `Estado ${estadosAll.length + 1}`;
+    const base = label.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").slice(0, 32) || "estado";
+    let key = base;
+    let i = 1;
+    while (estadosAll.some(e => e.key === key)) { key = `${base}-${i++}`; }
+    const next = [...estadosAll, { key, label, color: nextColor(estadosAll.length) }];
+    setEstadosAll(next); saveEstados(next); setNewEstado("");
   };
   const rmEstado = (key: string) => {
     if (DEFAULT_ESTADO_KEYS.has(key)) { toast.error("Estado predefinido — não pode ser removido."); return; }
-    const next = customEstados.filter(e => e.key !== key);
-    setCustomEstados(next); saveCustomEstados(next);
+    const next = estadosAll.filter(e => e.key !== key);
+    setEstadosAll(next); saveEstados(next);
     etapas.forEach(et => {
       if (et.estados_possiveis.includes(key)) {
         updEtapa(et.id, { estados_possiveis: et.estados_possiveis.filter(k => k !== key) });
       }
     });
   };
-  const renameEstado = (key: string, label: string) => {
-    if (DEFAULT_ESTADO_KEYS.has(key)) return;
-    const next = customEstados.map(e => e.key === key ? { ...e, label } : e);
-    setCustomEstados(next); saveCustomEstados(next);
+  const updEstado = (key: string, patch: Partial<EstadoDef>) => {
+    const next = estadosAll.map(e => e.key === key ? { ...e, ...patch } : e);
+    setEstadosAll(next); saveEstados(next);
   };
 
-  const addCategoria = () => {
-    const nome = newCategoria.trim();
-    if (!nome) return;
-    const next = [...categorias, { id: `c-${Date.now()}`, nome, color: nextColor(categorias.length) }];
-    setCategorias(next); saveCategorias(next); setNewCategoria("");
-  };
-  const rmCategoria = (id: string) => {
-    const next = categorias.filter(c => c.id !== id);
-    setCategorias(next); saveCategorias(next);
-  };
-  const renameCategoria = (id: string, nome: string) => {
-    const next = categorias.map(c => c.id === id ? { ...c, nome } : c);
-    setCategorias(next); saveCategorias(next);
-  };
 
 
   const updSessao = async (id: string, patch: Partial<Sessao>) => {
