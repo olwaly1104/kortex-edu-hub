@@ -269,31 +269,35 @@ export default function CalendarioAcademico() {
       </Card>
 
       {/* Candidaturas */}
-      <Card className="p-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <FileSignature className="w-4 h-4 text-primary" />
-          <p className="text-sm font-semibold">Candidaturas — {anoLetivo}</p>
-          <span className="text-[11px] text-muted-foreground">Janela de inscrições, vagas e taxa</span>
+      <Card className="p-4 space-y-4">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
+            <FileSignature className="w-4 h-4 text-primary" />
+            <p className="text-sm font-semibold">Candidaturas — {anoLetivo}</p>
+          </div>
+          <span className="text-[11px] text-muted-foreground">Janela de inscrições e vagas totais</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-          <div>
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Abertura</p>
-            <Input type="date" value={candidaturas.inicio} onChange={e => setCandidaturas(c => ({ ...c, inicio: e.target.value }))} className="h-9" />
+
+        <div>
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Período de inscrição</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <p className="text-[11px] text-muted-foreground mb-1">Abertura</p>
+              <Input type="date" value={candidaturas.inicio} onChange={e => setCandidaturas(c => ({ ...c, inicio: e.target.value }))} className="h-9" />
+            </div>
+            <div>
+              <p className="text-[11px] text-muted-foreground mb-1">Encerramento</p>
+              <Input type="date" value={candidaturas.fim} onChange={e => setCandidaturas(c => ({ ...c, fim: e.target.value }))} className="h-9" />
+            </div>
           </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Encerramento</p>
-            <Input type="date" value={candidaturas.fim} onChange={e => setCandidaturas(c => ({ ...c, fim: e.target.value }))} className="h-9" />
-          </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Vagas totais</p>
-            <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} className="h-9" />
-          </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Taxa de candidatura (Kz)</p>
-            <Input type="number" min={0} value={candidaturas.taxa} onChange={e => setCandidaturas(c => ({ ...c, taxa: +e.target.value || 0 }))} className="h-9" />
-          </div>
+        </div>
+
+        <div className="max-w-xs">
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Vagas totais</p>
+          <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} className="h-9" />
         </div>
       </Card>
+
 
       {/* Turnos */}
       <Card className="p-4 space-y-3">
