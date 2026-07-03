@@ -271,8 +271,10 @@ export default function CalendarioAcademico() {
   const displayEventos = useMemo<Evento[]>(() => [
     { id: "__inicio_ano", tipo: "especial", titulo: "Início do Ano Letivo", inicio, fim: inicio },
     { id: "__fim_ano",    tipo: "especial", titulo: "Fim do Ano Letivo",    inicio: fim, fim },
+    ...semestres.map(s => ({ id: `__sem_${s.id}`, tipo: "semestre" as EventoTipo, titulo: s.nome, inicio: s.inicio, fim: s.fim })),
+    { id: "__cand", tipo: "especial", titulo: "Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.fim },
     ...eventos,
-  ], [eventos, inicio, fim]);
+  ], [eventos, inicio, fim, semestres, candidaturas]);
 
   const eventsByMonth = useMemo(() => {
     const map: Record<string, Evento[]> = {};
