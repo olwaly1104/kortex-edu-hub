@@ -877,10 +877,8 @@ export default function AdminDiscentes() {
                   toast.error("Selecione o ano.");
                   return;
                 }
-                if (!draft.turma) {
-                  toast.error("Selecione a turma.");
-                  return;
-                }
+                setConfirmOpen(true);
+                return;
                 setConfirmOpen(true);
               }}
               disabled={uploading || createMut.isPending}
