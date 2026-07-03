@@ -501,26 +501,26 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
               <p className="text-[11px] font-semibold text-foreground uppercase tracking-wide mr-1">
                 Aplicar em massa às selecionadas
               </p>
-              <Select value={bulkFac} onValueChange={setBulkFac}>
-                <SelectTrigger className="h-8 text-xs w-[140px]"><SelectValue placeholder="Faculdade" /></SelectTrigger>
+              <Select value={bulkFac} onValueChange={applyBulkFaculdade}>
+                <SelectTrigger className="h-8 text-xs w-[180px]"><SelectValue placeholder="Faculdade" /></SelectTrigger>
                 <SelectContent>
-                  {faculdades.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.sigla || f.name}</SelectItem>)}
+                  {faculdades.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Select value={bulkCurso} onValueChange={setBulkCurso} disabled={!bulkFac}>
-                <SelectTrigger className="h-8 text-xs w-[160px]"><SelectValue placeholder="Curso" /></SelectTrigger>
+              <Select value={bulkCurso} onValueChange={applyBulkCurso}>
+                <SelectTrigger className="h-8 text-xs w-[180px]"><SelectValue placeholder="Curso" /></SelectTrigger>
                 <SelectContent>
-                  {bulkCursos.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.code || c.name}</SelectItem>)}
+                  {bulkCursos.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name || c.code}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Select value={bulkAno} onValueChange={setBulkAno} disabled={!bulkCurso}>
+              <Select value={bulkAno} onValueChange={applyBulkAno}>
                 <SelectTrigger className="h-8 text-xs w-[90px]"><SelectValue placeholder="Ano" /></SelectTrigger>
                 <SelectContent>
                   {bulkAnos.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Button size="sm" onClick={applyBulk} className="h-8 gap-1 text-xs">
-                <ArrowRight className="w-3.5 h-3.5" /> Aplicar
+              <Button size="sm" onClick={confirmBulk} className="h-8 gap-1 text-xs" disabled={!bulkFac && !bulkCurso && !bulkAno}>
+                <Check className="w-3.5 h-3.5" /> Confirmar
               </Button>
               <div className="ml-auto flex items-center gap-2">
                 <Button size="sm" variant="ghost" onClick={() => toggleAll(true)} className="h-8 text-[11px]">Selecionar tudo</Button>
