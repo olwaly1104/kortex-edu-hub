@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, ChevronDown, CalendarClock, MapPin, Clock, Users } from "lucide-react";
+import { Plus, Trash2, ChevronDown, CalendarClock, MapPin, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { loadDocentes, syncDocentesFromDb, type DocenteRow } from "@/lib/peopleStorage";
@@ -77,12 +77,6 @@ const formatIsoLocal = (date: Date): string => {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
-};
-
-const isBeforeDay = (date: Date, minDate: Date) => {
-  const current = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-  const min = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate()).getTime();
-  return current < min;
 };
 
 function loadEstados(): EstadoDef[] {
@@ -438,12 +432,11 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                 <th className="px-2 py-2 text-left w-24"><Clock className="w-3 h-3 inline mr-1" />Hora</th>
                 <th className="px-2 py-2 text-left w-32"><MapPin className="w-3 h-3 inline mr-1" />Local</th>
                 <th className="px-2 py-2 text-left w-40">Responsável</th>
-                <th className="px-2 py-2 text-center w-20"><Users className="w-3 h-3 inline mr-1" />Cap.</th>
               </tr>
             </thead>
             <tbody>
               {sessoesAgendadas.length === 0 ? (
-                <tr><td colSpan={7} className="px-3 py-6 text-center text-muted-foreground italic">
+                <tr><td colSpan={6} className="px-3 py-6 text-center text-muted-foreground italic">
                   Sem etapas agendáveis. Ative "Agenda" numa etapa acima para criar uma sessão.
                 </td></tr>
               ) : sessoesAgendadas.map(({ etapa, sessao }) => {
@@ -470,64 +463,28 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                       </Select>
                     </td>
                     <td className="px-2 py-2">
-                      {sessao.mode === "periodo" ? (() => {
-                        const from = parseIsoLocal(sessao.datas[0]);
-                        const to = parseIsoLocal(sessao.data_fim);
-                        return (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 min-w-[260px]">
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
-                                  <span className="text-muted-foreground mr-1">De</span>
-                                  {sessao.datas[0] || "Escolher"}
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
-                                <Calendar
-                                  mode="single"
-                                  selected={from}
-                                  defaultMonth={from ?? to ?? new Date()}
-                                  onSelect={(date) => {
-                                    if (!date) {
-                                      updSessao(sessao.id, { datas: [], data_fim: null });
-                                      return;
-                                    }
-                                    const nextFrom = formatIsoLocal(date);
-                                    const nextTo = to && !isBeforeDay(to, date) ? sessao.data_fim : null;
-                                    updSessao(sessao.id, { datas: [nextFrom], data_fim: nextTo });
-                                  }}
-                                  className="p-3 pointer-events-auto"
-                                />
-                              </PopoverContent>
-                            </Popover>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
-                                  <span className="text-muted-foreground mr-1">Até</span>
-                                  {sessao.data_fim || "Escolher"}
-                                </Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
-                                <Calendar
-                                  mode="single"
-                                  selected={to}
-                                  defaultMonth={to ?? from ?? new Date()}
-                                  disabled={from ? (date) => isBeforeDay(date, from) : undefined}
-                                  onSelect={(date) => {
-                                    if (!date) {
-                                      updSessao(sessao.id, { data_fim: null });
-                                      return;
-                                    }
-                                    const nextTo = formatIsoLocal(date);
-                                    updSessao(sessao.id, { data_fim: nextTo, datas: sessao.datas[0] ? sessao.datas : [nextTo] });
-                                  }}
-                                  className="p-3 pointer-events-auto"
-                                />
-                              </PopoverContent>
-                            </Popover>
-                          </div>
-                        );
-                      })() : sessao.mode === "dia" ? (
+                      {sessao.mode === "periodo" ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 min-w-[260px]">
+                          <label className="space-y-1">
+                            <span className="text-[10px] font-medium text-muted-foreground">De</span>
+                            <Input
+                              type="date"
+                              className="h-8 text-xs"
+                              value={sessao.datas[0] || ""}
+                              onChange={e => updSessao(sessao.id, { datas: e.target.value ? [e.target.value] : [] })}
+                            />
+                          </label>
+                          <label className="space-y-1">
+                            <span className="text-[10px] font-medium text-muted-foreground">Até</span>
+                            <Input
+                              type="date"
+                              className="h-8 text-xs"
+                              value={sessao.data_fim || ""}
+                              onChange={e => updSessao(sessao.id, { data_fim: e.target.value || null })}
+                            />
+                          </label>
+                        </div>
+                      ) : sessao.mode === "dia" ? (
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
@@ -621,10 +578,6 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                           ))}
                         </SelectContent>
                       </Select>
-                    </td>
-                    <td className="px-2 py-2">
-                      <Input type="number" min={1} className="h-8 text-xs text-center" value={sessao.capacidade ?? ""}
-                        onChange={e => updSessao(sessao.id, { capacidade: e.target.value === "" ? null : Number(e.target.value) })} placeholder="—" />
                     </td>
                   </tr>
                 );
