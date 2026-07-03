@@ -422,7 +422,7 @@ export default function CalendarioAcademico() {
       <Card className="p-4 space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <p className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-primary" /> Plano do Ano — {anoLetivo}</p>
+            <p className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-primary" /> Pré-visualização do Ano — {anoLetivo}</p>
             <p className="text-[11px] text-muted-foreground mt-0.5">{months.length} meses · {eventos.length} eventos</p>
           </div>
           <div className="flex items-center gap-3">
