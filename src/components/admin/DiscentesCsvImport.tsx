@@ -449,13 +449,13 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     );
   }
 
-  return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col animate-fade-in">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] bg-background flex flex-col animate-fade-in">
       {/* Top bar */}
       <div className="px-6 py-3 border-b bg-gradient-to-br from-primary/5 via-background to-background flex items-center gap-4">
         <button
           type="button"
-          onClick={close}
+          onClick={backToUpload}
           className="h-8 px-2.5 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
         >
           <X className="w-3.5 h-3.5" /> Sair
