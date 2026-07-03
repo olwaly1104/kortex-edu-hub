@@ -1,120 +1,171 @@
 import { OnboardingStepBanner, markOnboardingStepDone, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { cursoTemplates, alocacaoCandidatos } from "@/data/academica2Data";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ArrowLeft, Check, Users, ChevronDown, ChevronRight, Building2, GraduationCap, Plus, Trash2, MapPin, ClipboardList, Layers, Wand2, Eye, Mail } from "lucide-react";
+import { ArrowLeft, Check, Users, ChevronDown, ChevronRight, Building2, GraduationCap, Plus, Trash2, MapPin, ClipboardList, Layers, Eye, Mail, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-type Turma = { id: string; letra: string; capacidade: number; sala: string; turno: "Manhã" | "Tarde" | "Noite" };
-type CursoTurmas = Record<number, Turma[]>; // year -> turmas
-
-const salasPool = ["Sala 101", "Sala 102", "Sala 203", "Sala 204", "Anfiteatro A", "Anfiteatro B", "Lab. Info 1", "Lab. Info 2", "Auditório"];
-const turnos: Turma["turno"][] = ["Manhã", "Tarde", "Noite"];
-const LETRAS = ["A", "B", "C", "D", "E"];
-
-const buildDefault = (years: number, estudantesEsperados: number): CursoTurmas => {
-  const out: CursoTurmas = {};
-  // year 1 receives most students (admission cohort); other years carry-over with 4 turmas
-  for (let y = 1; y <= years; y++) {
-    const total = y === 1 ? estudantesEsperados : Math.round(estudantesEsperados * 0.85);
-    const nTurmas = y === 1 ? Math.min(5, Math.max(2, Math.ceil(total / 32))) : 4;
-    const capacidade = Math.ceil(total / nTurmas);
-    out[y] = Array.from({ length: nTurmas }, (_, i) => ({
-      id: `t-${y}-${i}`,
-      letra: LETRAS[i],
-      capacidade,
-      sala: salasPool[(y + i) % salasPool.length],
-      turno: turnos[i % turnos.length],
-    }));
-  }
-  return out;
+type TurmaRow = {
+  id: string;
+  curso_id: string;
+  ano: string;
+  letra: string;
+  sala: string | null;
+  turno: string | null;
+  capacidade: number;
 };
 
-const FIRST_NAMES = ["João","Maria","Pedro","Ana","Carlos","Sofia","Tiago","Inês","Rui","Beatriz","André","Mariana","Bruno","Catarina","Diogo","Filipa","Gonçalo","Helena","Hugo","Joana","Luís","Margarida","Miguel","Núria","Paulo","Rita","Sérgio","Teresa","Vasco","Xavier","Yara","Zita"];
-const LAST_NAMES = ["Silva","Santos","Pereira","Costa","Ferreira","Almeida","Rodrigues","Martins","Carvalho","Oliveira","Lopes","Sousa","Marques","Gonçalves","Pinto","Ramos","Mendes","Castro","Antunes","Fonseca"];
-const hashStr = (s: string) => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); };
-const buildStudents = (seed: string, n: number) => Array.from({ length: n }, (_, i) => {
-  const h = hashStr(`${seed}-${i}`);
-  const fn = FIRST_NAMES[h % FIRST_NAMES.length];
-  const ln1 = LAST_NAMES[(h >> 3) % LAST_NAMES.length];
-  const ln2 = LAST_NAMES[(h >> 7) % LAST_NAMES.length];
-  const nome = `${fn} ${ln1} ${ln2}`;
-  const email = `${fn}.${ln1}`.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") + (i + 1) + "@upra.kor";
-  return { id: `${seed}-${i}`, nome, email, numero: 20000 + (h % 80000) };
-});
+const turnos = ["Manhã", "Tarde", "Noite"] as const;
+const LETRAS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
 export default function CriarTurmas() {
   const isOnboarding = useIsOnboardingStep();
   const { user } = useAuth();
-  const [data, setData] = useState<Record<string, CursoTurmas>>(() =>
-    Object.fromEntries(cursoTemplates.map(c => [c.id, buildDefault(c.years, c.estudantesEsperados)]))
+  const qc = useQueryClient();
+
+  const { data: faculdades = [] } = useQuery({
+    queryKey: ["faculdades-all"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("faculdades").select("id,name,sigla").order("name");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const { data: cursos = [] } = useQuery({
+    queryKey: ["cursos-all"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("cursos").select("id,name,code,years,faculdade_id").order("name");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const { data: turmas = [], isLoading: loadingTurmas } = useQuery({
+    queryKey: ["turmas-all"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("turmas").select("*").order("ano").order("letra");
+      if (error) throw error;
+      return (data ?? []) as TurmaRow[];
+    },
+  });
+
+  const { data: estudantes = [] } = useQuery({
+    queryKey: ["estudantes-all-lite"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("estudantes").select("id,nome,email,curso_id,ano,turma");
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const createMut = useMutation({
+    mutationFn: async (row: { curso_id: string; ano: string; letra: string }) => {
+      const { error } = await supabase.from("turmas").insert({
+        ...row,
+        owner_user_id: user?.id!,
+        capacidade: 32,
+        turno: "Manhã",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["turmas-all"] }),
+    onError: (e: any) => toast.error(e.message || "Erro ao criar turma"),
+  });
+
+  const updateMut = useMutation({
+    mutationFn: async ({ id, patch }: { id: string; patch: Partial<TurmaRow> }) => {
+      const { error } = await supabase.from("turmas").update(patch).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["turmas-all"] }),
+    onError: (e: any) => toast.error(e.message || "Erro ao atualizar"),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("turmas").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["turmas-all"] }),
+    onError: (e: any) => toast.error(e.message || "Erro ao remover"),
+  });
+
+  const facsWithCursos = useMemo(
+    () => faculdades.filter((f) => cursos.some((c) => c.faculdade_id === f.id)),
+    [faculdades, cursos]
   );
 
-  const faculdades = useMemo(
-    () => Array.from(new Set(cursoTemplates.map(c => c.faculty))),
-    []
-  );
   const [openFacs, setOpenFacs] = useState<Record<string, boolean>>({});
-  const toggleFac = (f: string) => setOpenFacs(p => ({ ...p, [f]: !p[f] }));
-  const [selectedCurso, setSelectedCurso] = useState<string>(cursoTemplates[0].id);
-  const [verTurma, setVerTurma] = useState<{ codigo: string; sala: string; turno: string; capacidade: number; estudantes: ReturnType<typeof buildStudents> } | null>(null);
+  const toggleFac = (f: string) => setOpenFacs((p) => ({ ...p, [f]: !p[f] }));
+  const [selectedCurso, setSelectedCurso] = useState<string>("");
 
-  const curso = cursoTemplates.find(c => c.id === selectedCurso)!;
-  const cursoTurmas = data[selectedCurso];
+  useEffect(() => {
+    if (!selectedCurso && cursos.length) setSelectedCurso(cursos[0].id);
+  }, [cursos, selectedCurso]);
 
-  const update = (cid: string, ano: number, idx: number, patch: Partial<Turma>) =>
-    setData(prev => ({
-      ...prev,
-      [cid]: { ...prev[cid], [ano]: prev[cid][ano].map((t, i) => i === idx ? { ...t, ...patch } : t) },
-    }));
+  const curso = cursos.find((c) => c.id === selectedCurso);
 
-  const addTurma = (cid: string, ano: number) =>
-    setData(prev => {
-      const arr = prev[cid][ano];
-      const nextLetra = LETRAS[arr.length] ?? `T${arr.length + 1}`;
-      return { ...prev, [cid]: { ...prev[cid], [ano]: [...arr, { id: `t-${ano}-${arr.length}-${Date.now()}`, letra: nextLetra, capacidade: 32, sala: salasPool[0], turno: "Manhã" }] } };
+  const turmasByCursoAno = useMemo(() => {
+    const map: Record<string, Record<string, TurmaRow[]>> = {};
+    turmas.forEach((t) => {
+      map[t.curso_id] ??= {};
+      map[t.curso_id][t.ano] ??= [];
+      map[t.curso_id][t.ano].push(t);
     });
+    return map;
+  }, [turmas]);
 
-  const removeTurma = (cid: string, ano: number, idx: number) =>
-    setData(prev => ({ ...prev, [cid]: { ...prev[cid], [ano]: prev[cid][ano].filter((_, i) => i !== idx) } }));
+  const countPorCurso = (cid: string) =>
+    Object.values(turmasByCursoAno[cid] ?? {}).reduce((a, arr) => a + arr.length, 0);
 
-  const regenerate = () =>
-    setData(Object.fromEntries(cursoTemplates.map(c => [c.id, buildDefault(c.years, c.estudantesEsperados)])));
+  const totals = useMemo(() => ({
+    turmas: turmas.length,
+    capacidade: turmas.reduce((a, t) => a + (t.capacidade ?? 0), 0),
+    estudantes: estudantes.length,
+  }), [turmas, estudantes]);
+
+  const [verTurma, setVerTurma] = useState<TurmaRow | null>(null);
+
+  const estudantesVer = useMemo(() => {
+    if (!verTurma) return [];
+    return estudantes.filter(
+      (e) => e.curso_id === verTurma.curso_id && String(e.ano) === String(verTurma.ano) && e.turma === verTurma.letra
+    );
+  }, [verTurma, estudantes]);
+
+  const addTurma = (cid: string, ano: string) => {
+    const existing = turmasByCursoAno[cid]?.[ano] ?? [];
+    const used = new Set(existing.map((t) => t.letra));
+    const nextLetra = LETRAS.find((l) => !used.has(l)) ?? `T${existing.length + 1}`;
+    createMut.mutate({ curso_id: cid, ano, letra: nextLetra });
+  };
 
   const confirmTurmas = () => {
     markOnboardingStepDone(user?.email, "aca.tur");
-    toast.success("Turmas confirmadas para todos os cursos");
+    toast.success("Turmas confirmadas");
   };
 
-  const totals = useMemo(() => {
-    let turmas = 0, capacidade = 0;
-    Object.values(data).forEach(c => Object.values(c).forEach(arr => arr.forEach(t => { turmas++; capacidade += t.capacidade; })));
-    return { turmas, capacidade };
-  }, [data]);
-
-  const candidatosPorCurso = useMemo(() => {
-    const m: Record<string, number> = {};
-    alocacaoCandidatos.forEach(c => {
-      const found = cursoTemplates.find(ct => ct.name === c.curso);
-      if (found) m[found.id] = (m[found.id] ?? 0) + 1;
-    });
-    return m;
-  }, []);
+  const anosDoCurso = useMemo(() => {
+    if (!curso) return [] as string[];
+    const set = new Set<string>();
+    for (let i = 1; i <= curso.years; i++) set.add(String(i));
+    Object.keys(turmasByCursoAno[curso.id] ?? {}).forEach((a) => set.add(a));
+    return Array.from(set).sort((a, b) => Number(a) - Number(b));
+  }, [curso, turmasByCursoAno]);
 
   return (
     <div className="p-6 lg:p-8 space-y-6 animate-fade-in">
       <OnboardingStepBanner actions={
-        <>
-          <Button onClick={regenerate} size="sm" variant="outline" className="gap-1 h-8"><Wand2 className="w-3.5 h-3.5" /> Regenerar</Button>
-          <Button onClick={confirmTurmas} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar</Button>
-        </>
+        <Button onClick={confirmTurmas} size="sm" variant="outline" className="gap-1 h-8"><Check className="w-3.5 h-3.5" /> Confirmar</Button>
       } />
       {!isOnboarding && (
         <div>
@@ -127,42 +178,43 @@ export default function CriarTurmas() {
               <h1 className="text-2xl font-bold flex items-center gap-2">
                 <Users className="w-6 h-6 text-primary" /> Criar Turmas
               </h1>
-              <p className="text-muted-foreground mt-1 text-sm">Geração automática de turmas (A–E) por curso e ano. Configure capacidade, sala e turno.</p>
+              <p className="text-muted-foreground mt-1 text-sm">Configure turmas por curso e ano. Capacidade, sala e turno.</p>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={regenerate} className="gap-2"><Wand2 className="w-4 h-4" /> Regenerar Automático</Button>
-              <Button onClick={confirmTurmas} className="gap-2"><Check className="w-4 h-4" /> Confirmar Turmas</Button>
-            </div>
+            <Button onClick={confirmTurmas} className="gap-2"><Check className="w-4 h-4" /> Confirmar Turmas</Button>
           </div>
         </div>
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Building2 className="w-3.5 h-3.5" /><p className="text-xs">Faculdades</p></div><p className="text-2xl font-bold">{faculdades.length}</p></Card>
-        <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><GraduationCap className="w-3.5 h-3.5" /><p className="text-xs">Cursos</p></div><p className="text-2xl font-bold">{cursoTemplates.length}</p></Card>
+        <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Building2 className="w-3.5 h-3.5" /><p className="text-xs">Faculdades</p></div><p className="text-2xl font-bold">{facsWithCursos.length}</p></Card>
+        <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><GraduationCap className="w-3.5 h-3.5" /><p className="text-xs">Cursos</p></div><p className="text-2xl font-bold">{cursos.length}</p></Card>
         <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Layers className="w-3.5 h-3.5" /><p className="text-xs">Turmas</p></div><p className="text-2xl font-bold text-primary">{totals.turmas}</p></Card>
         <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><Users className="w-3.5 h-3.5" /><p className="text-xs">Capacidade</p></div><p className="text-2xl font-bold">{totals.capacidade}</p></Card>
-        <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><ClipboardList className="w-3.5 h-3.5" /><p className="text-xs">Candidatos</p></div><p className="text-2xl font-bold">{alocacaoCandidatos.length}</p></Card>
+        <Card className="p-4"><div className="flex items-center gap-1.5 text-muted-foreground mb-1"><ClipboardList className="w-3.5 h-3.5" /><p className="text-xs">Estudantes</p></div><p className="text-2xl font-bold">{totals.estudantes}</p></Card>
       </div>
 
+      {cursos.length === 0 ? (
+        <Card className="p-10 text-center text-sm text-muted-foreground">
+          Ainda não existem cursos. Crie cursos e faculdades antes de configurar turmas.
+        </Card>
+      ) : (
       <div className="grid md:grid-cols-[260px_1fr] gap-4">
         <Card className="p-3 h-fit space-y-2">
-          {faculdades.map(fac => {
-            const cursosOfFac = cursoTemplates.filter(c => c.faculty === fac);
-            const isOpen = openFacs[fac];
+          {facsWithCursos.map((fac) => {
+            const cursosOfFac = cursos.filter((c) => c.faculdade_id === fac.id);
+            const isOpen = openFacs[fac.id];
             return (
-              <div key={fac} className="space-y-1.5">
-                <button onClick={() => toggleFac(fac)} className="w-full flex items-center gap-1.5 px-2 py-2 rounded-md hover:bg-muted/50 transition">
+              <div key={fac.id} className="space-y-1.5">
+                <button onClick={() => toggleFac(fac.id)} className="w-full flex items-center gap-1.5 px-2 py-2 rounded-md hover:bg-muted/50 transition">
                   {isOpen ? <ChevronDown className="w-3.5 h-3.5 shrink-0" /> : <ChevronRight className="w-3.5 h-3.5 shrink-0" />}
                   <Building2 className="w-3.5 h-3.5 text-primary shrink-0" />
-                  <span className="text-[11px] font-bold uppercase tracking-wide flex-1 text-left leading-tight break-words">{fac}</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wide flex-1 text-left leading-tight break-words">{fac.name}</span>
                   <Badge variant="outline" className="text-[10px]">{cursosOfFac.length}</Badge>
                 </button>
                 {isOpen && (
                   <div className="space-y-0.5 pl-4 border-l ml-3">
-                    {cursosOfFac.map(c => {
+                    {cursosOfFac.map((c) => {
                       const isSel = selectedCurso === c.id;
-                      const count = Object.values(data[c.id] ?? {}).reduce((a, r) => a + r.length, 0);
                       return (
                         <button key={c.id} onClick={() => setSelectedCurso(c.id)}
                           className={`w-full text-left px-2.5 py-1.5 rounded-md text-sm flex items-center justify-between transition ${
@@ -172,7 +224,7 @@ export default function CriarTurmas() {
                             <GraduationCap className="w-3 h-3 shrink-0 opacity-70" />
                             {c.name}
                           </span>
-                          <Badge variant={isSel ? "secondary" : "outline"} className="text-[10px] ml-2">{count}</Badge>
+                          <Badge variant={isSel ? "secondary" : "outline"} className="text-[10px] ml-2">{countPorCurso(c.id)}</Badge>
                         </button>
                       );
                     })}
@@ -184,96 +236,116 @@ export default function CriarTurmas() {
         </Card>
 
         <div className="space-y-3 min-w-0">
-          <Card className="p-3 flex items-center justify-between gap-3 flex-wrap">
-            <div>
-              <p className="text-sm font-semibold">{curso.name} <span className="text-muted-foreground font-normal">({curso.code})</span></p>
-              <p className="text-[11px] text-muted-foreground">{curso.faculty} · {curso.years} anos · {curso.estudantesEsperados} estudantes esperados</p>
-            </div>
-            <Badge variant="outline" className="text-[10px]">Candidatos alocados: {candidatosPorCurso[curso.id] ?? 0}</Badge>
-          </Card>
+          {curso && (
+            <Card className="p-3 flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <p className="text-sm font-semibold">{curso.name} <span className="text-muted-foreground font-normal">({curso.code})</span></p>
+                <p className="text-[11px] text-muted-foreground">{faculdades.find((f) => f.id === curso.faculdade_id)?.name} · {curso.years} anos</p>
+              </div>
+              <Badge variant="outline" className="text-[10px]">
+                Estudantes: {estudantes.filter((e) => e.curso_id === curso.id).length}
+              </Badge>
+            </Card>
+          )}
 
-          {Object.entries(cursoTurmas).map(([anoStr, turmas]) => {
-            const ano = Number(anoStr);
+          {loadingTurmas && (
+            <Card className="p-6 text-center text-xs text-muted-foreground inline-flex items-center gap-2 justify-center w-full">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> A carregar turmas…
+            </Card>
+          )}
+
+          {curso && anosDoCurso.map((ano) => {
+            const arr = turmasByCursoAno[curso.id]?.[ano] ?? [];
             return (
               <Card key={ano} className="overflow-hidden">
                 <div className="bg-primary/10 px-4 py-2.5 border-b flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-bold text-primary">{ano}º Ano</p>
-                    <Badge variant="outline" className="text-[10px]">{turmas.length} turmas</Badge>
-                    <Badge variant="outline" className="text-[10px]">{turmas.reduce((a, t) => a + t.capacidade, 0)} lugares</Badge>
+                    <Badge variant="outline" className="text-[10px]">{arr.length} turmas</Badge>
+                    <Badge variant="outline" className="text-[10px]">{arr.reduce((a, t) => a + t.capacidade, 0)} lugares</Badge>
                   </div>
-                  <Button size="sm" variant="ghost" onClick={() => addTurma(curso.id, ano)} className="h-7 gap-1 text-xs">
+                  <Button size="sm" variant="ghost" onClick={() => addTurma(curso.id, ano)} disabled={createMut.isPending} className="h-7 gap-1 text-xs">
                     <Plus className="w-3 h-3" /> Adicionar Turma
                   </Button>
                 </div>
-                <div className="grid grid-cols-[60px_1fr_110px_110px_70px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
-                  <span>Turma</span><span>Sala</span><span>Turno</span><span>Capacidade</span><span>Alunos</span><span></span>
-                </div>
-                <div className="divide-y">
-                  {turmas.map((t, idx) => {
-                    const codigo = `${curso.code}-${ano}${t.letra}`;
-                    const nAlunos = Math.min(t.capacidade, Math.max(0, t.capacidade - ((idx + ano) % 4)));
-                    return (
-                    <div key={t.id} className="grid grid-cols-[60px_1fr_110px_110px_70px_36px] gap-2 p-2 items-center">
-                      <div className="flex items-center gap-1.5 font-bold text-primary text-sm pl-2">
-                        <span>{codigo}</span>
-                      </div>
-                      <Select value={t.sala} onValueChange={v => update(curso.id, ano, idx, { sala: v })}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                        <SelectContent>{salasPool.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <Select value={t.turno} onValueChange={v => update(curso.id, ano, idx, { turno: v as Turma["turno"] })}>
-                        <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-                        <SelectContent>{turnos.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                      </Select>
-                      <Input type="number" value={t.capacidade} onChange={e => update(curso.id, ano, idx, { capacidade: +e.target.value })} className="h-8 text-xs" />
-                      <Button size="sm" variant="outline" className="h-8 gap-1 text-xs"
-                        onClick={() => setVerTurma({ codigo, sala: t.sala, turno: t.turno, capacidade: t.capacidade, estudantes: buildStudents(codigo, nAlunos) })}>
-                        <Eye className="w-3 h-3" /> Ver
-                      </Button>
-                      <Button size="icon" variant="ghost" onClick={() => removeTurma(curso.id, ano, idx)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                {arr.length === 0 ? (
+                  <div className="px-4 py-6 text-center text-xs text-muted-foreground">Sem turmas configuradas.</div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-[60px_1fr_110px_110px_70px_36px] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b">
+                      <span>Turma</span><span>Sala</span><span>Turno</span><span>Capacidade</span><span>Alunos</span><span></span>
                     </div>
-                    );
-                  })}
-                </div>
+                    <div className="divide-y">
+                      {arr.map((t) => {
+                        const codigo = `${curso.code}-${ano}${t.letra}`;
+                        const nAlunos = estudantes.filter((e) => e.curso_id === curso.id && String(e.ano) === String(ano) && e.turma === t.letra).length;
+                        return (
+                          <div key={t.id} className="grid grid-cols-[60px_1fr_110px_110px_70px_36px] gap-2 p-2 items-center">
+                            <div className="flex items-center gap-1.5 font-bold text-primary text-sm pl-2">
+                              <span>{codigo}</span>
+                            </div>
+                            <Input value={t.sala ?? ""} placeholder="Sala"
+                              onChange={(e) => updateMut.mutate({ id: t.id, patch: { sala: e.target.value } })}
+                              className="h-8 text-xs" />
+                            <Select value={t.turno ?? "Manhã"} onValueChange={(v) => updateMut.mutate({ id: t.id, patch: { turno: v } })}>
+                              <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
+                              <SelectContent>{turnos.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                            </Select>
+                            <Input type="number" value={t.capacidade}
+                              onChange={(e) => updateMut.mutate({ id: t.id, patch: { capacidade: +e.target.value || 0 } })}
+                              className="h-8 text-xs" />
+                            <Button size="sm" variant="outline" className="h-8 gap-1 text-xs" onClick={() => setVerTurma(t)}>
+                              <Eye className="w-3 h-3" /> Ver
+                            </Button>
+                            <Button size="icon" variant="ghost" onClick={() => {
+                              if (confirm(`Remover turma ${codigo}?`)) deleteMut.mutate(t.id);
+                            }} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
               </Card>
             );
           })}
         </div>
       </div>
+      )}
 
-      <div className="flex justify-end gap-2 pt-4">
-        <Button variant="outline" asChild><Link to="/areaacademica/criador/cadeiras">Voltar</Link></Button>
-        <Button asChild className="gap-2"><Link to="/areaacademica/criador/calendario">Próximo: Calendário <Check className="w-4 h-4" /></Link></Button>
-      </div>
+      {!isOnboarding && (
+        <div className="flex justify-end gap-2 pt-4">
+          <Button variant="outline" asChild><Link to="/areaacademica/criador/cadeiras">Voltar</Link></Button>
+          <Button asChild className="gap-2"><Link to="/areaacademica/criador/calendario">Próximo: Calendário <Check className="w-4 h-4" /></Link></Button>
+        </div>
+      )}
 
       <Dialog open={!!verTurma} onOpenChange={(o) => !o && setVerTurma(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> Turma {verTurma?.codigo}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> Turma {verTurma && curso ? `${curso.code}-${verTurma.ano}${verTurma.letra}` : ""}</DialogTitle>
             <DialogDescription className="flex items-center gap-3 text-xs">
-              <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> {verTurma?.sala}</span>
-              <span>· {verTurma?.turno}</span>
-              <span>· {verTurma?.estudantes.length}/{verTurma?.capacidade} alunos</span>
+              <span className="inline-flex items-center gap-1"><MapPin className="w-3 h-3" /> {verTurma?.sala || "—"}</span>
+              <span>· {verTurma?.turno || "—"}</span>
+              <span>· {estudantesVer.length}/{verTurma?.capacidade} alunos</span>
             </DialogDescription>
           </DialogHeader>
           <div className="max-h-[60vh] overflow-y-auto border rounded-md">
-            <div className="grid grid-cols-[40px_70px_1fr_1fr] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b sticky top-0">
-              <span>#</span><span>Nº</span><span>Nome</span><span>Email</span>
+            <div className="grid grid-cols-[40px_1fr_1fr] gap-2 px-3 py-2 text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b sticky top-0">
+              <span>#</span><span>Nome</span><span>Email</span>
             </div>
             <div className="divide-y">
-              {verTurma?.estudantes.map((e, i) => (
-                <div key={e.id} className="grid grid-cols-[40px_70px_1fr_1fr] gap-2 px-3 py-1.5 text-xs items-center">
+              {estudantesVer.map((e, i) => (
+                <div key={e.id} className="grid grid-cols-[40px_1fr_1fr] gap-2 px-3 py-1.5 text-xs items-center">
                   <span className="text-muted-foreground">{i + 1}</span>
-                  <span className="font-mono text-[11px]">{e.numero}</span>
                   <span className="font-medium truncate">{e.nome}</span>
                   <span className="text-muted-foreground inline-flex items-center gap-1 truncate"><Mail className="w-3 h-3 shrink-0" />{e.email}</span>
                 </div>
               ))}
-              {verTurma && verTurma.estudantes.length === 0 && (
-                <div className="px-3 py-6 text-center text-xs text-muted-foreground">Sem alunos alocados.</div>
+              {estudantesVer.length === 0 && (
+                <div className="px-3 py-6 text-center text-xs text-muted-foreground">Sem alunos alocados a esta turma.</div>
               )}
             </div>
           </div>
