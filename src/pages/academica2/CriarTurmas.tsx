@@ -23,7 +23,23 @@ type TurmaRow = {
   capacidade: number;
 };
 
-const turnos = ["Manhã", "Tarde", "Noite"] as const;
+type TurnoOpt = { nome: string; inicio: string; fim: string };
+function useTurnosConfig(): TurnoOpt[] {
+  const [opts, setOpts] = useState<TurnoOpt[]>([]);
+  useEffect(() => {
+    const load = () => {
+      try {
+        const raw = JSON.parse(localStorage.getItem("upra:turnos-cfg") || "[]");
+        if (Array.isArray(raw)) setOpts(raw.filter((t: any) => t?.nome).map((t: any) => ({ nome: t.nome, inicio: t.inicio, fim: t.fim })));
+      } catch {}
+    };
+    load();
+    const onStorage = (e: StorageEvent) => { if (e.key === "upra:turnos-cfg") load(); };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+  return opts;
+}
 const LETRAS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
 type SalaOpt = { value: string; label: string };
