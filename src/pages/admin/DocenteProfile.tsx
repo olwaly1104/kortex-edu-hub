@@ -91,6 +91,8 @@ export default function AdminDocenteProfile() {
                       <Award className="w-3 h-3" /> Coordenador
                     </span>
                   )}
+                </div>
+
 
                 <div className="flex items-center gap-2 mt-4 flex-wrap">
                   <Button size="sm" variant="outline" className="gap-1.5 text-xs h-7">
