@@ -198,20 +198,20 @@ export default function CalendarioAcademico() {
 
   // Load all scheduled sessões (with etapa name) for preview + read-only list
   type SessaoRow = { id: string; etapa_id: string; mode: string | null; datas: string[]; data_fim: string | null; hora: string | null; horas: string[]; local: string | null };
-  type EtapaRow = { id: string; nome: string };
+  type EtapaRow = { id: string; nome: string; ordem: number };
   const [sessoesAgendadas, setSessoesAgendadas] = useState<SessaoRow[]>([]);
-  const [etapasMap, setEtapasMap] = useState<Record<string, string>>({});
+  const [etapasMap, setEtapasMap] = useState<Record<string, { nome: string; ordem: number }>>({});
   useEffect(() => {
     let cancel = false;
     (async () => {
       const [{ data: se }, { data: et }] = await Promise.all([
         supabase.from("candidaturas_sessoes").select("id,etapa_id,mode,datas,data_fim,hora,horas,local"),
-        supabase.from("candidaturas_etapas").select("id,nome"),
+        supabase.from("candidaturas_etapas").select("id,nome,ordem").order("ordem"),
       ]);
       if (cancel) return;
       setSessoesAgendadas(((se ?? []) as any[]).map(r => ({ ...r, datas: r.datas ?? [], horas: r.horas ?? [] })) as SessaoRow[]);
-      const map: Record<string, string> = {};
-      ((et ?? []) as EtapaRow[]).forEach(e => { map[e.id] = e.nome; });
+      const map: Record<string, { nome: string; ordem: number }> = {};
+      ((et ?? []) as EtapaRow[]).forEach(e => { map[e.id] = { nome: e.nome, ordem: e.ordem }; });
       setEtapasMap(map);
     })();
     return () => { cancel = true; };
@@ -329,16 +329,22 @@ export default function CalendarioAcademico() {
     return out;
   }, [inicio, fim]);
 
-  const sessaoEvents = useMemo<Evento[]>(() => {
-    const out: Evento[] = [];
-    sessoesAgendadas.forEach(s => {
-      const nome = etapasMap[s.etapa_id] || "Sessão";
+  type SessaoEvent = Evento & { ordem: number };
+  const sessaoEvents = useMemo<SessaoEvent[]>(() => {
+    const out: SessaoEvent[] = [];
+    const ordered = sessoesAgendadas
+      .slice()
+      .sort((a, b) => (etapasMap[a.etapa_id]?.ordem ?? 999) - (etapasMap[b.etapa_id]?.ordem ?? 999));
+    ordered.forEach(s => {
+      const meta = etapasMap[s.etapa_id];
+      const nome = meta?.nome || "Sessão";
+      const ordem = meta?.ordem ?? 999;
       if (s.mode === "periodo" && s.datas[0] && s.data_fim) {
-        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.data_fim });
+        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.data_fim, ordem });
       } else if (s.mode === "dia" && s.datas[0]) {
-        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.datas[0] });
+        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.datas[0], ordem });
       } else if (s.mode === "dias") {
-        s.datas.forEach((d, i) => out.push({ id: `__ses_${s.id}_${i}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: d, fim: d }));
+        s.datas.forEach((d, i) => out.push({ id: `__ses_${s.id}_${i}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: d, fim: d, ordem }));
       }
     });
     return out;
@@ -533,7 +539,7 @@ export default function CalendarioAcademico() {
                   <div className="divide-y">
                     {sessaoEvents
                       .slice()
-                      .sort((a, b) => a.inicio.localeCompare(b.inicio))
+                      .sort((a, b) => (a.ordem - b.ordem) || a.inicio.localeCompare(b.inicio))
                       .map(ev => (
                         <div key={ev.id} className="px-3 py-2 flex items-center justify-between gap-3 text-xs">
                           <span className="font-medium truncate">{ev.titulo.replace(/^Candidaturas — /, "")}</span>
