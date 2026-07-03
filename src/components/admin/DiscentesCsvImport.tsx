@@ -113,6 +113,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const createMut = useCreateEstudante();
 
   const [stage, setStage] = useState<"upload" | "preview">("upload");
+  const [parsing, setParsing] = useState(false);
   const [rows, setRows] = useState<Row[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [importing, setImporting] = useState(false);
