@@ -337,7 +337,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
               <tr>
                 <th className="px-3 py-2 text-left">Etapa</th>
                 <th className="px-3 py-2 text-center w-24">Obrigatória</th>
-                <th className="px-3 py-2 text-center w-20">Agenda</th>
+                <th className="px-3 py-2 text-center w-28">Agendamento</th>
                 <th className="px-3 py-2 text-left">Estados possíveis</th>
                 <th className="w-10"></th>
               </tr>
