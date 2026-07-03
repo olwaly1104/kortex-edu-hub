@@ -198,28 +198,35 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   };
 
 
-  const addEstado = () => {
+  const addEstado = async () => {
     const label = newEstado.trim() || `Estado ${estadosAll.length + 1}`;
     const base = label.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").slice(0, 32) || "estado";
     let key = base;
     let i = 1;
     while (estadosAll.some(e => e.key === key)) { key = `${base}-${i++}`; }
-    const next = [...estadosAll, { key, label, color: nextColor(estadosAll.length) }];
-    setEstadosAll(next); saveEstados(next); setNewEstado("");
+    const row = { key, label, color: nextColor(estadosAll.length), ordem: estadosAll.length, owner_user_id: authUserId, is_default: false };
+    const { data, error } = await (supabase.from as any)("candidaturas_estados").insert(row).select("*").single();
+    if (error) { toast.error(error.message); return; }
+    setEstadosAll(prev => [...prev, data as EstadoDef]);
+    setNewEstado("");
   };
-  const rmEstado = (key: string) => {
-    if (DEFAULT_ESTADO_KEYS.has(key)) { toast.error("Estado predefinido — não pode ser removido."); return; }
-    const next = estadosAll.filter(e => e.key !== key);
-    setEstadosAll(next); saveEstados(next);
+  const rmEstado = async (est: EstadoDef) => {
+    if (est.is_default) { toast.error("Estado predefinido — não pode ser removido."); return; }
+    if (!est.id) return;
+    const { error } = await (supabase.from as any)("candidaturas_estados").delete().eq("id", est.id);
+    if (error) { toast.error(error.message); return; }
+    setEstadosAll(prev => prev.filter(e => e.key !== est.key));
     etapas.forEach(et => {
-      if (et.estados_possiveis.includes(key)) {
-        updEtapa(et.id, { estados_possiveis: et.estados_possiveis.filter(k => k !== key) });
+      if (et.estados_possiveis.includes(est.key)) {
+        updEtapa(et.id, { estados_possiveis: et.estados_possiveis.filter(k => k !== est.key) });
       }
     });
   };
-  const updEstado = (key: string, patch: Partial<EstadoDef>) => {
-    const next = estadosAll.map(e => e.key === key ? { ...e, ...patch } : e);
-    setEstadosAll(next); saveEstados(next);
+  const updEstado = async (est: EstadoDef, patch: Partial<EstadoDef>) => {
+    setEstadosAll(prev => prev.map(e => e.key === est.key ? { ...e, ...patch } : e));
+    if (!est.id) return;
+    const { error } = await (supabase.from as any)("candidaturas_estados").update(patch).eq("id", est.id);
+    if (error) toast.error(error.message);
   };
 
   const toggleEstado = (et: Etapa, key: string) => {
