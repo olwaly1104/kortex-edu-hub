@@ -165,6 +165,7 @@ Deno.serve(async (req) => {
         email,
         cargo,
         categoria: "Assistente",
+        modulo_kortex: modulo,
       }, { onConflict: "id" });
       if (docErr) console.error("docente upsert failed:", docErr.message);
     } else if (STAFF_ROLES.has(modulo)) {
@@ -179,6 +180,7 @@ Deno.serve(async (req) => {
         email,
         funcao: funcaoMap[modulo] || modulo,
         departamento: funcaoMap[modulo] || modulo,
+        modulo_kortex: modulo,
       }, { onConflict: "id" });
       if (stErr) console.error("staff upsert failed:", stErr.message);
     }
