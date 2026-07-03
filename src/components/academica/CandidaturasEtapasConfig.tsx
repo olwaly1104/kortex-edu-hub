@@ -238,9 +238,9 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
 
 
   const updSessao = async (id: string, patch: Partial<Sessao>) => {
-    const { error } = await supabase.from("candidaturas_sessoes").update(patch).eq("id", id);
-    if (error) { toast.error(error.message); return; }
     setSessoes(prev => prev.map(s => s.id === id ? { ...s, ...patch } : s));
+    const { error } = await supabase.from("candidaturas_sessoes").update(patch).eq("id", id);
+    if (error) toast.error(error.message);
   };
 
   const toggleSessaoData = (s: Sessao, data: string) => {
