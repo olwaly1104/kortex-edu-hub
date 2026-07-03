@@ -539,7 +539,7 @@ export default function CalendarioAcademico() {
                   <div className="divide-y">
                     {sessaoEvents
                       .slice()
-                      .sort((a, b) => a.inicio.localeCompare(b.inicio))
+                      .sort((a, b) => (a.ordem - b.ordem) || a.inicio.localeCompare(b.inicio))
                       .map(ev => (
                         <div key={ev.id} className="px-3 py-2 flex items-center justify-between gap-3 text-xs">
                           <span className="font-medium truncate">{ev.titulo.replace(/^Candidaturas — /, "")}</span>
