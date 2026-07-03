@@ -404,8 +404,21 @@ export type EstudanteInput = {
   regime?: "bolseiro" | "normal";
 };
 
-async function provisionStudentAccount(name: string, email: string) {
-  return provisionKortexUser({ name, email, modulo: "estudante" });
+async function provisionStudentAccount(name: string, email: string, estudante: Record<string, unknown>) {
+  const { data, error } = await supabase.functions.invoke("admin-create-user", {
+    body: {
+      name,
+      email,
+      password: `Aluno@${Math.random().toString(36).slice(2, 8)}`,
+      modulo: "estudante",
+      estudante,
+    },
+  });
+  const serverError = (data && typeof data === "object" && "error" in data) ? (data as any).error : null;
+  if (error || serverError) throw new Error(String(serverError || error?.message || "Falha ao criar utilizador."));
+  const user = (data as any)?.user as { id: string } | undefined;
+  if (!user?.id) throw new Error("Resposta inesperada do servidor.");
+  return user;
 }
 
 export function useCreateEstudante() {
@@ -414,21 +427,18 @@ export function useCreateEstudante() {
     mutationFn: async (input: EstudanteInput) => {
       const inst = await currentInstitutionId();
       if (!inst) throw new Error("Sessão expirada.");
-      const account = await provisionStudentAccount(input.nome, input.email);
+      const account = await provisionStudentAccount(input.nome, input.email, {
+        ...input,
+        ano: input.ano || "1",
+        turma: input.turma || "A",
+        origem: input.origem || "novo",
+      });
       const { data, error } = await (supabase.from("estudantes" as any) as any)
-        .insert({
-          id: account.id,
-          owner_user_id: inst,
-          ano: "1",
-          turma: "A",
-          origem: "novo",
-          ...input,
-        })
-        .select()
+        .select("*")
+        .eq("id", account.id)
         .single();
       if (error) throw error;
-      const row = data as EstudanteRow;
-      return row;
+      return data as EstudanteRow;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: KEY_EST });
@@ -444,18 +454,18 @@ export function useBulkCreateEstudantes() {
       const inst = await currentInstitutionId();
       if (!inst) throw new Error("Sessão expirada.");
       if (inputs.length === 0) return [];
-      const accounts = await Promise.all(inputs.map((i) => provisionStudentAccount(i.nome, i.email)));
-      const rows = inputs.map((i, index) => ({
-        id: accounts[index].id,
-        owner_user_id: inst,
-        ano: "1",
-        turma: "A",
-        origem: "importado",
-        ...i,
-      }));
+      const accounts = await Promise.all(
+        inputs.map((i) => provisionStudentAccount(i.nome, i.email, {
+          ...i,
+          ano: i.ano || "1",
+          turma: i.turma || "A",
+          origem: i.origem || "importado",
+        }))
+      );
+      const ids = accounts.map((a) => a.id);
       const { data, error } = await (supabase.from("estudantes" as any) as any)
-        .insert(rows)
-        .select();
+        .select("*")
+        .in("id", ids);
       if (error) throw error;
       return (data ?? []) as EstudanteRow[];
     },
