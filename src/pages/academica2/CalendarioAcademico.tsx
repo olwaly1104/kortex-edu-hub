@@ -329,16 +329,22 @@ export default function CalendarioAcademico() {
     return out;
   }, [inicio, fim]);
 
-  const sessaoEvents = useMemo<Evento[]>(() => {
-    const out: Evento[] = [];
-    sessoesAgendadas.forEach(s => {
-      const nome = etapasMap[s.etapa_id] || "Sessão";
+  type SessaoEvent = Evento & { ordem: number };
+  const sessaoEvents = useMemo<SessaoEvent[]>(() => {
+    const out: SessaoEvent[] = [];
+    const ordered = sessoesAgendadas
+      .slice()
+      .sort((a, b) => (etapasMap[a.etapa_id]?.ordem ?? 999) - (etapasMap[b.etapa_id]?.ordem ?? 999));
+    ordered.forEach(s => {
+      const meta = etapasMap[s.etapa_id];
+      const nome = meta?.nome || "Sessão";
+      const ordem = meta?.ordem ?? 999;
       if (s.mode === "periodo" && s.datas[0] && s.data_fim) {
-        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.data_fim });
+        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.data_fim, ordem });
       } else if (s.mode === "dia" && s.datas[0]) {
-        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.datas[0] });
+        out.push({ id: `__ses_${s.id}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: s.datas[0], fim: s.datas[0], ordem });
       } else if (s.mode === "dias") {
-        s.datas.forEach((d, i) => out.push({ id: `__ses_${s.id}_${i}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: d, fim: d }));
+        s.datas.forEach((d, i) => out.push({ id: `__ses_${s.id}_${i}`, tipo: "especial", titulo: `Candidaturas — ${nome}`, inicio: d, fim: d, ordem }));
       }
     });
     return out;
