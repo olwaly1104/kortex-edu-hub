@@ -31,6 +31,7 @@ export type DocenteRow = {
   contacto: string;
   faculdade: string;
   departamento?: string;
+  curso?: string;
   categoria: string;
   cargo: string;
   nascimento?: string;
