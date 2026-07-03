@@ -245,7 +245,132 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
 
     </div>
 
+      {/* SESSÕES AGENDADAS */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
+              <CalendarClock className="w-3.5 h-3.5" /> Sessões Agendadas
+            </p>
+            <p className="text-[11px] text-muted-foreground">Uma sessão automática por cada etapa com Agenda ativa.</p>
+          </div>
+        </div>
+        <div className="rounded-lg border overflow-hidden">
+          <table className="w-full text-xs">
+            <thead className="bg-muted/40 text-[10px] uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-3 py-2 text-left">Etapa</th>
+                <th className="px-2 py-2 text-left w-24">Opção</th>
+                <th className="px-2 py-2 text-left">Datas</th>
+                <th className="px-2 py-2 text-left w-24"><Clock className="w-3 h-3 inline mr-1" />Hora</th>
+                <th className="px-2 py-2 text-left w-32"><MapPin className="w-3 h-3 inline mr-1" />Local</th>
+                <th className="px-2 py-2 text-left w-40">Responsável</th>
+                <th className="px-2 py-2 text-center w-20"><Users className="w-3 h-3 inline mr-1" />Cap.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sessoesAgendadas.length === 0 ? (
+                <tr><td colSpan={7} className="px-3 py-6 text-center text-muted-foreground italic">
+                  Sem etapas agendáveis. Ative "Agenda" numa etapa acima para criar uma sessão.
+                </td></tr>
+              ) : sessoesAgendadas.map(({ etapa, sessao }) => {
+                if (!sessao) return null;
+                return (
+                  <tr key={etapa.id} className="border-t align-top">
+                    <td className="px-3 py-2 font-medium">{etapa.nome}</td>
+                    <td className="px-2 py-2">
+                      <Select value={sessao.mode || undefined} onValueChange={(v: "dia" | "dias" | "periodo") => updSessao(sessao.id, {
+                        mode: v,
+                        datas: v === "periodo" ? [sessao.datas[0] || ""] : (v === "dia" ? sessao.datas.slice(0, 1) : sessao.datas),
+                        data_fim: v === "periodo" ? (sessao.data_fim || "") : null,
+                      })}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="dia">Dia</SelectItem>
+                          <SelectItem value="dias">Dias</SelectItem>
+                          <SelectItem value="periodo">Período</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </td>
+                    <td className="px-2 py-2">
+                      {sessao.mode === "periodo" ? (
+                        <div className="flex items-center gap-1">
+                          <Input type="date" className="h-8 text-xs" value={sessao.datas[0] || ""} onChange={e => updSessao(sessao.id, { datas: [e.target.value] })} />
+                          <span className="text-muted-foreground">→</span>
+                          <Input type="date" className="h-8 text-xs" value={sessao.data_fim || ""} onChange={e => updSessao(sessao.id, { data_fim: e.target.value })} />
+                        </div>
+                      ) : sessao.mode === "dia" ? (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
+                              {sessao.datas[0] || <span className="text-muted-foreground">Escolher data</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0">
+                            <Calendar mode="single" selected={sessao.datas[0] ? new Date(sessao.datas[0]) : undefined}
+                              onSelect={d => updSessao(sessao.id, { datas: d ? [d.toISOString().slice(0, 10)] : [] })} />
+                          </PopoverContent>
+                        </Popover>
+                      ) : sessao.mode === "dias" ? (
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
+                              {sessao.datas.length > 0 ? `${sessao.datas.length} data${sessao.datas.length === 1 ? "" : "s"}` : <span className="text-muted-foreground">Escolher datas</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0">
+                            <Calendar mode="multiple" selected={sessao.datas.map(d => new Date(d))}
+                              onSelect={(ds) => updSessao(sessao.id, { datas: (ds || []).map(d => d.toISOString().slice(0, 10)).sort() })} />
+                            {sessao.datas.length > 0 && (
+                              <div className="p-2 border-t flex flex-wrap gap-1 max-w-[280px]">
+                                {sessao.datas.map(d => (
+                                  <Badge key={d} variant="outline" className="text-[10px] gap-1">
+                                    {d}
+                                    <button onClick={() => toggleSessaoData(sessao, d)} className="hover:text-destructive"><Trash2 className="w-2.5 h-2.5" /></button>
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </PopoverContent>
+                        </Popover>
+                      ) : (
+                        <span className="text-muted-foreground italic text-[11px]">Escolha uma opção</span>
+                      )}
+                    </td>
+                    <td className="px-2 py-2">
+                      <Input type="time" className="h-8 text-xs" value={sessao.hora || ""} onChange={e => updSessao(sessao.id, { hora: e.target.value })} />
+                    </td>
+                    <td className="px-2 py-2">
+                      <Input className="h-8 text-xs" value={sessao.local || ""} onChange={e => updSessao(sessao.id, { local: e.target.value })} placeholder="Ex: Anfiteatro A" />
+                    </td>
+                    <td className="px-2 py-2">
+                      <Select value={sessao.responsavel_id || undefined} onValueChange={v => updSessao(sessao.id, { responsavel_id: v })}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={docentes.length ? "Docente" : "Sem docentes"} /></SelectTrigger>
+                        <SelectContent>
+                          {docentes.length === 0 ? (
+                            <div className="px-2 py-1.5 text-xs text-muted-foreground">Sem docentes</div>
+                          ) : docentes.map(d => (
+                            <SelectItem key={d.id} value={d.id}>{[d.primeiroNome, d.ultimoNome].filter(Boolean).join(" ") || d.email || "Docente"}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </td>
+                    <td className="px-2 py-2">
+                      <Input type="number" min={1} className="h-8 text-xs text-center" value={sessao.capacidade ?? ""}
+                        onChange={e => updSessao(sessao.id, { capacidade: e.target.value === "" ? null : Number(e.target.value) })} placeholder="—" />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
     </fieldset>
+
   );
 }
 
