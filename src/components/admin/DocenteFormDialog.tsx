@@ -292,7 +292,25 @@ export function DocenteFormDialog({
 
 
             <section>
-              <SectionTitle index={3} icon={<BookOpen className="w-3.5 h-3.5" />} title="Formação Académica" hint="Grau máximo concluído e área de especialidade" />
+              <SectionTitle index={3} icon={<GraduationCap className="w-3.5 h-3.5" />} title="Afiliação Institucional" hint="Faculdade, curso, departamento e cargo" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <Field label="Faculdade">
+                  <Input className="h-8 text-xs" value={draft.faculdade || ""} onChange={(e) => setF("faculdade", e.target.value)} placeholder="Ex.: Ciências Exatas" />
+                </Field>
+                <Field label="Curso">
+                  <Input className="h-8 text-xs" value={draft.curso || ""} onChange={(e) => setF("curso", e.target.value)} placeholder="Ex.: Arquitectura" />
+                </Field>
+                <Field label="Departamento">
+                  <Input className="h-8 text-xs" value={draft.departamento || ""} onChange={(e) => setF("departamento", e.target.value)} placeholder="Ex.: Projeto" />
+                </Field>
+                <Field label="Cargo">
+                  <Input className="h-8 text-xs" value={draft.cargo || ""} onChange={(e) => setF("cargo", e.target.value)} placeholder="Docente" />
+                </Field>
+              </div>
+            </section>
+
+            <section>
+              <SectionTitle index={4} icon={<BookOpen className="w-3.5 h-3.5" />} title="Formação Académica" hint="Grau máximo concluído e área de especialidade" />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Field label="Grau académico">
                   <Select value={draft.grau || "Licenciatura"} onValueChange={(v) => setF("grau", v as Grau)}>
