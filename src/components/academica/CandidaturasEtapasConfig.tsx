@@ -99,7 +99,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     supabase.from("edificios").select("id,sigla,nome").order("sigla").then(({ data }) => setGeopontos(data ?? []));
   }, []);
   const [docentes, setDocentes] = useState<DocenteRow[]>(() => loadDocentes());
-  const [estadosAll, setEstadosAll] = useState<EstadoDef[]>(() => loadEstados());
+  const [estadosAll, setEstadosAll] = useState<EstadoDef[]>([]);
   const [newEstado, setNewEstado] = useState("");
 
   const estadoMeta = (k: string): EstadoDef =>
