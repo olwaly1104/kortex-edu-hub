@@ -97,7 +97,11 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   }, []);
   const [etapas, setEtapas] = useState<Etapa[]>([]);
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
+  const [geopontos, setGeopontos] = useState<{ id: string; sigla: string; nome: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    supabase.from("edificios").select("id,sigla,nome").order("sigla").then(({ data }) => setGeopontos(data ?? []));
+  }, []);
   const [docentes, setDocentes] = useState<DocenteRow[]>(() => loadDocentes());
   const [estadosAll, setEstadosAll] = useState<EstadoDef[]>(() => loadEstados());
   const [newEstado, setNewEstado] = useState("");
@@ -507,7 +511,16 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                       )}
                     </td>
                     <td className="px-2 py-2">
-                      <Input className="h-8 text-xs" value={sessao.local || ""} onChange={e => updSessao(sessao.id, { local: e.target.value })} placeholder="Ex: Anfiteatro A" />
+                      <Select value={sessao.local || undefined} onValueChange={v => updSessao(sessao.id, { local: v })}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder={geopontos.length ? "Geoponto" : "Sem geopontos"} /></SelectTrigger>
+                        <SelectContent>
+                          {geopontos.length === 0 ? (
+                            <div className="px-2 py-1.5 text-xs text-muted-foreground">Sem geopontos</div>
+                          ) : geopontos.map(g => (
+                            <SelectItem key={g.id} value={g.sigla || g.nome}>{g.sigla ? `${g.sigla} — ${g.nome}` : g.nome}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </td>
                     <td className="px-2 py-2">
                       <Select value={sessao.responsavel_id || undefined} onValueChange={v => updSessao(sessao.id, { responsavel_id: v })}>
