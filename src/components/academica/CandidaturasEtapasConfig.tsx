@@ -79,7 +79,7 @@ function saveEstados(v: EstadoDef[]) {
 
 
 const DEFAULT_ETAPAS = [
-  { nome: "Submissão da candidatura", ordem: 0, agenda: false, obrigatoria: true, estados_possiveis: ["completo"] },
+  { nome: "Submissão da candidatura (online)", ordem: 0, agenda: false, obrigatoria: true, estados_possiveis: ["completo"] },
   { nome: "Entrevista",               ordem: 1, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "completo", "remarcado"] },
   { nome: "Curso Preparatório",       ordem: 2, agenda: true,  obrigatoria: false, estados_possiveis: ["agendado", "completo", "remarcado"] },
   { nome: "Exame de Acesso",          ordem: 3, agenda: true,  obrigatoria: true, estados_possiveis: ["agendado", "aprovado", "reprovado", "remarcado"] },
