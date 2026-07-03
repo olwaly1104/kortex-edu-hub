@@ -13,6 +13,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import CandidaturasEtapasConfig from "@/components/academica/CandidaturasEtapasConfig";
+
 
 type EventoTipo = "semestre" | "exames" | "ferias" | "feriado" | "especial";
 type Epoca = "1" | "2" | "especial";
@@ -151,29 +153,17 @@ export default function CalendarioAcademico() {
     return () => { cancel = true; };
   }, [anoLetivo]);
 
-  // Candidaturas configuration (application windows)
-  type CandEtapa = { id: string; nome: string; inicio: string; fim: string };
-  type CandCfg = { inicio: string; fim: string; vagas: number; taxa: number; etapas: CandEtapa[] };
+  // Candidaturas configuration (application windows) — window + vagas only; etapas live in DB below.
+  type CandCfg = { inicio: string; fim: string; vagas: number; taxa: number };
   const [candidaturas, setCandidaturas] = useState<CandCfg>(
     () => {
       const y = initial.inicio.slice(0, 4);
-      const defaults: CandCfg = {
-        inicio: `${y}-05-01`, fim: `${y}-08-15`, vagas: 200, taxa: 15000,
-        etapas: [
-          { id: "et-abertura", nome: "Abertura de Candidaturas", inicio: `${y}-05-01`, fim: `${y}-05-01` },
-          { id: "et-provas",   nome: "Provas de Admissão",       inicio: `${y}-07-01`, fim: `${y}-07-15` },
-          { id: "et-result",   nome: "Publicação de Resultados", inicio: `${y}-07-25`, fim: `${y}-07-25` },
-          { id: "et-matric",   nome: "Matrículas",               inicio: `${y}-08-01`, fim: `${y}-08-15` },
-        ],
-      };
+      const defaults: CandCfg = { inicio: `${y}-05-01`, fim: `${y}-08-15`, vagas: 200, taxa: 15000 };
       const loaded = loadJSON<CandCfg>(CAND_KEY, defaults);
-      return { ...defaults, ...loaded, etapas: loaded.etapas ?? defaults.etapas };
+      return { ...defaults, ...loaded };
     }
   );
   useEffect(() => { try { localStorage.setItem(CAND_KEY, JSON.stringify(candidaturas)); } catch {} }, [candidaturas]);
-  const addEtapa = () => setCandidaturas(c => ({ ...c, etapas: [...c.etapas, { id: `et-${Date.now()}`, nome: `Etapa ${c.etapas.length + 1}`, inicio: c.inicio, fim: c.inicio }] }));
-  const updEtapa = (id: string, patch: Partial<CandEtapa>) => setCandidaturas(c => ({ ...c, etapas: c.etapas.map(e => e.id === id ? { ...e, ...patch } : e) }));
-  const rmEtapa = (id: string) => setCandidaturas(c => ({ ...c, etapas: c.etapas.filter(e => e.id !== id) }));
 
   // Turnos configuration
   const [turnos, setTurnos] = useState<Turno[]>(() => loadJSON(TURNOS_KEY, DEFAULT_TURNOS));
@@ -294,7 +284,7 @@ export default function CalendarioAcademico() {
       { id: `__sem_${s.id}_fim`, tipo: "semestre" as EventoTipo, titulo: `Fim do ${s.nome}`, inicio: s.fim, fim: s.fim },
     ]),
     { id: "__cand", tipo: "especial", titulo: "Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.fim },
-    ...candidaturas.etapas.map(et => ({ id: `__cand_${et.id}`, tipo: "especial" as EventoTipo, titulo: et.nome, inicio: et.inicio, fim: et.fim })),
+
     ...eventos,
   ], [eventos, inicio, fim, semestres, candidaturas]);
 
@@ -467,30 +457,9 @@ export default function CalendarioAcademico() {
                 </div>
               </div>
               <div className="pt-2 border-t">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Etapas do Processo</p>
-                  <Button size="sm" variant="outline" className="h-7 gap-1 text-xs" onClick={addEtapa}>
-                    <Plus className="w-3 h-3" /> Adicionar Etapa
-                  </Button>
-                </div>
-                {candidaturas.etapas.length === 0 ? (
-                  <p className="text-xs text-muted-foreground italic">Sem etapas configuradas.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {candidaturas.etapas.map(et => (
-                      <div key={et.id} className="grid grid-cols-[1fr_130px_130px_32px] gap-2 items-center">
-                        <Input value={et.nome} onChange={e => updEtapa(et.id, { nome: e.target.value })} placeholder="Nome da etapa" className="h-8 text-xs" />
-                        <Input type="date" value={et.inicio} onChange={e => updEtapa(et.id, { inicio: e.target.value })} className="h-8 text-xs" />
-                        <Input type="date" value={et.fim} onChange={e => updEtapa(et.id, { fim: e.target.value })} className="h-8 text-xs" />
-                        <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                          onClick={() => { if (confirm(`Remover etapa "${et.nome}"?`)) rmEtapa(et.id); }}>
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <CandidaturasEtapasConfig />
               </div>
+
             </div>
           </section>
         </div>

@@ -327,6 +327,101 @@ export type Database = {
         }
         Relationships: []
       }
+      candidaturas_etapas: {
+        Row: {
+          agenda: boolean
+          created_at: string
+          estados_possiveis: string[]
+          id: string
+          institution_id: string | null
+          nome: string
+          obrigatoria: boolean
+          ordem: number
+          owner_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          agenda?: boolean
+          created_at?: string
+          estados_possiveis?: string[]
+          id?: string
+          institution_id?: string | null
+          nome: string
+          obrigatoria?: boolean
+          ordem?: number
+          owner_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          agenda?: boolean
+          created_at?: string
+          estados_possiveis?: string[]
+          id?: string
+          institution_id?: string | null
+          nome?: string
+          obrigatoria?: boolean
+          ordem?: number
+          owner_user_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      candidaturas_sessoes: {
+        Row: {
+          capacidade: number | null
+          created_at: string
+          data_fim: string | null
+          datas: string[]
+          etapa_id: string
+          hora: string | null
+          id: string
+          institution_id: string | null
+          local: string | null
+          mode: string
+          owner_user_id: string
+          responsavel_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          capacidade?: number | null
+          created_at?: string
+          data_fim?: string | null
+          datas?: string[]
+          etapa_id: string
+          hora?: string | null
+          id?: string
+          institution_id?: string | null
+          local?: string | null
+          mode?: string
+          owner_user_id: string
+          responsavel_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          capacidade?: number | null
+          created_at?: string
+          data_fim?: string | null
+          datas?: string[]
+          etapa_id?: string
+          hora?: string | null
+          id?: string
+          institution_id?: string | null
+          local?: string | null
+          mode?: string
+          owner_user_id?: string
+          responsavel_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "candidaturas_sessoes_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "candidaturas_etapas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversation_participants: {
         Row: {
           conversation_id: string
