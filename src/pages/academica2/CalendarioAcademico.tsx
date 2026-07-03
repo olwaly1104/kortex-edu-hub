@@ -780,7 +780,7 @@ export default function CalendarioAcademico() {
                     <span className="inline-flex items-center gap-1.5"><Icon className="w-3 h-3" /> {M.label}</span>
                   </SelectTrigger>
                   <SelectContent>
-                    {(Object.keys(TIPO_META) as EventoTipo[]).map(t => <SelectItem key={t} value={t}>{TIPO_META[t].label}</SelectItem>)}
+                    {ADDABLE_TIPOS.map(t => <SelectItem key={t} value={t}>{TIPO_META[t].label}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 {e.tipo === "exames" && !isAuto ? (
