@@ -1,5 +1,5 @@
 import { OnboardingStepBanner, markOnboardingStepDone, useIsOnboardingStep } from "@/components/admin/OnboardingStepBanner";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -85,6 +85,21 @@ const buildAuto = (startISO: string, endISO: string): Evento[] => {
   ];
 };
 
+type Turno = { id: string; nome: string; inicio: string; fim: string };
+
+const DEFAULT_TURNOS: Turno[] = [
+  { id: "t-m", nome: "Manhã", inicio: "08:00", fim: "12:00" },
+  { id: "t-t", nome: "Tarde", inicio: "13:00", fim: "17:00" },
+  { id: "t-n", nome: "Noite", inicio: "18:00", fim: "22:00" },
+];
+
+const TURNOS_KEY = "upra:turnos-cfg";
+const CAND_KEY = "upra:candidaturas-cfg";
+
+function loadJSON<T>(key: string, fallback: T): T {
+  try { const r = localStorage.getItem(key); return r ? (JSON.parse(r) as T) : fallback; } catch { return fallback; }
+}
+
 export default function CalendarioAcademico() {
   const isOnboarding = useIsOnboardingStep();
   const { user } = useAuth();
@@ -97,6 +112,19 @@ export default function CalendarioAcademico() {
   const [planView, setPlanView] = useState<"cards" | "mensal">("cards");
   const [monthCursor, setMonthCursor] = useState(() => { const d = new Date(initial.inicio); return new Date(d.getFullYear(), d.getMonth(), 1); });
 
+  // Candidaturas configuration (application windows)
+  const [candidaturas, setCandidaturas] = useState<{ inicio: string; fim: string; vagas: number; taxa: number }>(
+    () => loadJSON(CAND_KEY, { inicio: `${initial.inicio.slice(0,4)}-05-01`, fim: `${initial.inicio.slice(0,4)}-08-15`, vagas: 200, taxa: 15000 })
+  );
+  useEffect(() => { try { localStorage.setItem(CAND_KEY, JSON.stringify(candidaturas)); } catch {} }, [candidaturas]);
+
+  // Turnos configuration
+  const [turnos, setTurnos] = useState<Turno[]>(() => loadJSON(TURNOS_KEY, DEFAULT_TURNOS));
+  useEffect(() => { try { localStorage.setItem(TURNOS_KEY, JSON.stringify(turnos)); } catch {} }, [turnos]);
+  const addTurno = () => setTurnos(p => [...p, { id: `t-${Date.now()}`, nome: `Turno ${p.length + 1}`, inicio: "08:00", fim: "12:00" }]);
+  const updTurno = (id: string, patch: Partial<Turno>) => setTurnos(p => p.map(t => t.id === id ? { ...t, ...patch } : t));
+  const rmTurno = (id: string) => setTurnos(p => p.filter(t => t.id !== id));
+
   const changeAno = (v: string) => {
     setAnoLetivo(v);
     const r = rangeFromAno(v);
@@ -106,6 +134,7 @@ export default function CalendarioAcademico() {
     const d = new Date(r.inicio);
     setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
   };
+
 
   const regenerate = () => {
     setEventos(buildAuto(inicio, fim));
@@ -238,6 +267,65 @@ export default function CalendarioAcademico() {
           <Input type="date" value={fim} onChange={e => setFim(e.target.value)} className="h-9" />
         </div>
       </Card>
+
+      {/* Candidaturas */}
+      <Card className="p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <FileSignature className="w-4 h-4 text-primary" />
+          <p className="text-sm font-semibold">Candidaturas — {anoLetivo}</p>
+          <span className="text-[11px] text-muted-foreground">Janela de inscrições, vagas e taxa</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Abertura</p>
+            <Input type="date" value={candidaturas.inicio} onChange={e => setCandidaturas(c => ({ ...c, inicio: e.target.value }))} className="h-9" />
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Encerramento</p>
+            <Input type="date" value={candidaturas.fim} onChange={e => setCandidaturas(c => ({ ...c, fim: e.target.value }))} className="h-9" />
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Vagas totais</p>
+            <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} className="h-9" />
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Taxa de candidatura (Kz)</p>
+            <Input type="number" min={0} value={candidaturas.taxa} onChange={e => setCandidaturas(c => ({ ...c, taxa: +e.target.value || 0 }))} className="h-9" />
+          </div>
+        </div>
+      </Card>
+
+      {/* Turnos */}
+      <Card className="p-4 space-y-3">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Sun className="w-4 h-4 text-primary" />
+            <p className="text-sm font-semibold">Turnos ({turnos.length})</p>
+            <span className="text-[11px] text-muted-foreground">Configure quantos turnos e os respectivos horários</span>
+          </div>
+          <Button size="sm" variant="outline" className="h-8 gap-1" onClick={addTurno}>
+            <Plus className="w-3.5 h-3.5" /> Adicionar Turno
+          </Button>
+        </div>
+        <div className="space-y-2">
+          {turnos.length === 0 && (
+            <p className="text-xs text-muted-foreground italic">Sem turnos configurados.</p>
+          )}
+          {turnos.map(t => (
+            <div key={t.id} className="grid grid-cols-[1fr_110px_110px_36px] gap-2 items-center">
+              <Input value={t.nome} onChange={e => updTurno(t.id, { nome: e.target.value })} placeholder="Nome do turno" className="h-8 text-xs" />
+              <Input type="time" value={t.inicio} onChange={e => updTurno(t.id, { inicio: e.target.value })} className="h-8 text-xs" />
+              <Input type="time" value={t.fim} onChange={e => updTurno(t.id, { fim: e.target.value })} className="h-8 text-xs" />
+              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                onClick={() => { if (confirm(`Remover turno "${t.nome}"?`)) rmTurno(t.id); }}>
+                <Trash2 className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+
 
       {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
