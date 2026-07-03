@@ -142,11 +142,41 @@ export default function CriarTurmas() {
     );
   }, [verTurma, estudantes]);
 
-  const addTurma = (cid: string, ano: string) => {
+  const [novaTurma, setNovaTurma] = useState<{ curso_id: string; ano: string; letra: string; sala: string; turno: string; capacidade: number } | null>(null);
+
+  const openAddTurma = (cid: string, ano: string) => {
     const existing = turmasByCursoAno[cid]?.[ano] ?? [];
     const used = new Set(existing.map((t) => t.letra));
     const nextLetra = LETRAS.find((l) => !used.has(l)) ?? `T${existing.length + 1}`;
-    createMut.mutate({ curso_id: cid, ano, letra: nextLetra });
+    setNovaTurma({ curso_id: cid, ano, letra: nextLetra, sala: "", turno: "Manhã", capacidade: 32 });
+  };
+
+  const confirmarNovaTurma = async () => {
+    if (!novaTurma) return;
+    const letra = novaTurma.letra.trim().toUpperCase();
+    if (!letra) { toast.error("Indique o nome/letra da turma"); return; }
+    const existing = turmasByCursoAno[novaTurma.curso_id]?.[novaTurma.ano] ?? [];
+    if (existing.some((t) => t.letra.toUpperCase() === letra)) {
+      toast.error(`Já existe uma turma "${letra}" neste ano.`);
+      return;
+    }
+    try {
+      const { error } = await supabase.from("turmas").insert({
+        curso_id: novaTurma.curso_id,
+        ano: novaTurma.ano,
+        letra,
+        owner_user_id: user?.id!,
+        sala: novaTurma.sala || null,
+        turno: novaTurma.turno,
+        capacidade: novaTurma.capacidade || 0,
+      });
+      if (error) throw error;
+      qc.invalidateQueries({ queryKey: ["turmas-all"] });
+      toast.success("Turma criada");
+      setNovaTurma(null);
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao criar turma");
+    }
   };
 
   const confirmTurmas = () => {
@@ -264,7 +294,7 @@ export default function CriarTurmas() {
                     <Badge variant="outline" className="text-[10px]">{arr.length} turmas</Badge>
                     <Badge variant="outline" className="text-[10px]">{arr.reduce((a, t) => a + t.capacidade, 0)} lugares</Badge>
                   </div>
-                  <Button size="sm" variant="ghost" onClick={() => addTurma(curso.id, ano)} disabled={createMut.isPending} className="h-7 gap-1 text-xs">
+                  <Button size="sm" variant="ghost" onClick={() => openAddTurma(curso.id, ano)} className="h-7 gap-1 text-xs">
                     <Plus className="w-3 h-3" /> Adicionar Turma
                   </Button>
                 </div>
@@ -349,6 +379,51 @@ export default function CriarTurmas() {
               )}
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+
+      <Dialog open={!!novaTurma} onOpenChange={(o) => !o && setNovaTurma(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Plus className="w-4 h-4 text-primary" /> Nova Turma</DialogTitle>
+            <DialogDescription className="text-xs">
+              {curso && novaTurma ? `${curso.name} · ${novaTurma.ano}º Ano` : ""}
+            </DialogDescription>
+          </DialogHeader>
+          {novaTurma && curso && (
+            <div className="space-y-3">
+              <div className="rounded-md border bg-muted/30 px-3 py-2 flex items-center justify-between">
+                <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Sigla</span>
+                <span className="text-sm font-bold text-primary">{curso.code}-{novaTurma.ano}{(novaTurma.letra || "?").toUpperCase()}</span>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium">Nome / Letra da turma</label>
+                <Input value={novaTurma.letra} onChange={(e) => setNovaTurma({ ...novaTurma, letra: e.target.value.toUpperCase().slice(0, 4) })} placeholder="Ex.: A" className="h-9" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">Sala</label>
+                  <Input value={novaTurma.sala} onChange={(e) => setNovaTurma({ ...novaTurma, sala: e.target.value })} placeholder="Ex.: S-201" className="h-9" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-medium">Turno</label>
+                  <Select value={novaTurma.turno} onValueChange={(v) => setNovaTurma({ ...novaTurma, turno: v })}>
+                    <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                    <SelectContent>{turnos.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-medium">Capacidade</label>
+                <Input type="number" value={novaTurma.capacidade} onChange={(e) => setNovaTurma({ ...novaTurma, capacidade: +e.target.value || 0 })} className="h-9" />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => setNovaTurma(null)}>Cancelar</Button>
+                <Button onClick={confirmarNovaTurma} className="gap-1"><Check className="w-4 h-4" /> Criar Turma</Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
