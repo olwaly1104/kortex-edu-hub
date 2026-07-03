@@ -550,25 +550,20 @@ export default function AdminDiscentes() {
           <div className="px-6 py-5 space-y-6">
             {/* Minimal required block */}
             <section className="space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Field label="Primeiro nome *">
-                  <Input
-                    autoFocus
-                    value={draft.primeiroNome}
-                    onChange={(e) => setF("primeiroNome", e.target.value)}
-                    placeholder="Ana"
-                    className="h-9 text-sm"
-                  />
-                </Field>
-                <Field label="Último nome *">
-                  <Input
-                    value={draft.ultimoNome}
-                    onChange={(e) => setF("ultimoNome", e.target.value)}
-                    placeholder="Silva"
-                    className="h-9 text-sm"
-                  />
-                </Field>
-              </div>
+              <Field label="Nome completo *">
+                <Input
+                  autoFocus
+                  value={`${draft.primeiroNome}${draft.ultimoNome ? " " + draft.ultimoNome : ""}`.trim()}
+                  onChange={(e) => {
+                    const parts = e.target.value.trimStart().split(/\s+/);
+                    const first = parts.shift() || "";
+                    const last = parts.join(" ");
+                    setDraft((d) => ({ ...d, primeiroNome: first, ultimoNome: last }));
+                  }}
+                  placeholder="Ana Silva"
+                  className="h-9 text-sm"
+                />
+              </Field>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Field label="Faculdade *">

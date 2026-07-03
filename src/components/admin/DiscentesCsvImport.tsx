@@ -1,11 +1,10 @@
 import { useMemo, useRef, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Upload, FileSpreadsheet, Download, X, Check, AlertCircle,
+  Upload, FileSpreadsheet, X, Check, AlertCircle,
   Trash2, Loader2, Sparkles, ArrowRight, UserPlus,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -43,10 +42,11 @@ const norm = (s: string) =>
   (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "");
 
 const HEADER_MAP: Record<string, string> = {
-  primeironome: "primeiro_nome", primeiro: "primeiro_nome", nome: "primeiro_nome", firstname: "primeiro_nome",
+  nome: "nome_completo", nomecompleto: "nome_completo", fullname: "nome_completo", name: "nome_completo",
+  primeironome: "primeiro_nome", primeiro: "primeiro_nome", firstname: "primeiro_nome",
   ultimonome: "ultimo_nome", apelido: "ultimo_nome", ultimo: "ultimo_nome", lastname: "ultimo_nome", sobrenome: "ultimo_nome",
   faculdade: "faculdade", faculty: "faculdade", sigla: "faculdade",
-  curso: "curso", codigo: "curso", codigocurso: "curso", coursecode: "curso",
+  curso: "curso", nomedocurso: "curso", nomecurso: "curso", codigo: "curso", codigocurso: "curso", coursecode: "curso", coursename: "curso",
   ano: "ano", year: "ano",
   turma: "turma", class: "turma",
   nascimento: "nascimento", datanascimento: "nascimento", birthdate: "nascimento",
@@ -59,8 +59,15 @@ const HEADER_MAP: Record<string, string> = {
   endereco: "endereco", morada: "endereco", address: "endereco",
 };
 
-const FIELDS = ["primeiro_nome","ultimo_nome","faculdade","curso","ano","turma","nascimento","genero","regime","telemovel","bilhete","provincia","municipio","endereco"] as const;
+const FIELDS = ["nome_completo","primeiro_nome","ultimo_nome","faculdade","curso","ano","turma","nascimento","genero","regime","telemovel","bilhete","provincia","municipio","endereco"] as const;
 type Field = typeof FIELDS[number];
+
+const splitName = (full: string): [string, string] => {
+  const parts = (full || "").trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return ["", ""];
+  if (parts.length === 1) return [parts[0], ""];
+  return [parts[0], parts.slice(1).join(" ")];
+};
 
 type Row = {
   _key: string;
@@ -89,11 +96,7 @@ const emptyRow = (): Row => ({
   telemovel: "", bilhete: "", provincia: "", municipio: "", endereco: "",
 });
 
-const TEMPLATE_HEADERS = ["primeiro_nome","ultimo_nome","faculdade","curso","ano","turma","genero","regime","telemovel","bilhete"];
-const TEMPLATE_EXAMPLE = [
-  ["Ana","Silva","ARQ","ARQ-BAC","1","A","F","normal","+244 923 000 001","000000000LA000"],
-  ["Bruno","Costa","ARQ","ARQ-BAC","1","A","M","bolseiro","","000000000LA001"],
-];
+const RECOGNIZED_COLS = ["nome","faculdade","curso","ano","turma","genero","regime","telemovel","bilhete","nascimento","provincia","municipio","endereco"];
 
 /* ---------------- component ---------------- */
 
@@ -137,10 +140,16 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     const n = norm(raw);
     if (!n) return "";
     const pool = facId ? cursos.filter((c: any) => c.faculdade_id === facId) : cursos;
+    // exact code / name → startsWith → contains either direction
     return (
       pool.find((c: any) => norm(c.code || "") === n)?.id ||
       pool.find((c: any) => norm(c.name || "") === n)?.id ||
-      pool.find((c: any) => norm(c.name || "").startsWith(n))?.id || ""
+      pool.find((c: any) => norm(c.code || "").startsWith(n) || n.startsWith(norm(c.code || "")))?.id ||
+      pool.find((c: any) => norm(c.name || "").startsWith(n) || n.startsWith(norm(c.name || "")))?.id ||
+      pool.find((c: any) => {
+        const cn = norm(c.name || ""); const cc = norm(c.code || "");
+        return (cn && (cn.includes(n) || n.includes(cn))) || (cc && (cc.includes(n) || n.includes(cc)));
+      })?.id || ""
     );
   };
 
@@ -154,10 +163,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       const r = emptyRow();
       const facRaw = cells[mapping.indexOf("faculdade")] || "";
       const cursoRaw = cells[mapping.indexOf("curso")] || "";
+      const nomeCompletoRaw = cells[mapping.indexOf("nome_completo")] || "";
       mapping.forEach((f, idx) => {
         if (!f) return;
         const val = (cells[idx] || "").trim();
-        if (f === "faculdade" || f === "curso") return; // handled below
+        if (f === "faculdade" || f === "curso" || f === "nome_completo") return; // handled below
         if (f === "genero") {
           const g = val.toUpperCase();
           r.genero = g.startsWith("M") ? "M" : g.startsWith("F") ? "F" : g ? "Outro" : "";
@@ -168,6 +178,16 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
           (r as any)[f] = val;
         }
       });
+      // Smart name extraction: prefer nome_completo, else use primeiro_nome as source if it contains spaces
+      if (nomeCompletoRaw.trim()) {
+        const [first, last] = splitName(nomeCompletoRaw);
+        r.primeiro_nome = first;
+        r.ultimo_nome = last || r.ultimo_nome;
+      } else if (!r.ultimo_nome && r.primeiro_nome && /\s/.test(r.primeiro_nome)) {
+        const [first, last] = splitName(r.primeiro_nome);
+        r.primeiro_nome = first;
+        r.ultimo_nome = last;
+      }
       const facId = resolveFaculdade(facRaw);
       r.faculdade_id = facId;
       r.curso_id = resolveCurso(cursoRaw, facId);
@@ -186,14 +206,6 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     ingestText(text);
   };
 
-  const downloadTemplate = () => {
-    const csv = [TEMPLATE_HEADERS.join(","), ...TEMPLATE_EXAMPLE.map((r) => r.join(","))].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "template-discentes.csv"; a.click();
-    URL.revokeObjectURL(url);
-  };
 
   /* validation */
   const validate = (r: Row): string[] => {
@@ -307,35 +319,46 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
 
   /* ---------------- render ---------------- */
 
-  return (
-    <Dialog open={open} onOpenChange={(v) => (v ? onOpenChange(true) : close())}>
-      <DialogContent className="max-w-6xl max-h-[92vh] overflow-hidden p-0 flex flex-col">
-        <div className="px-6 pt-5 pb-4 border-b bg-gradient-to-br from-primary/5 via-background to-background space-y-3">
-          {onSwitchToManual && <ModeToggle mode="csv" onSwitchToManual={onSwitchToManual} />}
-          <DialogHeader className="space-y-1.5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <FileSpreadsheet className="w-5 h-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <DialogTitle className="text-base font-bold">Importar Discentes via CSV</DialogTitle>
-                <DialogDescription className="text-[12px]">
-                  Carregue um ficheiro CSV, reveja em massa e confirme a criação dos discentes.
-                </DialogDescription>
-              </div>
-              {stage === "preview" && (
-                <div className="flex items-center gap-2 shrink-0">
-                  <StatChip color="emerald" label="Válidas" value={stats.valid} />
-                  <StatChip color="amber" label="Com erro" value={stats.invalid} />
-                  <StatChip color="muted" label="Total" value={stats.total} />
-                </div>
-              )}
-            </div>
-          </DialogHeader>
-        </div>
+  if (!open) return null;
 
-        {stage === "upload" && (
-          <div className="flex-1 overflow-y-auto px-6 py-6">
+  return (
+    <div className="fixed inset-0 z-50 bg-background flex flex-col animate-fade-in">
+      {/* Top bar */}
+      <div className="px-6 py-3 border-b bg-gradient-to-br from-primary/5 via-background to-background flex items-center gap-4">
+        <button
+          type="button"
+          onClick={close}
+          className="h-8 px-2.5 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+        >
+          <X className="w-3.5 h-3.5" /> Sair
+        </button>
+        <div className="w-px h-6 bg-border" />
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <FileSpreadsheet className="w-4 h-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-bold leading-tight">Importar Discentes via CSV</p>
+            <p className="text-[11px] text-muted-foreground leading-tight">
+              {stage === "upload" ? "Carregue um ficheiro CSV para começar" : "Reveja e edite antes de confirmar"}
+            </p>
+          </div>
+        </div>
+        {stage === "preview" && (
+          <div className="flex items-center gap-2">
+            <StatChip color="emerald" label="Válidas" value={stats.valid} />
+            <StatChip color="amber" label="Com erro" value={stats.invalid} />
+            <StatChip color="muted" label="Total" value={stats.total} />
+          </div>
+        )}
+        <div className="ml-auto">
+          {onSwitchToManual && <ModeToggle mode="csv" onSwitchToManual={onSwitchToManual} />}
+        </div>
+      </div>
+
+      {stage === "upload" && (
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-2xl mx-auto px-6 py-10">
             <div
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
@@ -344,12 +367,12 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                 onFile(e.dataTransfer.files?.[0] || null);
               }}
               onClick={() => fileRef.current?.click()}
-              className={`border-2 border-dashed rounded-xl px-6 py-14 text-center cursor-pointer transition-colors ${
+              className={`border-2 border-dashed rounded-xl px-6 py-16 text-center cursor-pointer transition-colors ${
                 dragOver ? "border-primary bg-primary/5" : "border-input hover:border-primary/60 hover:bg-muted/30"
               }`}
             >
-              <div className="w-14 h-14 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
-                <Upload className="w-6 h-6" />
+              <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
+                <Upload className="w-7 h-7" />
               </div>
               <p className="text-sm font-semibold">Arraste o CSV para aqui, ou clique para escolher</p>
               <p className="text-xs text-muted-foreground mt-1">Suporta vírgula ou ponto-e-vírgula · UTF-8</p>
@@ -360,39 +383,35 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
               />
             </div>
 
-            <div className="mt-6 grid md:grid-cols-2 gap-3">
-              <div className="rounded-lg border bg-muted/30 p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  <p className="text-xs font-semibold">Colunas reconhecidas</p>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {TEMPLATE_HEADERS.map((h) => (
-                    <span key={h} className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-background border">
-                      {h}
-                    </span>
-                  ))}
-                </div>
-                <p className="text-[10.5px] text-muted-foreground mt-2 leading-relaxed">
-                  Só <strong>primeiro_nome, ultimo_nome, faculdade, curso, ano</strong> são obrigatórios.
-                  Faculdade pode ser sigla ou nome; curso pode ser código ou nome.
-                </p>
+            <div className="mt-6 rounded-lg border bg-muted/30 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <p className="text-xs font-semibold">Colunas reconhecidas — extracção inteligente</p>
               </div>
-
-              <div className="rounded-lg border p-4 flex flex-col justify-between">
-                <div>
-                  <p className="text-xs font-semibold mb-1">Template pronto a usar</p>
-                  <p className="text-[10.5px] text-muted-foreground leading-relaxed">
-                    Descarregue o modelo com exemplos e adapte-o à sua turma.
-                  </p>
-                </div>
-                <Button size="sm" variant="outline" onClick={downloadTemplate} className="mt-3 gap-1.5 w-fit">
-                  <Download className="w-3.5 h-3.5" /> Descarregar template.csv
-                </Button>
+              <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
+                Não precisa de nomes exactos. O sistema detecta variações comuns e faz a extracção automática:
+                <br />
+                <strong className="text-foreground">Nome</strong> → separa automaticamente primeiro e último nome ·{" "}
+                <strong className="text-foreground">Faculdade</strong> → aceita sigla ou nome completo ·{" "}
+                <strong className="text-foreground">Curso</strong> → reconhece código ou nome, mesmo parcial ·{" "}
+                <strong className="text-foreground">Género/Regime</strong> → normaliza valores (M/F, bolseiro/normal).
+              </p>
+              <div className="flex flex-wrap gap-1">
+                {RECOGNIZED_COLS.map((h) => (
+                  <span key={h} className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-background border">
+                    {h}
+                  </span>
+                ))}
               </div>
+              <p className="text-[10.5px] text-muted-foreground mt-3 leading-relaxed">
+                Obrigatórios: <strong>nome, faculdade, curso, ano</strong>. Os restantes podem ficar vazios e ser preenchidos depois.
+              </p>
             </div>
           </div>
-        )}
+        </div>
+      )}
+
+
 
         {stage === "preview" && (
           <>
@@ -554,8 +573,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
             </div>
           </>
         )}
-      </DialogContent>
-    </Dialog>
+    </div>
   );
 }
 
