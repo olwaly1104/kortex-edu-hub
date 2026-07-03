@@ -282,7 +282,7 @@ export default function CalendarioAcademico() {
       { id: `__sem_${s.id}_fim`, tipo: "semestre" as EventoTipo, titulo: `Fim do ${s.nome}`, inicio: s.fim, fim: s.fim },
     ]),
     { id: "__cand", tipo: "especial", titulo: "Candidaturas", inicio: candidaturas.inicio, fim: candidaturas.fim },
-    ...candidaturas.etapas.map(et => ({ id: `__cand_${et.id}`, tipo: "especial" as EventoTipo, titulo: et.nome, inicio: et.inicio, fim: et.fim })),
+
     ...eventos,
   ], [eventos, inicio, fim, semestres, candidaturas]);
 
