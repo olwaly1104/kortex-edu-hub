@@ -60,6 +60,31 @@ const nextColor = (i: number) => COR_OPCOES[i % COR_OPCOES.length].value;
 
 const ESTADOS_KEY = "upra:cand-estados-v2";
 
+const parseIsoLocal = (value?: string | null): Date | undefined => {
+  if (!value) return undefined;
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return undefined;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return undefined;
+  return date;
+};
+
+const formatIsoLocal = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const isBeforeDay = (date: Date, minDate: Date) => {
+  const current = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+  const min = new Date(minDate.getFullYear(), minDate.getMonth(), minDate.getDate()).getTime();
+  return current < min;
+};
+
 function loadEstados(): EstadoDef[] {
   if (typeof window === "undefined") return DEFAULT_ESTADOS;
   try {
@@ -427,13 +452,17 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                   <tr key={etapa.id} className="border-t align-top">
                     <td className="px-3 py-2 font-medium">{etapa.nome}</td>
                     <td className="px-2 py-2">
-                      <Select value={sessao.mode || undefined} onValueChange={(v: "dia" | "dias" | "periodo") => updSessao(sessao.id, {
-                        mode: v,
-                        datas: v === "periodo" ? (sessao.datas[0] ? [sessao.datas[0]] : []) : (v === "dia" ? sessao.datas.slice(0, 1) : sessao.datas),
-                        data_fim: v === "periodo" ? (sessao.data_fim || null) : null,
-                      })}>
+                      <Select value={sessao.mode || "none"} onValueChange={(v: "none" | "dia" | "dias" | "periodo") => {
+                        if (v === "none") return;
+                        updSessao(sessao.id, {
+                          mode: v,
+                          datas: v === "periodo" ? (sessao.datas[0] ? [sessao.datas[0]] : []) : (v === "dia" ? sessao.datas.slice(0, 1) : sessao.datas),
+                          data_fim: v === "periodo" ? (sessao.data_fim || null) : null,
+                        });
+                      }}>
                         <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="—" /></SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="none" disabled>—</SelectItem>
                           <SelectItem value="dia">Dia</SelectItem>
                           <SelectItem value="dias">Dias</SelectItem>
                           <SelectItem value="periodo">Período</SelectItem>
@@ -442,31 +471,61 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                     </td>
                     <td className="px-2 py-2">
                       {sessao.mode === "periodo" ? (() => {
-                        const parseD = (s: string) => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d); };
-                        const fmtD = (d: Date) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-                        const from = sessao.datas[0] ? parseD(sessao.datas[0]) : undefined;
-                        const to = sessao.data_fim ? parseD(sessao.data_fim) : undefined;
+                        const from = parseIsoLocal(sessao.datas[0]);
+                        const to = parseIsoLocal(sessao.data_fim);
                         return (
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
-                                {from && to ? `${sessao.datas[0]} → ${sessao.data_fim}`
-                                  : from ? `${sessao.datas[0]} → …`
-                                  : <span className="text-muted-foreground">Escolher período</span>}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
-                              <Calendar mode="range"
-                                defaultMonth={from ?? new Date()}
-                                selected={{ from, to }}
-                                onSelect={(r: any) => updSessao(sessao.id, {
-                                  datas: r?.from ? [fmtD(r.from)] : [],
-                                  data_fim: r?.to ? fmtD(r.to) : null,
-                                })}
-                                numberOfMonths={1}
-                                className="p-3 pointer-events-auto" />
-                            </PopoverContent>
-                          </Popover>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 min-w-[260px]">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
+                                  <span className="text-muted-foreground mr-1">De</span>
+                                  {sessao.datas[0] || "Escolher"}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={from}
+                                  defaultMonth={from ?? to ?? new Date()}
+                                  onSelect={(date) => {
+                                    if (!date) {
+                                      updSessao(sessao.id, { datas: [], data_fim: null });
+                                      return;
+                                    }
+                                    const nextFrom = formatIsoLocal(date);
+                                    const nextTo = to && !isBeforeDay(to, date) ? sessao.data_fim : null;
+                                    updSessao(sessao.id, { datas: [nextFrom], data_fim: nextTo });
+                                  }}
+                                  className="p-3 pointer-events-auto"
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="outline" size="sm" className="h-8 text-xs w-full justify-start font-normal">
+                                  <span className="text-muted-foreground mr-1">Até</span>
+                                  {sessao.data_fim || "Escolher"}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={to}
+                                  defaultMonth={to ?? from ?? new Date()}
+                                  disabled={from ? (date) => isBeforeDay(date, from) : undefined}
+                                  onSelect={(date) => {
+                                    if (!date) {
+                                      updSessao(sessao.id, { data_fim: null });
+                                      return;
+                                    }
+                                    const nextTo = formatIsoLocal(date);
+                                    updSessao(sessao.id, { data_fim: nextTo, datas: sessao.datas[0] ? sessao.datas : [nextTo] });
+                                  }}
+                                  className="p-3 pointer-events-auto"
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </div>
                         );
                       })() : sessao.mode === "dia" ? (
                         <Popover>
@@ -476,8 +535,8 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                             </Button>
                           </PopoverTrigger>
                           <PopoverContent className="w-auto p-0">
-                            <Calendar mode="single" selected={sessao.datas[0] ? new Date(sessao.datas[0]) : undefined}
-                              onSelect={d => updSessao(sessao.id, { datas: d ? [d.toISOString().slice(0, 10)] : [] })} />
+                            <Calendar mode="single" selected={parseIsoLocal(sessao.datas[0])}
+                              onSelect={d => updSessao(sessao.id, { datas: d ? [formatIsoLocal(d)] : [] })} />
                           </PopoverContent>
                         </Popover>
                       ) : sessao.mode === "dias" ? (
@@ -489,9 +548,9 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
-                              <Calendar mode="multiple" selected={sessao.datas.map(d => new Date(d))}
+                              <Calendar mode="multiple" selected={sessao.datas.map(parseIsoLocal).filter((d): d is Date => Boolean(d))}
                                 onSelect={(ds) => {
-                                  const newDatas = (ds || []).map(d => d.toISOString().slice(0, 10)).sort();
+                                  const newDatas = (ds || []).map(formatIsoLocal).sort();
                                   const oldMap = new Map(sessao.datas.map((d, i) => [d, sessao.horas[i] || ""]));
                                   const newHoras = newDatas.map(d => oldMap.get(d) || "");
                                   updSessao(sessao.id, { datas: newDatas, horas: newHoras });
