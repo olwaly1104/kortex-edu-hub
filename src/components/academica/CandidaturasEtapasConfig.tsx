@@ -412,7 +412,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                         </button>
                       </PopoverTrigger>
                       <PopoverContent align="start" className="w-56 p-2 space-y-1">
-                        {ESTADOS_DISPONIVEIS.map(e => (
+                        {estadosAll.map(e => (
                           <label key={e.key} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-muted cursor-pointer text-xs">
                             <Checkbox checked={et.estados_possiveis.includes(e.key)} onCheckedChange={() => toggleEstado(et, e.key)} />
                             <Badge variant="outline" className={cn("text-[10px]", e.color)}>{e.label}</Badge>
