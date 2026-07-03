@@ -127,6 +127,7 @@ const docenteFromDb = (r: any): DocenteRow => ({
   contacto: r.contacto || "",
   faculdade: r.faculdade || "",
   departamento: r.departamento || "",
+  curso: r.curso || "",
   categoria: r.categoria || "",
   cargo: r.cargo || "",
   nascimento: r.nascimento || "",
