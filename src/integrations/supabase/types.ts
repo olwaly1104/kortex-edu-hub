@@ -1073,6 +1073,53 @@ export type Database = {
         }
         Relationships: []
       }
+      turmas: {
+        Row: {
+          ano: string
+          capacidade: number
+          created_at: string
+          curso_id: string
+          id: string
+          letra: string
+          owner_user_id: string
+          sala: string | null
+          turno: string | null
+          updated_at: string
+        }
+        Insert: {
+          ano: string
+          capacidade?: number
+          created_at?: string
+          curso_id: string
+          id?: string
+          letra: string
+          owner_user_id?: string
+          sala?: string | null
+          turno?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ano?: string
+          capacidade?: number
+          created_at?: string
+          curso_id?: string
+          id?: string
+          letra?: string
+          owner_user_id?: string
+          sala?: string | null
+          turno?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "turmas_curso_id_fkey"
+            columns: ["curso_id"]
+            isOneToOne: false
+            referencedRelation: "cursos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
