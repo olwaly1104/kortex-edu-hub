@@ -592,7 +592,7 @@ export default function AdminDiscentes() {
                     <SelectContent>{anosDoCurso.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
                   </Select>
                 </Field>
-                <Field label="Turma *">
+                <Field label="Turma">
                   <Select value={draft.turma} onValueChange={(v) => setF("turma", v)} disabled={!draft.ano}>
                     <SelectTrigger className="h-9 text-xs">
                       <SelectValue placeholder={!draft.ano ? "—" : "—"} />
