@@ -16,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import CandidaturasEtapasConfig from "@/components/academica/CandidaturasEtapasConfig";
 
 
-type EventoTipo = "semestre" | "exames" | "ferias" | "feriado" | "especial";
+type EventoTipo = "exames" | "ferias" | "feriado" | "especial";
 type Epoca = "1" | "2" | "especial";
 type Semestre = "1" | "2";
 type Evento = {
