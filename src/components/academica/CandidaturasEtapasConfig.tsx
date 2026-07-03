@@ -176,7 +176,7 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   };
 
   const rmEtapa = async (id: string, nome: string) => {
-    if (isProtected(nome)) { toast.error("Etapa predefinida — não pode ser removida."); return; }
+    
     if (!confirm(`Remover etapa "${nome}"?`)) return;
     const { error } = await supabase.from("candidaturas_etapas").delete().eq("id", id);
     if (error) { toast.error(error.message); return; }
