@@ -480,7 +480,6 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                     <th className="px-2 py-2 text-left">Faculdade</th>
                     <th className="px-2 py-2 text-left">Curso</th>
                     <th className="px-2 py-2 text-left w-16">Ano</th>
-                    <th className="px-2 py-2 text-left w-16">Turma</th>
                     <th className="px-2 py-2 text-left w-20">Regime</th>
                     <th className="px-2 py-2 text-left">Telemóvel</th>
                     <th className="px-2 py-2 text-left w-8"></th>
