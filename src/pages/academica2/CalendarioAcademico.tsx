@@ -247,40 +247,82 @@ export default function CalendarioAcademico() {
         </div>
       )}
 
-      {/* Parameters */}
-      <Card className="p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div>
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Ano Letivo</p>
-          <Select value={anoLetivo} onValueChange={changeAno}>
-            <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {ANOS_LETIVOS.map(a => <SelectItem key={a} value={a}>{a}</SelectItem>)}
-            </SelectContent>
-          </Select>
+      {/* Ano Letivo + Turnos */}
+      <Card className="p-4 space-y-5">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="w-4 h-4 text-primary" />
+          <p className="text-sm font-semibold">Ano Letivo</p>
+          <span className="text-[11px] text-muted-foreground">Período académico e turnos diários</span>
         </div>
+
         <div>
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Início</p>
-          <Input type="date" value={inicio} onChange={e => setInicio(e.target.value)} className="h-9" />
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Período</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <p className="text-[11px] text-muted-foreground mb-1">Ano Letivo</p>
+              <Select value={anoLetivo} onValueChange={changeAno}>
+                <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {ANOS_LETIVOS.map(a => <SelectItem key={a} value={a}>{a}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <p className="text-[11px] text-muted-foreground mb-1">Início</p>
+              <Input type="date" value={inicio} onChange={e => setInicio(e.target.value)} className="h-9" />
+            </div>
+            <div>
+              <p className="text-[11px] text-muted-foreground mb-1">Fim</p>
+              <Input type="date" value={fim} onChange={e => setFim(e.target.value)} className="h-9" />
+            </div>
+          </div>
         </div>
-        <div>
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Fim</p>
-          <Input type="date" value={fim} onChange={e => setFim(e.target.value)} className="h-9" />
+
+        <div className="pt-1 border-t">
+          <div className="flex items-center justify-between gap-2 flex-wrap mt-4 mb-2">
+            <div className="flex items-center gap-2">
+              <Sun className="w-3.5 h-3.5 text-primary" />
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Turnos ({turnos.length})</p>
+            </div>
+            <Button size="sm" variant="outline" className="h-8 gap-1" onClick={addTurno}>
+              <Plus className="w-3.5 h-3.5" /> Adicionar Turno
+            </Button>
+          </div>
+          <div className="space-y-2">
+            {turnos.length === 0 && (
+              <p className="text-xs text-muted-foreground italic">Sem turnos configurados.</p>
+            )}
+            {turnos.length > 0 && (
+              <div className="grid grid-cols-[1fr_110px_110px_36px] gap-2 items-center text-[10px] uppercase tracking-wide text-muted-foreground px-1">
+                <span>Nome</span><span>Início</span><span>Fim</span><span />
+              </div>
+            )}
+            {turnos.map(t => (
+              <div key={t.id} className="grid grid-cols-[1fr_110px_110px_36px] gap-2 items-center">
+                <Input value={t.nome} onChange={e => updTurno(t.id, { nome: e.target.value })} placeholder="Nome do turno" className="h-8 text-xs" />
+                <Input type="time" value={t.inicio} onChange={e => updTurno(t.id, { inicio: e.target.value })} className="h-8 text-xs" />
+                <Input type="time" value={t.fim} onChange={e => updTurno(t.id, { fim: e.target.value })} className="h-8 text-xs" />
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                  onClick={() => { if (confirm(`Remover turno "${t.nome}"?`)) rmTurno(t.id); }}>
+                  <Trash2 className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       </Card>
 
       {/* Candidaturas */}
-      <Card className="p-4 space-y-4">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2">
-            <FileSignature className="w-4 h-4 text-primary" />
-            <p className="text-sm font-semibold">Candidaturas — {anoLetivo}</p>
-          </div>
+      <Card className="p-4 space-y-5">
+        <div className="flex items-center gap-2">
+          <FileSignature className="w-4 h-4 text-primary" />
+          <p className="text-sm font-semibold">Candidaturas — {anoLetivo}</p>
           <span className="text-[11px] text-muted-foreground">Janela de inscrições e vagas totais</span>
         </div>
 
         <div>
           <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Período de inscrição</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <p className="text-[11px] text-muted-foreground mb-1">Abertura</p>
               <Input type="date" value={candidaturas.inicio} onChange={e => setCandidaturas(c => ({ ...c, inicio: e.target.value }))} className="h-9" />
@@ -289,45 +331,14 @@ export default function CalendarioAcademico() {
               <p className="text-[11px] text-muted-foreground mb-1">Encerramento</p>
               <Input type="date" value={candidaturas.fim} onChange={e => setCandidaturas(c => ({ ...c, fim: e.target.value }))} className="h-9" />
             </div>
-          </div>
-        </div>
-
-        <div className="max-w-xs">
-          <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Vagas totais</p>
-          <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} className="h-9" />
-        </div>
-      </Card>
-
-
-      {/* Turnos */}
-      <Card className="p-4 space-y-3">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2">
-            <Sun className="w-4 h-4 text-primary" />
-            <p className="text-sm font-semibold">Turnos ({turnos.length})</p>
-            <span className="text-[11px] text-muted-foreground">Configure quantos turnos e os respectivos horários</span>
-          </div>
-          <Button size="sm" variant="outline" className="h-8 gap-1" onClick={addTurno}>
-            <Plus className="w-3.5 h-3.5" /> Adicionar Turno
-          </Button>
-        </div>
-        <div className="space-y-2">
-          {turnos.length === 0 && (
-            <p className="text-xs text-muted-foreground italic">Sem turnos configurados.</p>
-          )}
-          {turnos.map(t => (
-            <div key={t.id} className="grid grid-cols-[1fr_110px_110px_36px] gap-2 items-center">
-              <Input value={t.nome} onChange={e => updTurno(t.id, { nome: e.target.value })} placeholder="Nome do turno" className="h-8 text-xs" />
-              <Input type="time" value={t.inicio} onChange={e => updTurno(t.id, { inicio: e.target.value })} className="h-8 text-xs" />
-              <Input type="time" value={t.fim} onChange={e => updTurno(t.id, { fim: e.target.value })} className="h-8 text-xs" />
-              <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                onClick={() => { if (confirm(`Remover turno "${t.nome}"?`)) rmTurno(t.id); }}>
-                <Trash2 className="w-3.5 h-3.5" />
-              </Button>
+            <div>
+              <p className="text-[11px] text-muted-foreground mb-1">Vagas totais</p>
+              <Input type="number" min={0} value={candidaturas.vagas} onChange={e => setCandidaturas(c => ({ ...c, vagas: +e.target.value || 0 }))} className="h-9" />
             </div>
-          ))}
+          </div>
         </div>
       </Card>
+
 
 
 
