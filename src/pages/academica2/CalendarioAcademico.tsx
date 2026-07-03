@@ -16,7 +16,9 @@ import { supabase } from "@/integrations/supabase/client";
 import CandidaturasEtapasConfig from "@/components/academica/CandidaturasEtapasConfig";
 
 
-type EventoTipo = "exames" | "ferias" | "feriado" | "especial";
+type EventoTipo = "exames" | "ferias" | "feriado" | "especial" | "semestre" | "candidaturas";
+type EventoTipoAddable = "exames" | "ferias" | "feriado" | "especial";
+const ADDABLE_TIPOS: EventoTipoAddable[] = ["exames", "ferias", "feriado", "especial"];
 type Epoca = "1" | "2" | "especial";
 type Semestre = "1" | "2";
 type Evento = {
@@ -31,10 +33,12 @@ type Evento = {
 
 const TIPO_META: Record<EventoTipo, { label: string; color: string; dot: string; ring: string; icon: typeof BookOpen }> = {
   
-  exames:   { label: "Exames",   color: "bg-amber-500 text-white",             dot: "bg-amber-500",   ring: "border-l-amber-500",   icon: FileSignature },
-  ferias:   { label: "Férias",   color: "bg-sky-500 text-white",               dot: "bg-sky-500",     ring: "border-l-sky-500",     icon: Sun },
-  feriado:  { label: "Feriado",  color: "bg-rose-500 text-white",              dot: "bg-rose-500",    ring: "border-l-rose-500",    icon: Star },
-  especial: { label: "Especial", color: "bg-violet-500 text-white",            dot: "bg-violet-500",  ring: "border-l-violet-500",  icon: Sparkles },
+  exames:       { label: "Exames",       color: "bg-amber-500 text-white",  dot: "bg-amber-500",   ring: "border-l-amber-500",   icon: FileSignature },
+  ferias:       { label: "Férias",       color: "bg-sky-500 text-white",    dot: "bg-sky-500",     ring: "border-l-sky-500",     icon: Sun },
+  feriado:      { label: "Feriado",      color: "bg-rose-500 text-white",   dot: "bg-rose-500",    ring: "border-l-rose-500",    icon: Star },
+  especial:     { label: "Especial",     color: "bg-violet-500 text-white", dot: "bg-violet-500",  ring: "border-l-violet-500",  icon: Sparkles },
+  semestre:     { label: "Semestre",     color: "bg-emerald-600 text-white",dot: "bg-emerald-600", ring: "border-l-emerald-600", icon: BookOpen },
+  candidaturas: { label: "Candidaturas", color: "bg-indigo-500 text-white", dot: "bg-indigo-500",  ring: "border-l-indigo-500",  icon: CalendarRange },
 };
 
 const EPOCA_LABEL: Record<Epoca, string> = {
