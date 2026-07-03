@@ -116,11 +116,14 @@ export default function CriarTurmas() {
       const { data: authData } = await supabase.auth.getUser();
       const authId = authData?.user?.id;
       if (!authId) throw new Error("Sessão expirada. Volte a iniciar sessão.");
+      const firstTurno = (() => {
+        try { const a = JSON.parse(localStorage.getItem("upra:turnos-cfg") || "[]"); return a?.[0]?.nome ?? null; } catch { return null; }
+      })();
       const { error } = await supabase.from("turmas").insert({
         ...row,
         owner_user_id: authId,
         capacidade: 32,
-        turno: "Manhã",
+        turno: firstTurno,
       });
       if (error) throw error;
     },
