@@ -202,8 +202,19 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const onFile = async (f: File | null) => {
     if (!f) return;
     if (!/\.(csv|txt)$/i.test(f.name)) { toast.error("Ficheiro deve ser .csv"); return; }
-    const text = await f.text();
-    ingestText(text);
+    setParsing(true);
+    try {
+      const text = await f.text();
+      // Yield to the browser so the loading UI can paint before heavy sync parse.
+      await new Promise((r) => setTimeout(r, 30));
+      ingestText(text);
+      // Brief "complete" flash before switching to the preview.
+      await new Promise((r) => setTimeout(r, 250));
+    } catch (e: any) {
+      toast.error(e?.message || "Falha ao processar CSV");
+    } finally {
+      setParsing(false);
+    }
   };
 
 
