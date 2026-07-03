@@ -198,20 +198,20 @@ export default function CalendarioAcademico() {
 
   // Load all scheduled sessões (with etapa name) for preview + read-only list
   type SessaoRow = { id: string; etapa_id: string; mode: string | null; datas: string[]; data_fim: string | null; hora: string | null; horas: string[]; local: string | null };
-  type EtapaRow = { id: string; nome: string };
+  type EtapaRow = { id: string; nome: string; ordem: number };
   const [sessoesAgendadas, setSessoesAgendadas] = useState<SessaoRow[]>([]);
-  const [etapasMap, setEtapasMap] = useState<Record<string, string>>({});
+  const [etapasMap, setEtapasMap] = useState<Record<string, { nome: string; ordem: number }>>({});
   useEffect(() => {
     let cancel = false;
     (async () => {
       const [{ data: se }, { data: et }] = await Promise.all([
         supabase.from("candidaturas_sessoes").select("id,etapa_id,mode,datas,data_fim,hora,horas,local"),
-        supabase.from("candidaturas_etapas").select("id,nome"),
+        supabase.from("candidaturas_etapas").select("id,nome,ordem").order("ordem"),
       ]);
       if (cancel) return;
       setSessoesAgendadas(((se ?? []) as any[]).map(r => ({ ...r, datas: r.datas ?? [], horas: r.horas ?? [] })) as SessaoRow[]);
-      const map: Record<string, string> = {};
-      ((et ?? []) as EtapaRow[]).forEach(e => { map[e.id] = e.nome; });
+      const map: Record<string, { nome: string; ordem: number }> = {};
+      ((et ?? []) as EtapaRow[]).forEach(e => { map[e.id] = { nome: e.nome, ordem: e.ordem }; });
       setEtapasMap(map);
     })();
     return () => { cancel = true; };
