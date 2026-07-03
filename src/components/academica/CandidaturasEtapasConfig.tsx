@@ -45,7 +45,7 @@ const ESTADOS_DISPONIVEIS = [
 
 const estadoMeta = (k: string) => ESTADOS_DISPONIVEIS.find(e => e.key === k) ?? { key: k, label: k, color: "bg-muted text-foreground border-border" };
 
-export default function CandidaturasEtapasConfig() {
+export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnly?: boolean } = {}) {
   const { user } = useAuth();
   const [etapas, setEtapas] = useState<Etapa[]>([]);
   const [sessoes, setSessoes] = useState<Sessao[]>([]);
