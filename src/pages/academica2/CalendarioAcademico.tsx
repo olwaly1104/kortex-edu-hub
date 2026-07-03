@@ -763,9 +763,10 @@ export default function CalendarioAcademico() {
         <div className="divide-y">
           {filtered.map(e => {
             const M = TIPO_META[e.tipo]; const Icon = M.icon;
+            const isAuto = e.id.startsWith("__");
             return (
-              <div key={e.id} className="grid grid-cols-[120px_1fr_140px_140px_36px] gap-2 p-2 items-center">
-                <Select value={e.tipo} onValueChange={v => update(e.id, { tipo: v as EventoTipo })}>
+              <div key={e.id} className={`grid grid-cols-[120px_1fr_140px_140px_36px] gap-2 p-2 items-center ${isAuto ? "bg-muted/20" : ""}`}>
+                <Select value={e.tipo} onValueChange={v => update(e.id, { tipo: v as EventoTipo })} disabled={isAuto}>
                   <SelectTrigger className="h-8 text-xs">
                     <span className="inline-flex items-center gap-1.5"><Icon className="w-3 h-3" /> {M.label}</span>
                   </SelectTrigger>
@@ -773,7 +774,7 @@ export default function CalendarioAcademico() {
                     {(Object.keys(TIPO_META) as EventoTipo[]).map(t => <SelectItem key={t} value={t}>{TIPO_META[t].label}</SelectItem>)}
                   </SelectContent>
                 </Select>
-                {e.tipo === "exames" ? (
+                {e.tipo === "exames" && !isAuto ? (
                   <div className="flex gap-2">
                     <Select value={e.epoca ?? "1"} onValueChange={v => update(e.id, { epoca: v as Epoca })}>
                       <SelectTrigger className="h-8 text-xs flex-1"><SelectValue placeholder="Época" /></SelectTrigger>
@@ -792,16 +793,24 @@ export default function CalendarioAcademico() {
                     </Select>
                   </div>
                 ) : (
-                  <Input value={e.titulo} onChange={ev => update(e.id, { titulo: ev.target.value })} className="h-8 text-xs" />
+                  <div className="flex items-center gap-2">
+                    <Input value={e.titulo} onChange={ev => update(e.id, { titulo: ev.target.value })} className="h-8 text-xs" disabled={isAuto} readOnly={isAuto} />
+                    {isAuto && <Badge variant="outline" className="text-[9px] h-5 shrink-0">Auto</Badge>}
+                  </div>
                 )}
-                <Input type="date" value={e.inicio} onChange={ev => update(e.id, { inicio: ev.target.value })} className="h-8 text-xs" />
-                <Input type="date" value={e.fim} onChange={ev => update(e.id, { fim: ev.target.value })} className="h-8 text-xs" />
-                <Button size="icon" variant="ghost" onClick={() => remove(e.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
+                <Input type="date" value={e.inicio} onChange={ev => update(e.id, { inicio: ev.target.value })} className="h-8 text-xs" disabled={isAuto} readOnly={isAuto} />
+                <Input type="date" value={e.fim} onChange={ev => update(e.id, { fim: ev.target.value })} className="h-8 text-xs" disabled={isAuto} readOnly={isAuto} />
+                {isAuto ? (
+                  <span />
+                ) : (
+                  <Button size="icon" variant="ghost" onClick={() => remove(e.id)} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                )}
               </div>
             );
           })}
+
           {filtered.length === 0 && (
             <div className="p-8 text-center text-sm text-muted-foreground flex flex-col items-center gap-2">
               <Coffee className="w-5 h-5" />
