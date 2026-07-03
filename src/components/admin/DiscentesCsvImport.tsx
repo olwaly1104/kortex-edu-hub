@@ -141,10 +141,16 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     const n = norm(raw);
     if (!n) return "";
     const pool = facId ? cursos.filter((c: any) => c.faculdade_id === facId) : cursos;
+    // exact code / name → startsWith → contains either direction
     return (
       pool.find((c: any) => norm(c.code || "") === n)?.id ||
       pool.find((c: any) => norm(c.name || "") === n)?.id ||
-      pool.find((c: any) => norm(c.name || "").startsWith(n))?.id || ""
+      pool.find((c: any) => norm(c.code || "").startsWith(n) || n.startsWith(norm(c.code || "")))?.id ||
+      pool.find((c: any) => norm(c.name || "").startsWith(n) || n.startsWith(norm(c.name || "")))?.id ||
+      pool.find((c: any) => {
+        const cn = norm(c.name || ""); const cc = norm(c.code || "");
+        return (cn && (cn.includes(n) || n.includes(cn))) || (cc && (cc.includes(n) || n.includes(cc)));
+      })?.id || ""
     );
   };
 
@@ -158,10 +164,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       const r = emptyRow();
       const facRaw = cells[mapping.indexOf("faculdade")] || "";
       const cursoRaw = cells[mapping.indexOf("curso")] || "";
+      const nomeCompletoRaw = cells[mapping.indexOf("nome_completo")] || "";
       mapping.forEach((f, idx) => {
         if (!f) return;
         const val = (cells[idx] || "").trim();
-        if (f === "faculdade" || f === "curso") return; // handled below
+        if (f === "faculdade" || f === "curso" || f === "nome_completo") return; // handled below
         if (f === "genero") {
           const g = val.toUpperCase();
           r.genero = g.startsWith("M") ? "M" : g.startsWith("F") ? "F" : g ? "Outro" : "";
@@ -172,6 +179,16 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
           (r as any)[f] = val;
         }
       });
+      // Smart name extraction: prefer nome_completo, else use primeiro_nome as source if it contains spaces
+      if (nomeCompletoRaw.trim()) {
+        const [first, last] = splitName(nomeCompletoRaw);
+        r.primeiro_nome = first;
+        r.ultimo_nome = last || r.ultimo_nome;
+      } else if (!r.ultimo_nome && r.primeiro_nome && /\s/.test(r.primeiro_nome)) {
+        const [first, last] = splitName(r.primeiro_nome);
+        r.primeiro_nome = first;
+        r.ultimo_nome = last;
+      }
       const facId = resolveFaculdade(facRaw);
       r.faculdade_id = facId;
       r.curso_id = resolveCurso(cursoRaw, facId);
@@ -190,14 +207,6 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     ingestText(text);
   };
 
-  const downloadTemplate = () => {
-    const csv = [TEMPLATE_HEADERS.join(","), ...TEMPLATE_EXAMPLE.map((r) => r.join(","))].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = "template-discentes.csv"; a.click();
-    URL.revokeObjectURL(url);
-  };
 
   /* validation */
   const validate = (r: Row): string[] => {
