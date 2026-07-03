@@ -119,10 +119,10 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
     ]);
     let etapasRows = (e.error ? [] : (e.data ?? [])) as Etapa[];
     // Ensure all protected defaults exist (seed missing ones)
-    if (!e.error && user?.id) {
+    if (!e.error && authUserId) {
       const existing = new Set(etapasRows.map(r => (r.nome || "").trim().toLowerCase()));
       const missing = DEFAULT_ETAPAS.filter(d => !existing.has(d.nome.toLowerCase()))
-        .map(d => ({ ...d, owner_user_id: user.id }));
+        .map(d => ({ ...d, owner_user_id: authUserId }));
       if (missing.length) {
         const ins = await supabase.from("candidaturas_etapas").insert(missing).select("*");
         if (!ins.error) etapasRows = [...etapasRows, ...((ins.data ?? []) as Etapa[])].sort((a, b) => a.ordem - b.ordem);
