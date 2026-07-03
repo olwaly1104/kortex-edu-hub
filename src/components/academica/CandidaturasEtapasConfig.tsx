@@ -247,9 +247,10 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
           <table className="w-full text-xs">
             <thead className="bg-muted/40 text-[10px] uppercase tracking-wide text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 text-left w-32">Pré-visualização</th>
-                <th className="px-3 py-2 text-left">Nome</th>
+                <th className="px-3 py-2 text-left w-40">Designação</th>
+                <th className="px-3 py-2 text-left">Descrição</th>
                 <th className="px-3 py-2 text-left w-40">Cor</th>
+                <th className="px-3 py-2 text-left w-32">Pré-visualização</th>
                 <th className="w-10"></th>
               </tr>
             </thead>
@@ -259,11 +260,15 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                 return (
                   <tr key={e.key} className="border-t align-middle">
                     <td className="px-3 py-2">
-                      <Badge variant="outline" className={cn("text-[11px]", e.color)}>{e.label || "—"}</Badge>
-                    </td>
-                    <td className="px-3 py-2">
                       <Input value={e.label} disabled={readOnly} readOnly={readOnly}
                         onChange={ev => updEstado(e.key, { label: ev.target.value })}
+                        placeholder="Designação"
+                        className="h-8 text-xs" />
+                    </td>
+                    <td className="px-3 py-2">
+                      <Input value={e.descricao ?? ""} disabled={readOnly} readOnly={readOnly}
+                        onChange={ev => updEstado(e.key, { descricao: ev.target.value })}
+                        placeholder="Breve explicação"
                         className="h-8 text-xs" />
                     </td>
                     <td className="px-3 py-2">
@@ -289,6 +294,9 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                         </PopoverContent>
                       </Popover>
                     </td>
+                    <td className="px-3 py-2">
+                      <Badge variant="outline" className={cn("text-[11px]", e.color)}>{e.label || "—"}</Badge>
+                    </td>
                     <td className="px-2 py-2">
                       {!readOnly && !isDefault && (
                         <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
@@ -296,7 +304,6 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       )}
-                      {isDefault && <Badge variant="outline" className="text-[9px] uppercase tracking-wide">Predefinido</Badge>}
                     </td>
                   </tr>
                 );
