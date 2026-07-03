@@ -329,9 +329,9 @@ export default function CalendarioAcademico() {
       )}
 
       <Tabs defaultValue="config" className="w-full">
-        <TabsList className="grid grid-cols-2 w-full max-w-lg">
-          <TabsTrigger value="config" className="gap-1.5"><Settings2 className="w-3.5 h-3.5" /> Configuração do Ano Letivo</TabsTrigger>
-          <TabsTrigger value="calendario" className="gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Calendário do Ano Letivo</TabsTrigger>
+        <TabsList className="inline-flex h-auto flex-wrap w-full lg:w-auto gap-1 p-1">
+          <TabsTrigger value="config" className="gap-1.5 whitespace-nowrap"><Settings2 className="w-3.5 h-3.5" /> Configuração do Ano Letivo</TabsTrigger>
+          <TabsTrigger value="calendario" className="gap-1.5 whitespace-nowrap"><CalendarDays className="w-3.5 h-3.5" /> Calendário do Ano Letivo</TabsTrigger>
         </TabsList>
 
         <TabsContent value="config" className="space-y-6 mt-4">
