@@ -139,6 +139,16 @@ export default function CalendarioAcademico() {
   const updTurno = (id: string, patch: Partial<Turno>) => setTurnos(p => p.map(t => t.id === id ? { ...t, ...patch } : t));
   const rmTurno = (id: string) => setTurnos(p => p.filter(t => t.id !== id));
 
+  // Semestres configuration
+  const [semestres, setSemestres] = useState<SemestreCfg[]>(
+    () => loadJSON(SEMESTRES_KEY, buildDefaultSemestres(initial.inicio, initial.fim))
+  );
+  useEffect(() => { try { localStorage.setItem(SEMESTRES_KEY, JSON.stringify(semestres)); } catch {} }, [semestres]);
+  const addSemestre = () => setSemestres(p => [...p, { id: `sem-${Date.now()}`, nome: `${p.length + 1}º Semestre`, inicio, fim }]);
+  const updSemestre = (id: string, patch: Partial<SemestreCfg>) => setSemestres(p => p.map(s => s.id === id ? { ...s, ...patch } : s));
+  const rmSemestre = (id: string) => setSemestres(p => p.filter(s => s.id !== id));
+
+
   const changeAno = (v: string) => {
     setAnoLetivo(v);
     const r = rangeFromAno(v);
