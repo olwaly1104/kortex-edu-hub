@@ -103,15 +103,19 @@ export default function CandidaturasEtapasConfig({ readOnly = false }: { readOnl
   }, [etapas, sessoes, loading, user?.id]);
 
   const addEtapa = async () => {
-    const nome = prompt("Nome da nova etapa:")?.trim();
-    if (!nome) return;
-    const { error } = await supabase.from("candidaturas_etapas").insert({
-      nome, ordem: etapas.length, owner_user_id: user?.id,
+    const { data, error } = await supabase.from("candidaturas_etapas").insert({
+      nome: "", ordem: etapas.length, owner_user_id: user?.id,
       agenda: false, obrigatoria: false, estados_possiveis: [],
-    });
+    }).select("*").single();
     if (error) { toast.error(error.message); return; }
-    load();
+    setEtapas(prev => [...prev, data as Etapa]);
+    // focus the new row's name input
+    setTimeout(() => {
+      const el = document.querySelector<HTMLInputElement>(`input[data-etapa-id="${(data as Etapa).id}"]`);
+      el?.focus();
+    }, 50);
   };
+
 
   const updEtapa = async (id: string, patch: Partial<Etapa>) => {
     const { error } = await supabase.from("candidaturas_etapas").update(patch).eq("id", id);
