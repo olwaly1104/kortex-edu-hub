@@ -142,41 +142,11 @@ export default function CriarTurmas() {
     );
   }, [verTurma, estudantes]);
 
-  const [novaTurma, setNovaTurma] = useState<{ curso_id: string; ano: string; letra: string; sala: string; turno: string; capacidade: number } | null>(null);
-
   const openAddTurma = (cid: string, ano: string) => {
     const existing = turmasByCursoAno[cid]?.[ano] ?? [];
-    const used = new Set(existing.map((t) => t.letra));
+    const used = new Set(existing.map((t) => t.letra.toUpperCase()));
     const nextLetra = LETRAS.find((l) => !used.has(l)) ?? `T${existing.length + 1}`;
-    setNovaTurma({ curso_id: cid, ano, letra: nextLetra, sala: "", turno: "Manhã", capacidade: 32 });
-  };
-
-  const confirmarNovaTurma = async () => {
-    if (!novaTurma) return;
-    const letra = novaTurma.letra.trim().toUpperCase();
-    if (!letra) { toast.error("Indique o nome/letra da turma"); return; }
-    const existing = turmasByCursoAno[novaTurma.curso_id]?.[novaTurma.ano] ?? [];
-    if (existing.some((t) => t.letra.toUpperCase() === letra)) {
-      toast.error(`Já existe uma turma "${letra}" neste ano.`);
-      return;
-    }
-    try {
-      const { error } = await supabase.from("turmas").insert({
-        curso_id: novaTurma.curso_id,
-        ano: novaTurma.ano,
-        letra,
-        owner_user_id: user?.id!,
-        sala: novaTurma.sala || null,
-        turno: novaTurma.turno,
-        capacidade: novaTurma.capacidade || 0,
-      });
-      if (error) throw error;
-      qc.invalidateQueries({ queryKey: ["turmas-all"] });
-      toast.success("Turma criada");
-      setNovaTurma(null);
-    } catch (e: any) {
-      toast.error(e.message || "Erro ao criar turma");
-    }
+    createMut.mutate({ curso_id: cid, ano, letra: nextLetra });
   };
 
   const confirmTurmas = () => {
