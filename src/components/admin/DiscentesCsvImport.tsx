@@ -849,7 +849,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((r, idx) => {
+                  {rows.map((r) => {
                     const errs = validationSummary.errors.get(r._key) || [];
                     const bad = errs.length > 0;
                     const cursoPool = r.faculdade_id ? cursos.filter((c: any) => c.faculdade_id === r.faculdade_id) : [];
