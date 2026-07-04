@@ -6,11 +6,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
-  Upload, FileSpreadsheet, X, Check, AlertCircle,
-  Trash2, Loader2, Sparkles, UserPlus, Eye,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Progress } from "@/components/ui/progress";
+import {
+  Upload, FileSpreadsheet, X, Check, AlertCircle, Users,
+  Trash2, Loader2, Sparkles, UserPlus, Eye, ShieldCheck, Clock, Mail,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useCursos, useFaculdades, useCreateEstudante } from "@/lib/useInstitution";
+
+const EMAIL_DOMAIN = "upra.kor";
+const emailSlug = (s: string) =>
+  (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
+const buildAutoEmail = (primeiro: string, ultimo: string) => {
+  const p = emailSlug(primeiro);
+  const u = emailSlug(ultimo);
+  if (!p && !u) return "";
+  return `${[p, u].filter(Boolean).join(".")}@${EMAIL_DOMAIN}`;
+};
+
 
 /* ---------------- CSV utils ---------------- */
 
