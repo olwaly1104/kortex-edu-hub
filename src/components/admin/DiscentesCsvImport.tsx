@@ -955,6 +955,127 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   );
 }
 
+const CsvPreviewRow = memo(function CsvPreviewRow({
+  row,
+  errors,
+  cursos,
+  faculdades,
+  selectionVersion,
+  initiallySelected,
+  onToggleSelected,
+  onSetCell,
+  onRemoveRow,
+}: {
+  row: Row;
+  errors: string[];
+  cursos: any[];
+  faculdades: any[];
+  selectionVersion: number;
+  initiallySelected: boolean;
+  onToggleSelected: (key: string, checked?: boolean) => boolean;
+  onSetCell: (key: string, patch: Partial<Row>) => void;
+  onRemoveRow: (key: string) => void;
+}) {
+  const bad = errors.length > 0;
+  const cursoPool = row.faculdade_id ? cursos.filter((c: any) => c.faculdade_id === row.faculdade_id) : [];
+  const curso = cursos.find((c: any) => c.id === row.curso_id) as any;
+  const anos = curso ? Array.from({ length: Math.max(1, Math.min(10, Number(curso.years) || 0)) }, (_, i) => String(i + 1)) : [];
+
+  return (
+    <tr
+      className={`border-b transition-colors ${bad ? "bg-amber-50/40 hover:bg-amber-50/70" : "hover:bg-muted/30"}`}
+      title={bad ? `Falta: ${errors.join(", ")}` : ""}
+    >
+      <td
+        className="px-3 py-1.5 cursor-pointer select-none"
+        onClick={(event) => {
+          const checked = onToggleSelected(row._key);
+          const input = event.currentTarget.querySelector<HTMLInputElement>("input[type='checkbox']");
+          if (input) input.checked = checked;
+        }}
+      >
+        <div className="flex items-center gap-1.5">
+          <input
+            key={`${row._key}-${selectionVersion}`}
+            type="checkbox"
+            defaultChecked={initiallySelected}
+            onChange={(event) => onToggleSelected(row._key, event.currentTarget.checked)}
+            onClick={(e) => e.stopPropagation()}
+            className="h-4 w-4 rounded border-input accent-primary cursor-pointer"
+          />
+          {bad
+            ? <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+            : <Check className="w-3.5 h-3.5 text-emerald-600" />}
+        </div>
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.primeiro_nome} onChange={(e) => onSetCell(row._key, { primeiro_nome: e.target.value })}
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.nome_meio} onChange={(e) => onSetCell(row._key, { nome_meio: e.target.value })}
+          placeholder="—"
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.ultimo_nome} onChange={(e) => onSetCell(row._key, { ultimo_nome: e.target.value })}
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.bilhete} onChange={(e) => onSetCell(row._key, { bilhete: e.target.value })}
+          placeholder="—"
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary font-mono" />
+      </td>
+      <td className="px-1 py-1">
+        <Select value={row.faculdade_id} onValueChange={(v) => onSetCell(row._key, { faculdade_id: v, curso_id: "" })}>
+          <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
+          <SelectContent className="z-[200]">
+            {faculdades.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </td>
+      <td className="px-1 py-1">
+        <Select value={row.curso_id} onValueChange={(v) => onSetCell(row._key, { curso_id: v, ano: "" })} disabled={!row.faculdade_id}>
+          <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
+          <SelectContent className="z-[200]">
+            {cursoPool.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name || c.code}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </td>
+      <td className="px-1 py-1">
+        <Select value={row.ano} onValueChange={(v) => onSetCell(row._key, { ano: v })} disabled={!anos.length}>
+          <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
+          <SelectContent className="z-[200]">{anos.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
+        </Select>
+      </td>
+      <td className="px-1 py-1">
+        <Select value={row.regime || "normal"} onValueChange={(v) => onSetCell(row._key, { regime: v as any })}>
+          <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue /></SelectTrigger>
+          <SelectContent className="z-[200]">
+            <SelectItem value="normal">Normal</SelectItem>
+            <SelectItem value="bolseiro">Bolseiro</SelectItem>
+          </SelectContent>
+        </Select>
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.telemovel} onChange={(e) => onSetCell(row._key, { telemovel: e.target.value })}
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.endereco} onChange={(e) => onSetCell(row._key, { endereco: e.target.value })}
+          placeholder="Endereço"
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+      </td>
+      <td className="px-1 py-1 text-right">
+        <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
+          onClick={() => onRemoveRow(row._key)}>
+          <Trash2 className="w-3.5 h-3.5" />
+        </Button>
+      </td>
+    </tr>
+  );
+});
+
 function formatEta(seconds: number) {
   if (!isFinite(seconds) || seconds <= 0) return "—";
   const s = Math.round(seconds);
