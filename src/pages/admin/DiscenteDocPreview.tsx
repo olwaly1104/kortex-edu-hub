@@ -19,6 +19,7 @@ export type DiscenteDoc = {
   nome: string;
   email: string;
   primeiro_nome?: string | null;
+  nome_meio?: string | null;
   ultimo_nome?: string | null;
   nascimento?: string | null;
   genero?: string | null;
