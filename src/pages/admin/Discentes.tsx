@@ -98,6 +98,7 @@ const emptyDraft = (faculdade_id = "", curso_id = ""): Draft => ({
   fotoFile: null,
   fotoPreview: "",
   primeiroNome: "",
+  meioNome: "",
   ultimoNome: "",
   nascimento: "",
   genero: "M",
