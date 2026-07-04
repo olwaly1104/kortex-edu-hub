@@ -196,6 +196,47 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const openPreview = () => { setStage("preview"); };
 
   /* resolve faculdade/curso from free-text using sigla/code/name (fuzzy) */
+  const tokens = (s: string) =>
+    (s || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((t) => t.length >= 3);
+
+  // Longest common substring length (bounded, cheap)
+  const lcs = (a: string, b: string) => {
+    if (!a || !b) return 0;
+    const m = a.length, n = b.length;
+    let best = 0;
+    const row = new Array(n + 1).fill(0);
+    for (let i = 1; i <= m; i++) {
+      let prev = 0;
+      for (let j = 1; j <= n; j++) {
+        const tmp = row[j];
+        row[j] = a[i - 1] === b[j - 1] ? prev + 1 : 0;
+        if (row[j] > best) best = row[j];
+        prev = tmp;
+      }
+    }
+    return best;
+  };
+
+  const tokenOverlap = (raw: string, target: string) => {
+    const rt = tokens(raw);
+    const tt = tokens(target);
+    if (!rt.length || !tt.length) return false;
+    return rt.some((r) =>
+      tt.some((t) => {
+        if (r === t) return true;
+        const prefix = Math.min(r.length, t.length, 4);
+        if (r.slice(0, prefix) === t.slice(0, prefix)) return true;
+        // tolerate 1 char difference (missing/extra letter, e.g. arquitectura ↔ arquitetura)
+        return lcs(r, t) >= Math.min(r.length, t.length) - 1 && Math.min(r.length, t.length) >= 5;
+      }),
+    );
+  };
+
   const resolveFaculdade = (raw: string) => {
     const n = norm(raw);
     if (!n) return "";
@@ -209,14 +250,15 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       faculdades.find((f: any) => {
         const s = norm(f.sigla || "");
         return s && (n.includes(s) || s.includes(n));
-      })?.id || ""
+      })?.id ||
+      faculdades.find((f: any) => tokenOverlap(raw, `${f.name || ""} ${f.sigla || ""}`))?.id ||
+      ""
     );
   };
   const resolveCurso = (raw: string, facId: string) => {
     const n = norm(raw);
     if (!n) return "";
     const pool = facId ? cursos.filter((c: any) => c.faculdade_id === facId) : cursos;
-    // exact code / name → startsWith → contains either direction
     return (
       pool.find((c: any) => norm(c.code || "") === n)?.id ||
       pool.find((c: any) => norm(c.name || "") === n)?.id ||
@@ -225,9 +267,16 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       pool.find((c: any) => {
         const cn = norm(c.name || ""); const cc = norm(c.code || "");
         return (cn && (cn.includes(n) || n.includes(cn))) || (cc && (cc.includes(n) || n.includes(cc)));
-      })?.id || ""
+      })?.id ||
+      pool.find((c: any) => tokenOverlap(raw, `${c.name || ""} ${c.code || ""}`))?.id ||
+      // last resort: search across ALL cursos (in case faculdade was mis-detected)
+      (facId
+        ? cursos.find((c: any) => tokenOverlap(raw, `${c.name || ""} ${c.code || ""}`))?.id
+        : "") ||
+      ""
     );
   };
+
 
 
   const ingestText = (text: string) => {
