@@ -807,7 +807,7 @@ export type Database = {
           provincia: string | null
           regime: string
           telemovel: string | null
-          turma: string
+          turma: string | null
           ultimo_nome: string | null
           updated_at: string
         }
@@ -838,7 +838,7 @@ export type Database = {
           provincia?: string | null
           regime?: string
           telemovel?: string | null
-          turma?: string
+          turma?: string | null
           ultimo_nome?: string | null
           updated_at?: string
         }
@@ -869,7 +869,7 @@ export type Database = {
           provincia?: string | null
           regime?: string
           telemovel?: string | null
-          turma?: string
+          turma?: string | null
           ultimo_nome?: string | null
           updated_at?: string
         }
