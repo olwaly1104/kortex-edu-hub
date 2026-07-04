@@ -800,6 +800,7 @@ export type Database = {
           nacionalidade: string | null
           nascimento: string | null
           nome: string
+          nome_meio: string | null
           origem: string
           owner_user_id: string
           primeiro_nome: string | null
@@ -830,6 +831,7 @@ export type Database = {
           nacionalidade?: string | null
           nascimento?: string | null
           nome: string
+          nome_meio?: string | null
           origem?: string
           owner_user_id: string
           primeiro_nome?: string | null
@@ -860,6 +862,7 @@ export type Database = {
           nacionalidade?: string | null
           nascimento?: string | null
           nome?: string
+          nome_meio?: string | null
           origem?: string
           owner_user_id?: string
           primeiro_nome?: string | null
