@@ -497,6 +497,7 @@ export default function AdminDiscentes() {
                 >
                   <span className="text-[11px] font-mono text-muted-foreground">{shortId}</span>
                   <span className="text-xs font-medium truncate">{r.primeiroNome}</span>
+                  <span className="text-xs truncate text-muted-foreground">{r.meioNome || "—"}</span>
                   <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold w-fit ${r.regime === "bolseiro" ? "bg-amber-50 text-amber-700" : "bg-muted text-muted-foreground"}`}>
                     {r.regime === "bolseiro" ? "Bolseiro" : "Normal"}
