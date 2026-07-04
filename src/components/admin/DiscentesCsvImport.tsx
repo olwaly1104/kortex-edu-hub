@@ -186,10 +186,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       const facRaw = cells[mapping.indexOf("faculdade")] || "";
       const cursoRaw = cells[mapping.indexOf("curso")] || "";
       const nomeCompletoRaw = cells[mapping.indexOf("nome_completo")] || "";
+      const encNomeRaw = cells[mapping.indexOf("enc_nome" as Field)] || "";
       mapping.forEach((f, idx) => {
         if (!f) return;
         const val = (cells[idx] || "").trim();
-        if (f === "faculdade" || f === "curso" || f === "nome_completo") return; // handled below
+        if (f === "faculdade" || f === "curso" || f === "nome_completo" || f === ("enc_nome" as Field)) return; // handled below
         if (f === "genero") {
           const g = val.toUpperCase();
           r.genero = g.startsWith("M") ? "M" : g.startsWith("F") ? "F" : g ? "Outro" : "";
@@ -209,6 +210,12 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
         const [first, last] = splitName(r.primeiro_nome);
         r.primeiro_nome = first;
         r.ultimo_nome = last;
+      }
+      // Encarregado: split full name if provided as one field
+      if (encNomeRaw.trim() && !r.enc_primeiro && !r.enc_ultimo) {
+        const [first, last] = splitName(encNomeRaw);
+        r.enc_primeiro = first;
+        r.enc_ultimo = last;
       }
       const facId = resolveFaculdade(facRaw);
       r.faculdade_id = facId;
