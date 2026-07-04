@@ -261,7 +261,7 @@ export default function GapEstudantes() {
                   />
                 </div>
                 <div>
-                  <Label className="text-xs">Nome do meio</Label>
+                  <Label className="text-xs">Nome(s) do meio</Label>
                   <Input
                     className="h-9 mt-1"
                     value={draft.meioNome}

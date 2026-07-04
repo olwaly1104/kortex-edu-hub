@@ -206,7 +206,7 @@ export default function AdminDiscenteProfile() {
           <div className="grid lg:grid-cols-2 gap-4">
             <SectionCard title="Informações Pessoais" icon={<UserCheck className="w-4 h-4" />}>
               <InfoRow label="Primeiro nome" value={student.primeiro_nome || "—"} icon={<UserCheck className="w-4 h-4 text-primary" />} />
-              <InfoRow label="Nome do meio" value={student.nome_meio || "—"} icon={<UserCheck className="w-4 h-4 text-primary" />} />
+              <InfoRow label="Nome(s) do meio" value={student.nome_meio || "—"} icon={<UserCheck className="w-4 h-4 text-primary" />} />
               <InfoRow label="Último nome" value={student.ultimo_nome || "—"} icon={<UserCheck className="w-4 h-4 text-primary" />} />
               <InfoRow label="Email" value={student.email || "—"} icon={<Mail className="w-4 h-4 text-primary" />} />
               <InfoRow label="Telemóvel" value={student.telemovel || "—"} icon={<Phone className="w-4 h-4 text-primary" />} />
