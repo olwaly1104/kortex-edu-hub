@@ -199,13 +199,16 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const [rows, setRows] = useState<Row[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [importing, setImporting] = useState(false);
-  const [progress, setProgress] = useState({ done: 0, total: 0 });
+  const [progress, setProgress] = useState({ done: 0, total: 0, ok: 0, fail: 0, startedAt: 0 });
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const resetAll = () => {
-    setStage("upload"); setRows([]); setImporting(false); setProgress({ done: 0, total: 0 });
+    setStage("upload"); setRows([]); setImporting(false);
+    setProgress({ done: 0, total: 0, ok: 0, fail: 0, startedAt: 0 });
     if (fileRef.current) fileRef.current.value = "";
   };
+
 
   const close = () => { resetAll(); onOpenChange(false); };
   const backToUpload = () => { setStage("upload"); };
