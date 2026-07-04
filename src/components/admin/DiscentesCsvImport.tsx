@@ -1,9 +1,8 @@
-import { useMemo, useRef, useState } from "react";
+import { memo, startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -133,6 +132,8 @@ type Row = {
   enc_bilhete: string;
 };
 
+type ImportBatchItem = { row: Row; email: string; nome: string };
+
 const emptyRow = (): Row => ({
   _key: Math.random().toString(36).slice(2),
   _selected: true,
@@ -203,12 +204,20 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const [progress, setProgress] = useState({ done: 0, total: 0, ok: 0, fail: 0, startedAt: 0 });
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
+  const [pendingImportBatch, setPendingImportBatch] = useState<ImportBatchItem[]>([]);
+  const [selectionSummary, setSelectionSummary] = useState({ selected: 0, valid: 0 });
+  const [selectionVersion, setSelectionVersion] = useState(0);
   const cancelRequestedRef = useRef(false);
+  const selectedKeysRef = useRef<Set<string>>(new Set());
+  const selectionSyncTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const resetAll = () => {
     setStage("upload"); setRows([]); setImporting(false);
     setProgress({ done: 0, total: 0, ok: 0, fail: 0, startedAt: 0 });
+    setPendingImportBatch([]);
+    selectedKeysRef.current = new Set();
+    setSelectionSummary({ selected: 0, valid: 0 });
     if (fileRef.current) fileRef.current.value = "";
   };
 
@@ -365,6 +374,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       return r;
 
     });
+    selectedKeysRef.current = new Set(parsed.map((r) => r._key));
+    setSelectionSummary({
+      selected: parsed.length,
+      valid: parsed.reduce((total, row) => total + (validate(row).length === 0 ? 1 : 0), 0),
+    });
     setRows(parsed);
     setStage("preview");
   };
@@ -401,27 +415,84 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     return errs;
   };
 
-  const stats = useMemo(() => {
-    let valid = 0, invalid = 0, selected = 0;
+  const validationSummary = useMemo(() => {
+    let valid = 0, invalid = 0;
+    const errors = new Map<string, string[]>();
+    const validKeys = new Set<string>();
     rows.forEach((r) => {
-      if (r._selected) selected++;
-      if (validate(r).length === 0) valid++; else invalid++;
+      const rowErrors = validate(r);
+      errors.set(r._key, rowErrors);
+      if (rowErrors.length === 0) {
+        valid++;
+        validKeys.add(r._key);
+      } else {
+        invalid++;
+      }
     });
-    return { valid, invalid, selected, total: rows.length };
+    return { valid, invalid, errors, validKeys };
   }, [rows]);
 
-  const selectedValidCount = useMemo(
-    () => rows.filter((r) => r._selected && validate(r).length === 0).length,
-    [rows],
-  );
+  const recomputeSelectionSummary = useCallback(() => {
+    let selected = 0;
+    let valid = 0;
+    selectedKeysRef.current.forEach((key) => {
+      selected++;
+      if (validationSummary.validKeys.has(key)) valid++;
+    });
+    setSelectionSummary({ selected, valid });
+  }, [validationSummary.validKeys]);
 
-  const setCell = (key: string, patch: Partial<Row>) =>
+  const scheduleSelectionSummary = useCallback(() => {
+    if (selectionSyncTimerRef.current) clearTimeout(selectionSyncTimerRef.current);
+    selectionSyncTimerRef.current = setTimeout(() => {
+      selectionSyncTimerRef.current = null;
+      startTransition(() => recomputeSelectionSummary());
+    }, 160);
+  }, [recomputeSelectionSummary]);
+
+  useEffect(() => {
+    recomputeSelectionSummary();
+  }, [recomputeSelectionSummary]);
+
+  useEffect(() => () => {
+    if (selectionSyncTimerRef.current) clearTimeout(selectionSyncTimerRef.current);
+  }, []);
+
+  const stats = useMemo(() => ({
+    valid: validationSummary.valid,
+    invalid: validationSummary.invalid,
+    selected: selectionSummary.selected,
+    total: rows.length,
+  }), [rows.length, selectionSummary.selected, validationSummary.invalid, validationSummary.valid]);
+
+  const selectedValidCount = selectionSummary.valid;
+
+  const setCell = useCallback((key: string, patch: Partial<Row>) => {
     setRows((rs) => rs.map((r) => (r._key === key ? { ...r, ...patch } : r)));
+  }, []);
 
-  const removeRow = (key: string) => setRows((rs) => rs.filter((r) => r._key !== key));
-  const removeInvalid = () => setRows((rs) => rs.filter((r) => validate(r).length === 0));
-  const toggleAll = (v: boolean) => setRows((rs) => rs.map((r) => ({ ...r, _selected: v })));
-  const toggleSelected = (key: string) => setRows((rs) => rs.map((r) => (r._key === key ? { ...r, _selected: !r._selected } : r)));
+  const removeRow = useCallback((key: string) => {
+    selectedKeysRef.current.delete(key);
+    setRows((rs) => rs.filter((r) => r._key !== key));
+  }, []);
+  const removeInvalid = () => {
+    const remaining = rows.filter((r) => validate(r).length === 0);
+    const remainingKeys = new Set(remaining.map((r) => r._key));
+    selectedKeysRef.current = new Set([...selectedKeysRef.current].filter((key) => remainingKeys.has(key)));
+    setRows(remaining);
+  };
+  const toggleAll = (v: boolean) => {
+    selectedKeysRef.current = v ? new Set(rows.map((r) => r._key)) : new Set();
+    setSelectionSummary({ selected: v ? rows.length : 0, valid: v ? validationSummary.valid : 0 });
+    setSelectionVersion((current) => current + 1);
+  };
+  const toggleSelected = useCallback((key: string, checked?: boolean) => {
+    const nextChecked = checked ?? !selectedKeysRef.current.has(key);
+    if (nextChecked) selectedKeysRef.current.add(key);
+    else selectedKeysRef.current.delete(key);
+    scheduleSelectionSummary();
+    return nextChecked;
+  }, [scheduleSelectionSummary]);
 
   /* bulk apply — auto-applies on every change */
   const [bulkFac, setBulkFac] = useState("");
@@ -442,7 +513,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     setBulkCurso("");
     setBulkAno("");
     setRows((rs) => rs.map((r) => {
-      if (!r._selected) return r;
+      if (!selectedKeysRef.current.has(r._key)) return r;
       const next = { ...r, faculdade_id: id };
       if (r.curso_id) {
         const stillOk = cursos.find((c: any) => c.id === r.curso_id && c.faculdade_id === id);
@@ -456,7 +527,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     setBulkAno("");
     const curso = cursos.find((c: any) => c.id === id) as any;
     setRows((rs) => rs.map((r) => {
-      if (!r._selected) return r;
+      if (!selectedKeysRef.current.has(r._key)) return r;
       const next = { ...r, curso_id: id };
       if (curso?.faculdade_id) next.faculdade_id = curso.faculdade_id;
       // reset ano if it's out of range for the new curso
@@ -467,7 +538,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   };
   const applyBulkAno = (v: string) => {
     setBulkAno(v);
-    setRows((rs) => rs.map((r) => (r._selected ? { ...r, ano: v } : r)));
+    setRows((rs) => rs.map((r) => (selectedKeysRef.current.has(r._key) ? { ...r, ano: v } : r)));
   };
   const confirmBulk = () => {
     setBulkFac(""); setBulkCurso(""); setBulkAno("");
@@ -475,11 +546,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   };
 
   // Build the final import batch with auto-generated emails + dedupe by email
-  const importBatch = useMemo(() => {
+  const buildImportBatch = useCallback(() => {
     const seen = new Set<string>();
-    const batch: { row: Row; email: string; nome: string }[] = [];
+    const batch: ImportBatchItem[] = [];
     for (const r of rows) {
-      if (!r._selected) continue;
+      if (!selectedKeysRef.current.has(r._key)) continue;
       if (validate(r).length > 0) continue;
       const primeiro = r.primeiro_nome.trim();
       const ultimo = r.ultimo_nome.trim();
@@ -493,26 +564,29 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   }, [rows]);
 
   const requestImport = () => {
-    if (!importBatch.length) { toast.error("Nenhuma linha válida selecionada"); return; }
+    const nextBatch = buildImportBatch();
+    if (!nextBatch.length) { toast.error("Nenhuma linha válida selecionada"); return; }
+    setPendingImportBatch(nextBatch);
     setConfirmOpen(true);
   };
 
   const doImport = async () => {
     setConfirmOpen(false);
-    if (!importBatch.length) return;
+    const batch = pendingImportBatch.length ? pendingImportBatch : buildImportBatch();
+    if (!batch.length) return;
     cancelRequestedRef.current = false;
     setImporting(true);
-    setProgress({ done: 0, total: importBatch.length, ok: 0, fail: 0, startedAt: Date.now() });
+    setProgress({ done: 0, total: batch.length, ok: 0, fail: 0, startedAt: Date.now() });
 
     const CONCURRENCY = 3;
     let cursor = 0;
     let okCount = 0;
     let failCount = 0;
     const runOne = async () => {
-      while (cursor < importBatch.length) {
+      while (cursor < batch.length) {
         if (cancelRequestedRef.current) return;
         const idx = cursor++;
-        const { row: r, email, nome } = importBatch[idx];
+        const { row: r, email, nome } = batch[idx];
         try {
           await createMut.mutateAsync({
             curso_id: r.curso_id,
@@ -552,6 +626,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
 
     const wasCancelled = cancelRequestedRef.current;
     cancelRequestedRef.current = false;
+    setPendingImportBatch([]);
     setImporting(false);
     if (wasCancelled) {
       toast.warning(`Importação cancelada · ${okCount} criada(s)${failCount ? ` · ${failCount} falharam` : ""}`);
@@ -775,101 +850,20 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((r, idx) => {
-                    const errs = validate(r);
-                    const bad = errs.length > 0;
-                    const cursoPool = r.faculdade_id ? cursos.filter((c: any) => c.faculdade_id === r.faculdade_id) : [];
-                    const curso = cursos.find((c: any) => c.id === r.curso_id) as any;
-                    const anos = curso ? Array.from({ length: Math.max(1, Math.min(10, Number(curso.years) || 0)) }, (_, i) => String(i + 1)) : [];
-                    return (
-                      <tr key={r._key}
-                        className={`border-b transition-colors ${bad ? "bg-amber-50/40 hover:bg-amber-50/70" : "hover:bg-muted/30"}`}
-                        title={bad ? `Falta: ${errs.join(", ")}` : ""}
-                      >
-                        <td
-                          className="px-3 py-1.5 cursor-pointer select-none"
-                          onClick={() => toggleSelected(r._key)}
-                        >
-                          <div className="flex items-center gap-1.5">
-                            <input
-                              type="checkbox"
-                              checked={r._selected}
-                              onChange={() => toggleSelected(r._key)}
-                              onClick={(e) => e.stopPropagation()}
-                              className="h-4 w-4 rounded border-input accent-primary cursor-pointer"
-                            />
-                            {bad
-                              ? <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                              : <Check className="w-3.5 h-3.5 text-emerald-600" />}
-                          </div>
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.primeiro_nome} onChange={(e) => setCell(r._key, { primeiro_nome: e.target.value })}
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.nome_meio} onChange={(e) => setCell(r._key, { nome_meio: e.target.value })}
-                            placeholder="—"
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.ultimo_nome} onChange={(e) => setCell(r._key, { ultimo_nome: e.target.value })}
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.bilhete} onChange={(e) => setCell(r._key, { bilhete: e.target.value })}
-                            placeholder="—"
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary font-mono" />
-                        </td>
-                        <td className="px-1 py-1">
-                          <Select value={r.faculdade_id} onValueChange={(v) => setCell(r._key, { faculdade_id: v, curso_id: "" })}>
-                            <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
-                            <SelectContent className="z-[200]">
-                              {faculdades.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td className="px-1 py-1">
-                          <Select value={r.curso_id} onValueChange={(v) => setCell(r._key, { curso_id: v, ano: "" })} disabled={!r.faculdade_id}>
-                            <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
-                            <SelectContent className="z-[200]">
-                              {cursoPool.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name || c.code}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td className="px-1 py-1">
-                          <Select value={r.ano} onValueChange={(v) => setCell(r._key, { ano: v })} disabled={!anos.length}>
-                            <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
-                            <SelectContent className="z-[200]">{anos.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
-                          </Select>
-                        </td>
-                        <td className="px-1 py-1">
-                          <Select value={r.regime || "normal"} onValueChange={(v) => setCell(r._key, { regime: v as any })}>
-                            <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue /></SelectTrigger>
-                            <SelectContent className="z-[200]">
-                              <SelectItem value="normal">Normal</SelectItem>
-                              <SelectItem value="bolseiro">Bolseiro</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.telemovel} onChange={(e) => setCell(r._key, { telemovel: e.target.value })}
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.endereco} onChange={(e) => setCell(r._key, { endereco: e.target.value })}
-                            placeholder="Endereço"
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
-                        </td>
-                        <td className="px-1 py-1 text-right">
-                          <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                            onClick={() => removeRow(r._key)}>
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {rows.map((r) => (
+                    <CsvPreviewRow
+                      key={r._key}
+                      row={r}
+                      errors={validationSummary.errors.get(r._key) || []}
+                      cursos={cursos}
+                      faculdades={faculdades}
+                      selectionVersion={selectionVersion}
+                      initiallySelected={selectedKeysRef.current.has(r._key)}
+                      onToggleSelected={toggleSelected}
+                      onSetCell={setCell}
+                      onRemoveRow={removeRow}
+                    />
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -881,11 +875,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
               </Button>
               <div className="ml-auto flex items-center gap-3">
                 <p className="text-xs text-muted-foreground">
-                  <strong className="text-foreground tabular-nums">{importBatch.length}</strong> conta(s) Kortex a criar
+                  <strong className="text-foreground tabular-nums">{selectedValidCount}</strong> linha(s) válida(s) selecionada(s)
                 </p>
-                <Button size="sm" onClick={requestImport} disabled={importing || importBatch.length === 0} className="gap-1.5">
+                <Button size="sm" onClick={requestImport} disabled={importing || selectedValidCount === 0} className="gap-1.5">
                   <Check className="w-3.5 h-3.5" />
-                  Importar {importBatch.length}
+                  Importar {selectedValidCount}
                 </Button>
               </div>
             </div>
@@ -903,7 +897,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
               <AlertDialogDescription asChild>
                 <div className="space-y-3 pt-1">
                   <p className="text-sm">
-                    Serão criadas <strong className="text-foreground">{importBatch.length}</strong> conta(s) Kortex
+                    Serão criadas <strong className="text-foreground">{pendingImportBatch.length}</strong> conta(s) Kortex
                     para os discentes selecionados. Cada discente receberá um email institucional
                     <code className="mx-1 px-1 py-0.5 rounded bg-muted text-[11px] font-mono">@{EMAIL_DOMAIN}</code>
                     e será obrigado a definir palavra-passe no primeiro acesso.
@@ -911,7 +905,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                   <div className="rounded-md border bg-muted/40 px-3 py-2 text-xs flex items-center gap-2">
                     <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                     Tempo estimado: <strong className="text-foreground tabular-nums">
-                      {formatEta(Math.ceil(importBatch.length / 3) * 1.5)}
+                      {formatEta(Math.ceil(pendingImportBatch.length / 3) * 1.5)}
                     </strong>
                   </div>
                 </div>
@@ -920,7 +914,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
             <AlertDialogFooter>
               <AlertDialogCancel>Cancelar</AlertDialogCancel>
               <AlertDialogAction onClick={doImport}>
-                Criar {importBatch.length} conta(s)
+                Criar {pendingImportBatch.length} conta(s)
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -960,6 +954,127 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     document.body,
   );
 }
+
+const CsvPreviewRow = memo(function CsvPreviewRow({
+  row,
+  errors,
+  cursos,
+  faculdades,
+  selectionVersion,
+  initiallySelected,
+  onToggleSelected,
+  onSetCell,
+  onRemoveRow,
+}: {
+  row: Row;
+  errors: string[];
+  cursos: any[];
+  faculdades: any[];
+  selectionVersion: number;
+  initiallySelected: boolean;
+  onToggleSelected: (key: string, checked?: boolean) => boolean;
+  onSetCell: (key: string, patch: Partial<Row>) => void;
+  onRemoveRow: (key: string) => void;
+}) {
+  const bad = errors.length > 0;
+  const cursoPool = row.faculdade_id ? cursos.filter((c: any) => c.faculdade_id === row.faculdade_id) : [];
+  const curso = cursos.find((c: any) => c.id === row.curso_id) as any;
+  const anos = curso ? Array.from({ length: Math.max(1, Math.min(10, Number(curso.years) || 0)) }, (_, i) => String(i + 1)) : [];
+
+  return (
+    <tr
+      className={`border-b transition-colors ${bad ? "bg-amber-50/40 hover:bg-amber-50/70" : "hover:bg-muted/30"}`}
+      title={bad ? `Falta: ${errors.join(", ")}` : ""}
+    >
+      <td
+        className="px-3 py-1.5 cursor-pointer select-none"
+        onClick={(event) => {
+          const checked = onToggleSelected(row._key);
+          const input = event.currentTarget.querySelector<HTMLInputElement>("input[type='checkbox']");
+          if (input) input.checked = checked;
+        }}
+      >
+        <div className="flex items-center gap-1.5">
+          <input
+            key={`${row._key}-${selectionVersion}`}
+            type="checkbox"
+            defaultChecked={initiallySelected}
+            onChange={(event) => onToggleSelected(row._key, event.currentTarget.checked)}
+            onClick={(e) => e.stopPropagation()}
+            className="h-4 w-4 rounded border-input accent-primary cursor-pointer"
+          />
+          {bad
+            ? <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+            : <Check className="w-3.5 h-3.5 text-emerald-600" />}
+        </div>
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.primeiro_nome} onChange={(e) => onSetCell(row._key, { primeiro_nome: e.target.value })}
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.nome_meio} onChange={(e) => onSetCell(row._key, { nome_meio: e.target.value })}
+          placeholder="—"
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.ultimo_nome} onChange={(e) => onSetCell(row._key, { ultimo_nome: e.target.value })}
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.bilhete} onChange={(e) => onSetCell(row._key, { bilhete: e.target.value })}
+          placeholder="—"
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary font-mono" />
+      </td>
+      <td className="px-1 py-1">
+        <Select value={row.faculdade_id} onValueChange={(v) => onSetCell(row._key, { faculdade_id: v, curso_id: "" })}>
+          <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
+          <SelectContent className="z-[200]">
+            {faculdades.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </td>
+      <td className="px-1 py-1">
+        <Select value={row.curso_id} onValueChange={(v) => onSetCell(row._key, { curso_id: v, ano: "" })} disabled={!row.faculdade_id}>
+          <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
+          <SelectContent className="z-[200]">
+            {cursoPool.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name || c.code}</SelectItem>)}
+          </SelectContent>
+        </Select>
+      </td>
+      <td className="px-1 py-1">
+        <Select value={row.ano} onValueChange={(v) => onSetCell(row._key, { ano: v })} disabled={!anos.length}>
+          <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
+          <SelectContent className="z-[200]">{anos.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
+        </Select>
+      </td>
+      <td className="px-1 py-1">
+        <Select value={row.regime || "normal"} onValueChange={(v) => onSetCell(row._key, { regime: v as any })}>
+          <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue /></SelectTrigger>
+          <SelectContent className="z-[200]">
+            <SelectItem value="normal">Normal</SelectItem>
+            <SelectItem value="bolseiro">Bolseiro</SelectItem>
+          </SelectContent>
+        </Select>
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.telemovel} onChange={(e) => onSetCell(row._key, { telemovel: e.target.value })}
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+      </td>
+      <td className="px-1 py-1">
+        <Input value={row.endereco} onChange={(e) => onSetCell(row._key, { endereco: e.target.value })}
+          placeholder="Endereço"
+          className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+      </td>
+      <td className="px-1 py-1 text-right">
+        <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
+          onClick={() => onRemoveRow(row._key)}>
+          <Trash2 className="w-3.5 h-3.5" />
+        </Button>
+      </td>
+    </tr>
+  );
+});
 
 function formatEta(seconds: number) {
   if (!isFinite(seconds) || seconds <= 0) return "—";
