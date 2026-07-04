@@ -80,7 +80,7 @@ export default function GapEstudantes() {
 
   const save = async () => {
     if (!draft.primeiroNome.trim() || !draft.curso_id) return;
-    const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
+    const nome = [draft.primeiroNome.trim(), draft.meioNome.trim(), draft.ultimoNome.trim()].filter(Boolean).join(" ");
     const email = buildEmail(draft.primeiroNome, draft.ultimoNome);
     if (!email) { toast.error("Não foi possível gerar email a partir do nome"); return; }
     try {
@@ -91,6 +91,7 @@ export default function GapEstudantes() {
         ano: draft.ano,
         turma: draft.turma,
         primeiro_nome: draft.primeiroNome.trim(),
+        nome_meio: draft.meioNome.trim() || null,
         ultimo_nome: draft.ultimoNome.trim() || null,
       });
       toast.success(`Discente adicionado · ${email}`);
