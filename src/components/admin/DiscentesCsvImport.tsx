@@ -786,9 +786,18 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                         className={`border-b transition-colors ${bad ? "bg-amber-50/40 hover:bg-amber-50/70" : "hover:bg-muted/30"}`}
                         title={bad ? `Falta: ${errs.join(", ")}` : ""}
                       >
-                        <td className="px-3 py-1.5">
+                        <td
+                          className="px-3 py-1.5 cursor-pointer select-none"
+                          onClick={() => toggleSelected(r._key)}
+                        >
                           <div className="flex items-center gap-1.5">
-                            <Checkbox checked={r._selected} onCheckedChange={(v) => setCell(r._key, { _selected: !!v })} />
+                            <input
+                              type="checkbox"
+                              checked={r._selected}
+                              onChange={() => toggleSelected(r._key)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="h-4 w-4 rounded border-input accent-primary cursor-pointer"
+                            />
                             {bad
                               ? <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
                               : <Check className="w-3.5 h-3.5 text-emerald-600" />}
