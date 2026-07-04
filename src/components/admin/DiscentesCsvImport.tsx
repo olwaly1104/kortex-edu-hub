@@ -612,6 +612,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                             className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
                         </td>
                         <td className="px-1 py-1">
+                          <Input value={r.bilhete} onChange={(e) => setCell(r._key, { bilhete: e.target.value })}
+                            placeholder="—"
+                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary font-mono" />
+                        </td>
+                        <td className="px-1 py-1">
                           <Select value={r.faculdade_id} onValueChange={(v) => setCell(r._key, { faculdade_id: v, curso_id: "" })}>
                             <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
                             <SelectContent>
