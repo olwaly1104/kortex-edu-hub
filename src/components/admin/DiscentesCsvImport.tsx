@@ -125,7 +125,7 @@ const emptyRow = (): Row => ({
   enc_primeiro: "", enc_ultimo: "", enc_parentesco: "", enc_telefone: "", enc_email: "", enc_bilhete: "",
 });
 
-const RECOGNIZED_COLS = ["nome","prefixo","faculdade","curso","ano","genero","regime","telemovel","email","bilhete","nascimento","provincia","municipio","morada","enc_nome","enc_parentesco","enc_telefone","enc_email","enc_bilhete"];
+const RECOGNIZED_COLS = ["nome","primeiro_nome","nome_meio","ultimo_nome","prefixo","faculdade","curso","ano","genero","regime","telemovel","email","bilhete","nascimento","provincia","municipio","morada","enc_nome","enc_parentesco","enc_telefone","enc_email","enc_bilhete"];
 
 // Smart header resolution: try exact HEADER_MAP first, then direct field name,
 // then substring signals (e.g. "n_identificacao", "bilhete de identidade", "num bi").
