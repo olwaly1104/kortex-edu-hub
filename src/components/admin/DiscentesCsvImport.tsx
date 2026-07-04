@@ -407,7 +407,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     let ok = 0, fail = 0;
     for (const r of toImport) {
       try {
-        const nome = `${r.primeiro_nome.trim()} ${r.ultimo_nome.trim()}`.trim();
+        const nome = [r.primeiro_nome.trim(), r.nome_meio.trim(), r.ultimo_nome.trim()].filter(Boolean).join(" ");
         await createMut.mutateAsync({
           curso_id: r.curso_id,
           nome,
@@ -415,6 +415,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
           turma: "A",
           prefixo: r.prefixo.trim() || null,
           primeiro_nome: r.primeiro_nome.trim(),
+          nome_meio: r.nome_meio.trim() || null,
           ultimo_nome: r.ultimo_nome.trim() || null,
           nascimento: r.nascimento || null,
           genero: r.genero || "M",
