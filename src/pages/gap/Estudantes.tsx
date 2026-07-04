@@ -21,6 +21,7 @@ const turmasPool = ["A", "B", "C", "D", "E"];
 
 type Draft = {
   primeiroNome: string;
+  meioNome: string;
   ultimoNome: string;
   curso_id: string;
   ano: string;
