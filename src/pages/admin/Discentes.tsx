@@ -558,14 +558,15 @@ export default function AdminDiscentes() {
               <Field label="Nome completo *">
                 <Input
                   autoFocus
-                  value={`${draft.primeiroNome}${draft.ultimoNome ? " " + draft.ultimoNome : ""}`.trim()}
+                  value={[draft.primeiroNome, draft.meioNome, draft.ultimoNome].filter(Boolean).join(" ")}
                   onChange={(e) => {
-                    const parts = e.target.value.trimStart().split(/\s+/);
+                    const parts = e.target.value.trimStart().split(/\s+/).filter(Boolean);
                     const first = parts.shift() || "";
-                    const last = parts.join(" ");
-                    setDraft((d) => ({ ...d, primeiroNome: first, ultimoNome: last }));
+                    const last = parts.length > 0 ? parts.pop() || "" : "";
+                    const middle = parts.join(" ");
+                    setDraft((d) => ({ ...d, primeiroNome: first, meioNome: middle, ultimoNome: last }));
                   }}
-                  placeholder="Ana Silva"
+                  placeholder="Ana Maria Silva"
                   className="h-9 text-sm"
                 />
               </Field>
