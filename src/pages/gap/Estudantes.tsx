@@ -251,13 +251,22 @@ export default function GapEstudantes() {
 
           <div className="space-y-5 py-2">
             <FormSection icon={<User className="w-3.5 h-3.5" />} title="Identificação">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <Label className="text-xs">Primeiro nome</Label>
                   <Input
                     className="h-9 mt-1"
                     value={draft.primeiroNome}
                     onChange={(e) => setF("primeiroNome", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Nome do meio</Label>
+                  <Input
+                    className="h-9 mt-1"
+                    value={draft.meioNome}
+                    onChange={(e) => setF("meioNome", e.target.value)}
+                    placeholder="Opcional"
                   />
                 </div>
                 <div>
