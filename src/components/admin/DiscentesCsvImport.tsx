@@ -272,8 +272,10 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       // Yield to the browser so the loading UI can paint before heavy sync parse.
       await new Promise((r) => setTimeout(r, 30));
       ingestText(text);
-      // Brief "complete" flash before switching to the preview.
-      await new Promise((r) => setTimeout(r, 250));
+      // Keep the spinner rotating until the preview table has committed to the DOM.
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      await new Promise((r) => setTimeout(r, 400));
     } catch (e: any) {
       toast.error(e?.message || "Falha ao processar CSV");
     } finally {
