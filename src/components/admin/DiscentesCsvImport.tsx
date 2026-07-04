@@ -664,7 +664,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                           <Select value={r.curso_id} onValueChange={(v) => setCell(r._key, { curso_id: v, ano: "" })} disabled={!r.faculdade_id}>
                             <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
                             <SelectContent>
-                              {cursoPool.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.code || c.name}</SelectItem>)}
+                              {cursoPool.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name || c.code}</SelectItem>)}
                             </SelectContent>
                           </Select>
                         </td>
