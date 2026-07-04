@@ -264,6 +264,7 @@ export default function AdminDiscentes() {
       const q = searchTerm.toLowerCase();
       return (
         r.primeiroNome.toLowerCase().includes(q) ||
+        r.meioNome.toLowerCase().includes(q) ||
         r.ultimoNome.toLowerCase().includes(q) ||
         r.email.toLowerCase().includes(q) ||
         r.curso.toLowerCase().includes(q) ||
