@@ -688,6 +688,9 @@ export default function AdminDiscentes() {
                       <Field label="Primeiro nome">
                         <Input value={draft.primeiroNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
                       </Field>
+                      <Field label="Nome do meio">
+                        <Input value={draft.meioNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
+                      </Field>
                       <Field label="Último nome">
                         <Input value={draft.ultimoNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
                       </Field>
