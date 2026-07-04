@@ -184,14 +184,21 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const backToUpload = () => { setStage("upload"); };
   const openPreview = () => { setStage("preview"); };
 
-  /* resolve faculdade/curso from free-text using sigla/code/name */
+  /* resolve faculdade/curso from free-text using sigla/code/name (fuzzy) */
   const resolveFaculdade = (raw: string) => {
     const n = norm(raw);
     if (!n) return "";
     return (
       faculdades.find((f: any) => norm(f.sigla || "") === n)?.id ||
       faculdades.find((f: any) => norm(f.name || "") === n)?.id ||
-      faculdades.find((f: any) => norm(f.name || "").startsWith(n))?.id || ""
+      faculdades.find((f: any) => {
+        const fn = norm(f.name || "");
+        return fn && (fn.startsWith(n) || n.startsWith(fn) || fn.includes(n) || n.includes(fn));
+      })?.id ||
+      faculdades.find((f: any) => {
+        const s = norm(f.sigla || "");
+        return s && (n.includes(s) || s.includes(n));
+      })?.id || ""
     );
   };
   const resolveCurso = (raw: string, facId: string) => {
@@ -210,6 +217,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       })?.id || ""
     );
   };
+
 
   const ingestText = (text: string) => {
     const table = parseCsv(text);
