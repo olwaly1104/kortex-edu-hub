@@ -119,7 +119,7 @@ type Row = {
 const emptyRow = (): Row => ({
   _key: Math.random().toString(36).slice(2),
   _selected: true,
-  prefixo: "", primeiro_nome: "", ultimo_nome: "", faculdade_id: "", curso_id: "",
+  prefixo: "", primeiro_nome: "", nome_meio: "", ultimo_nome: "", faculdade_id: "", curso_id: "",
   ano: "", nascimento: "", genero: "", regime: "",
   telemovel: "", email: "", bilhete: "", provincia: "", municipio: "", endereco: "",
   enc_primeiro: "", enc_ultimo: "", enc_parentesco: "", enc_telefone: "", enc_email: "", enc_bilhete: "",
