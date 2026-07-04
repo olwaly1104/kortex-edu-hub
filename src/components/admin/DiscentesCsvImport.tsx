@@ -470,53 +470,86 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     toast.success("Alterações confirmadas");
   };
 
-  const doImport = async () => {
-    const toImport = rows.filter((r) => r._selected && validate(r).length === 0);
-    if (!toImport.length) { toast.error("Nenhuma linha válida selecionada"); return; }
-    setImporting(true);
-    setProgress({ done: 0, total: toImport.length });
-    let ok = 0, fail = 0;
-    for (const r of toImport) {
-      try {
-        const nome = [r.primeiro_nome.trim(), r.nome_meio.trim(), r.ultimo_nome.trim()].filter(Boolean).join(" ");
-        await createMut.mutateAsync({
-          curso_id: r.curso_id,
-          nome,
-          ano: r.ano,
-          turma: "A",
-          prefixo: r.prefixo.trim() || null,
-          primeiro_nome: r.primeiro_nome.trim(),
-          nome_meio: r.nome_meio.trim() || null,
-          ultimo_nome: r.ultimo_nome.trim() || null,
-          nascimento: r.nascimento || null,
-          genero: r.genero || "M",
-          regime: r.regime || "normal",
-          telemovel: r.telemovel.trim() || null,
-          email: r.email.trim() || null,
-          bilhete: r.bilhete.trim() || null,
-          provincia: r.provincia.trim() || null,
-          municipio: r.municipio.trim() || null,
-          endereco: r.endereco.trim() || null,
-          enc_primeiro_nome: r.enc_primeiro.trim() || null,
-          enc_ultimo_nome: r.enc_ultimo.trim() || null,
-          enc_parentesco: r.enc_parentesco.trim() || null,
-          enc_telefone: r.enc_telefone.trim() || null,
-          enc_email: r.enc_email.trim() || null,
-          enc_bilhete: r.enc_bilhete.trim() || null,
-        } as any);
-        ok++;
-      } catch (e: any) {
-        console.warn("csv row failed:", e?.message);
-        fail++;
-      }
-      setProgress((p) => ({ ...p, done: p.done + 1 }));
+  // Build the final import batch with auto-generated emails + dedupe by email
+  const importBatch = useMemo(() => {
+    const seen = new Set<string>();
+    const batch: { row: Row; email: string; nome: string }[] = [];
+    for (const r of rows) {
+      if (!r._selected) continue;
+      if (validate(r).length > 0) continue;
+      const primeiro = r.primeiro_nome.trim();
+      const ultimo = r.ultimo_nome.trim();
+      const email = (r.email.trim() || buildAutoEmail(primeiro, ultimo)).toLowerCase();
+      if (!email || seen.has(email)) continue;
+      seen.add(email);
+      const nome = [primeiro, r.nome_meio.trim(), ultimo].filter(Boolean).join(" ");
+      batch.push({ row: r, email, nome });
     }
-    setImporting(false);
-    if (ok) toast.success(`${ok} discente(s) importado(s)${fail ? ` · ${fail} falharam` : ""}`);
-    else toast.error("Nenhuma linha foi importada");
-    onImported?.();
-    close();
+    return batch;
+  }, [rows]);
+
+  const requestImport = () => {
+    if (!importBatch.length) { toast.error("Nenhuma linha válida selecionada"); return; }
+    setConfirmOpen(true);
   };
+
+  const doImport = async () => {
+    setConfirmOpen(false);
+    if (!importBatch.length) return;
+    setImporting(true);
+    setProgress({ done: 0, total: importBatch.length, ok: 0, fail: 0, startedAt: Date.now() });
+
+    const CONCURRENCY = 3;
+    let cursor = 0;
+    const runOne = async () => {
+      while (cursor < importBatch.length) {
+        const idx = cursor++;
+        const { row: r, email, nome } = importBatch[idx];
+        try {
+          await createMut.mutateAsync({
+            curso_id: r.curso_id,
+            nome,
+            ano: r.ano,
+            turma: "A",
+            prefixo: r.prefixo.trim() || null,
+            primeiro_nome: r.primeiro_nome.trim(),
+            nome_meio: r.nome_meio.trim() || null,
+            ultimo_nome: r.ultimo_nome.trim() || null,
+            nascimento: r.nascimento || null,
+            genero: r.genero || "M",
+            regime: r.regime || "normal",
+            telemovel: r.telemovel.trim() || null,
+            email,
+            bilhete: r.bilhete.trim() || null,
+            provincia: r.provincia.trim() || null,
+            municipio: r.municipio.trim() || null,
+            endereco: r.endereco.trim() || null,
+            enc_primeiro_nome: r.enc_primeiro.trim() || null,
+            enc_ultimo_nome: r.enc_ultimo.trim() || null,
+            enc_parentesco: r.enc_parentesco.trim() || null,
+            enc_telefone: r.enc_telefone.trim() || null,
+            enc_email: r.enc_email.trim() || null,
+            enc_bilhete: r.enc_bilhete.trim() || null,
+          } as any);
+          setProgress((p) => ({ ...p, done: p.done + 1, ok: p.ok + 1 }));
+        } catch (e: any) {
+          console.warn("csv row failed:", email, e?.message);
+          setProgress((p) => ({ ...p, done: p.done + 1, fail: p.fail + 1 }));
+        }
+      }
+    };
+    await Promise.all(Array.from({ length: CONCURRENCY }, runOne));
+
+    setImporting(false);
+    setProgress((p) => {
+      if (p.ok) toast.success(`${p.ok} conta(s) Kortex criada(s)${p.fail ? ` · ${p.fail} falharam` : ""}`);
+      else toast.error("Nenhuma linha foi importada");
+      return p;
+    });
+    onImported?.();
+    if (progress.fail === 0) close();
+  };
+
 
   /* ---------------- render ---------------- */
 
