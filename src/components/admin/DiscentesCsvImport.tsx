@@ -6,11 +6,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Progress } from "@/components/ui/progress";
+import {
   Upload, FileSpreadsheet, X, Check, AlertCircle,
-  Trash2, Loader2, Sparkles, UserPlus, Eye,
+  Trash2, Loader2, Sparkles, UserPlus, Eye, ShieldCheck, Clock,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { useCursos, useFaculdades, useCreateEstudante } from "@/lib/useInstitution";
+
+const EMAIL_DOMAIN = "upra.kor";
+const emailSlug = (s: string) =>
+  (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
+const buildAutoEmail = (primeiro: string, ultimo: string) => {
+  const p = emailSlug(primeiro);
+  const u = emailSlug(ultimo);
+  if (!p && !u) return "";
+  return `${[p, u].filter(Boolean).join(".")}@${EMAIL_DOMAIN}`;
+};
+
 
 /* ---------------- CSV utils ---------------- */
 
@@ -183,13 +200,16 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const [rows, setRows] = useState<Row[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [importing, setImporting] = useState(false);
-  const [progress, setProgress] = useState({ done: 0, total: 0 });
+  const [progress, setProgress] = useState({ done: 0, total: 0, ok: 0, fail: 0, startedAt: 0 });
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const resetAll = () => {
-    setStage("upload"); setRows([]); setImporting(false); setProgress({ done: 0, total: 0 });
+    setStage("upload"); setRows([]); setImporting(false);
+    setProgress({ done: 0, total: 0, ok: 0, fail: 0, startedAt: 0 });
     if (fileRef.current) fileRef.current.value = "";
   };
+
 
   const close = () => { resetAll(); onOpenChange(false); };
   const backToUpload = () => { setStage("upload"); };
@@ -451,53 +471,88 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     toast.success("Alterações confirmadas");
   };
 
-  const doImport = async () => {
-    const toImport = rows.filter((r) => r._selected && validate(r).length === 0);
-    if (!toImport.length) { toast.error("Nenhuma linha válida selecionada"); return; }
-    setImporting(true);
-    setProgress({ done: 0, total: toImport.length });
-    let ok = 0, fail = 0;
-    for (const r of toImport) {
-      try {
-        const nome = [r.primeiro_nome.trim(), r.nome_meio.trim(), r.ultimo_nome.trim()].filter(Boolean).join(" ");
-        await createMut.mutateAsync({
-          curso_id: r.curso_id,
-          nome,
-          ano: r.ano,
-          turma: "A",
-          prefixo: r.prefixo.trim() || null,
-          primeiro_nome: r.primeiro_nome.trim(),
-          nome_meio: r.nome_meio.trim() || null,
-          ultimo_nome: r.ultimo_nome.trim() || null,
-          nascimento: r.nascimento || null,
-          genero: r.genero || "M",
-          regime: r.regime || "normal",
-          telemovel: r.telemovel.trim() || null,
-          email: r.email.trim() || null,
-          bilhete: r.bilhete.trim() || null,
-          provincia: r.provincia.trim() || null,
-          municipio: r.municipio.trim() || null,
-          endereco: r.endereco.trim() || null,
-          enc_primeiro_nome: r.enc_primeiro.trim() || null,
-          enc_ultimo_nome: r.enc_ultimo.trim() || null,
-          enc_parentesco: r.enc_parentesco.trim() || null,
-          enc_telefone: r.enc_telefone.trim() || null,
-          enc_email: r.enc_email.trim() || null,
-          enc_bilhete: r.enc_bilhete.trim() || null,
-        } as any);
-        ok++;
-      } catch (e: any) {
-        console.warn("csv row failed:", e?.message);
-        fail++;
-      }
-      setProgress((p) => ({ ...p, done: p.done + 1 }));
+  // Build the final import batch with auto-generated emails + dedupe by email
+  const importBatch = useMemo(() => {
+    const seen = new Set<string>();
+    const batch: { row: Row; email: string; nome: string }[] = [];
+    for (const r of rows) {
+      if (!r._selected) continue;
+      if (validate(r).length > 0) continue;
+      const primeiro = r.primeiro_nome.trim();
+      const ultimo = r.ultimo_nome.trim();
+      const email = (r.email.trim() || buildAutoEmail(primeiro, ultimo)).toLowerCase();
+      if (!email || seen.has(email)) continue;
+      seen.add(email);
+      const nome = [primeiro, r.nome_meio.trim(), ultimo].filter(Boolean).join(" ");
+      batch.push({ row: r, email, nome });
     }
+    return batch;
+  }, [rows]);
+
+  const requestImport = () => {
+    if (!importBatch.length) { toast.error("Nenhuma linha válida selecionada"); return; }
+    setConfirmOpen(true);
+  };
+
+  const doImport = async () => {
+    setConfirmOpen(false);
+    if (!importBatch.length) return;
+    setImporting(true);
+    setProgress({ done: 0, total: importBatch.length, ok: 0, fail: 0, startedAt: Date.now() });
+
+    const CONCURRENCY = 3;
+    let cursor = 0;
+    let okCount = 0;
+    let failCount = 0;
+    const runOne = async () => {
+      while (cursor < importBatch.length) {
+        const idx = cursor++;
+        const { row: r, email, nome } = importBatch[idx];
+        try {
+          await createMut.mutateAsync({
+            curso_id: r.curso_id,
+            nome,
+            ano: r.ano,
+            turma: "A",
+            prefixo: r.prefixo.trim() || null,
+            primeiro_nome: r.primeiro_nome.trim(),
+            nome_meio: r.nome_meio.trim() || null,
+            ultimo_nome: r.ultimo_nome.trim() || null,
+            nascimento: r.nascimento || null,
+            genero: r.genero || "M",
+            regime: r.regime || "normal",
+            telemovel: r.telemovel.trim() || null,
+            email,
+            bilhete: r.bilhete.trim() || null,
+            provincia: r.provincia.trim() || null,
+            municipio: r.municipio.trim() || null,
+            endereco: r.endereco.trim() || null,
+            enc_primeiro_nome: r.enc_primeiro.trim() || null,
+            enc_ultimo_nome: r.enc_ultimo.trim() || null,
+            enc_parentesco: r.enc_parentesco.trim() || null,
+            enc_telefone: r.enc_telefone.trim() || null,
+            enc_email: r.enc_email.trim() || null,
+            enc_bilhete: r.enc_bilhete.trim() || null,
+          } as any);
+          okCount++;
+          setProgress((p) => ({ ...p, done: p.done + 1, ok: p.ok + 1 }));
+        } catch (e: any) {
+          console.warn("csv row failed:", email, e?.message);
+          failCount++;
+          setProgress((p) => ({ ...p, done: p.done + 1, fail: p.fail + 1 }));
+        }
+      }
+    };
+    await Promise.all(Array.from({ length: CONCURRENCY }, runOne));
+
     setImporting(false);
-    if (ok) toast.success(`${ok} discente(s) importado(s)${fail ? ` · ${fail} falharam` : ""}`);
+    if (okCount) toast.success(`${okCount} conta(s) Kortex criada(s)${failCount ? ` · ${failCount} falharam` : ""}`);
     else toast.error("Nenhuma linha foi importada");
     onImported?.();
-    close();
+    if (failCount === 0) close();
   };
+
+
 
   /* ---------------- render ---------------- */
 
@@ -800,30 +855,136 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
 
             {/* Footer */}
             <div className="px-6 py-3 border-t bg-background flex items-center gap-3">
-              <Button variant="ghost" size="sm" onClick={resetAll} className="gap-1.5">
+              <Button variant="ghost" size="sm" onClick={resetAll} className="gap-1.5" disabled={importing}>
                 <X className="w-3.5 h-3.5" /> Cancelar
               </Button>
-              {importing && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> A importar {progress.done}/{progress.total}
-                </div>
-              )}
               <div className="ml-auto flex items-center gap-3">
                 <p className="text-xs text-muted-foreground">
-                  <strong className="text-foreground tabular-nums">{selectedValidCount}</strong> pronto(s) para importar
+                  <strong className="text-foreground tabular-nums">{importBatch.length}</strong> conta(s) Kortex a criar
                 </p>
-                <Button size="sm" onClick={doImport} disabled={importing || selectedValidCount === 0} className="gap-1.5">
-                  {importing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                  Importar {selectedValidCount}
+                <Button size="sm" onClick={requestImport} disabled={importing || importBatch.length === 0} className="gap-1.5">
+                  <Check className="w-3.5 h-3.5" />
+                  Importar {importBatch.length}
                 </Button>
               </div>
             </div>
           </>
         )}
+
+        {/* Confirmation dialog */}
+        <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-primary" />
+                Confirmar importação
+              </AlertDialogTitle>
+              <AlertDialogDescription asChild>
+                <div className="space-y-3 pt-1">
+                  <p className="text-sm">
+                    Serão criadas <strong className="text-foreground">{importBatch.length}</strong> conta(s) Kortex
+                    para os discentes selecionados. Cada discente receberá um email institucional
+                    <code className="mx-1 px-1 py-0.5 rounded bg-muted text-[11px] font-mono">@{EMAIL_DOMAIN}</code>
+                    e será obrigado a definir palavra-passe no primeiro acesso.
+                  </p>
+                  <div className="rounded-md border bg-muted/40 px-3 py-2 text-xs flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                    Tempo estimado: <strong className="text-foreground tabular-nums">
+                      {formatEta(Math.ceil(importBatch.length / 3) * 1.5)}
+                    </strong>
+                  </div>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={doImport}>
+                Criar {importBatch.length} conta(s)
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Full-screen progress overlay while importing */}
+        {importing && <ImportProgressOverlay progress={progress} />}
     </div>,
     document.body,
   );
 }
+
+function formatEta(seconds: number) {
+  if (!isFinite(seconds) || seconds <= 0) return "—";
+  const s = Math.round(seconds);
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  const rs = s % 60;
+  if (m < 60) return rs ? `${m}m ${rs}s` : `${m}m`;
+  const h = Math.floor(m / 60);
+  const rm = m % 60;
+  return rm ? `${h}h ${rm}m` : `${h}h`;
+}
+
+function ImportProgressOverlay({
+  progress,
+}: {
+  progress: { done: number; total: number; ok: number; fail: number; startedAt: number };
+}) {
+  const pct = progress.total ? Math.round((progress.done / progress.total) * 100) : 0;
+  const elapsed = progress.startedAt ? (Date.now() - progress.startedAt) / 1000 : 0;
+  const rate = progress.done > 0 && elapsed > 0 ? progress.done / elapsed : 0;
+  const remaining = rate > 0 ? Math.ceil((progress.total - progress.done) / rate) : 0;
+
+  return (
+    <div className="fixed inset-0 z-[300] bg-background/95 backdrop-blur-sm flex items-center justify-center animate-fade-in">
+      <div className="w-full max-w-md mx-4 rounded-2xl border bg-card shadow-xl p-6 space-y-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <Loader2 className="w-5 h-5 animate-spin" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold">A criar contas Kortex</p>
+            <p className="text-[11px] text-muted-foreground">
+              A provisionar utilizadores no backend. Não feche esta janela.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-baseline justify-between">
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Progresso</p>
+            <p className="text-xs font-mono tabular-nums">
+              {progress.done} / {progress.total} <span className="text-muted-foreground">({pct}%)</span>
+            </p>
+          </div>
+          <Progress value={pct} className="h-2" />
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="rounded-lg border bg-muted/30 py-2">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Criados</p>
+            <p className="text-lg font-bold text-emerald-600 tabular-nums">{progress.ok}</p>
+          </div>
+          <div className="rounded-lg border bg-muted/30 py-2">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Falhou</p>
+            <p className="text-lg font-bold text-destructive tabular-nums">{progress.fail}</p>
+          </div>
+          <div className="rounded-lg border bg-muted/30 py-2">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Restam</p>
+            <p className="text-lg font-bold tabular-nums">{progress.total - progress.done}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground border-t pt-3">
+          <span className="inline-flex items-center gap-1.5">
+            <Clock className="w-3 h-3" /> Tempo restante: <strong className="text-foreground tabular-nums">{formatEta(remaining)}</strong>
+          </span>
+          <span className="tabular-nums">{rate > 0 ? `${rate.toFixed(1)}/s` : "…"}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 function StatChip({ label, value, color }: { label: string; value: number; color: "emerald" | "amber" | "muted" }) {
   const cls = color === "emerald"
