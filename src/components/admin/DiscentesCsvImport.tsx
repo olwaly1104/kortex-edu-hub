@@ -47,6 +47,7 @@ const HEADER_MAP: Record<string, string> = {
   nome: "nome_completo", nomecompleto: "nome_completo", fullname: "nome_completo", name: "nome_completo",
   prefixo: "prefixo", titulo: "prefixo", tratamento: "prefixo",
   primeironome: "primeiro_nome", primeiro: "primeiro_nome", firstname: "primeiro_nome",
+  nomedomeio: "nome_meio", nomemeio: "nome_meio", meio: "nome_meio", middlename: "nome_meio", middle: "nome_meio", segundonome: "nome_meio",
   ultimonome: "ultimo_nome", apelido: "ultimo_nome", ultimo: "ultimo_nome", lastname: "ultimo_nome", sobrenome: "ultimo_nome",
   faculdade: "faculdade", faculty: "faculdade", sigla: "faculdade",
   curso: "curso", nomedocurso: "curso", nomecurso: "curso", codigo: "curso", codigocurso: "curso", coursecode: "curso", coursename: "curso",
