@@ -30,6 +30,7 @@ type Draft = {
   fotoFile: File | null;
   fotoPreview: string;
   primeiroNome: string;
+  meioNome: string;
   ultimoNome: string;
   nascimento: string;
   genero: Genero;
