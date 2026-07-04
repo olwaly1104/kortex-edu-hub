@@ -1,4 +1,4 @@
-import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -467,13 +467,14 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
 
   const selectedValidCount = selectionSummary.valid;
 
-  const setCell = (key: string, patch: Partial<Row>) =>
+  const setCell = useCallback((key: string, patch: Partial<Row>) => {
     setRows((rs) => rs.map((r) => (r._key === key ? { ...r, ...patch } : r)));
+  }, []);
 
-  const removeRow = (key: string) => {
+  const removeRow = useCallback((key: string) => {
     selectedKeysRef.current.delete(key);
     setRows((rs) => rs.filter((r) => r._key !== key));
-  };
+  }, []);
   const removeInvalid = () => {
     const remaining = rows.filter((r) => validate(r).length === 0);
     const remainingKeys = new Set(remaining.map((r) => r._key));
@@ -849,106 +850,20 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                   </tr>
                 </thead>
                 <tbody>
-                  {rows.map((r) => {
-                    const errs = validationSummary.errors.get(r._key) || [];
-                    const bad = errs.length > 0;
-                    const cursoPool = r.faculdade_id ? cursos.filter((c: any) => c.faculdade_id === r.faculdade_id) : [];
-                    const curso = cursos.find((c: any) => c.id === r.curso_id) as any;
-                    const anos = curso ? Array.from({ length: Math.max(1, Math.min(10, Number(curso.years) || 0)) }, (_, i) => String(i + 1)) : [];
-                    return (
-                      <tr key={r._key}
-                        className={`border-b transition-colors ${bad ? "bg-amber-50/40 hover:bg-amber-50/70" : "hover:bg-muted/30"}`}
-                        title={bad ? `Falta: ${errs.join(", ")}` : ""}
-                      >
-                        <td
-                          className="px-3 py-1.5 cursor-pointer select-none"
-                          onClick={(event) => {
-                            const checked = toggleSelected(r._key);
-                            const input = event.currentTarget.querySelector<HTMLInputElement>("input[type='checkbox']");
-                            if (input) input.checked = checked;
-                          }}
-                        >
-                          <div className="flex items-center gap-1.5">
-                            <input
-                              key={`${r._key}-${selectionVersion}`}
-                              type="checkbox"
-                              defaultChecked={selectedKeysRef.current.has(r._key)}
-                              onChange={(event) => toggleSelected(r._key, event.currentTarget.checked)}
-                              onClick={(e) => e.stopPropagation()}
-                              className="h-4 w-4 rounded border-input accent-primary cursor-pointer"
-                            />
-                            {bad
-                              ? <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                              : <Check className="w-3.5 h-3.5 text-emerald-600" />}
-                          </div>
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.primeiro_nome} onChange={(e) => setCell(r._key, { primeiro_nome: e.target.value })}
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.nome_meio} onChange={(e) => setCell(r._key, { nome_meio: e.target.value })}
-                            placeholder="—"
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.ultimo_nome} onChange={(e) => setCell(r._key, { ultimo_nome: e.target.value })}
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.bilhete} onChange={(e) => setCell(r._key, { bilhete: e.target.value })}
-                            placeholder="—"
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary font-mono" />
-                        </td>
-                        <td className="px-1 py-1">
-                          <Select value={r.faculdade_id} onValueChange={(v) => setCell(r._key, { faculdade_id: v, curso_id: "" })}>
-                            <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
-                            <SelectContent className="z-[200]">
-                              {faculdades.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td className="px-1 py-1">
-                          <Select value={r.curso_id} onValueChange={(v) => setCell(r._key, { curso_id: v, ano: "" })} disabled={!r.faculdade_id}>
-                            <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
-                            <SelectContent className="z-[200]">
-                              {cursoPool.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name || c.code}</SelectItem>)}
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td className="px-1 py-1">
-                          <Select value={r.ano} onValueChange={(v) => setCell(r._key, { ano: v })} disabled={!anos.length}>
-                            <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
-                            <SelectContent className="z-[200]">{anos.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
-                          </Select>
-                        </td>
-                        <td className="px-1 py-1">
-                          <Select value={r.regime || "normal"} onValueChange={(v) => setCell(r._key, { regime: v as any })}>
-                            <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue /></SelectTrigger>
-                            <SelectContent className="z-[200]">
-                              <SelectItem value="normal">Normal</SelectItem>
-                              <SelectItem value="bolseiro">Bolseiro</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.telemovel} onChange={(e) => setCell(r._key, { telemovel: e.target.value })}
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
-                        </td>
-                        <td className="px-1 py-1">
-                          <Input value={r.endereco} onChange={(e) => setCell(r._key, { endereco: e.target.value })}
-                            placeholder="Endereço"
-                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
-                        </td>
-                        <td className="px-1 py-1 text-right">
-                          <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                            onClick={() => removeRow(r._key)}>
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {rows.map((r) => (
+                    <CsvPreviewRow
+                      key={r._key}
+                      row={r}
+                      errors={validationSummary.errors.get(r._key) || []}
+                      cursos={cursos}
+                      faculdades={faculdades}
+                      selectionVersion={selectionVersion}
+                      initiallySelected={selectedKeysRef.current.has(r._key)}
+                      onToggleSelected={toggleSelected}
+                      onSetCell={setCell}
+                      onRemoveRow={removeRow}
+                    />
+                  ))}
                 </tbody>
               </table>
             </div>
