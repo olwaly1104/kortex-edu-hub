@@ -555,21 +555,33 @@ export default function AdminDiscentes() {
           <div className="px-6 py-5 space-y-6">
             {/* Minimal required block */}
             <section className="space-y-3">
-              <Field label="Nome completo *">
-                <Input
-                  autoFocus
-                  value={[draft.primeiroNome, draft.meioNome, draft.ultimoNome].filter(Boolean).join(" ")}
-                  onChange={(e) => {
-                    const parts = e.target.value.trimStart().split(/\s+/).filter(Boolean);
-                    const first = parts.shift() || "";
-                    const last = parts.length > 0 ? parts.pop() || "" : "";
-                    const middle = parts.join(" ");
-                    setDraft((d) => ({ ...d, primeiroNome: first, meioNome: middle, ultimoNome: last }));
-                  }}
-                  placeholder="Ana Maria Silva"
-                  className="h-9 text-sm"
-                />
-              </Field>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <Field label="Primeiro nome *">
+                  <Input
+                    autoFocus
+                    value={draft.primeiroNome}
+                    onChange={(e) => setF("primeiroNome", e.target.value)}
+                    placeholder="Ana"
+                    className="h-9 text-sm"
+                  />
+                </Field>
+                <Field label="Nome(s) do meio">
+                  <Input
+                    value={draft.meioNome}
+                    onChange={(e) => setF("meioNome", e.target.value)}
+                    placeholder="Maria"
+                    className="h-9 text-sm"
+                  />
+                </Field>
+                <Field label="Último nome *">
+                  <Input
+                    value={draft.ultimoNome}
+                    onChange={(e) => setF("ultimoNome", e.target.value)}
+                    placeholder="Silva"
+                    className="h-9 text-sm"
+                  />
+                </Field>
+              </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Field label="Faculdade *">
