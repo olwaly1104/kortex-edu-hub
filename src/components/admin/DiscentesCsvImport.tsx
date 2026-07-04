@@ -680,6 +680,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                             className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
                         </td>
                         <td className="px-1 py-1">
+                          <Input value={r.nome_meio} onChange={(e) => setCell(r._key, { nome_meio: e.target.value })}
+                            placeholder="—"
+                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+                        </td>
+                        <td className="px-1 py-1">
                           <Input value={r.ultimo_nome} onChange={(e) => setCell(r._key, { ultimo_nome: e.target.value })}
                             className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
                         </td>
