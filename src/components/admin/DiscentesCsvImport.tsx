@@ -11,9 +11,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Progress } from "@/components/ui/progress";
 import {
-  Upload, FileSpreadsheet, X, Check, AlertCircle, Users,
-  Trash2, Loader2, Sparkles, UserPlus, Eye, ShieldCheck, Clock, Mail,
+  Upload, FileSpreadsheet, X, Check, AlertCircle,
+  Trash2, Loader2, Sparkles, UserPlus, Eye, ShieldCheck, Clock,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { useCursos, useFaculdades, useCreateEstudante } from "@/lib/useInstitution";
 
