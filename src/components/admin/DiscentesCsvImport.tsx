@@ -873,7 +873,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
 
         {/* Confirmation dialog */}
         <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-          <AlertDialogContent>
+          <AlertDialogContent className="z-[200]">
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-primary" />
