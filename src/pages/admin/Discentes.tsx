@@ -334,7 +334,7 @@ export default function AdminDiscentes() {
       if (draft.certificadoFile) certificado_url = await uploadDoc(draft.certificadoFile, "certificado", previewEmail);
       if (draft.encBilheteFile) enc_bilhete_url = await uploadDoc(draft.encBilheteFile, "enc-bi", previewEmail);
 
-      const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
+      const nome = [draft.primeiroNome.trim(), draft.meioNome.trim(), draft.ultimoNome.trim()].filter(Boolean).join(" ");
       await createMut.mutateAsync({
         curso_id: draft.curso_id,
         nome,
@@ -342,6 +342,7 @@ export default function AdminDiscentes() {
         ano: draft.ano,
         turma: draft.turma || "A",
         primeiro_nome: draft.primeiroNome.trim(),
+        nome_meio: draft.meioNome.trim() || null,
         ultimo_nome: draft.ultimoNome.trim() || null,
         nascimento: draft.nascimento || null,
         genero: draft.genero,
