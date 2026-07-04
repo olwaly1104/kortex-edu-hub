@@ -327,15 +327,18 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       // Resolve curso first without faculdade — if we find it, we can infer the faculdade.
       let facId = resolveFaculdade(facRaw);
       let cursoId = resolveCurso(cursoRaw, facId);
-      if (!cursoId) {
+      if (!cursoId && facId) {
+        // curso didn't match inside the resolved faculdade — retry across all cursos
         cursoId = resolveCurso(cursoRaw, "");
-        if (cursoId) {
-          const c = cursos.find((x: any) => x.id === cursoId) as any;
-          if (c?.faculdade_id) facId = c.faculdade_id;
-        }
+      }
+      // Always infer/override faculdade from the resolved curso when we have one
+      if (cursoId) {
+        const c = cursos.find((x: any) => x.id === cursoId) as any;
+        if (c?.faculdade_id) facId = c.faculdade_id;
       }
       r.faculdade_id = facId;
       r.curso_id = cursoId;
+
       if (!r.regime) r.regime = "normal";
       return r;
 
