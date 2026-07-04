@@ -509,6 +509,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     let failCount = 0;
     const runOne = async () => {
       while (cursor < importBatch.length) {
+        if (cancelRequestedRef.current) return;
         const idx = cursor++;
         const { row: r, email, nome } = importBatch[idx];
         try {
