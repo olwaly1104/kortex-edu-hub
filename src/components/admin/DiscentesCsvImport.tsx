@@ -852,30 +852,136 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
 
             {/* Footer */}
             <div className="px-6 py-3 border-t bg-background flex items-center gap-3">
-              <Button variant="ghost" size="sm" onClick={resetAll} className="gap-1.5">
+              <Button variant="ghost" size="sm" onClick={resetAll} className="gap-1.5" disabled={importing}>
                 <X className="w-3.5 h-3.5" /> Cancelar
               </Button>
-              {importing && (
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" /> A importar {progress.done}/{progress.total}
-                </div>
-              )}
               <div className="ml-auto flex items-center gap-3">
                 <p className="text-xs text-muted-foreground">
-                  <strong className="text-foreground tabular-nums">{selectedValidCount}</strong> pronto(s) para importar
+                  <strong className="text-foreground tabular-nums">{importBatch.length}</strong> conta(s) Kortex a criar
                 </p>
-                <Button size="sm" onClick={doImport} disabled={importing || selectedValidCount === 0} className="gap-1.5">
-                  {importing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
-                  Importar {selectedValidCount}
+                <Button size="sm" onClick={requestImport} disabled={importing || importBatch.length === 0} className="gap-1.5">
+                  <Check className="w-3.5 h-3.5" />
+                  Importar {importBatch.length}
                 </Button>
               </div>
             </div>
           </>
         )}
+
+        {/* Confirmation dialog */}
+        <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-primary" />
+                Confirmar importação
+              </AlertDialogTitle>
+              <AlertDialogDescription asChild>
+                <div className="space-y-3 pt-1">
+                  <p className="text-sm">
+                    Serão criadas <strong className="text-foreground">{importBatch.length}</strong> conta(s) Kortex
+                    para os discentes selecionados. Cada discente receberá um email institucional
+                    <code className="mx-1 px-1 py-0.5 rounded bg-muted text-[11px] font-mono">@{EMAIL_DOMAIN}</code>
+                    e será obrigado a definir palavra-passe no primeiro acesso.
+                  </p>
+                  <div className="rounded-md border bg-muted/40 px-3 py-2 text-xs flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                    Tempo estimado: <strong className="text-foreground tabular-nums">
+                      {formatEta(Math.ceil(importBatch.length / 3) * 1.5)}
+                    </strong>
+                  </div>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={doImport}>
+                Criar {importBatch.length} conta(s)
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Full-screen progress overlay while importing */}
+        {importing && <ImportProgressOverlay progress={progress} />}
     </div>,
     document.body,
   );
 }
+
+function formatEta(seconds: number) {
+  if (!isFinite(seconds) || seconds <= 0) return "—";
+  const s = Math.round(seconds);
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  const rs = s % 60;
+  if (m < 60) return rs ? `${m}m ${rs}s` : `${m}m`;
+  const h = Math.floor(m / 60);
+  const rm = m % 60;
+  return rm ? `${h}h ${rm}m` : `${h}h`;
+}
+
+function ImportProgressOverlay({
+  progress,
+}: {
+  progress: { done: number; total: number; ok: number; fail: number; startedAt: number };
+}) {
+  const pct = progress.total ? Math.round((progress.done / progress.total) * 100) : 0;
+  const elapsed = progress.startedAt ? (Date.now() - progress.startedAt) / 1000 : 0;
+  const rate = progress.done > 0 && elapsed > 0 ? progress.done / elapsed : 0;
+  const remaining = rate > 0 ? Math.ceil((progress.total - progress.done) / rate) : 0;
+
+  return (
+    <div className="fixed inset-0 z-[300] bg-background/95 backdrop-blur-sm flex items-center justify-center animate-fade-in">
+      <div className="w-full max-w-md mx-4 rounded-2xl border bg-card shadow-xl p-6 space-y-5">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <Loader2 className="w-5 h-5 animate-spin" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold">A criar contas Kortex</p>
+            <p className="text-[11px] text-muted-foreground">
+              A provisionar utilizadores no backend. Não feche esta janela.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-baseline justify-between">
+            <p className="text-[11px] uppercase tracking-wide text-muted-foreground font-semibold">Progresso</p>
+            <p className="text-xs font-mono tabular-nums">
+              {progress.done} / {progress.total} <span className="text-muted-foreground">({pct}%)</span>
+            </p>
+          </div>
+          <Progress value={pct} className="h-2" />
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="rounded-lg border bg-muted/30 py-2">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Criados</p>
+            <p className="text-lg font-bold text-emerald-600 tabular-nums">{progress.ok}</p>
+          </div>
+          <div className="rounded-lg border bg-muted/30 py-2">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Falhou</p>
+            <p className="text-lg font-bold text-destructive tabular-nums">{progress.fail}</p>
+          </div>
+          <div className="rounded-lg border bg-muted/30 py-2">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Restam</p>
+            <p className="text-lg font-bold tabular-nums">{progress.total - progress.done}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground border-t pt-3">
+          <span className="inline-flex items-center gap-1.5">
+            <Clock className="w-3 h-3" /> Tempo restante: <strong className="text-foreground tabular-nums">{formatEta(remaining)}</strong>
+          </span>
+          <span className="tabular-nums">{rate > 0 ? `${rate.toFixed(1)}/s` : "…"}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 function StatChip({ label, value, color }: { label: string; value: number; color: "emerald" | "amber" | "muted" }) {
   const cls = color === "emerald"
