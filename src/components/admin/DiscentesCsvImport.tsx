@@ -965,8 +965,12 @@ function formatEta(seconds: number) {
 
 function ImportProgressOverlay({
   progress,
+  onCancel,
+  cancelling,
 }: {
   progress: { done: number; total: number; ok: number; fail: number; startedAt: number };
+  onCancel: () => void;
+  cancelling: boolean;
 }) {
   const pct = progress.total ? Math.round((progress.done / progress.total) * 100) : 0;
   const elapsed = progress.startedAt ? (Date.now() - progress.startedAt) / 1000 : 0;
