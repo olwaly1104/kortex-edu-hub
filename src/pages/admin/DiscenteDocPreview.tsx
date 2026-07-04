@@ -87,6 +87,7 @@ export default function DiscenteDocPreview({
       rows: [
         ["Nome completo", d.nome],
         ["Primeiro nome", d.primeiro_nome || "—"],
+        ["Nome do meio", d.nome_meio || "—"],
         ["Último nome", d.ultimo_nome || "—"],
         ["Data de nascimento", fmtDataShort(d.nascimento)],
         ["Género", generoLabel(d.genero)],
