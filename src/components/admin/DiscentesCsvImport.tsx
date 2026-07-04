@@ -573,19 +573,19 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
               </p>
               <Select value={bulkFac} onValueChange={applyBulkFaculdade}>
                 <SelectTrigger className="h-8 text-xs w-[180px]"><SelectValue placeholder="Faculdade" /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[200]">
                   {faculdades.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
                 </SelectContent>
               </Select>
               <Select value={bulkCurso} onValueChange={applyBulkCurso}>
                 <SelectTrigger className="h-8 text-xs w-[180px]"><SelectValue placeholder="Curso" /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[200]">
                   {bulkCursos.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name || c.code}</SelectItem>)}
                 </SelectContent>
               </Select>
               <Select value={bulkAno} onValueChange={applyBulkAno}>
                 <SelectTrigger className="h-8 text-xs w-[90px]"><SelectValue placeholder="Ano" /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[200]">
                   {bulkAnos.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -657,7 +657,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                         <td className="px-1 py-1">
                           <Select value={r.faculdade_id} onValueChange={(v) => setCell(r._key, { faculdade_id: v, curso_id: "" })}>
                             <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="z-[200]">
                               {faculdades.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
                             </SelectContent>
                           </Select>
@@ -665,7 +665,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                         <td className="px-1 py-1">
                           <Select value={r.curso_id} onValueChange={(v) => setCell(r._key, { curso_id: v, ano: "" })} disabled={!r.faculdade_id}>
                             <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="z-[200]">
                               {cursoPool.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name || c.code}</SelectItem>)}
                             </SelectContent>
                           </Select>
@@ -673,13 +673,13 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                         <td className="px-1 py-1">
                           <Select value={r.ano} onValueChange={(v) => setCell(r._key, { ano: v })} disabled={!anos.length}>
                             <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue placeholder="—" /></SelectTrigger>
-                            <SelectContent>{anos.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
+                            <SelectContent className="z-[200]">{anos.map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}</SelectContent>
                           </Select>
                         </td>
                         <td className="px-1 py-1">
                           <Select value={r.regime || "normal"} onValueChange={(v) => setCell(r._key, { regime: v as any })}>
                             <SelectTrigger className="h-7 text-xs border-transparent hover:border-input"><SelectValue /></SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="z-[200]">
                               <SelectItem value="normal">Normal</SelectItem>
                               <SelectItem value="bolseiro">Bolseiro</SelectItem>
                             </SelectContent>
