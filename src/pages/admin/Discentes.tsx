@@ -393,7 +393,7 @@ export default function AdminDiscentes() {
     window.open(data.signedUrl, "_blank");
   };
 
-  const GRID = "grid grid-cols-[90px_1fr_1fr_1fr_80px_70px_1fr_50px_70px_88px] gap-2 px-4 py-2 items-center";
+  const GRID = "grid grid-cols-[90px_1fr_1fr_80px_70px_1fr_50px_70px_88px] gap-2 px-4 py-2 items-center";
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -471,7 +471,6 @@ export default function AdminDiscentes() {
           <div className={`${GRID} text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b !py-2`}>
             <span>ID</span>
             <span>Primeiro</span>
-            <span>Meio</span>
             <span>Último</span>
             <span>Regime</span>
             <span>Faculdade</span>
@@ -497,7 +496,6 @@ export default function AdminDiscentes() {
                 >
                   <span className="text-[11px] font-mono text-muted-foreground">{shortId}</span>
                   <span className="text-xs font-medium truncate">{r.primeiroNome}</span>
-                  <span className="text-xs truncate text-muted-foreground">{r.meioNome || "—"}</span>
                   <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold w-fit ${r.regime === "bolseiro" ? "bg-amber-50 text-amber-700" : "bg-muted text-muted-foreground"}`}>
                     {r.regime === "bolseiro" ? "Bolseiro" : "Normal"}
