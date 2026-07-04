@@ -74,7 +74,15 @@ const HEADER_MAP: Record<string, string> = {
 const FIELDS = ["nome_completo","prefixo","primeiro_nome","nome_meio","ultimo_nome","faculdade","curso","ano","nascimento","genero","regime","telemovel","email","bilhete","provincia","municipio","endereco","enc_nome","enc_primeiro","enc_ultimo","enc_parentesco","enc_telefone","enc_email","enc_bilhete"] as const;
 type Field = typeof FIELDS[number];
 
-const splitName = (full: string): [string, string] => {
+const splitName = (full: string): [string, string, string] => {
+  const parts = (full || "").trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return ["", "", ""];
+  if (parts.length === 1) return [parts[0], "", ""];
+  if (parts.length === 2) return [parts[0], "", parts[1]];
+  return [parts[0], parts.slice(1, -1).join(" "), parts[parts.length - 1]];
+};
+
+const splitNameTwo = (full: string): [string, string] => {
   const parts = (full || "").trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return ["", ""];
   if (parts.length === 1) return [parts[0], ""];
