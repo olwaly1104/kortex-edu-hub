@@ -421,6 +421,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const removeRow = (key: string) => setRows((rs) => rs.filter((r) => r._key !== key));
   const removeInvalid = () => setRows((rs) => rs.filter((r) => validate(r).length === 0));
   const toggleAll = (v: boolean) => setRows((rs) => rs.map((r) => ({ ...r, _selected: v })));
+  const toggleSelected = (key: string) => setRows((rs) => rs.map((r) => (r._key === key ? { ...r, _selected: !r._selected } : r)));
 
   /* bulk apply — auto-applies on every change */
   const [bulkFac, setBulkFac] = useState("");
