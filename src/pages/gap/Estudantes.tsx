@@ -40,6 +40,7 @@ const buildEmail = (primeiro: string, ultimo: string) => {
 
 const empty = (curso_id = ""): Draft => ({
   primeiroNome: "",
+  meioNome: "",
   ultimoNome: "",
   curso_id,
   ano: "1",
