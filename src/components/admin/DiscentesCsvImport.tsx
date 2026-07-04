@@ -643,6 +643,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                   <tr className="border-b text-[10px] uppercase tracking-wide text-muted-foreground">
                     <th className="px-3 py-2 text-left w-8"></th>
                     <th className="px-2 py-2 text-left">Primeiro</th>
+                    <th className="px-2 py-2 text-left">Meio</th>
                     <th className="px-2 py-2 text-left">Último</th>
                     <th className="px-2 py-2 text-left">Bilhete</th>
                     <th className="px-2 py-2 text-left">Faculdade</th>
