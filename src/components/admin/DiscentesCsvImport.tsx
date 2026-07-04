@@ -261,11 +261,21 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
         r.enc_primeiro = first;
         r.enc_ultimo = last;
       }
-      const facId = resolveFaculdade(facRaw);
+      // Resolve curso first without faculdade — if we find it, we can infer the faculdade.
+      let facId = resolveFaculdade(facRaw);
+      let cursoId = resolveCurso(cursoRaw, facId);
+      if (!cursoId) {
+        cursoId = resolveCurso(cursoRaw, "");
+        if (cursoId) {
+          const c = cursos.find((x: any) => x.id === cursoId) as any;
+          if (c?.faculdade_id) facId = c.faculdade_id;
+        }
+      }
       r.faculdade_id = facId;
-      r.curso_id = resolveCurso(cursoRaw, facId);
+      r.curso_id = cursoId;
       if (!r.regime) r.regime = "normal";
       return r;
+
     });
     setRows(parsed);
     setStage("preview");
