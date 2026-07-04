@@ -502,6 +502,8 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
 
     const CONCURRENCY = 3;
     let cursor = 0;
+    let okCount = 0;
+    let failCount = 0;
     const runOne = async () => {
       while (cursor < importBatch.length) {
         const idx = cursor++;
@@ -532,9 +534,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
             enc_email: r.enc_email.trim() || null,
             enc_bilhete: r.enc_bilhete.trim() || null,
           } as any);
+          okCount++;
           setProgress((p) => ({ ...p, done: p.done + 1, ok: p.ok + 1 }));
         } catch (e: any) {
           console.warn("csv row failed:", email, e?.message);
+          failCount++;
           setProgress((p) => ({ ...p, done: p.done + 1, fail: p.fail + 1 }));
         }
       }
@@ -542,14 +546,12 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     await Promise.all(Array.from({ length: CONCURRENCY }, runOne));
 
     setImporting(false);
-    setProgress((p) => {
-      if (p.ok) toast.success(`${p.ok} conta(s) Kortex criada(s)${p.fail ? ` · ${p.fail} falharam` : ""}`);
-      else toast.error("Nenhuma linha foi importada");
-      return p;
-    });
+    if (okCount) toast.success(`${okCount} conta(s) Kortex criada(s)${failCount ? ` · ${failCount} falharam` : ""}`);
+    else toast.error("Nenhuma linha foi importada");
     onImported?.();
-    if (progress.fail === 0) close();
+    if (failCount === 0) close();
   };
+
 
 
   /* ---------------- render ---------------- */
