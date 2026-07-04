@@ -71,7 +71,7 @@ const HEADER_MAP: Record<string, string> = {
   encbi: "enc_bilhete", encbilhete: "enc_bilhete", bibencarregado: "enc_bilhete",
 };
 
-const FIELDS = ["nome_completo","prefixo","primeiro_nome","ultimo_nome","faculdade","curso","ano","nascimento","genero","regime","telemovel","email","bilhete","provincia","municipio","endereco","enc_nome","enc_primeiro","enc_ultimo","enc_parentesco","enc_telefone","enc_email","enc_bilhete"] as const;
+const FIELDS = ["nome_completo","prefixo","primeiro_nome","nome_meio","ultimo_nome","faculdade","curso","ano","nascimento","genero","regime","telemovel","email","bilhete","provincia","municipio","endereco","enc_nome","enc_primeiro","enc_ultimo","enc_parentesco","enc_telefone","enc_email","enc_bilhete"] as const;
 type Field = typeof FIELDS[number];
 
 const splitName = (full: string): [string, string] => {
