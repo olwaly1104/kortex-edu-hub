@@ -471,7 +471,6 @@ export default function AdminDiscentes() {
           <div className={`${GRID} text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b !py-2`}>
             <span>ID</span>
             <span>Primeiro</span>
-            <span>Meio</span>
             <span>Último</span>
             <span>Regime</span>
             <span>Faculdade</span>
