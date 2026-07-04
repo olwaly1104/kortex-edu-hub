@@ -45,6 +45,7 @@ const norm = (s: string) =>
 
 const HEADER_MAP: Record<string, string> = {
   nome: "nome_completo", nomecompleto: "nome_completo", fullname: "nome_completo", name: "nome_completo",
+  prefixo: "prefixo", titulo: "prefixo", tratamento: "prefixo",
   primeironome: "primeiro_nome", primeiro: "primeiro_nome", firstname: "primeiro_nome",
   ultimonome: "ultimo_nome", apelido: "ultimo_nome", ultimo: "ultimo_nome", lastname: "ultimo_nome", sobrenome: "ultimo_nome",
   faculdade: "faculdade", faculty: "faculdade", sigla: "faculdade",
@@ -54,13 +55,22 @@ const HEADER_MAP: Record<string, string> = {
   genero: "genero", sexo: "genero", gender: "genero",
   regime: "regime",
   telemovel: "telemovel", telefone: "telemovel", phone: "telemovel", contacto: "telemovel",
+  email: "email", emailinstitucional: "email", mail: "email",
   bilhete: "bilhete", bi: "bilhete", idcard: "bilhete", identificacao: "bilhete", identificação: "bilhete", identidade: "bilhete",
   provincia: "provincia", province: "provincia",
   municipio: "municipio",
   endereco: "endereco", morada: "endereco", address: "endereco",
+  // Encarregado de educação
+  encnome: "enc_nome", encarregado: "enc_nome", encarregadonome: "enc_nome", nomeencarregado: "enc_nome",
+  encprimeironome: "enc_primeiro", encprimeiro: "enc_primeiro",
+  encultimonome: "enc_ultimo", encultimo: "enc_ultimo", encapelido: "enc_ultimo",
+  encparentesco: "enc_parentesco", parentesco: "enc_parentesco",
+  enctelefone: "enc_telefone", enctelemovel: "enc_telefone", telefoneencarregado: "enc_telefone",
+  encemail: "enc_email", emailencarregado: "enc_email",
+  encbi: "enc_bilhete", encbilhete: "enc_bilhete", bibencarregado: "enc_bilhete",
 };
 
-const FIELDS = ["nome_completo","primeiro_nome","ultimo_nome","faculdade","curso","ano","nascimento","genero","regime","telemovel","bilhete","provincia","municipio","endereco"] as const;
+const FIELDS = ["nome_completo","prefixo","primeiro_nome","ultimo_nome","faculdade","curso","ano","nascimento","genero","regime","telemovel","email","bilhete","provincia","municipio","endereco","enc_nome","enc_primeiro","enc_ultimo","enc_parentesco","enc_telefone","enc_email","enc_bilhete"] as const;
 type Field = typeof FIELDS[number];
 
 const splitName = (full: string): [string, string] => {
@@ -73,6 +83,7 @@ const splitName = (full: string): [string, string] => {
 type Row = {
   _key: string;
   _selected: boolean;
+  prefixo: string;
   primeiro_nome: string;
   ultimo_nome: string;
   faculdade_id: string;   // resolved id
@@ -82,21 +93,29 @@ type Row = {
   genero: "M" | "F" | "Outro" | "";
   regime: "normal" | "bolseiro" | "";
   telemovel: string;
+  email: string;
   bilhete: string;
   provincia: string;
   municipio: string;
   endereco: string;
+  enc_primeiro: string;
+  enc_ultimo: string;
+  enc_parentesco: string;
+  enc_telefone: string;
+  enc_email: string;
+  enc_bilhete: string;
 };
 
 const emptyRow = (): Row => ({
   _key: Math.random().toString(36).slice(2),
   _selected: true,
-  primeiro_nome: "", ultimo_nome: "", faculdade_id: "", curso_id: "",
+  prefixo: "", primeiro_nome: "", ultimo_nome: "", faculdade_id: "", curso_id: "",
   ano: "", nascimento: "", genero: "", regime: "",
-  telemovel: "", bilhete: "", provincia: "", municipio: "", endereco: "",
+  telemovel: "", email: "", bilhete: "", provincia: "", municipio: "", endereco: "",
+  enc_primeiro: "", enc_ultimo: "", enc_parentesco: "", enc_telefone: "", enc_email: "", enc_bilhete: "",
 });
 
-const RECOGNIZED_COLS = ["nome","faculdade","curso","ano","genero","regime","telemovel","bilhete","nascimento","provincia","municipio","endereco"];
+const RECOGNIZED_COLS = ["nome","prefixo","faculdade","curso","ano","genero","regime","telemovel","email","bilhete","nascimento","provincia","municipio","morada","enc_nome","enc_parentesco","enc_telefone","enc_email","enc_bilhete"];
 
 /* ---------------- component ---------------- */
 
