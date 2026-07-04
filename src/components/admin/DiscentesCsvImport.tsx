@@ -202,6 +202,8 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const [importing, setImporting] = useState(false);
   const [progress, setProgress] = useState({ done: 0, total: 0, ok: 0, fail: 0, startedAt: 0 });
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
+  const cancelRequestedRef = useRef(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const resetAll = () => {
