@@ -592,7 +592,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
             curso_id: r.curso_id,
             nome,
             ano: r.ano,
-            turma: "A",
+            
             prefixo: r.prefixo.trim() || null,
             primeiro_nome: r.primeiro_nome.trim(),
             nome_meio: r.nome_meio.trim() || null,

@@ -432,7 +432,7 @@ export function useCreateEstudante() {
       const account = await provisionStudentAccount(input.nome, input.email, {
         ...input,
         ano: input.ano || "1",
-        turma: input.turma || "A",
+        turma: input.turma ?? null,
         origem: input.origem || "novo",
       });
       const { data, error } = await (supabase.from("estudantes" as any) as any)
@@ -460,7 +460,7 @@ export function useBulkCreateEstudantes() {
         inputs.map((i) => provisionStudentAccount(i.nome, i.email, {
           ...i,
           ano: i.ano || "1",
-          turma: i.turma || "A",
+          turma: i.turma ?? null,
           origem: i.origem || "importado",
         }))
       );
