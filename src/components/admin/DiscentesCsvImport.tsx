@@ -45,6 +45,7 @@ const norm = (s: string) =>
 
 const HEADER_MAP: Record<string, string> = {
   nome: "nome_completo", nomecompleto: "nome_completo", fullname: "nome_completo", name: "nome_completo",
+  prefixo: "prefixo", titulo: "prefixo", tratamento: "prefixo",
   primeironome: "primeiro_nome", primeiro: "primeiro_nome", firstname: "primeiro_nome",
   ultimonome: "ultimo_nome", apelido: "ultimo_nome", ultimo: "ultimo_nome", lastname: "ultimo_nome", sobrenome: "ultimo_nome",
   faculdade: "faculdade", faculty: "faculdade", sigla: "faculdade",
@@ -54,13 +55,22 @@ const HEADER_MAP: Record<string, string> = {
   genero: "genero", sexo: "genero", gender: "genero",
   regime: "regime",
   telemovel: "telemovel", telefone: "telemovel", phone: "telemovel", contacto: "telemovel",
+  email: "email", emailinstitucional: "email", mail: "email",
   bilhete: "bilhete", bi: "bilhete", idcard: "bilhete", identificacao: "bilhete", identificação: "bilhete", identidade: "bilhete",
   provincia: "provincia", province: "provincia",
   municipio: "municipio",
   endereco: "endereco", morada: "endereco", address: "endereco",
+  // Encarregado de educação
+  encnome: "enc_nome", encarregado: "enc_nome", encarregadonome: "enc_nome", nomeencarregado: "enc_nome",
+  encprimeironome: "enc_primeiro", encprimeiro: "enc_primeiro",
+  encultimonome: "enc_ultimo", encultimo: "enc_ultimo", encapelido: "enc_ultimo",
+  encparentesco: "enc_parentesco", parentesco: "enc_parentesco",
+  enctelefone: "enc_telefone", enctelemovel: "enc_telefone", telefoneencarregado: "enc_telefone",
+  encemail: "enc_email", emailencarregado: "enc_email",
+  encbi: "enc_bilhete", encbilhete: "enc_bilhete", bibencarregado: "enc_bilhete",
 };
 
-const FIELDS = ["nome_completo","primeiro_nome","ultimo_nome","faculdade","curso","ano","nascimento","genero","regime","telemovel","bilhete","provincia","municipio","endereco"] as const;
+const FIELDS = ["nome_completo","prefixo","primeiro_nome","ultimo_nome","faculdade","curso","ano","nascimento","genero","regime","telemovel","email","bilhete","provincia","municipio","endereco","enc_nome","enc_primeiro","enc_ultimo","enc_parentesco","enc_telefone","enc_email","enc_bilhete"] as const;
 type Field = typeof FIELDS[number];
 
 const splitName = (full: string): [string, string] => {
@@ -73,6 +83,7 @@ const splitName = (full: string): [string, string] => {
 type Row = {
   _key: string;
   _selected: boolean;
+  prefixo: string;
   primeiro_nome: string;
   ultimo_nome: string;
   faculdade_id: string;   // resolved id
@@ -82,21 +93,29 @@ type Row = {
   genero: "M" | "F" | "Outro" | "";
   regime: "normal" | "bolseiro" | "";
   telemovel: string;
+  email: string;
   bilhete: string;
   provincia: string;
   municipio: string;
   endereco: string;
+  enc_primeiro: string;
+  enc_ultimo: string;
+  enc_parentesco: string;
+  enc_telefone: string;
+  enc_email: string;
+  enc_bilhete: string;
 };
 
 const emptyRow = (): Row => ({
   _key: Math.random().toString(36).slice(2),
   _selected: true,
-  primeiro_nome: "", ultimo_nome: "", faculdade_id: "", curso_id: "",
+  prefixo: "", primeiro_nome: "", ultimo_nome: "", faculdade_id: "", curso_id: "",
   ano: "", nascimento: "", genero: "", regime: "",
-  telemovel: "", bilhete: "", provincia: "", municipio: "", endereco: "",
+  telemovel: "", email: "", bilhete: "", provincia: "", municipio: "", endereco: "",
+  enc_primeiro: "", enc_ultimo: "", enc_parentesco: "", enc_telefone: "", enc_email: "", enc_bilhete: "",
 });
 
-const RECOGNIZED_COLS = ["nome","faculdade","curso","ano","genero","regime","telemovel","bilhete","nascimento","provincia","municipio","endereco"];
+const RECOGNIZED_COLS = ["nome","prefixo","faculdade","curso","ano","genero","regime","telemovel","email","bilhete","nascimento","provincia","municipio","morada","enc_nome","enc_parentesco","enc_telefone","enc_email","enc_bilhete"];
 
 /* ---------------- component ---------------- */
 
@@ -167,10 +186,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       const facRaw = cells[mapping.indexOf("faculdade")] || "";
       const cursoRaw = cells[mapping.indexOf("curso")] || "";
       const nomeCompletoRaw = cells[mapping.indexOf("nome_completo")] || "";
+      const encNomeRaw = cells[mapping.indexOf("enc_nome" as Field)] || "";
       mapping.forEach((f, idx) => {
         if (!f) return;
         const val = (cells[idx] || "").trim();
-        if (f === "faculdade" || f === "curso" || f === "nome_completo") return; // handled below
+        if (f === "faculdade" || f === "curso" || f === "nome_completo" || f === ("enc_nome" as Field)) return; // handled below
         if (f === "genero") {
           const g = val.toUpperCase();
           r.genero = g.startsWith("M") ? "M" : g.startsWith("F") ? "F" : g ? "Outro" : "";
@@ -190,6 +210,12 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
         const [first, last] = splitName(r.primeiro_nome);
         r.primeiro_nome = first;
         r.ultimo_nome = last;
+      }
+      // Encarregado: split full name if provided as one field
+      if (encNomeRaw.trim() && !r.enc_primeiro && !r.enc_ultimo) {
+        const [first, last] = splitName(encNomeRaw);
+        r.enc_primeiro = first;
+        r.enc_ultimo = last;
       }
       const facId = resolveFaculdade(facRaw);
       r.faculdade_id = facId;
@@ -317,16 +343,24 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
           nome,
           ano: r.ano,
           turma: "A",
+          prefixo: r.prefixo.trim() || null,
           primeiro_nome: r.primeiro_nome.trim(),
           ultimo_nome: r.ultimo_nome.trim() || null,
           nascimento: r.nascimento || null,
           genero: r.genero || "M",
           regime: r.regime || "normal",
           telemovel: r.telemovel.trim() || null,
+          email: r.email.trim() || null,
           bilhete: r.bilhete.trim() || null,
           provincia: r.provincia.trim() || null,
           municipio: r.municipio.trim() || null,
           endereco: r.endereco.trim() || null,
+          enc_primeiro_nome: r.enc_primeiro.trim() || null,
+          enc_ultimo_nome: r.enc_ultimo.trim() || null,
+          enc_parentesco: r.enc_parentesco.trim() || null,
+          enc_telefone: r.enc_telefone.trim() || null,
+          enc_email: r.enc_email.trim() || null,
+          enc_bilhete: r.enc_bilhete.trim() || null,
         } as any);
         ok++;
       } catch (e: any) {
@@ -539,11 +573,13 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                     <th className="px-3 py-2 text-left w-8"></th>
                     <th className="px-2 py-2 text-left">Primeiro</th>
                     <th className="px-2 py-2 text-left">Último</th>
+                    <th className="px-2 py-2 text-left">Bilhete</th>
                     <th className="px-2 py-2 text-left">Faculdade</th>
                     <th className="px-2 py-2 text-left">Curso</th>
                     <th className="px-2 py-2 text-left w-16">Ano</th>
                     <th className="px-2 py-2 text-left w-20">Regime</th>
                     <th className="px-2 py-2 text-left">Telemóvel</th>
+                    <th className="px-2 py-2 text-left">Morada</th>
                     <th className="px-2 py-2 text-left w-8"></th>
                   </tr>
                 </thead>
@@ -574,6 +610,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                         <td className="px-1 py-1">
                           <Input value={r.ultimo_nome} onChange={(e) => setCell(r._key, { ultimo_nome: e.target.value })}
                             className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+                        </td>
+                        <td className="px-1 py-1">
+                          <Input value={r.bilhete} onChange={(e) => setCell(r._key, { bilhete: e.target.value })}
+                            placeholder="—"
+                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary font-mono" />
                         </td>
                         <td className="px-1 py-1">
                           <Select value={r.faculdade_id} onValueChange={(v) => setCell(r._key, { faculdade_id: v, curso_id: "" })}>
@@ -608,6 +649,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                         </td>
                         <td className="px-1 py-1">
                           <Input value={r.telemovel} onChange={(e) => setCell(r._key, { telemovel: e.target.value })}
+                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+                        </td>
+                        <td className="px-1 py-1">
+                          <Input value={r.endereco} onChange={(e) => setCell(r._key, { endereco: e.target.value })}
+                            placeholder="Endereço"
                             className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
                         </td>
                         <td className="px-1 py-1 text-right">
