@@ -1023,6 +1023,19 @@ function ImportProgressOverlay({
           </span>
           <span className="tabular-nums">{rate > 0 ? `${rate.toFixed(1)}/s` : "…"}</span>
         </div>
+
+        <div className="pt-1">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full h-9 text-xs text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+            onClick={onCancel}
+            disabled={cancelling}
+          >
+            <X className="w-3.5 h-3.5 mr-1.5" />
+            {cancelling ? "A cancelar…" : "Cancelar importação"}
+          </Button>
+        </div>
       </div>
     </div>
   );
