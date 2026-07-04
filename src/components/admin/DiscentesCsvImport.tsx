@@ -256,19 +256,22 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
           (r as any)[f] = val;
         }
       });
-      // Smart name extraction: prefer nome_completo, else use primeiro_nome as source if it contains spaces
+      // Smart name extraction: prefer nome_completo (splits into first/middle/last).
+      // If nome_completo missing but primeiro_nome contains spaces, split it.
       if (nomeCompletoRaw.trim()) {
-        const [first, last] = splitName(nomeCompletoRaw);
+        const [first, middle, last] = splitName(nomeCompletoRaw);
         r.primeiro_nome = first;
+        r.nome_meio = middle || r.nome_meio;
         r.ultimo_nome = last || r.ultimo_nome;
       } else if (!r.ultimo_nome && r.primeiro_nome && /\s/.test(r.primeiro_nome)) {
-        const [first, last] = splitName(r.primeiro_nome);
+        const [first, middle, last] = splitName(r.primeiro_nome);
         r.primeiro_nome = first;
+        r.nome_meio = middle || r.nome_meio;
         r.ultimo_nome = last;
       }
-      // Encarregado: split full name if provided as one field
+      // Encarregado: split full name if provided as one field (only first/last)
       if (encNomeRaw.trim() && !r.enc_primeiro && !r.enc_ultimo) {
-        const [first, last] = splitName(encNomeRaw);
+        const [first, last] = splitNameTwo(encNomeRaw);
         r.enc_primeiro = first;
         r.enc_ultimo = last;
       }
