@@ -54,7 +54,7 @@ const HEADER_MAP: Record<string, string> = {
   genero: "genero", sexo: "genero", gender: "genero",
   regime: "regime",
   telemovel: "telemovel", telefone: "telemovel", phone: "telemovel", contacto: "telemovel",
-  bilhete: "bilhete", bi: "bilhete", idcard: "bilhete",
+  bilhete: "bilhete", bi: "bilhete", idcard: "bilhete", identificacao: "bilhete", identificação: "bilhete", identidade: "bilhete",
   provincia: "provincia", province: "provincia",
   municipio: "municipio",
   endereco: "endereco", morada: "endereco", address: "endereco",
