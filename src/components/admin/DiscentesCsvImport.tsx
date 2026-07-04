@@ -134,6 +134,7 @@ const HEADER_SIGNALS: [RegExp, Field][] = [
   [/bilhete|identidade|identifica|documento(?!s)|^doc$/, "bilhete"],
   [/nomecompleto|fullname|^nome$|^name$/, "nome_completo"],
   [/primeiro|firstname/, "primeiro_nome"],
+  [/(nome.*meio|meio.*nome|middlename|middle|segundonome|segundo)/, "nome_meio"],
   [/ultimo|apelido|sobrenome|lastname/, "ultimo_nome"],
   [/faculdade|faculty/, "faculdade"],
   [/curso|course/, "curso"],
