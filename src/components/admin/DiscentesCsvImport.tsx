@@ -94,6 +94,7 @@ type Row = {
   _selected: boolean;
   prefixo: string;
   primeiro_nome: string;
+  nome_meio: string;
   ultimo_nome: string;
   faculdade_id: string;   // resolved id
   curso_id: string;       // resolved id
