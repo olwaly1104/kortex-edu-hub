@@ -202,6 +202,8 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const [importing, setImporting] = useState(false);
   const [progress, setProgress] = useState({ done: 0, total: 0, ok: 0, fail: 0, startedAt: 0 });
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
+  const cancelRequestedRef = useRef(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const resetAll = () => {
@@ -497,6 +499,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const doImport = async () => {
     setConfirmOpen(false);
     if (!importBatch.length) return;
+    cancelRequestedRef.current = false;
     setImporting(true);
     setProgress({ done: 0, total: importBatch.length, ok: 0, fail: 0, startedAt: Date.now() });
 
@@ -506,6 +509,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     let failCount = 0;
     const runOne = async () => {
       while (cursor < importBatch.length) {
+        if (cancelRequestedRef.current) return;
         const idx = cursor++;
         const { row: r, email, nome } = importBatch[idx];
         try {
@@ -545,11 +549,18 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     };
     await Promise.all(Array.from({ length: CONCURRENCY }, runOne));
 
+    const wasCancelled = cancelRequestedRef.current;
+    cancelRequestedRef.current = false;
     setImporting(false);
-    if (okCount) toast.success(`${okCount} conta(s) Kortex criada(s)${failCount ? ` · ${failCount} falharam` : ""}`);
-    else toast.error("Nenhuma linha foi importada");
+    if (wasCancelled) {
+      toast.warning(`Importação cancelada · ${okCount} criada(s)${failCount ? ` · ${failCount} falharam` : ""}`);
+    } else if (okCount) {
+      toast.success(`${okCount} conta(s) Kortex criada(s)${failCount ? ` · ${failCount} falharam` : ""}`);
+    } else {
+      toast.error("Nenhuma linha foi importada");
+    }
     onImported?.();
-    if (failCount === 0) close();
+    if (!wasCancelled && failCount === 0) close();
   };
 
 
@@ -905,8 +916,36 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
           </AlertDialogContent>
         </AlertDialog>
 
+        {/* Cancel confirmation dialog */}
+        <AlertDialog open={cancelConfirmOpen} onOpenChange={setCancelConfirmOpen}>
+          <AlertDialogContent className="z-[400]">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Cancelar importação?</AlertDialogTitle>
+              <AlertDialogDescription>
+                As contas já criadas serão mantidas. As restantes não serão criadas.
+                Tem a certeza que deseja cancelar?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Continuar importação</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => { cancelRequestedRef.current = true; setCancelConfirmOpen(false); }}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Sim, cancelar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         {/* Full-screen progress overlay while importing */}
-        {importing && <ImportProgressOverlay progress={progress} />}
+        {importing && (
+          <ImportProgressOverlay
+            progress={progress}
+            onCancel={() => setCancelConfirmOpen(true)}
+            cancelling={cancelRequestedRef.current}
+          />
+        )}
     </div>,
     document.body,
   );
@@ -926,8 +965,12 @@ function formatEta(seconds: number) {
 
 function ImportProgressOverlay({
   progress,
+  onCancel,
+  cancelling,
 }: {
   progress: { done: number; total: number; ok: number; fail: number; startedAt: number };
+  onCancel: () => void;
+  cancelling: boolean;
 }) {
   const pct = progress.total ? Math.round((progress.done / progress.total) * 100) : 0;
   const elapsed = progress.startedAt ? (Date.now() - progress.startedAt) / 1000 : 0;
@@ -979,6 +1022,19 @@ function ImportProgressOverlay({
             <Clock className="w-3 h-3" /> Tempo restante: <strong className="text-foreground tabular-nums">{formatEta(remaining)}</strong>
           </span>
           <span className="tabular-nums">{rate > 0 ? `${rate.toFixed(1)}/s` : "…"}</span>
+        </div>
+
+        <div className="pt-1">
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full h-9 text-xs text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
+            onClick={onCancel}
+            disabled={cancelling}
+          >
+            <X className="w-3.5 h-3.5 mr-1.5" />
+            {cancelling ? "A cancelar…" : "Cancelar importação"}
+          </Button>
         </div>
       </div>
     </div>
