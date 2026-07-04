@@ -690,7 +690,7 @@ export default function AdminDiscentes() {
                       <Field label="Primeiro nome">
                         <Input value={draft.primeiroNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
                       </Field>
-                      <Field label="Nome do meio">
+                      <Field label="Nome(s) do meio">
                         <Input value={draft.meioNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
                       </Field>
                       <Field label="Último nome">
