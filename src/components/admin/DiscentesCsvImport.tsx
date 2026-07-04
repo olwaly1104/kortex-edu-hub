@@ -179,7 +179,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     const table = parseCsv(text);
     if (!table.length) { toast.error("CSV vazio"); return; }
     const headers = table[0].map(norm);
-    const mapping: (Field | null)[] = headers.map((h) => (HEADER_MAP[h] as Field) || (FIELDS.includes(h as Field) ? (h as Field) : null));
+    const mapping: (Field | null)[] = headers.map((h) => resolveHeader(h));
 
     const parsed: Row[] = table.slice(1).map((cells) => {
       const r = emptyRow();
