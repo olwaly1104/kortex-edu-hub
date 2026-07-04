@@ -916,8 +916,36 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
           </AlertDialogContent>
         </AlertDialog>
 
+        {/* Cancel confirmation dialog */}
+        <AlertDialog open={cancelConfirmOpen} onOpenChange={setCancelConfirmOpen}>
+          <AlertDialogContent className="z-[400]">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Cancelar importação?</AlertDialogTitle>
+              <AlertDialogDescription>
+                As contas já criadas serão mantidas. As restantes não serão criadas.
+                Tem a certeza que deseja cancelar?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Continuar importação</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => { cancelRequestedRef.current = true; setCancelConfirmOpen(false); }}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Sim, cancelar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         {/* Full-screen progress overlay while importing */}
-        {importing && <ImportProgressOverlay progress={progress} />}
+        {importing && (
+          <ImportProgressOverlay
+            progress={progress}
+            onCancel={() => setCancelConfirmOpen(true)}
+            cancelling={cancelRequestedRef.current}
+          />
+        )}
     </div>,
     document.body,
   );
