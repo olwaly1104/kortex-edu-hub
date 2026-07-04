@@ -21,6 +21,7 @@ const turmasPool = ["A", "B", "C", "D", "E"];
 
 type Draft = {
   primeiroNome: string;
+  meioNome: string;
   ultimoNome: string;
   curso_id: string;
   ano: string;
@@ -39,6 +40,7 @@ const buildEmail = (primeiro: string, ultimo: string) => {
 
 const empty = (curso_id = ""): Draft => ({
   primeiroNome: "",
+  meioNome: "",
   ultimoNome: "",
   curso_id,
   ano: "1",
@@ -78,7 +80,7 @@ export default function GapEstudantes() {
 
   const save = async () => {
     if (!draft.primeiroNome.trim() || !draft.curso_id) return;
-    const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
+    const nome = [draft.primeiroNome.trim(), draft.meioNome.trim(), draft.ultimoNome.trim()].filter(Boolean).join(" ");
     const email = buildEmail(draft.primeiroNome, draft.ultimoNome);
     if (!email) { toast.error("Não foi possível gerar email a partir do nome"); return; }
     try {
@@ -89,6 +91,7 @@ export default function GapEstudantes() {
         ano: draft.ano,
         turma: draft.turma,
         primeiro_nome: draft.primeiroNome.trim(),
+        nome_meio: draft.meioNome.trim() || null,
         ultimo_nome: draft.ultimoNome.trim() || null,
       });
       toast.success(`Discente adicionado · ${email}`);
@@ -248,13 +251,22 @@ export default function GapEstudantes() {
 
           <div className="space-y-5 py-2">
             <FormSection icon={<User className="w-3.5 h-3.5" />} title="Identificação">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
                   <Label className="text-xs">Primeiro nome</Label>
                   <Input
                     className="h-9 mt-1"
                     value={draft.primeiroNome}
                     onChange={(e) => setF("primeiroNome", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Nome do meio</Label>
+                  <Input
+                    className="h-9 mt-1"
+                    value={draft.meioNome}
+                    onChange={(e) => setF("meioNome", e.target.value)}
+                    placeholder="Opcional"
                   />
                 </div>
                 <div>

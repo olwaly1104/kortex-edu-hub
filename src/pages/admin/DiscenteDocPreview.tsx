@@ -19,6 +19,7 @@ export type DiscenteDoc = {
   nome: string;
   email: string;
   primeiro_nome?: string | null;
+  nome_meio?: string | null;
   ultimo_nome?: string | null;
   nascimento?: string | null;
   genero?: string | null;
@@ -86,6 +87,7 @@ export default function DiscenteDocPreview({
       rows: [
         ["Nome completo", d.nome],
         ["Primeiro nome", d.primeiro_nome || "—"],
+        ["Nome do meio", d.nome_meio || "—"],
         ["Último nome", d.ultimo_nome || "—"],
         ["Data de nascimento", fmtDataShort(d.nascimento)],
         ["Género", generoLabel(d.genero)],

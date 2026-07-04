@@ -1,0 +1,1 @@
+ALTER TABLE public.estudantes ADD COLUMN IF NOT EXISTS nome_meio TEXT;

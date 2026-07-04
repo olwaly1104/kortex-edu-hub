@@ -198,6 +198,7 @@ Deno.serve(async (req) => {
           turma: (est.turma as string) || "A",
           origem: (est.origem as string) || "novo",
           primeiro_nome: est.primeiro_nome ?? primeiro,
+          nome_meio: est.nome_meio ?? null,
           ultimo_nome: est.ultimo_nome ?? ultimo,
           curso_id: est.curso_id,
           nascimento: est.nascimento ?? null,

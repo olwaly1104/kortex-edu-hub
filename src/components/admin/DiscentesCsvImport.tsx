@@ -47,6 +47,7 @@ const HEADER_MAP: Record<string, string> = {
   nome: "nome_completo", nomecompleto: "nome_completo", fullname: "nome_completo", name: "nome_completo",
   prefixo: "prefixo", titulo: "prefixo", tratamento: "prefixo",
   primeironome: "primeiro_nome", primeiro: "primeiro_nome", firstname: "primeiro_nome",
+  nomedomeio: "nome_meio", nomemeio: "nome_meio", meio: "nome_meio", middlename: "nome_meio", middle: "nome_meio", segundonome: "nome_meio",
   ultimonome: "ultimo_nome", apelido: "ultimo_nome", ultimo: "ultimo_nome", lastname: "ultimo_nome", sobrenome: "ultimo_nome",
   faculdade: "faculdade", faculty: "faculdade", sigla: "faculdade",
   curso: "curso", nomedocurso: "curso", nomecurso: "curso", codigo: "curso", codigocurso: "curso", coursecode: "curso", coursename: "curso",
@@ -70,10 +71,18 @@ const HEADER_MAP: Record<string, string> = {
   encbi: "enc_bilhete", encbilhete: "enc_bilhete", bibencarregado: "enc_bilhete",
 };
 
-const FIELDS = ["nome_completo","prefixo","primeiro_nome","ultimo_nome","faculdade","curso","ano","nascimento","genero","regime","telemovel","email","bilhete","provincia","municipio","endereco","enc_nome","enc_primeiro","enc_ultimo","enc_parentesco","enc_telefone","enc_email","enc_bilhete"] as const;
+const FIELDS = ["nome_completo","prefixo","primeiro_nome","nome_meio","ultimo_nome","faculdade","curso","ano","nascimento","genero","regime","telemovel","email","bilhete","provincia","municipio","endereco","enc_nome","enc_primeiro","enc_ultimo","enc_parentesco","enc_telefone","enc_email","enc_bilhete"] as const;
 type Field = typeof FIELDS[number];
 
-const splitName = (full: string): [string, string] => {
+const splitName = (full: string): [string, string, string] => {
+  const parts = (full || "").trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return ["", "", ""];
+  if (parts.length === 1) return [parts[0], "", ""];
+  if (parts.length === 2) return [parts[0], "", parts[1]];
+  return [parts[0], parts.slice(1, -1).join(" "), parts[parts.length - 1]];
+};
+
+const splitNameTwo = (full: string): [string, string] => {
   const parts = (full || "").trim().split(/\s+/).filter(Boolean);
   if (!parts.length) return ["", ""];
   if (parts.length === 1) return [parts[0], ""];
@@ -85,6 +94,7 @@ type Row = {
   _selected: boolean;
   prefixo: string;
   primeiro_nome: string;
+  nome_meio: string;
   ultimo_nome: string;
   faculdade_id: string;   // resolved id
   curso_id: string;       // resolved id
@@ -109,13 +119,13 @@ type Row = {
 const emptyRow = (): Row => ({
   _key: Math.random().toString(36).slice(2),
   _selected: true,
-  prefixo: "", primeiro_nome: "", ultimo_nome: "", faculdade_id: "", curso_id: "",
+  prefixo: "", primeiro_nome: "", nome_meio: "", ultimo_nome: "", faculdade_id: "", curso_id: "",
   ano: "", nascimento: "", genero: "", regime: "",
   telemovel: "", email: "", bilhete: "", provincia: "", municipio: "", endereco: "",
   enc_primeiro: "", enc_ultimo: "", enc_parentesco: "", enc_telefone: "", enc_email: "", enc_bilhete: "",
 });
 
-const RECOGNIZED_COLS = ["nome","prefixo","faculdade","curso","ano","genero","regime","telemovel","email","bilhete","nascimento","provincia","municipio","morada","enc_nome","enc_parentesco","enc_telefone","enc_email","enc_bilhete"];
+const RECOGNIZED_COLS = ["nome","primeiro_nome","nome_meio","ultimo_nome","prefixo","faculdade","curso","ano","genero","regime","telemovel","email","bilhete","nascimento","provincia","municipio","morada","enc_nome","enc_parentesco","enc_telefone","enc_email","enc_bilhete"];
 
 // Smart header resolution: try exact HEADER_MAP first, then direct field name,
 // then substring signals (e.g. "n_identificacao", "bilhete de identidade", "num bi").
@@ -124,6 +134,7 @@ const HEADER_SIGNALS: [RegExp, Field][] = [
   [/bilhete|identidade|identifica|documento(?!s)|^doc$/, "bilhete"],
   [/nomecompleto|fullname|^nome$|^name$/, "nome_completo"],
   [/primeiro|firstname/, "primeiro_nome"],
+  [/(nome.*meio|meio.*nome|middlename|middle|segundonome|segundo)/, "nome_meio"],
   [/ultimo|apelido|sobrenome|lastname/, "ultimo_nome"],
   [/faculdade|faculty/, "faculdade"],
   [/curso|course/, "curso"],
@@ -245,19 +256,22 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
           (r as any)[f] = val;
         }
       });
-      // Smart name extraction: prefer nome_completo, else use primeiro_nome as source if it contains spaces
+      // Smart name extraction: prefer nome_completo (splits into first/middle/last).
+      // If nome_completo missing but primeiro_nome contains spaces, split it.
       if (nomeCompletoRaw.trim()) {
-        const [first, last] = splitName(nomeCompletoRaw);
+        const [first, middle, last] = splitName(nomeCompletoRaw);
         r.primeiro_nome = first;
+        r.nome_meio = middle || r.nome_meio;
         r.ultimo_nome = last || r.ultimo_nome;
       } else if (!r.ultimo_nome && r.primeiro_nome && /\s/.test(r.primeiro_nome)) {
-        const [first, last] = splitName(r.primeiro_nome);
+        const [first, middle, last] = splitName(r.primeiro_nome);
         r.primeiro_nome = first;
+        r.nome_meio = middle || r.nome_meio;
         r.ultimo_nome = last;
       }
-      // Encarregado: split full name if provided as one field
+      // Encarregado: split full name if provided as one field (only first/last)
       if (encNomeRaw.trim() && !r.enc_primeiro && !r.enc_ultimo) {
-        const [first, last] = splitName(encNomeRaw);
+        const [first, last] = splitNameTwo(encNomeRaw);
         r.enc_primeiro = first;
         r.enc_ultimo = last;
       }
@@ -393,7 +407,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     let ok = 0, fail = 0;
     for (const r of toImport) {
       try {
-        const nome = `${r.primeiro_nome.trim()} ${r.ultimo_nome.trim()}`.trim();
+        const nome = [r.primeiro_nome.trim(), r.nome_meio.trim(), r.ultimo_nome.trim()].filter(Boolean).join(" ");
         await createMut.mutateAsync({
           curso_id: r.curso_id,
           nome,
@@ -401,6 +415,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
           turma: "A",
           prefixo: r.prefixo.trim() || null,
           primeiro_nome: r.primeiro_nome.trim(),
+          nome_meio: r.nome_meio.trim() || null,
           ultimo_nome: r.ultimo_nome.trim() || null,
           nascimento: r.nascimento || null,
           genero: r.genero || "M",
@@ -628,6 +643,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                   <tr className="border-b text-[10px] uppercase tracking-wide text-muted-foreground">
                     <th className="px-3 py-2 text-left w-8"></th>
                     <th className="px-2 py-2 text-left">Primeiro</th>
+                    <th className="px-2 py-2 text-left">Meio</th>
                     <th className="px-2 py-2 text-left">Último</th>
                     <th className="px-2 py-2 text-left">Bilhete</th>
                     <th className="px-2 py-2 text-left">Faculdade</th>
@@ -661,6 +677,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                         </td>
                         <td className="px-1 py-1">
                           <Input value={r.primeiro_nome} onChange={(e) => setCell(r._key, { primeiro_nome: e.target.value })}
+                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+                        </td>
+                        <td className="px-1 py-1">
+                          <Input value={r.nome_meio} onChange={(e) => setCell(r._key, { nome_meio: e.target.value })}
+                            placeholder="—"
                             className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
                         </td>
                         <td className="px-1 py-1">

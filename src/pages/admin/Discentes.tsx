@@ -30,6 +30,7 @@ type Draft = {
   fotoFile: File | null;
   fotoPreview: string;
   primeiroNome: string;
+  meioNome: string;
   ultimoNome: string;
   nascimento: string;
   genero: Genero;
@@ -97,6 +98,7 @@ const emptyDraft = (faculdade_id = "", curso_id = ""): Draft => ({
   fotoFile: null,
   fotoPreview: "",
   primeiroNome: "",
+  meioNome: "",
   ultimoNome: "",
   nascimento: "",
   genero: "M",
@@ -235,7 +237,8 @@ export default function AdminDiscentes() {
         return {
           id: r.id as string,
           primeiroNome: r.primeiro_nome || parts[0] || "",
-          ultimoNome: r.ultimo_nome || (parts.length > 1 ? parts.slice(1).join(" ") : ""),
+          meioNome: r.nome_meio || (parts.length > 2 ? parts.slice(1, -1).join(" ") : ""),
+          ultimoNome: r.ultimo_nome || (parts.length > 1 ? parts[parts.length - 1] : ""),
           email: r.email as string,
           curso_id: r.curso_id as string,
           curso: cursoCode.get(r.curso_id) || "—",
@@ -261,6 +264,7 @@ export default function AdminDiscentes() {
       const q = searchTerm.toLowerCase();
       return (
         r.primeiroNome.toLowerCase().includes(q) ||
+        r.meioNome.toLowerCase().includes(q) ||
         r.ultimoNome.toLowerCase().includes(q) ||
         r.email.toLowerCase().includes(q) ||
         r.curso.toLowerCase().includes(q) ||
@@ -330,7 +334,7 @@ export default function AdminDiscentes() {
       if (draft.certificadoFile) certificado_url = await uploadDoc(draft.certificadoFile, "certificado", previewEmail);
       if (draft.encBilheteFile) enc_bilhete_url = await uploadDoc(draft.encBilheteFile, "enc-bi", previewEmail);
 
-      const nome = `${draft.primeiroNome.trim()} ${draft.ultimoNome.trim()}`.trim();
+      const nome = [draft.primeiroNome.trim(), draft.meioNome.trim(), draft.ultimoNome.trim()].filter(Boolean).join(" ");
       await createMut.mutateAsync({
         curso_id: draft.curso_id,
         nome,
@@ -338,6 +342,7 @@ export default function AdminDiscentes() {
         ano: draft.ano,
         turma: draft.turma || "A",
         primeiro_nome: draft.primeiroNome.trim(),
+        nome_meio: draft.meioNome.trim() || null,
         ultimo_nome: draft.ultimoNome.trim() || null,
         nascimento: draft.nascimento || null,
         genero: draft.genero,
@@ -388,7 +393,7 @@ export default function AdminDiscentes() {
     window.open(data.signedUrl, "_blank");
   };
 
-  const GRID = "grid grid-cols-[90px_1fr_1fr_80px_70px_1fr_50px_70px_88px] gap-2 px-4 py-2 items-center";
+  const GRID = "grid grid-cols-[90px_1fr_1fr_1fr_80px_70px_1fr_50px_70px_88px] gap-2 px-4 py-2 items-center";
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -466,6 +471,7 @@ export default function AdminDiscentes() {
           <div className={`${GRID} text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b !py-2`}>
             <span>ID</span>
             <span>Primeiro</span>
+            <span>Meio</span>
             <span>Último</span>
             <span>Regime</span>
             <span>Faculdade</span>
@@ -491,6 +497,7 @@ export default function AdminDiscentes() {
                 >
                   <span className="text-[11px] font-mono text-muted-foreground">{shortId}</span>
                   <span className="text-xs font-medium truncate">{r.primeiroNome}</span>
+                  <span className="text-xs truncate text-muted-foreground">{r.meioNome || "—"}</span>
                   <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold w-fit ${r.regime === "bolseiro" ? "bg-amber-50 text-amber-700" : "bg-muted text-muted-foreground"}`}>
                     {r.regime === "bolseiro" ? "Bolseiro" : "Normal"}
@@ -553,14 +560,15 @@ export default function AdminDiscentes() {
               <Field label="Nome completo *">
                 <Input
                   autoFocus
-                  value={`${draft.primeiroNome}${draft.ultimoNome ? " " + draft.ultimoNome : ""}`.trim()}
+                  value={[draft.primeiroNome, draft.meioNome, draft.ultimoNome].filter(Boolean).join(" ")}
                   onChange={(e) => {
-                    const parts = e.target.value.trimStart().split(/\s+/);
+                    const parts = e.target.value.trimStart().split(/\s+/).filter(Boolean);
                     const first = parts.shift() || "";
-                    const last = parts.join(" ");
-                    setDraft((d) => ({ ...d, primeiroNome: first, ultimoNome: last }));
+                    const last = parts.length > 0 ? parts.pop() || "" : "";
+                    const middle = parts.join(" ");
+                    setDraft((d) => ({ ...d, primeiroNome: first, meioNome: middle, ultimoNome: last }));
                   }}
-                  placeholder="Ana Silva"
+                  placeholder="Ana Maria Silva"
                   className="h-9 text-sm"
                 />
               </Field>
@@ -681,6 +689,9 @@ export default function AdminDiscentes() {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 flex-1">
                       <Field label="Primeiro nome">
                         <Input value={draft.primeiroNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
+                      </Field>
+                      <Field label="Nome do meio">
+                        <Input value={draft.meioNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
                       </Field>
                       <Field label="Último nome">
                         <Input value={draft.ultimoNome} readOnly disabled className="h-8 text-xs bg-muted/40" />
