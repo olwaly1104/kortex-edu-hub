@@ -1,0 +1,1 @@
+ALTER TABLE public.estudantes ALTER COLUMN turma DROP NOT NULL; ALTER TABLE public.estudantes ALTER COLUMN turma DROP DEFAULT;
