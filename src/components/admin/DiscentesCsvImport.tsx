@@ -117,6 +117,42 @@ const emptyRow = (): Row => ({
 
 const RECOGNIZED_COLS = ["nome","prefixo","faculdade","curso","ano","genero","regime","telemovel","email","bilhete","nascimento","provincia","municipio","morada","enc_nome","enc_parentesco","enc_telefone","enc_email","enc_bilhete"];
 
+// Smart header resolution: try exact HEADER_MAP first, then direct field name,
+// then substring signals (e.g. "n_identificacao", "bilhete de identidade", "num bi").
+const HEADER_SIGNALS: [RegExp, Field][] = [
+  [/(^|[^a-z])(bi|cc|nif)([^a-z]|$)/, "bilhete"],
+  [/bilhete|identidade|identifica|documento(?!s)|^doc$/, "bilhete"],
+  [/nomecompleto|fullname|^nome$|^name$/, "nome_completo"],
+  [/primeiro|firstname/, "primeiro_nome"],
+  [/ultimo|apelido|sobrenome|lastname/, "ultimo_nome"],
+  [/faculdade|faculty/, "faculdade"],
+  [/curso|course/, "curso"],
+  [/^ano$|anocurric|year/, "ano"],
+  [/nascimento|birth/, "nascimento"],
+  [/genero|sexo|gender/, "genero"],
+  [/regime|bolseir/, "regime"],
+  [/telemovel|telefone|contacto|phone|celular|movel/, "telemovel"],
+  [/email|mail/, "email"],
+  [/provincia|province/, "provincia"],
+  [/municipio|concelho/, "municipio"],
+  [/endereco|morada|address|rua/, "endereco"],
+  [/^enc.*parentesco|^parentesco/, "enc_parentesco"],
+  [/^enc.*(tel|phone|contacto)/, "enc_telefone"],
+  [/^enc.*mail/, "enc_email"],
+  [/^enc.*(bi|bilhete|identifica)/, "enc_bilhete"],
+  [/^enc.*primeiro/, "enc_primeiro"],
+  [/^enc.*ultimo/, "enc_ultimo"],
+  [/^enc.*nome$|encarregado/, "enc_nome"],
+];
+
+const resolveHeader = (h: string): Field | null => {
+  if (!h) return null;
+  if (HEADER_MAP[h]) return HEADER_MAP[h] as Field;
+  if ((FIELDS as readonly string[]).includes(h)) return h as Field;
+  for (const [re, field] of HEADER_SIGNALS) if (re.test(h)) return field;
+  return null;
+};
+
 /* ---------------- component ---------------- */
 
 type Props = {
