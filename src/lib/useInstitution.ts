@@ -383,7 +383,7 @@ export type EstudanteInput = {
   nome: string;
   email: string;
   ano?: string;
-  turma?: string;
+  turma?: string | null;
   origem?: string;
   primeiro_nome?: string | null;
   nome_meio?: string | null;
