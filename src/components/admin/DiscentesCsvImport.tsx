@@ -651,6 +651,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                           <Input value={r.telemovel} onChange={(e) => setCell(r._key, { telemovel: e.target.value })}
                             className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
                         </td>
+                        <td className="px-1 py-1">
+                          <Input value={r.endereco} onChange={(e) => setCell(r._key, { endereco: e.target.value })}
+                            placeholder="Endereço"
+                            className="h-7 text-xs border-transparent hover:border-input focus-visible:border-primary" />
+                        </td>
                         <td className="px-1 py-1 text-right">
                           <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-destructive"
                             onClick={() => removeRow(r._key)}>
