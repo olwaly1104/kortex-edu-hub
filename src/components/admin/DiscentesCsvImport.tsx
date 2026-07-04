@@ -549,11 +549,18 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     };
     await Promise.all(Array.from({ length: CONCURRENCY }, runOne));
 
+    const wasCancelled = cancelRequestedRef.current;
+    cancelRequestedRef.current = false;
     setImporting(false);
-    if (okCount) toast.success(`${okCount} conta(s) Kortex criada(s)${failCount ? ` · ${failCount} falharam` : ""}`);
-    else toast.error("Nenhuma linha foi importada");
+    if (wasCancelled) {
+      toast.warning(`Importação cancelada · ${okCount} criada(s)${failCount ? ` · ${failCount} falharam` : ""}`);
+    } else if (okCount) {
+      toast.success(`${okCount} conta(s) Kortex criada(s)${failCount ? ` · ${failCount} falharam` : ""}`);
+    } else {
+      toast.error("Nenhuma linha foi importada");
+    }
     onImported?.();
-    if (failCount === 0) close();
+    if (!wasCancelled && failCount === 0) close();
   };
 
 
