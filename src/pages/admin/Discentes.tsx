@@ -237,7 +237,8 @@ export default function AdminDiscentes() {
         return {
           id: r.id as string,
           primeiroNome: r.primeiro_nome || parts[0] || "",
-          ultimoNome: r.ultimo_nome || (parts.length > 1 ? parts.slice(1).join(" ") : ""),
+          meioNome: r.nome_meio || (parts.length > 2 ? parts.slice(1, -1).join(" ") : ""),
+          ultimoNome: r.ultimo_nome || (parts.length > 1 ? parts[parts.length - 1] : ""),
           email: r.email as string,
           curso_id: r.curso_id as string,
           curso: cursoCode.get(r.curso_id) || "—",
