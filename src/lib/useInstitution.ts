@@ -64,7 +64,7 @@ export type EstudanteRow = {
   nome: string;
   email: string;
   ano: string;
-  turma: string;
+  turma: string | null;
   origem: string;
   primeiro_nome: string | null;
   nome_meio: string | null;
@@ -423,6 +423,24 @@ async function provisionStudentAccount(name: string, email: string, estudante: R
   return user;
 }
 
+export async function deleteKortexUser(input: { id?: string; email?: string }) {
+  const { data, error } = await supabase.functions.invoke("admin-delete-user", {
+    body: { user_id: input.id, email: input.email },
+  });
+  const serverError = (data && typeof data === "object" && "error" in data) ? (data as any).error : null;
+  if (error || serverError) throw new Error(String(serverError || error?.message || "Falha ao remover utilizador."));
+  return data as { ok: boolean };
+}
+
+export async function bulkDeleteKortexStudents(input: { ids?: string[]; all?: boolean }) {
+  const { data, error } = await supabase.functions.invoke("admin-bulk-delete-students", {
+    body: { ids: input.ids ?? [], all: input.all === true },
+  });
+  const serverError = (data && typeof data === "object" && "error" in data) ? (data as any).error : null;
+  if (error || serverError) throw new Error(String(serverError || error?.message || "Falha ao remover discentes."));
+  return data as { ok: boolean; deleted: number; failed: number };
+}
+
 export function useCreateEstudante() {
   const qc = useQueryClient();
   return useMutation({
@@ -482,11 +500,33 @@ export function useDeleteEstudante() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      await deleteKortexUser({ id });
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_EST }); },
+  });
+}
+
+export function useBulkUpdateEstudantes() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { ids: string[]; patch: Partial<Pick<EstudanteRow, "curso_id" | "ano" | "turma" | "regime">> }) => {
+      if (input.ids.length === 0) return;
       const { error } = await (supabase.from("estudantes" as any) as any)
-        .delete()
-        .eq("id", id);
+        .update({ ...input.patch, updated_at: new Date().toISOString() })
+        .in("id", input.ids);
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: KEY_EST }); },
+  });
+}
+
+export function useBulkDeleteEstudantes() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { ids?: string[]; all?: boolean }) => bulkDeleteKortexStudents(input),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: KEY_EST });
+      qc.invalidateQueries({ queryKey: ["institution-contacts"] });
+    },
   });
 }
