@@ -56,7 +56,42 @@ Deno.serve(async (req) => {
     const { data: students, error: listErr } = await query;
     if (listErr) return json({ error: listErr.message }, 400);
 
-    const targets = (students ?? []).filter((s: any) => s.id !== callerId);
+    const targetMap = new Map<string, any>();
+    (students ?? []).forEach((s: any) => {
+      if (s.id !== callerId) targetMap.set(String(s.id), s);
+    });
+
+    if (deleteAll) {
+      const { data: roleRows, error: roleErr } = await admin
+        .from("user_roles")
+        .select("user_id")
+        .eq("role", "estudante");
+      if (roleErr) return json({ error: roleErr.message }, 400);
+
+      const roleIds = [...new Set((roleRows ?? []).map((r: any) => String(r.user_id)).filter((id) => id && id !== callerId))];
+      if (roleIds.length > 0) {
+        const { data: profileRows, error: profileErr } = await admin
+          .from("profiles")
+          .select("id,email,institution_id")
+          .in("id", roleIds);
+        if (profileErr) return json({ error: profileErr.message }, 400);
+        (profileRows ?? []).forEach((p: any) => {
+          const profileInstitutionId = (p.institution_id as string) || p.id;
+          if (profileInstitutionId === institutionId && p.id !== callerId && !targetMap.has(String(p.id))) {
+            targetMap.set(String(p.id), {
+              id: p.id,
+              email: p.email,
+              foto_url: null,
+              bilhete_url: null,
+              certificado_url: null,
+              enc_bilhete_url: null,
+            });
+          }
+        });
+      }
+    }
+
+    const targets = [...targetMap.values()];
     let deleted = 0;
     let failed = 0;
 
