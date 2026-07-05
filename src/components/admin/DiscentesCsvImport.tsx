@@ -15,7 +15,8 @@ import {
 } from "lucide-react";
 
 import { toast } from "sonner";
-import { useCursos, useFaculdades, useCreateEstudante } from "@/lib/useInstitution";
+import { supabase } from "@/integrations/supabase/client";
+import { deleteKortexUser, useCursos, useFaculdades, useCreateEstudante } from "@/lib/useInstitution";
 
 const EMAIL_DOMAIN = "upra.kor";
 const emailSlug = (s: string) =>
@@ -205,6 +206,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
   const [pendingImportBatch, setPendingImportBatch] = useState<ImportBatchItem[]>([]);
+  const [checkingDuplicates, setCheckingDuplicates] = useState(false);
   const [selectionSummary, setSelectionSummary] = useState({ selected: 0, valid: 0 });
   const [selectionVersion, setSelectionVersion] = useState(0);
   const cancelRequestedRef = useRef(false);
@@ -547,7 +549,6 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
 
   // Build the final import batch with auto-generated emails + dedupe by email
   const buildImportBatch = useCallback(() => {
-    const seen = new Set<string>();
     const batch: ImportBatchItem[] = [];
     for (const r of rows) {
       if (!selectedKeysRef.current.has(r._key)) continue;
@@ -555,17 +556,44 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       const primeiro = r.primeiro_nome.trim();
       const ultimo = r.ultimo_nome.trim();
       const email = (r.email.trim() || buildAutoEmail(primeiro, ultimo)).toLowerCase();
-      if (!email || seen.has(email)) continue;
-      seen.add(email);
+      if (!email) continue;
       const nome = [primeiro, r.nome_meio.trim(), ultimo].filter(Boolean).join(" ");
       batch.push({ row: r, email, nome });
     }
     return batch;
   }, [rows]);
 
-  const requestImport = () => {
+  const requestImport = async () => {
     const nextBatch = buildImportBatch();
     if (!nextBatch.length) { toast.error("Nenhuma linha válida selecionada"); return; }
+    const duplicateInFile = nextBatch.find((item, index) => nextBatch.findIndex((other) => other.email === item.email) !== index);
+    if (duplicateInFile) {
+      toast.error(`Email duplicado no ficheiro: ${duplicateInFile.email}`);
+      return;
+    }
+    setCheckingDuplicates(true);
+    try {
+      const emails = nextBatch.map((item) => item.email);
+      const [profilesRes, estudantesRes] = await Promise.all([
+        (supabase.from("profiles" as any) as any).select("email").in("email", emails),
+        (supabase.from("estudantes" as any) as any).select("email").in("email", emails),
+      ]);
+      if (profilesRes.error) throw profilesRes.error;
+      if (estudantesRes.error) throw estudantesRes.error;
+      const existing = new Set<string>([
+        ...((profilesRes.data ?? []) as any[]).map((r) => String(r.email || "").toLowerCase()),
+        ...((estudantesRes.data ?? []) as any[]).map((r) => String(r.email || "").toLowerCase()),
+      ]);
+      if (existing.size > 0) {
+        toast.error(`${existing.size} discente(s) já existem. Corrija/remova duplicados antes de importar.`);
+        return;
+      }
+    } catch (e: any) {
+      toast.error(e?.message || "Não foi possível verificar duplicados.");
+      return;
+    } finally {
+      setCheckingDuplicates(false);
+    }
     setPendingImportBatch(nextBatch);
     setConfirmOpen(true);
   };
@@ -578,17 +606,20 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     setImporting(true);
     setProgress({ done: 0, total: batch.length, ok: 0, fail: 0, startedAt: Date.now() });
 
-    const CONCURRENCY = 3;
+    const CONCURRENCY = 2;
     let cursor = 0;
     let okCount = 0;
     let failCount = 0;
+    let rollbackCount = 0;
+    const createdIds = new Set<string>();
     const runOne = async () => {
       while (cursor < batch.length) {
         if (cancelRequestedRef.current) return;
         const idx = cursor++;
         const { row: r, email, nome } = batch[idx];
+        if (cancelRequestedRef.current) return;
         try {
-          await createMut.mutateAsync({
+          const created = await createMut.mutateAsync({
             curso_id: r.curso_id,
             nome,
             ano: r.ano,
@@ -613,9 +644,19 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
             enc_email: r.enc_email.trim() || null,
             enc_bilhete: r.enc_bilhete.trim() || null,
           } as any);
+          if (created?.id) createdIds.add(created.id);
+          if (cancelRequestedRef.current) {
+            if (created?.id) {
+              await deleteKortexUser({ id: created.id, email }).catch(() => undefined);
+              createdIds.delete(created.id);
+              rollbackCount++;
+            }
+            return;
+          }
           okCount++;
           setProgress((p) => ({ ...p, done: p.done + 1, ok: p.ok + 1 }));
         } catch (e: any) {
+          if (cancelRequestedRef.current) return;
           console.warn("csv row failed:", email, e?.message);
           failCount++;
           setProgress((p) => ({ ...p, done: p.done + 1, fail: p.fail + 1 }));
@@ -625,11 +666,15 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
     await Promise.all(Array.from({ length: CONCURRENCY }, runOne));
 
     const wasCancelled = cancelRequestedRef.current;
+    if (wasCancelled && createdIds.size > 0) {
+      await Promise.all([...createdIds].map((id) => deleteKortexUser({ id }).then(() => { rollbackCount++; }).catch(() => undefined)));
+      okCount = 0;
+    }
     cancelRequestedRef.current = false;
     setPendingImportBatch([]);
     setImporting(false);
     if (wasCancelled) {
-      toast.warning(`Importação cancelada · ${okCount} criada(s)${failCount ? ` · ${failCount} falharam` : ""}`);
+      toast.warning(`Importação cancelada · ${rollbackCount} conta(s) revertida(s)`);
     } else if (okCount) {
       toast.success(`${okCount} conta(s) Kortex criada(s)${failCount ? ` · ${failCount} falharam` : ""}`);
     } else {
@@ -877,9 +922,9 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
                 <p className="text-xs text-muted-foreground">
                   <strong className="text-foreground tabular-nums">{selectedValidCount}</strong> linha(s) válida(s) selecionada(s)
                 </p>
-                <Button size="sm" onClick={requestImport} disabled={importing || selectedValidCount === 0} className="gap-1.5">
-                  <Check className="w-3.5 h-3.5" />
-                  Importar {selectedValidCount}
+                <Button size="sm" onClick={requestImport} disabled={importing || checkingDuplicates || selectedValidCount === 0} className="gap-1.5">
+                  {checkingDuplicates ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                  {checkingDuplicates ? "A verificar…" : `Importar ${selectedValidCount}`}
                 </Button>
               </div>
             </div>
@@ -926,7 +971,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
             <AlertDialogHeader>
               <AlertDialogTitle>Cancelar importação?</AlertDialogTitle>
               <AlertDialogDescription>
-                As contas já criadas serão mantidas. As restantes não serão criadas.
+                A criação será parada e as contas criadas nesta importação serão revertidas.
                 Tem a certeza que deseja cancelar?
               </AlertDialogDescription>
             </AlertDialogHeader>
