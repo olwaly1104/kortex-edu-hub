@@ -557,7 +557,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       const primeiro = r.primeiro_nome.trim();
       const ultimo = r.ultimo_nome.trim();
       const email = (r.email.trim() || buildAutoEmail(primeiro, ultimo)).toLowerCase();
-      if (!email || seen.has(email)) continue;
+      if (!email) continue;
       seen.add(email);
       const nome = [primeiro, r.nome_meio.trim(), ultimo].filter(Boolean).join(" ");
       batch.push({ row: r, email, nome });
