@@ -568,6 +568,11 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
   const requestImport = async () => {
     const nextBatch = buildImportBatch();
     if (!nextBatch.length) { toast.error("Nenhuma linha válida selecionada"); return; }
+    const duplicateInFile = nextBatch.find((item, index) => nextBatch.findIndex((other) => other.email === item.email) !== index);
+    if (duplicateInFile) {
+      toast.error(`Email duplicado no ficheiro: ${duplicateInFile.email}`);
+      return;
+    }
     setCheckingDuplicates(true);
     try {
       const emails = nextBatch.map((item) => item.email);
