@@ -549,7 +549,6 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
 
   // Build the final import batch with auto-generated emails + dedupe by email
   const buildImportBatch = useCallback(() => {
-    const seen = new Set<string>();
     const batch: ImportBatchItem[] = [];
     for (const r of rows) {
       if (!selectedKeysRef.current.has(r._key)) continue;
@@ -558,7 +557,6 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
       const ultimo = r.ultimo_nome.trim();
       const email = (r.email.trim() || buildAutoEmail(primeiro, ultimo)).toLowerCase();
       if (!email) continue;
-      seen.add(email);
       const nome = [primeiro, r.nome_meio.trim(), ultimo].filter(Boolean).join(" ");
       batch.push({ row: r, email, nome });
     }
