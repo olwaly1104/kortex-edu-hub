@@ -968,7 +968,7 @@ export function DiscentesCsvImport({ open, onOpenChange, onImported, onSwitchToM
             <AlertDialogHeader>
               <AlertDialogTitle>Cancelar importação?</AlertDialogTitle>
               <AlertDialogDescription>
-                As contas já criadas serão mantidas. As restantes não serão criadas.
+                A criação será parada e as contas criadas nesta importação serão revertidas.
                 Tem a certeza que deseja cancelar?
               </AlertDialogDescription>
             </AlertDialogHeader>
