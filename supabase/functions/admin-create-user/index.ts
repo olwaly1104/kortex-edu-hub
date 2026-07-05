@@ -3,11 +3,7 @@
 // auth.users row and link it to the caller's institution.
 
 import { createClient } from "npm:@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 type Body = {
   email?: string;
@@ -101,21 +97,8 @@ Deno.serve(async (req) => {
     let newUserId = created.user?.id;
     if (createErr || !newUserId) {
       const alreadyExists = /already|registered|exists/i.test(createErr?.message ?? "");
-      if (!alreadyExists) {
-        return json({ error: createErr?.message ?? "Falha ao criar utilizador." }, 400);
-      }
-      const { data: existingProfile, error: existingErr } = await admin
-        .from("profiles")
-        .select("id,institution_id")
-        .eq("email", email)
-        .maybeSingle();
-      if (existingErr || !existingProfile?.id) {
-        return json({ error: "Este email já existe na autenticação, mas ainda não tem perfil ligado. Crie com outro email." }, 409);
-      }
-      if (existingProfile.institution_id && existingProfile.institution_id !== institutionId) {
-        return json({ error: "Este email já pertence a outra instituição." }, 409);
-      }
-      newUserId = existingProfile.id;
+      if (alreadyExists) return json({ error: "Este email já existe. Remova o duplicado do ficheiro ou use outro nome/email." }, 409);
+      return json({ error: createErr?.message ?? "Falha ao criar utilizador." }, 400);
     }
 
     // Force the new user to change the admin-provided password on first sign-in.
@@ -195,7 +178,7 @@ Deno.serve(async (req) => {
           nome: name,
           email,
           ano: (est.ano as string) || "1",
-          turma: (est.turma as string) || "A",
+          turma: (est.turma as string | null | undefined) ?? null,
           origem: (est.origem as string) || "novo",
           primeiro_nome: est.primeiro_nome ?? primeiro,
           nome_meio: est.nome_meio ?? null,
