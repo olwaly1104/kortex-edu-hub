@@ -21,6 +21,8 @@ import {
   useFaculdades,
   useCreateEstudante,
   useDeleteEstudante,
+  useBulkUpdateEstudantes,
+  useBulkDeleteEstudantes,
 } from "@/lib/useInstitution";
 
 type Regime = "bolseiro" | "normal";
@@ -56,6 +58,8 @@ type Draft = {
 const anosPool = ["1", "2", "3", "4", "5", "6"];
 const turmasPool = ["A", "B", "C", "D", "E"];
 const EMAIL_DOMAIN = "upra.kor";
+const KEEP = "__keep__";
+const CLEAR = "__clear__";
 
 const PROVINCIAS = [
   "Bengo", "Benguela", "Bié", "Cabinda", "Cuando Cubango", "Cuanza Norte",
@@ -141,6 +145,8 @@ export default function AdminDiscentes() {
   const { data: faculdades = [] } = useFaculdades();
   const createMut = useCreateEstudante();
   const deleteMut = useDeleteEstudante();
+  const bulkUpdateMut = useBulkUpdateEstudantes();
+  const bulkDeleteMut = useBulkDeleteEstudantes();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [draft, setDraft] = useState<Draft>(emptyDraft());
@@ -151,6 +157,15 @@ export default function AdminDiscentes() {
   const [showMore, setShowMore] = useState(false);
   const [previewId, setPreviewId] = useState<string>("");
   const [csvOpen, setCsvOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkEditOpen, setBulkEditOpen] = useState(false);
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [deleteAllOpen, setDeleteAllOpen] = useState(false);
+  const [bulkFaculdade, setBulkFaculdade] = useState(KEEP);
+  const [bulkCurso, setBulkCurso] = useState(KEEP);
+  const [bulkAno, setBulkAno] = useState(KEEP);
+  const [bulkTurma, setBulkTurma] = useState(KEEP);
+  const [bulkRegime, setBulkRegime] = useState(KEEP);
 
   useEffect(() => {
     if (open) {
@@ -244,7 +259,7 @@ export default function AdminDiscentes() {
           curso: cursoCode.get(r.curso_id) || "—",
           faculdadeSigla: cursoFacSigla.get(r.curso_id) || "—",
           ano: r.ano as string,
-          turma: r.turma as string,
+          turma: (r.turma as string | null) || "",
           nascimento: (r.nascimento as string) || "",
           regime: ((r.regime as string) || "normal") as Regime,
           telemovel: (r.telemovel as string) || "",
@@ -290,6 +305,82 @@ export default function AdminDiscentes() {
   const previewEmail = buildEmail(draft.primeiroNome, draft.ultimoNome);
   const profileBasePath = location.pathname.startsWith("/gap") ? "/gap/estudantes" : "/admin/discentes";
   const openDiscenteProfile = (id: string) => navigate(`${profileBasePath}/${id}`);
+  const selectedCount = selectedIds.size;
+  const selectedFilteredCount = filtered.filter((r) => selectedIds.has(r.id)).length;
+  const visibleAllSelected = filtered.length > 0 && selectedFilteredCount === filtered.length;
+  const bulkCursosDaFac = useMemo(
+    () => (bulkFaculdade !== KEEP ? cursos.filter((c: any) => c.faculdade_id === bulkFaculdade) : cursos),
+    [bulkFaculdade, cursos],
+  );
+  const bulkAnosDoCurso = useMemo(() => {
+    const c = cursos.find((x: any) => x.id === bulkCurso) as any;
+    const n = Math.max(1, Math.min(10, Number(c?.years) || 6));
+    return Array.from({ length: n }, (_, i) => String(i + 1));
+  }, [bulkCurso, cursos]);
+  const toggleSelected = (id: string, checked?: boolean) => {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      const shouldSelect = checked ?? !next.has(id);
+      if (shouldSelect) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  };
+  const toggleVisible = () => {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (visibleAllSelected) filtered.forEach((r) => next.delete(r.id));
+      else filtered.forEach((r) => next.add(r.id));
+      return next;
+    });
+  };
+  const resetBulkDraft = () => {
+    setBulkFaculdade(KEEP);
+    setBulkCurso(KEEP);
+    setBulkAno(KEEP);
+    setBulkTurma(KEEP);
+    setBulkRegime(KEEP);
+  };
+  const applyBulkEdit = async () => {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    const patch: any = {};
+    if (bulkCurso !== KEEP) patch.curso_id = bulkCurso;
+    if (bulkAno !== KEEP) patch.ano = bulkAno;
+    if (bulkTurma !== KEEP) patch.turma = bulkTurma === CLEAR ? null : bulkTurma;
+    if (bulkRegime !== KEEP) patch.regime = bulkRegime;
+    if (Object.keys(patch).length === 0) { toast.error("Escolha pelo menos um campo para alterar."); return; }
+    try {
+      await bulkUpdateMut.mutateAsync({ ids, patch });
+      toast.success(`${ids.length} discente(s) atualizados`);
+      resetBulkDraft();
+      setBulkEditOpen(false);
+    } catch (e: any) {
+      toast.error(e?.message || "Erro ao atualizar discentes");
+    }
+  };
+  const bulkDeleteSelected = async () => {
+    const ids = [...selectedIds];
+    if (ids.length === 0) return;
+    try {
+      const result = await bulkDeleteMut.mutateAsync({ ids });
+      toast.success(`${result.deleted} discente(s) removidos`);
+      setSelectedIds(new Set());
+      setBulkDeleteOpen(false);
+    } catch (e: any) {
+      toast.error(e?.message || "Erro ao remover discentes");
+    }
+  };
+  const deleteAllStudents = async () => {
+    try {
+      const result = await bulkDeleteMut.mutateAsync({ all: true });
+      toast.success(`${result.deleted} discente(s) removidos da base de dados e das contas Kortex`);
+      setSelectedIds(new Set());
+      setDeleteAllOpen(false);
+    } catch (e: any) {
+      toast.error(e?.message || "Erro ao remover todos os discentes");
+    }
+  };
 
   const onFoto = (f: File | null) => {
     if (!f) return;
@@ -393,7 +484,7 @@ export default function AdminDiscentes() {
     window.open(data.signedUrl, "_blank");
   };
 
-  const GRID = "grid grid-cols-[90px_1fr_1fr_80px_70px_1fr_50px_70px_88px] gap-2 px-4 py-2 items-center";
+  const GRID = "grid grid-cols-[34px_90px_1fr_1fr_80px_70px_1fr_50px_70px_88px] gap-2 px-4 py-2 items-center";
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-6 animate-fade-in">
@@ -438,6 +529,22 @@ export default function AdminDiscentes() {
           />
         </div>
         <span className="text-[11px] text-muted-foreground">{filtered.length} discentes</span>
+        {selectedCount > 0 && (
+          <div className="flex items-center gap-1.5 rounded-lg border bg-muted/30 px-2 py-1 text-[11px]">
+            <strong className="tabular-nums">{selectedCount}</strong> selecionado(s)
+            <Button size="sm" variant="ghost" className="h-7 px-2 text-[11px]" onClick={() => setBulkEditOpen(true)}>
+              Editar em massa
+            </Button>
+            <Button size="sm" variant="ghost" className="h-7 px-2 text-[11px] text-destructive hover:text-destructive" onClick={() => setBulkDeleteOpen(true)}>
+              Eliminar
+            </Button>
+          </div>
+        )}
+        {normalized.length > 0 && (
+          <Button size="sm" variant="outline" onClick={() => setDeleteAllOpen(true)} className="gap-1 text-destructive border-destructive/30 hover:text-destructive">
+            <Trash2 className="w-3.5 h-3.5" /> Eliminar todos
+          </Button>
+        )}
         <Button size="sm" onClick={() => setOpen(true)} className="ml-auto gap-1">
           <Plus className="w-3.5 h-3.5" /> Adicionar Discente
         </Button>
@@ -469,6 +576,9 @@ export default function AdminDiscentes() {
       ) : (
         <Card className="overflow-hidden">
           <div className={`${GRID} text-[10px] uppercase tracking-wide text-muted-foreground bg-muted/30 border-b !py-2`}>
+            <button type="button" onClick={toggleVisible} className="h-4 w-4 rounded border border-input bg-background" aria-label="Selecionar visíveis">
+              {visibleAllSelected && <Check className="w-3.5 h-3.5 text-primary" />}
+            </button>
             <span>ID</span>
             <span>Primeiro</span>
             <span>Último</span>
@@ -494,6 +604,15 @@ export default function AdminDiscentes() {
                   tabIndex={0}
                   onKeyDown={(e) => { if (e.key === "Enter") openDiscenteProfile(r.id); }}
                 >
+                  <span onClick={(e) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(r.id)}
+                      onChange={(e) => toggleSelected(r.id, e.currentTarget.checked)}
+                      className="h-4 w-4 rounded border-input accent-primary cursor-pointer"
+                      aria-label={`Selecionar ${r.primeiroNome}`}
+                    />
+                  </span>
                   <span className="text-[11px] font-mono text-muted-foreground">{shortId}</span>
                   <span className="text-xs font-medium truncate">{r.primeiroNome}</span>
                   <span className="text-xs truncate">{r.ultimoNome || "—"}</span>
@@ -996,6 +1115,106 @@ export default function AdminDiscentes() {
               <p className="text-[11px] text-muted-foreground">Não feche esta janela até a operação concluir.</p>
             </div>
           )}
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog open={bulkEditOpen} onOpenChange={(o) => { setBulkEditOpen(o); if (!o) resetBulkDraft(); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Editar discentes em massa</DialogTitle>
+            <DialogDescription>
+              As alterações serão aplicadas a {selectedCount} discente(s) selecionado(s). Campos marcados como “Manter” não serão alterados.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-3 py-2">
+            <Field label="Faculdade (filtro)">
+              <Select value={bulkFaculdade} onValueChange={(v) => { setBulkFaculdade(v); setBulkCurso(KEEP); }}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={KEEP}>Manter / todas</SelectItem>
+                  {faculdades.map((f: any) => <SelectItem key={f.id} value={f.id}>{f.sigla || f.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Curso">
+              <Select value={bulkCurso} onValueChange={setBulkCurso}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={KEEP}>Manter</SelectItem>
+                  {bulkCursosDaFac.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.code || c.codigo || c.name || c.nome}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Ano">
+              <Select value={bulkAno} onValueChange={setBulkAno}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={KEEP}>Manter</SelectItem>
+                  {(bulkCurso !== KEEP ? bulkAnosDoCurso : anosPool).map((a) => <SelectItem key={a} value={a}>{a}º</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Turma">
+              <Select value={bulkTurma} onValueChange={setBulkTurma}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={KEEP}>Manter</SelectItem>
+                  <SelectItem value={CLEAR}>Sem turma</SelectItem>
+                  {turmasPool.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Regime">
+              <Select value={bulkRegime} onValueChange={setBulkRegime}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={KEEP}>Manter</SelectItem>
+                  <SelectItem value="normal">Normal</SelectItem>
+                  <SelectItem value="bolseiro">Bolseiro</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkEditOpen(false)} disabled={bulkUpdateMut.isPending}>Cancelar</Button>
+            <Button onClick={applyBulkEdit} disabled={bulkUpdateMut.isPending}>
+              {bulkUpdateMut.isPending ? <><Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> A guardar…</> : "Guardar alterações"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar {selectedCount} discente(s)?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação remove os registos, documentos e contas Kortex associadas. Não pode ser revertida.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkDeleteMut.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={(e) => { e.preventDefault(); bulkDeleteSelected(); }} disabled={bulkDeleteMut.isPending} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Eliminar selecionados
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={deleteAllOpen} onOpenChange={setDeleteAllOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminar todos os discentes?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Serão removidos todos os {normalized.length} discentes desta instituição, incluindo contas Kortex e documentos associados. Esta ação não pode ser revertida.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkDeleteMut.isPending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={(e) => { e.preventDefault(); deleteAllStudents(); }} disabled={bulkDeleteMut.isPending} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {bulkDeleteMut.isPending ? "A eliminar…" : "Eliminar todos"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
