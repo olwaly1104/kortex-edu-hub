@@ -75,6 +75,7 @@ export type EstudanteRow = {
   bilhete: string | null;
   telemovel: string | null;
   provincia: string | null;
+  regime: string;
   municipio: string | null;
   endereco: string | null;
   enc_nome: string | null;
